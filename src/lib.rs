@@ -46,11 +46,24 @@ mod tests {
                 namespaces: namespaces,
                 elements: vec![
                     Element {
-                        name: "person",
+                        name: Some("person"),
+                        attrs: vec![],
                         type_: ElementType::Sequence(vec![
-                            Element { name: "name", type_: ElementType::String },
-                            Element { name: "firstname", type_: ElementType::String },
-                            Element { name: "birthdate", type_: ElementType::Date },
+                            Element {
+                                name: Some("name"),
+                                attrs: vec![],
+                                type_: ElementType::String
+                            },
+                            Element {
+                                name: Some("firstname"),
+                                attrs: vec![],
+                                type_: ElementType::String
+                            },
+                            Element {
+                                name: Some("birthdate"),
+                                attrs: vec![],
+                                type_: ElementType::Date
+                            },
                         ])
                     },
                 ],
