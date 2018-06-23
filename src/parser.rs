@@ -17,7 +17,7 @@ pub struct Schema<'a> {
     pub namespaces: HashMap<String, &'a str>,
     pub elements: Vec<Element<'a>>,
     pub types: HashMap<String, (Vec<Attribute<'a>>, ElementType<'a>)>,
-    pub groups: HashMap<String, (Vec<Attribute<'a>>, ElementType<'a>)>,
+    pub groups: HashMap<String, (Vec<Attribute<'a>>, Option<ElementType<'a>>)>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -33,7 +33,7 @@ pub enum ElementType<'a> {
     Sequence(Vec<Element<'a>>),
     Ref(&'a str),
     Custom(Option<&'a str>, &'a str),
-    Extension((Option<&'a str>, &'a str), Vec<Attribute<'a>>, Box<ElementType<'a>>),
+    Extension((Option<&'a str>, &'a str), Vec<Attribute<'a>>, Option<Box<ElementType<'a>>>),
     GroupRef(&'a str),
     Choice(Vec<Element<'a>>),
     Union(Option<Vec<(Option<&'a str>, &'a str)>>, Option<Vec<Element<'a>>>),
@@ -41,12 +41,18 @@ pub enum ElementType<'a> {
 }
 #[derive(Debug, PartialEq, Eq)]
 pub enum Attribute<'a> {
-    Def {
+    SmallDef {
         name: &'a str,
         type_: &'a str,
         default: Option<&'a str>,
     },
+    LongDef {
+        name: &'a str,
+        default: Option<&'a str>,
+        inner: Element<'a>,
+    },
     Ref(&'a str),
+    GroupRef(&'a str),
 }
 
 
@@ -162,7 +168,13 @@ fn parse_schema(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str))
             "group" if prefix == main_namespace => {
                 let (name, attrs, def) = Self::parse_group_def(stream2, main_namespace, (prefix, local));
                 assert_eq!(schema.groups.get(name), None);
-                schema.groups.insert(name.to_string(), (attrs, def));
+                schema.groups.insert(name.to_string(), (attrs, Some(def)));
+                Ok(())
+            },
+            "attributeGroup" if prefix == main_namespace => {
+                let (name, attrs) = Self::parse_attribute_group_def(stream2, main_namespace, (prefix, local));
+                assert_eq!(schema.groups.get(name), None);
+                schema.groups.insert(name.to_string(), (attrs, None));
                 Ok(())
             },
             "import" if prefix == main_namespace => {
@@ -235,6 +247,21 @@ fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
 
     assert_eq!(type_, None, "element {} with type={:?} has children.", name.unwrap(), type_);
 
+    let (type_, newattrs) = Self::parse_subelement(stream, main_namespace, closing_tag);
+    let attrs = match (attrs, newattrs) {
+        (Some(a), None) => a,
+        (None, Some(a)) => a,
+        _ => panic!("Conflict"),
+    };
+
+    let name = name.expect(&format!("Element has no name."));
+    let type_ = type_.expect(&format!("Element '{}' has no type", name));
+    Element { name: Some(name), attrs, type_ }
+}
+
+fn parse_subelement(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<ElementType<'a>>, Option<Vec<Attribute<'a>>>) {
+    let mut type_ = None;
+    let mut attrs = None;
     Self::parse_children(stream, main_namespace, closing_tag, |stream2, prefix, local| {
         assert_eq!(prefix, main_namespace);
         match local {
@@ -268,11 +295,9 @@ fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
         }
     }).unwrap();
 
-    let name = name.expect(&format!("Element has no name."));
-    let type_ = type_.expect(&format!("Element '{}' has no type", name));
-    let attrs = attrs.unwrap(); // Always set to Some at the same time as type_
-    Element { name: Some(name), attrs, type_ }
+    (type_, attrs)
 }
+
 
 fn parse_complex_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<&'a str>, Vec<Attribute<'a>>, ElementType<'a>) {
     let mut name = None;
@@ -289,7 +314,48 @@ fn parse_complex_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, 
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
     let (attributes, type_) = Self::parse_subtype(stream, main_namespace, closing_tag).unwrap();
-    (name, attributes, type_)
+    (name, attributes, type_.expect("complexType has no subtype."))
+}
+
+fn parse_attribute_group_def(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (&'a str, Vec<Attribute<'a>>) {
+    let mut name = None;
+
+    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+        match (prefix, local) {
+            ("", "name") => {
+                assert_eq!(name, None);
+                name = Some(value);
+                Ok(())
+            },
+            _ => Err(format!("Unknown attribute for group definition: {:?}", (prefix, local, name))),
+        }
+    });
+
+    assert_eq!(element_end, Ok(ElementEnd::Open));
+    let (attrs, items) = Self::parse_subtype(stream, main_namespace, closing_tag).unwrap();
+    let name = name.expect("AttributeGroup def has no name");
+    assert_eq!(items, None);
+    (name, attrs)
+}
+
+fn parse_attribute_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> &'a str {
+    let mut ref_ = None;
+
+    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+        match (prefix, local) {
+            ("", "ref") => {
+                assert_eq!(ref_, None);
+                ref_ = Some(value);
+                Ok(())
+            },
+            ("", "minOccurs") => Ok(()), // TODO
+            ("", "maxOccurs") => Ok(()), // TODO
+            _ => Err(format!("Unknown attribute for group reference: {:?}", (prefix, local, ref_))),
+        }
+    });
+
+    assert_eq!(element_end, Ok(ElementEnd::Empty));
+    ref_.expect("AttributeGroup ref has no name")
 }
 
 fn parse_group_def(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (&'a str, Vec<Attribute<'a>>, ElementType<'a>) {
@@ -309,7 +375,7 @@ fn parse_group_def(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
     assert_eq!(element_end, Ok(ElementEnd::Open));
     let (attrs, items) = Self::parse_subtype(stream, main_namespace, closing_tag).unwrap();
     let name = name.expect("Group def has no name");
-    (name, attrs, items)
+    (name, attrs, items.expect("Missing inner element type"))
 }
 
 fn parse_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> ElementType<'a> {
@@ -333,7 +399,7 @@ fn parse_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
     ElementType::GroupRef(ref_)
 }
 
-fn parse_subtype(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Result<(Vec<Attribute<'a>>, ElementType<'a>), String> {
+fn parse_subtype(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Result<(Vec<Attribute<'a>>, Option<ElementType<'a>>), String> {
     let mut inner = None;
     let mut attributes = Vec::new();
 
@@ -359,6 +425,10 @@ fn parse_subtype(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
                 inner = Some(Self::parse_group_ref(stream2, main_namespace, (prefix, local)));
                 Ok(())
             }
+            "attributeGroup" => {
+                attributes.push(Attribute::GroupRef(Self::parse_attribute_group_ref(stream2, main_namespace, (prefix, local))));
+                Ok(())
+            }
             "complexContent" => {
                 assert_eq!(inner, None);
                 inner = Some(Self::parse_complex_content(stream2, main_namespace, (prefix, local)));
@@ -368,11 +438,11 @@ fn parse_subtype(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
                 attributes.push(Self::parse_attribute(stream2, main_namespace, (prefix, local)));
                 Ok(())
             }
-            _ => Err(format!("Unknown complexType type: {}:{}", prefix, local)),
+            _ => Err(format!("Unknown subtype: {}:{}", prefix, local)),
         }
     })?;
 
-    Ok((attributes, inner.expect("Missing inner element type")))
+    Ok((attributes, inner))
 }
 
 fn parse_elements(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Vec<Element<'a>> {
@@ -400,9 +470,18 @@ fn parse_elements(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str
                 items.push(Element { name: None, attrs: Vec::new(), type_ });
                 Ok(())
             },
+            "choice" => {
+                let type_ = Self::parse_choice(stream2, main_namespace, (prefix, local));
+                items.push(Element { name: None, attrs: Vec::new(), type_ });
+                Ok(())
+            }
             "extension" => {
                 let type_ = Self::parse_extension(stream2, main_namespace, (prefix, local));
                 items.push(Element { name: None, attrs: Vec::new(), type_ });
+                Ok(())
+            },
+            "annotation" => {
+                Self::parse_annotation(stream2, main_namespace, (prefix, local));
                 Ok(())
             },
             _ => Err(format!("Unknown tag in sequence: {}:{}", prefix, local)),
@@ -428,8 +507,14 @@ fn parse_sequence(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str
 }
 
 fn parse_choice(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> ElementType<'a> {
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |_, _, _| Err(()));
-    assert_eq!(element_end, Ok(ElementEnd::Open));
+    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+        match (prefix, local) {
+            ("", "minOccurs") => Ok(()), // TODO
+            ("", "maxOccurs") => Ok(()), // TODO
+            _ => Err(format!("Unknown attribute for choice: {:?}", (prefix, local, value))),
+        }
+    });
+    assert_eq!(element_end, Ok(ElementEnd::Open), "{:?}", closing_tag);
 
     let items = Self::parse_elements(stream, main_namespace, closing_tag);
 
@@ -451,7 +536,8 @@ fn parse_extension(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
     let (attrs, inner) = Self::parse_subtype(stream, main_namespace, closing_tag).unwrap();
-    ElementType::Extension(split_id(base.expect("Extension has no base.")), attrs, Box::new(inner))}
+    ElementType::Extension(split_id(base.expect("Extension has no base.")), attrs, inner.map(Box::new))
+}
 
 fn parse_complex_content(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> ElementType<'a> {
     let mut type_ = None;
@@ -510,17 +596,28 @@ fn parse_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
             _ => Err(format!("Unknown attribute for <{}:{}: {}:{}=\"{}\"", closing_tag.0, closing_tag.1, prefix, local, value)),
         }
     });
-        assert_eq!(element_end, Ok(ElementEnd::Empty));
 
-    if let Some(ref_) = ref_ {
-        assert_eq!(name, None);
-        assert_eq!(type_, None);
-        Attribute::Ref(ref_)
-    }
-    else {
-        let name = name.expect("Attribute has no name.");
-        let type_ = type_.expect("Attribute has no type.");
-        Attribute::Def { name, type_, default }
+    match (&element_end, ref_) {
+        (&Ok(ElementEnd::Empty), Some(ref_)) => {
+            assert_eq!(name, None);
+            assert_eq!(type_, None);
+            Attribute::Ref(ref_)
+        },
+        (&Ok(ElementEnd::Empty), None) => {
+            let name = name.expect("Attribute has no name.");
+            let type_ = type_.expect("Attribute has no type.");
+            Attribute::SmallDef { name, type_, default }
+        },
+        (&Ok(ElementEnd::Open), None) => {
+            let name = name.expect("Attribute has no name.");
+            assert_eq!(type_, None);
+            let (type_, attrs) = Self::parse_subelement(stream, main_namespace, closing_tag);
+            let type_ = type_.expect(&format!("Expected subtype in open <{}:{}", closing_tag.0, closing_tag.1));
+            let attrs = attrs.unwrap();
+            let inner = Element { name: None, attrs, type_ };
+            Attribute::LongDef { name, default, inner }
+        },
+        _ => panic!(format!("<{}:{} did not expect: {:?} {:?}", closing_tag.0, closing_tag.1, element_end, ref_)),
     }
 }
 
@@ -565,7 +662,7 @@ fn parse_simple_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, &
                 Self::parse_annotation(stream2, main_namespace, (prefix, local));
                 Ok(())
             },
-            _ => Err(format!("Unknown complexType type: {}:{}", prefix, local)),
+            _ => Err(format!("Unknown simpleType type: {}:{}", prefix, local)),
         }
     }).unwrap();
 
