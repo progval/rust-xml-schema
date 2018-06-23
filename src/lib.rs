@@ -44,6 +44,7 @@ mod tests {
             standalone: None,
             schema: Some(Schema {
                 namespaces: namespaces,
+                groups: HashMap::new(),
                 elements: vec![
                     Element {
                         name: Some("person"),
