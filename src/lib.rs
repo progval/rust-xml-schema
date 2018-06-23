@@ -1,7 +1,16 @@
 extern crate xmlparser;
 extern crate codegen;
 
-mod parser;
+#[cfg(test)]
+#[macro_use]
+extern crate pretty_assertions;
+
+pub mod parser;
+
+pub fn parse_xsd(xsd: &str) -> parser::Document {
+    let mut stream = xmlparser::Tokenizer::from(xsd);
+    parser::Parser::parse_document(&mut stream)
+}
 
 
 #[cfg(test)]
@@ -25,8 +34,7 @@ mod tests {
 	  </xs:schema>"#;
     #[test]
     fn parse_person_schema() {
-        let mut stream = xmlparser::Tokenizer::from(PERSON_XSD);
-        let doc = parser::Parser::parse_document(&mut stream);
+        let doc = parse_xsd(PERSON_XSD);
 
         let mut namespaces = HashMap::new();
         namespaces.insert("xs".to_string(), "http://www.w3.org/2001/XMLSchema");
@@ -37,7 +45,16 @@ mod tests {
             schema: Some(Schema {
                 namespaces: namespaces,
                 elements: vec![
+                    Element {
+                        name: "person",
+                        type_: ElementType::Sequence(vec![
+                            Element { name: "name", type_: ElementType::String },
+                            Element { name: "firstname", type_: ElementType::String },
+                            Element { name: "birthdate", type_: ElementType::Date },
+                        ])
+                    },
                 ],
+                types: HashMap::new(),
             }),
         });
     }
