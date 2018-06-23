@@ -49,23 +49,27 @@ mod tests {
                     Element {
                         name: Some("person"),
                         attrs: vec![],
-                        type_: ElementType::Sequence(vec![
+                        mixed: false,
+                        type_: Some(ElementType::Sequence(vec![
                             Element {
                                 name: Some("name"),
                                 attrs: vec![],
-                                type_: ElementType::String
+                                mixed: false,
+                                type_: Some(ElementType::String),
                             },
                             Element {
                                 name: Some("firstname"),
                                 attrs: vec![],
-                                type_: ElementType::String
+                                mixed: false,
+                                type_: Some(ElementType::String),
                             },
                             Element {
                                 name: Some("birthdate"),
                                 attrs: vec![],
-                                type_: ElementType::Date
+                                mixed: false,
+                                type_: Some(ElementType::Date),
                             },
-                        ])
+                        ]))
                     },
                 ],
                 types: HashMap::new(),
