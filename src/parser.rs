@@ -5,6 +5,8 @@ use std::collections::HashMap;
 use codegen;
 use xmlparser::{Token, Tokenizer, Error, StrSpan, ElementEnd};
 
+use generated::UNQUAL::*;
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Id<'a>(pub Option<&'a str>, pub &'a str);
 impl<'a> fmt::Display for Id<'a> {
@@ -16,7 +18,7 @@ impl<'a> fmt::Display for Id<'a> {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct Document<'a> {
     pub version: Option<&'a str>,
     pub encoding: Option<&'a str>,
@@ -24,7 +26,7 @@ pub struct Document<'a> {
     pub schema: Option<Schema<'a>>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct Schema<'a> {
     pub target_namespace: &'a str,
     pub namespaces: HashMap<String, &'a str>,
@@ -33,14 +35,14 @@ pub struct Schema<'a> {
     pub groups: HashMap<String, (Vec<Attribute<'a>>, Option<ElementType<'a>>)>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub struct Element<'a> {
     pub name: Option<Id<'a>>,
     pub attrs: Vec<Attribute<'a>>,
     pub mixed: bool,
     pub type_: Option<ElementType<'a>>, // XXX is sometimes None, something about abstract elements facets blah blah blah?
 }
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum ElementType<'a> {
     String,
     Date,
@@ -55,7 +57,7 @@ pub enum ElementType<'a> {
     ComplexList(bool, Box<ElementType<'a>>), // (mixed, inner_type)
     SimpleList(Id<'a>),
 }
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq)]
 pub enum Attribute<'a> {
     SmallDef {
         name: &'a str,
@@ -69,7 +71,7 @@ pub enum Attribute<'a> {
     },
     Ref(Id<'a>),
     GroupRef(Id<'a>),
-    Any,
+    Any(anyAttribute_e),
 }
 
 
@@ -710,7 +712,7 @@ fn parse_any_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str,
 
     assert_eq!(element_end, Ok(ElementEnd::Empty));
 
-    Attribute::Any
+    Attribute::Any(anyAttribute_e::default())
 }
 
 fn parse_simple_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<&'a str>, Vec<Attribute<'a>>, ElementType<'a>) {
