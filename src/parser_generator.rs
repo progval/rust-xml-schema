@@ -49,6 +49,7 @@ impl<'a> ParserGenerator<'a> {
         {
             let mut module = cg::Module::new("UNQUAL");
             module.vis("pub");
+            module.scope().raw("use std::marker::PhantomData;");
             module.scope().raw("use support::*;");
             module.scope().raw("\n/////////// types\n");
             self.nsuri_to_module.insert(self.target_uri, ("UNQUAL".to_string(), module));
@@ -87,7 +88,7 @@ impl<'a> ParserGenerator<'a> {
 
     fn empty_type(&mut self, name: &str) -> String {
         let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-        module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default");
+        module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field("PhantomData<&'input ()>");
         name.to_string()
     }
 
@@ -104,19 +105,19 @@ impl<'a> ParserGenerator<'a> {
             Some(ElementType::Custom(id)) => {
                 let inner_type_name = self.id_to_type_name(*id);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
-                module.new_struct(&type_name).tuple_field(&inner_type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default");
+                module.new_struct(&type_name).tuple_field(&format!("{}<'input>", &inner_type_name)).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
                 module.scope().raw(&format!("// ^-- from {:?}", element));
             }
             Some(type_) => {
                 let inner_type_name = self.type_(&format!("{}_inner", type_name), type_);
 
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
-                module.new_struct(&type_name).tuple_field(&inner_type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default");
+                module.new_struct(&type_name).tuple_field(&format!("{}<'input>", inner_type_name)).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
                 module.scope().raw(&format!("// ^-- from {:?}", element));
             }
             None => {
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
-                module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default");
+                module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field("PhantomData<&'input ()>");
             }
         }
         type_name
@@ -171,10 +172,10 @@ impl<'a> ParserGenerator<'a> {
             }
             ElementType::Sequence(items) => {
                 let mut s = cg::Struct::new(name);
-                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default");
+                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
                 for (i, item) in items.iter().enumerate() {
                     let (element_name, field_typename) = self.unbloat_element(item, name, format!("seqfield{}", i));
-                    s.field(&element_name, field_typename); // TODO: make sure there is no name conflict
+                    s.field(&element_name, &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
@@ -192,17 +193,17 @@ impl<'a> ParserGenerator<'a> {
             ElementType::Custom(id_) => {
                 let type_name = self.id_to_type_name(*id_);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").tuple_field(type_name);
+                module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("{}<'input>", type_name));
                 name.to_string()
             }
             ElementType::Extension(base, attrs, inner) => {
                 let struct_name = escape_keyword(name);
                 let mut s = cg::Struct::new(&struct_name);
-                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default");
-                s.field("BASE", self.id_to_type_name(*base));
+                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
+                s.field("BASE", format!("{}<'input>", self.id_to_type_name(*base)));
                 if let Some(inner) = inner {
                     let inner_type_name = format!("{}__extension", name);
-                    s.field("EXTENSION", self.type_(&inner_type_name, inner));
+                    s.field("EXTENSION", format!("{}<'input>", self.type_(&inner_type_name, inner)));
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
@@ -211,28 +212,30 @@ impl<'a> ParserGenerator<'a> {
             ElementType::Union(member_types, items) => {
                 let struct_name = escape_keyword(name);
                 let mut s = cg::Struct::new(&struct_name);
-                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default");
+                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
                 if let Some(member_types) = member_types {
                     for (i, member_type) in member_types.iter().enumerate() {
                         let member_name = format!("member{}", i);
-                        s.field(&member_name, &self.id_to_type_name(*member_type));
+                        s.field(&member_name, &format!("{}<'input>", self.id_to_type_name(*member_type)));
                     }
                 }
                 if let Some(items) = items {
                     for (i, item) in items.iter().enumerate() {
                         let item_name = format!("item{}", i);
                         let item_type_name = format!("{}__item{}", name, i);
-                        s.field(&item_name, &self.type_(&item_type_name, item.type_.as_ref().unwrap()));
+                        let item_type = self.type_(&item_type_name, item.type_.as_ref().unwrap());
+                        s.field(&item_name, &format!("{}<'input>", item_type));
                     }
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
+                module.scope().raw(&format!("// ^-- from {:?}", type_tree));
                 struct_name
             },
             ElementType::Choice(items) => {
                 let enum_name = escape_keyword(name);
                 let mut e = cg::Enum::new(&enum_name);
-                e.vis("pub").derive("Debug").derive("PartialEq");
+                e.vis("pub").derive("Debug").derive("PartialEq").generic("'input");
                 let mut last_item_name = None;
                 /*
                 if let Some(member_types) = member_types {
@@ -245,14 +248,14 @@ impl<'a> ParserGenerator<'a> {
                     */
                     for (i, item) in items.iter().enumerate() {
                         let (element_name, field_typename) = self.unbloat_element(item, name, format!("choicevariant{}", i));
-                        e.new_variant(&element_name).tuple(&format!("Box<{}>", field_typename));
+                        e.new_variant(&element_name).tuple(&format!("Box<{}<'input>>", field_typename));
                         last_item_name = Some(element_name);
                     }
                 //}
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_enum(e);
                 let last_item_name = last_item_name.expect(&format!("enum {} has no variant", enum_name));
-                module.scope().raw(&format!("impl Default for {} {{ fn default() -> {} {{ {}::{}(Default::default()) }} }}", enum_name, enum_name, enum_name, last_item_name )); // TODO: remove this, that's a temporary hack
+                module.scope().raw(&format!("impl<'input> Default for {}<'input> {{ fn default() -> {}<'input> {{ {}::{}(Default::default()) }} }}", enum_name, enum_name, enum_name, last_item_name )); // TODO: remove this, that's a temporary hack
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
                 enum_name
             },
@@ -261,7 +264,7 @@ impl<'a> ParserGenerator<'a> {
                 let item_type_name = format!("{}__valuetype", name);
                 let type_ = self.type_(&item_type_name, item_type);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").tuple_field(&format!("Vec<{}>", type_));
+                module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(&format!("Vec<{}<'input>>", type_));
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
                 struct_name
             },
@@ -269,11 +272,11 @@ impl<'a> ParserGenerator<'a> {
                 let struct_name = escape_keyword(name);
                 let type_name = self.id_to_type_name(*item_type);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").tuple_field(&format!("Vec<{}>", type_name));
+                module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(&format!("Vec<{}<'input>>", type_name));
                 struct_name
             },
             ElementType::Any => {
-                "Vec<u8>".to_string()
+                "SUPPORT_ANY".to_string()
             },
             _ => unimplemented!("{:?}", type_tree),
         }

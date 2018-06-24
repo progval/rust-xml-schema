@@ -71,7 +71,7 @@ pub enum Attribute<'a> {
     },
     Ref(Id<'a>),
     GroupRef(Id<'a>),
-    Any(anyAttribute_e),
+    Any(anyAttribute_e<'a>),
 }
 
 

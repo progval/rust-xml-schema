@@ -1,4 +1,6 @@
 pub mod UNQUAL {
+    use std::marker::PhantomData;
+
     use support::*;
 
 
@@ -6,844 +8,864 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct all(super::UNQUAL::explicitGroup);
+    pub struct all<'input>(super::UNQUAL::explicitGroup<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct allNNI__item0(super::UNQUAL::NMTOKEN);
+    pub struct allNNI__item0<'input>(super::UNQUAL::NMTOKEN<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct allNNI {
-        member0: super::UNQUAL::nonNegativeInteger,
-        item0: allNNI__item0,
+    pub struct allNNI<'input> {
+        member0: super::UNQUAL::nonNegativeInteger<'input>,
+        item0: allNNI__item0<'input>,
     }
+
+    // ^-- from Union(Some([Id(Some("xs"), "nonNegativeInteger")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "NMTOKEN"))) }]))
 
     #[derive(Debug, PartialEq)]
-    pub enum altType__extension {
-        simpleType(Box<super::UNQUAL::localSimpleType>),
-        complexType(Box<super::UNQUAL::localComplexType>),
+    pub enum altType__extension<'input> {
+        simpleType(Box<super::UNQUAL::localSimpleType<'input>>),
+        complexType(Box<super::UNQUAL::localComplexType<'input>>),
     }
 
-    impl Default for altType__extension { fn default() -> altType__extension { altType__extension::complexType(Default::default()) } }
+    impl<'input> Default for altType__extension<'input> { fn default() -> altType__extension<'input> { altType__extension::complexType(Default::default()) } }
 
     // ^-- from Choice([Element { name: Some(Id(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localSimpleType"))) }, Element { name: Some(Id(None, "complexType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localComplexType"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: altType__extension,
+    pub struct altType<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: altType__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct annotated__extension {
-        annotation: super::UNQUAL::annotation_e,
+    pub struct annotated__extension<'input> {
+        annotation: super::UNQUAL::annotation_e<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct annotated {
-        BASE: super::UNQUAL::openAttrs,
-        EXTENSION: annotated__extension,
+    pub struct annotated<'input> {
+        BASE: super::UNQUAL::openAttrs<'input>,
+        EXTENSION: annotated__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct anyType {
-        seqfield0: Vec<u8>,
+    pub struct anyType<'input> {
+        seqfield0: SUPPORT_ANY<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct assertion {
-        BASE: super::UNQUAL::annotated,
+    pub struct assertion<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attribute__extension {
-        simpleType: super::UNQUAL::localSimpleType,
+    pub struct attribute__extension<'input> {
+        simpleType: super::UNQUAL::localSimpleType<'input>,
     }
 
     // ^-- from Sequence([Element { name: Some(Id(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localSimpleType"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attribute {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: attribute__extension,
+    pub struct attribute<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: attribute__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attributeGroup {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: super::UNQUAL::attrDecls,
+    pub struct attributeGroup<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: super::UNQUAL::attrDecls<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attributeGroupRef(super::UNQUAL::attributeGroup);
+    pub struct attributeGroupRef<'input>(super::UNQUAL::attributeGroup<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct basicNamespaceList__valuetype__item0(super::UNQUAL::token);
+    pub struct basicNamespaceList__valuetype__item0<'input>(super::UNQUAL::token<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct basicNamespaceList__valuetype {
-        member0: super::UNQUAL::anyURI,
-        item0: basicNamespaceList__valuetype__item0,
+    pub struct basicNamespaceList__valuetype<'input> {
+        member0: super::UNQUAL::anyURI<'input>,
+        item0: basicNamespaceList__valuetype__item0<'input>,
     }
 
+    // ^-- from Union(Some([Id(Some("xs"), "anyURI")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }]))
+
     #[derive(Debug, PartialEq, Default)]
-    pub struct basicNamespaceList(Vec<basicNamespaceList__valuetype>);
+    pub struct basicNamespaceList<'input>(Vec<basicNamespaceList__valuetype<'input>>);
 
     // ^-- from ComplexList(false, Union(Some([Id(Some("xs"), "anyURI")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }])))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct blockSet__item0(super::UNQUAL::token);
+    pub struct blockSet__item0<'input>(super::UNQUAL::token<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct blockSet__item1__valuetype(super::UNQUAL::derivationControl);
+    pub struct blockSet__item1__valuetype<'input>(super::UNQUAL::derivationControl<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct blockSet__item1(Vec<blockSet__item1__valuetype>);
+    pub struct blockSet__item1<'input>(Vec<blockSet__item1__valuetype<'input>>);
 
     // ^-- from ComplexList(false, Custom(Id(Some("xs"), "derivationControl")))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct blockSet {
-        item0: blockSet__item0,
-        item1: blockSet__item1,
+    pub struct blockSet<'input> {
+        item0: blockSet__item0<'input>,
+        item1: blockSet__item1<'input>,
+    }
+
+    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(ComplexList(false, Custom(Id(Some("xs"), "derivationControl")))) }]))
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexRestrictionType<'input>(super::UNQUAL::restrictionType<'input>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexType<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: super::UNQUAL::complexTypeModel<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexRestrictionType(super::UNQUAL::restrictionType);
+    pub struct derivationControl<'input>(super::UNQUAL::NMTOKEN<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexType {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: super::UNQUAL::complexTypeModel,
+    pub struct derivationSet__item0<'input>(super::UNQUAL::token<'input>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct derivationSet__item1<'input>(Vec<super::UNQUAL::reducedDerivationControl<'input>>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct derivationSet<'input> {
+        item0: derivationSet__item0<'input>,
+        item1: derivationSet__item1<'input>,
     }
 
-    #[derive(Debug, PartialEq, Default)]
-    pub struct derivationControl(super::UNQUAL::NMTOKEN);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct derivationSet__item0(super::UNQUAL::token);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct derivationSet__item1(Vec<super::UNQUAL::reducedDerivationControl>);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct derivationSet {
-        item0: derivationSet__item0,
-        item1: derivationSet__item1,
-    }
+    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(SimpleList(Id(Some("xs"), "reducedDerivationControl"))) }]))
 
     #[derive(Debug, PartialEq)]
-    pub enum element__extension__seqfield0 {
-        simpleType(Box<super::UNQUAL::localSimpleType>),
-        complexType(Box<super::UNQUAL::localComplexType>),
+    pub enum element__extension__seqfield0<'input> {
+        simpleType(Box<super::UNQUAL::localSimpleType<'input>>),
+        complexType(Box<super::UNQUAL::localComplexType<'input>>),
     }
 
-    impl Default for element__extension__seqfield0 { fn default() -> element__extension__seqfield0 { element__extension__seqfield0::complexType(Default::default()) } }
+    impl<'input> Default for element__extension__seqfield0<'input> { fn default() -> element__extension__seqfield0<'input> { element__extension__seqfield0::complexType(Default::default()) } }
 
     // ^-- from Choice([Element { name: Some(Id(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localSimpleType"))) }, Element { name: Some(Id(None, "complexType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localComplexType"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension {
-        seqfield0: element__extension__seqfield0,
-        alternative: super::UNQUAL::altType,
-        identityConstraint: super::UNQUAL::identityConstraint,
+    pub struct element__extension<'input> {
+        seqfield0: element__extension__seqfield0<'input>,
+        alternative: super::UNQUAL::altType<'input>,
+        identityConstraint: super::UNQUAL::identityConstraint<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(Id(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localSimpleType"))) }, Element { name: Some(Id(None, "complexType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localComplexType"))) }])) }, Element { name: Some(Id(None, "alternative")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "altType"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "identityConstraint"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: element__extension,
+    pub struct element<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: element__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct explicitGroup(super::UNQUAL::group);
+    pub struct explicitGroup<'input>(super::UNQUAL::group<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct extensionType__extension {
-        openContent: super::UNQUAL::openContent_e,
-        typeDefParticle: super::UNQUAL::typeDefParticle,
-        attrDecls: super::UNQUAL::attrDecls,
-        assertions: super::UNQUAL::assertions,
+    pub struct extensionType__extension<'input> {
+        openContent: super::UNQUAL::openContent_e<'input>,
+        typeDefParticle: super::UNQUAL::typeDefParticle<'input>,
+        attrDecls: super::UNQUAL::attrDecls<'input>,
+        assertions: super::UNQUAL::assertions<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "openContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "typeDefParticle"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "attrDecls"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "assertions"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct extensionType {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: extensionType__extension,
+    pub struct extensionType<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: extensionType__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct facet {
-        BASE: super::UNQUAL::annotated,
+    pub struct facet<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct formChoice(super::UNQUAL::NMTOKEN);
+    pub struct formChoice<'input>(super::UNQUAL::NMTOKEN<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct fullDerivationSet__item0(super::UNQUAL::token);
+    pub struct fullDerivationSet__item0<'input>(super::UNQUAL::token<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct fullDerivationSet__item1(Vec<super::UNQUAL::typeDerivationControl>);
+    pub struct fullDerivationSet__item1<'input>(Vec<super::UNQUAL::typeDerivationControl<'input>>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct fullDerivationSet {
-        item0: fullDerivationSet__item0,
-        item1: fullDerivationSet__item1,
+    pub struct fullDerivationSet<'input> {
+        item0: fullDerivationSet__item0<'input>,
+        item1: fullDerivationSet__item1<'input>,
+    }
+
+    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(SimpleList(Id(Some("xs"), "typeDerivationControl"))) }]))
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct group<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: super::UNQUAL::particle<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct group {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: super::UNQUAL::particle,
-    }
+    pub struct groupRef<'input>(super::UNQUAL::realGroup<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct groupRef(super::UNQUAL::realGroup);
+    pub struct intFacet<'input>(super::UNQUAL::facet<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct intFacet(super::UNQUAL::facet);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct keybase__extension {
-        selector: super::UNQUAL::selector_e,
-        field: super::UNQUAL::field_e,
+    pub struct keybase__extension<'input> {
+        selector: super::UNQUAL::selector_e<'input>,
+        field: super::UNQUAL::field_e<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "selector"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "field"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keybase {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: keybase__extension,
+    pub struct keybase<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: keybase__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct localComplexType(super::UNQUAL::complexType);
+    pub struct localComplexType<'input>(super::UNQUAL::complexType<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct localElement(super::UNQUAL::element);
+    pub struct localElement<'input>(super::UNQUAL::element<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct localSimpleType(super::UNQUAL::simpleType);
+    pub struct localSimpleType<'input>(super::UNQUAL::simpleType<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct namedAttributeGroup(super::UNQUAL::attributeGroup);
+    pub struct namedAttributeGroup<'input>(super::UNQUAL::attributeGroup<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct namedGroup(super::UNQUAL::realGroup);
+    pub struct namedGroup<'input>(super::UNQUAL::realGroup<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct namespaceList {
-        member0: super::UNQUAL::specialNamespaceList,
-        member1: super::UNQUAL::basicNamespaceList,
+    pub struct namespaceList<'input> {
+        member0: super::UNQUAL::specialNamespaceList<'input>,
+        member1: super::UNQUAL::basicNamespaceList<'input>,
     }
 
-    #[derive(Debug, PartialEq, Default)]
-    pub struct noFixedFacet(super::UNQUAL::facet);
+    // ^-- from Union(Some([Id(Some("xs"), "specialNamespaceList"), Id(Some("xs"), "basicNamespaceList")]), None)
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct numFacet(super::UNQUAL::facet);
+    pub struct noFixedFacet<'input>(super::UNQUAL::facet<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct openAttrs(super::UNQUAL::anyType);
+    pub struct numFacet<'input>(super::UNQUAL::facet<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct public(super::UNQUAL::token);
+    pub struct openAttrs<'input>(super::UNQUAL::anyType<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct qnameList__valuetype__item0(super::UNQUAL::token);
+    pub struct public<'input>(super::UNQUAL::token<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct qnameList__valuetype {
-        member0: super::UNQUAL::QName,
-        item0: qnameList__valuetype__item0,
+    pub struct qnameList__valuetype__item0<'input>(super::UNQUAL::token<'input>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct qnameList__valuetype<'input> {
+        member0: super::UNQUAL::QName<'input>,
+        item0: qnameList__valuetype__item0<'input>,
     }
 
+    // ^-- from Union(Some([Id(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }]))
+
     #[derive(Debug, PartialEq, Default)]
-    pub struct qnameList(Vec<qnameList__valuetype>);
+    pub struct qnameList<'input>(Vec<qnameList__valuetype<'input>>);
 
     // ^-- from ComplexList(false, Union(Some([Id(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }])))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct qnameListA__valuetype__item0(super::UNQUAL::token);
+    pub struct qnameListA__valuetype__item0<'input>(super::UNQUAL::token<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct qnameListA__valuetype {
-        member0: super::UNQUAL::QName,
-        item0: qnameListA__valuetype__item0,
+    pub struct qnameListA__valuetype<'input> {
+        member0: super::UNQUAL::QName<'input>,
+        item0: qnameListA__valuetype__item0<'input>,
     }
 
+    // ^-- from Union(Some([Id(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }]))
+
     #[derive(Debug, PartialEq, Default)]
-    pub struct qnameListA(Vec<qnameListA__valuetype>);
+    pub struct qnameListA<'input>(Vec<qnameListA__valuetype<'input>>);
 
     // ^-- from ComplexList(false, Union(Some([Id(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }])))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct realGroup(super::UNQUAL::group);
+    pub struct realGroup<'input>(super::UNQUAL::group<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct reducedDerivationControl(super::UNQUAL::derivationControl);
+    pub struct reducedDerivationControl<'input>(super::UNQUAL::derivationControl<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType__extension__seqfield0__choicevariant0 {
-        openContent: super::UNQUAL::openContent_e,
-        typeDefParticle: super::UNQUAL::typeDefParticle,
+    pub struct restrictionType__extension__seqfield0__choicevariant0<'input> {
+        openContent: super::UNQUAL::openContent_e<'input>,
+        typeDefParticle: super::UNQUAL::typeDefParticle<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "openContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "typeDefParticle"))) }])
 
     #[derive(Debug, PartialEq)]
-    pub enum restrictionType__extension__seqfield0 {
-        choicevariant0(Box<restrictionType__extension__seqfield0__choicevariant0>),
-        simpleRestrictionModel(Box<super::UNQUAL::simpleRestrictionModel>),
+    pub enum restrictionType__extension__seqfield0<'input> {
+        choicevariant0(Box<restrictionType__extension__seqfield0__choicevariant0<'input>>),
+        simpleRestrictionModel(Box<super::UNQUAL::simpleRestrictionModel<'input>>),
     }
 
-    impl Default for restrictionType__extension__seqfield0 { fn default() -> restrictionType__extension__seqfield0 { restrictionType__extension__seqfield0::simpleRestrictionModel(Default::default()) } }
+    impl<'input> Default for restrictionType__extension__seqfield0<'input> { fn default() -> restrictionType__extension__seqfield0<'input> { restrictionType__extension__seqfield0::simpleRestrictionModel(Default::default()) } }
 
     // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "openContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "typeDefParticle"))) }])) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "simpleRestrictionModel"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType__extension {
-        seqfield0: restrictionType__extension__seqfield0,
-        attrDecls: super::UNQUAL::attrDecls,
-        assertions: super::UNQUAL::assertions,
+    pub struct restrictionType__extension<'input> {
+        seqfield0: restrictionType__extension__seqfield0<'input>,
+        attrDecls: super::UNQUAL::attrDecls<'input>,
+        assertions: super::UNQUAL::assertions<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "openContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "typeDefParticle"))) }])) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "simpleRestrictionModel"))) }])) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "attrDecls"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "assertions"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: restrictionType__extension,
+    pub struct restrictionType<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: restrictionType__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleDerivationSet__item0(super::UNQUAL::token);
+    pub struct simpleDerivationSet__item0<'input>(super::UNQUAL::token<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleDerivationSet__item1__valuetype(super::UNQUAL::derivationControl);
+    pub struct simpleDerivationSet__item1__valuetype<'input>(super::UNQUAL::derivationControl<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleDerivationSet__item1(Vec<simpleDerivationSet__item1__valuetype>);
+    pub struct simpleDerivationSet__item1<'input>(Vec<simpleDerivationSet__item1__valuetype<'input>>);
 
     // ^-- from ComplexList(false, Custom(Id(Some("xs"), "derivationControl")))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleDerivationSet {
-        item0: simpleDerivationSet__item0,
-        item1: simpleDerivationSet__item1,
+    pub struct simpleDerivationSet<'input> {
+        item0: simpleDerivationSet__item0<'input>,
+        item1: simpleDerivationSet__item1<'input>,
+    }
+
+    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(ComplexList(false, Custom(Id(Some("xs"), "derivationControl")))) }]))
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleExplicitGroup<'input>(super::UNQUAL::explicitGroup<'input>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleExtensionType<'input>(super::UNQUAL::extensionType<'input>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionType<'input>(super::UNQUAL::restrictionType<'input>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleType<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: super::UNQUAL::simpleDerivation<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleExplicitGroup(super::UNQUAL::explicitGroup);
+    pub struct specialNamespaceList<'input>(super::UNQUAL::token<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleExtensionType(super::UNQUAL::extensionType);
+    pub struct topLevelAttribute<'input>(super::UNQUAL::attribute<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionType(super::UNQUAL::restrictionType);
+    pub struct topLevelComplexType<'input>(super::UNQUAL::complexType<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleType {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: super::UNQUAL::simpleDerivation,
+    pub struct topLevelElement<'input>(super::UNQUAL::element<'input>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct topLevelSimpleType<'input>(super::UNQUAL::simpleType<'input>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct typeDerivationControl<'input>(super::UNQUAL::derivationControl<'input>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct wildcard<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct specialNamespaceList(super::UNQUAL::token);
+    pub struct xpathDefaultNamespace__item0<'input>(super::UNQUAL::token<'input>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct topLevelAttribute(super::UNQUAL::attribute);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct topLevelComplexType(super::UNQUAL::complexType);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct topLevelElement(super::UNQUAL::element);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct topLevelSimpleType(super::UNQUAL::simpleType);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct typeDerivationControl(super::UNQUAL::derivationControl);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct wildcard {
-        BASE: super::UNQUAL::annotated,
+    pub struct xpathDefaultNamespace<'input> {
+        member0: super::UNQUAL::anyURI<'input>,
+        item0: xpathDefaultNamespace__item0<'input>,
     }
 
-    #[derive(Debug, PartialEq, Default)]
-    pub struct xpathDefaultNamespace__item0(super::UNQUAL::token);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct xpathDefaultNamespace {
-        member0: super::UNQUAL::anyURI,
-        item0: xpathDefaultNamespace__item0,
-    }
+    // ^-- from Union(Some([Id(Some("xs"), "anyURI")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) }]))
 
 
     /////////// elements
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct all_e(super::UNQUAL::all);
+    pub struct all_e<'input>(super::UNQUAL::all<'input>);
 
     // ^-- from Element { name: Some(Id(None, "all")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "all"))) }
 
     #[derive(Debug, PartialEq)]
-    pub enum annotation_e_inner__extension {
-        appinfo(Box<super::UNQUAL::appinfo_e>),
-        documentation(Box<super::UNQUAL::documentation_e>),
+    pub enum annotation_e_inner__extension<'input> {
+        appinfo(Box<super::UNQUAL::appinfo_e<'input>>),
+        documentation(Box<super::UNQUAL::documentation_e<'input>>),
     }
 
-    impl Default for annotation_e_inner__extension { fn default() -> annotation_e_inner__extension { annotation_e_inner__extension::documentation(Default::default()) } }
+    impl<'input> Default for annotation_e_inner__extension<'input> { fn default() -> annotation_e_inner__extension<'input> { annotation_e_inner__extension::documentation(Default::default()) } }
 
     // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "appinfo"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "documentation"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct annotation_e_inner {
-        BASE: super::UNQUAL::openAttrs,
-        EXTENSION: annotation_e_inner__extension,
+    pub struct annotation_e_inner<'input> {
+        BASE: super::UNQUAL::openAttrs<'input>,
+        EXTENSION: annotation_e_inner__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct annotation_e(annotation_e_inner);
+    pub struct annotation_e<'input>(annotation_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "annotation")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "openAttrs"), [SmallDef { name: "id", type_: Some(Id(Some("xs"), "ID")), default: None }], Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "appinfo"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "documentation"))) }])))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct any_e_inner {
-        BASE: super::UNQUAL::wildcard,
+    pub struct any_e_inner<'input> {
+        BASE: super::UNQUAL::wildcard<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct any_e(any_e_inner);
+    pub struct any_e<'input>(any_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "any")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "wildcard"), [SmallDef { name: "notQName", type_: Some(Id(Some("xs"), "qnameList")), default: None }, GroupRef(Id(Some("xs"), "occurs"))], None)) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct anyAttribute_e_inner {
-        BASE: super::UNQUAL::wildcard,
+    pub struct anyAttribute_e_inner<'input> {
+        BASE: super::UNQUAL::wildcard<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct anyAttribute_e(anyAttribute_e_inner);
+    pub struct anyAttribute_e<'input>(anyAttribute_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "anyAttribute")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "wildcard"), [SmallDef { name: "notQName", type_: Some(Id(Some("xs"), "qnameListA")), default: None }], None)) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct appinfo_e_inner {
-        seqfield0: Vec<u8>,
+    pub struct appinfo_e_inner<'input> {
+        seqfield0: SUPPORT_ANY<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct appinfo_e(appinfo_e_inner);
+    pub struct appinfo_e<'input>(appinfo_e_inner<'input>);
 
-    // ^-- from Element { name: Some(Id(None, "appinfo")), attrs: [SmallDef { name: "source", type_: Some(Id(Some("xs"), "anyURI")), default: None }, Any(anyAttribute_e(anyAttribute_e_inner { BASE: wildcard { BASE: annotated { BASE: openAttrs(anyType { seqfield0: [] }), EXTENSION: annotated__extension { annotation: annotation_e(annotation_e_inner { BASE: openAttrs(anyType { seqfield0: [] }), EXTENSION: documentation(documentation_e(documentation_e_inner { seqfield0: [] })) }) } } } }))], mixed: true, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any) }])) }
+    // ^-- from Element { name: Some(Id(None, "appinfo")), attrs: [SmallDef { name: "source", type_: Some(Id(Some("xs"), "anyURI")), default: None }, Any(anyAttribute_e(anyAttribute_e_inner { BASE: wildcard { BASE: annotated { BASE: openAttrs(anyType { seqfield0: SUPPORT_ANY("") }), EXTENSION: annotated__extension { annotation: annotation_e(annotation_e_inner { BASE: openAttrs(anyType { seqfield0: SUPPORT_ANY("") }), EXTENSION: documentation(documentation_e(documentation_e_inner { seqfield0: SUPPORT_ANY("") })) }) } } } }))], mixed: true, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any) }])) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct assertion_e(super::UNQUAL::assertion);
+    pub struct assertion_e<'input>(super::UNQUAL::assertion<'input>);
 
     // ^-- from Element { name: Some(Id(None, "assertion")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "assertion"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attribute_e(super::UNQUAL::topLevelAttribute);
+    pub struct attribute_e<'input>(super::UNQUAL::topLevelAttribute<'input>);
 
     // ^-- from Element { name: Some(Id(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "topLevelAttribute"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attributeGroup_e(super::UNQUAL::namedAttributeGroup);
+    pub struct attributeGroup_e<'input>(super::UNQUAL::namedAttributeGroup<'input>);
 
     // ^-- from Element { name: Some(Id(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "namedAttributeGroup"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct choice_e(super::UNQUAL::explicitGroup);
+    pub struct choice_e<'input>(super::UNQUAL::explicitGroup<'input>);
 
     // ^-- from Element { name: Some(Id(None, "choice")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "explicitGroup"))) }
 
     #[derive(Debug, PartialEq)]
-    pub enum complexContent_e_inner__extension {
-        restriction(Box<super::UNQUAL::complexRestrictionType>),
-        extension(Box<super::UNQUAL::extensionType>),
+    pub enum complexContent_e_inner__extension<'input> {
+        restriction(Box<super::UNQUAL::complexRestrictionType<'input>>),
+        extension(Box<super::UNQUAL::extensionType<'input>>),
     }
 
-    impl Default for complexContent_e_inner__extension { fn default() -> complexContent_e_inner__extension { complexContent_e_inner__extension::extension(Default::default()) } }
+    impl<'input> Default for complexContent_e_inner__extension<'input> { fn default() -> complexContent_e_inner__extension<'input> { complexContent_e_inner__extension::extension(Default::default()) } }
 
     // ^-- from Choice([Element { name: Some(Id(None, "restriction")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "complexRestrictionType"))) }, Element { name: Some(Id(None, "extension")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "extensionType"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e_inner {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: complexContent_e_inner__extension,
+    pub struct complexContent_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: complexContent_e_inner__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e(complexContent_e_inner);
+    pub struct complexContent_e<'input>(complexContent_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "complexContent")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [LongDef { name: "mixed", default: None, inner: Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "boolean"))) } }], Some(Choice([Element { name: Some(Id(None, "restriction")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "complexRestrictionType"))) }, Element { name: Some(Id(None, "extension")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "extensionType"))) }])))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexType_e(super::UNQUAL::topLevelComplexType);
+    pub struct complexType_e<'input>(super::UNQUAL::topLevelComplexType<'input>);
 
     // ^-- from Element { name: Some(Id(None, "complexType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "topLevelComplexType"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct defaultOpenContent_e_inner__extension {
-        any: super::UNQUAL::wildcard,
+    pub struct defaultOpenContent_e_inner__extension<'input> {
+        any: super::UNQUAL::wildcard<'input>,
     }
 
     // ^-- from Sequence([Element { name: Some(Id(None, "any")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "wildcard"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct defaultOpenContent_e_inner {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: defaultOpenContent_e_inner__extension,
+    pub struct defaultOpenContent_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: defaultOpenContent_e_inner__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct defaultOpenContent_e(defaultOpenContent_e_inner);
+    pub struct defaultOpenContent_e<'input>(defaultOpenContent_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "defaultOpenContent")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [SmallDef { name: "appliesToEmpty", type_: Some(Id(Some("xs"), "boolean")), default: Some("false") }, LongDef { name: "mode", default: Some("interleave"), inner: Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "NMTOKEN"))) } }], Some(Sequence([Element { name: Some(Id(None, "any")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "wildcard"))) }])))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct documentation_e_inner {
-        seqfield0: Vec<u8>,
+    pub struct documentation_e_inner<'input> {
+        seqfield0: SUPPORT_ANY<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct documentation_e(documentation_e_inner);
+    pub struct documentation_e<'input>(documentation_e_inner<'input>);
 
-    // ^-- from Element { name: Some(Id(None, "documentation")), attrs: [SmallDef { name: "source", type_: Some(Id(Some("xs"), "anyURI")), default: None }, Ref(Id(Some("xml"), "lang")), Any(anyAttribute_e(anyAttribute_e_inner { BASE: wildcard { BASE: annotated { BASE: openAttrs(anyType { seqfield0: [] }), EXTENSION: annotated__extension { annotation: annotation_e(annotation_e_inner { BASE: openAttrs(anyType { seqfield0: [] }), EXTENSION: documentation(documentation_e(documentation_e_inner { seqfield0: [] })) }) } } } }))], mixed: true, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any) }])) }
+    // ^-- from Element { name: Some(Id(None, "documentation")), attrs: [SmallDef { name: "source", type_: Some(Id(Some("xs"), "anyURI")), default: None }, Ref(Id(Some("xml"), "lang")), Any(anyAttribute_e(anyAttribute_e_inner { BASE: wildcard { BASE: annotated { BASE: openAttrs(anyType { seqfield0: SUPPORT_ANY("") }), EXTENSION: annotated__extension { annotation: annotation_e(annotation_e_inner { BASE: openAttrs(anyType { seqfield0: SUPPORT_ANY("") }), EXTENSION: documentation(documentation_e(documentation_e_inner { seqfield0: SUPPORT_ANY("") })) }) } } } }))], mixed: true, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any) }])) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element_e(super::UNQUAL::topLevelElement);
+    pub struct element_e<'input>(super::UNQUAL::topLevelElement<'input>);
 
     // ^-- from Element { name: Some(Id(None, "element")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "topLevelElement"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct enumeration_e(super::UNQUAL::noFixedFacet);
+    pub struct enumeration_e<'input>(super::UNQUAL::noFixedFacet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "enumeration")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "noFixedFacet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct explicitTimezone_e(super::UNQUAL::facet);
+    pub struct explicitTimezone_e<'input>(super::UNQUAL::facet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "explicitTimezone")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "facet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct facet_e;
+    pub struct facet_e<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct field_e_inner {
-        BASE: super::UNQUAL::annotated,
+    pub struct field_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct field_e(field_e_inner);
+    pub struct field_e<'input>(field_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "field")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [LongDef { name: "xpath", default: None, inner: Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) } }, SmallDef { name: "xpathDefaultNamespace", type_: Some(Id(Some("xs"), "xpathDefaultNamespace")), default: None }], None)) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct fractionDigits_e(super::UNQUAL::numFacet);
+    pub struct fractionDigits_e<'input>(super::UNQUAL::numFacet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "fractionDigits")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "numFacet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct group_e(super::UNQUAL::namedGroup);
+    pub struct group_e<'input>(super::UNQUAL::namedGroup<'input>);
 
     // ^-- from Element { name: Some(Id(None, "group")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "namedGroup"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct import_e_inner {
-        BASE: super::UNQUAL::annotated,
+    pub struct import_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct import_e(import_e_inner);
+    pub struct import_e<'input>(import_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "import")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [SmallDef { name: "namespace", type_: Some(Id(Some("xs"), "anyURI")), default: None }, SmallDef { name: "schemaLocation", type_: Some(Id(Some("xs"), "anyURI")), default: None }], None)) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct include_e_inner {
-        BASE: super::UNQUAL::annotated,
+    pub struct include_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct include_e(include_e_inner);
+    pub struct include_e<'input>(include_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "include")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [SmallDef { name: "schemaLocation", type_: Some(Id(Some("xs"), "anyURI")), default: None }], None)) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct key_e(super::UNQUAL::keybase);
+    pub struct key_e<'input>(super::UNQUAL::keybase<'input>);
 
     // ^-- from Element { name: Some(Id(None, "key")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "keybase"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keyref_e_inner {
-        BASE: super::UNQUAL::keybase,
+    pub struct keyref_e_inner<'input> {
+        BASE: super::UNQUAL::keybase<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keyref_e(keyref_e_inner);
+    pub struct keyref_e<'input>(keyref_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "keyref")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "keybase"), [SmallDef { name: "refer", type_: Some(Id(Some("xs"), "QName")), default: None }], None)) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct length_e(super::UNQUAL::numFacet);
+    pub struct length_e<'input>(super::UNQUAL::numFacet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "length")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "numFacet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct list_e_inner__extension {
-        simpleType: super::UNQUAL::localSimpleType,
+    pub struct list_e_inner__extension<'input> {
+        simpleType: super::UNQUAL::localSimpleType<'input>,
     }
 
     // ^-- from Sequence([Element { name: Some(Id(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localSimpleType"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct list_e_inner {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: list_e_inner__extension,
+    pub struct list_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: list_e_inner__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct list_e(list_e_inner);
+    pub struct list_e<'input>(list_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "list")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [SmallDef { name: "itemType", type_: Some(Id(Some("xs"), "QName")), default: None }], Some(Sequence([Element { name: Some(Id(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localSimpleType"))) }])))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct maxExclusive_e(super::UNQUAL::facet);
+    pub struct maxExclusive_e<'input>(super::UNQUAL::facet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "maxExclusive")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "facet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct maxInclusive_e(super::UNQUAL::facet);
+    pub struct maxInclusive_e<'input>(super::UNQUAL::facet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "maxInclusive")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "facet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct maxLength_e(super::UNQUAL::numFacet);
+    pub struct maxLength_e<'input>(super::UNQUAL::numFacet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "maxLength")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "numFacet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct minExclusive_e(super::UNQUAL::facet);
+    pub struct minExclusive_e<'input>(super::UNQUAL::facet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "minExclusive")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "facet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct minInclusive_e(super::UNQUAL::facet);
+    pub struct minInclusive_e<'input>(super::UNQUAL::facet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "minInclusive")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "facet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct minLength_e(super::UNQUAL::numFacet);
+    pub struct minLength_e<'input>(super::UNQUAL::numFacet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "minLength")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "numFacet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct notation_e_inner {
-        BASE: super::UNQUAL::annotated,
+    pub struct notation_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct notation_e(notation_e_inner);
+    pub struct notation_e<'input>(notation_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "notation")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [SmallDef { name: "name", type_: Some(Id(Some("xs"), "NCName")), default: None }, SmallDef { name: "public", type_: Some(Id(Some("xs"), "public")), default: None }, SmallDef { name: "system", type_: Some(Id(Some("xs"), "anyURI")), default: None }], None)) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e_inner__extension {
-        any: super::UNQUAL::wildcard,
+    pub struct openContent_e_inner__extension<'input> {
+        any: super::UNQUAL::wildcard<'input>,
     }
 
     // ^-- from Sequence([Element { name: Some(Id(None, "any")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "wildcard"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e_inner {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: openContent_e_inner__extension,
+    pub struct openContent_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: openContent_e_inner__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e(openContent_e_inner);
+    pub struct openContent_e<'input>(openContent_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "openContent")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [LongDef { name: "mode", default: Some("interleave"), inner: Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "NMTOKEN"))) } }], Some(Sequence([Element { name: Some(Id(None, "any")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "wildcard"))) }])))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct override_e_inner__extension {
-        annotation: super::UNQUAL::annotation_e,
-        schemaTop: super::UNQUAL::schemaTop,
+    pub struct override_e_inner__extension<'input> {
+        annotation: super::UNQUAL::annotation_e<'input>,
+        schemaTop: super::UNQUAL::schemaTop<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "schemaTop"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct override_e_inner {
-        BASE: super::UNQUAL::openAttrs,
-        EXTENSION: override_e_inner__extension,
+    pub struct override_e_inner<'input> {
+        BASE: super::UNQUAL::openAttrs<'input>,
+        EXTENSION: override_e_inner__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct override_e(override_e_inner);
+    pub struct override_e<'input>(override_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "override")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "openAttrs"), [SmallDef { name: "schemaLocation", type_: Some(Id(Some("xs"), "anyURI")), default: None }, SmallDef { name: "id", type_: Some(Id(Some("xs"), "ID")), default: None }], Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "schemaTop"))) }])))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct pattern_e(super::UNQUAL::noFixedFacet);
+    pub struct pattern_e<'input>(super::UNQUAL::noFixedFacet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "pattern")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "noFixedFacet"))) }
 
     #[derive(Debug, PartialEq)]
-    pub enum redefine_e_inner__extension {
-        annotation(Box<super::UNQUAL::annotation_e>),
-        redefinable(Box<super::UNQUAL::redefinable>),
+    pub enum redefine_e_inner__extension<'input> {
+        annotation(Box<super::UNQUAL::annotation_e<'input>>),
+        redefinable(Box<super::UNQUAL::redefinable<'input>>),
     }
 
-    impl Default for redefine_e_inner__extension { fn default() -> redefine_e_inner__extension { redefine_e_inner__extension::redefinable(Default::default()) } }
+    impl<'input> Default for redefine_e_inner__extension<'input> { fn default() -> redefine_e_inner__extension<'input> { redefine_e_inner__extension::redefinable(Default::default()) } }
 
     // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "redefinable"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct redefine_e_inner {
-        BASE: super::UNQUAL::openAttrs,
-        EXTENSION: redefine_e_inner__extension,
+    pub struct redefine_e_inner<'input> {
+        BASE: super::UNQUAL::openAttrs<'input>,
+        EXTENSION: redefine_e_inner__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct redefine_e(redefine_e_inner);
+    pub struct redefine_e<'input>(redefine_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "redefine")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "openAttrs"), [SmallDef { name: "schemaLocation", type_: Some(Id(Some("xs"), "anyURI")), default: None }, SmallDef { name: "id", type_: Some(Id(Some("xs"), "ID")), default: None }], Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "redefinable"))) }])))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restriction_e_inner {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: super::UNQUAL::simpleRestrictionModel,
+    pub struct restriction_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: super::UNQUAL::simpleRestrictionModel<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restriction_e(restriction_e_inner);
+    pub struct restriction_e<'input>(restriction_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "restriction")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [SmallDef { name: "base", type_: Some(Id(Some("xs"), "QName")), default: None }], Some(GroupRef(Id(Some("xs"), "simpleRestrictionModel"))))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield1 {
-        defaultOpenContent: super::UNQUAL::defaultOpenContent_e,
-        annotation: super::UNQUAL::annotation_e,
+    pub struct schema_e_inner__extension__seqfield1<'input> {
+        defaultOpenContent: super::UNQUAL::defaultOpenContent_e<'input>,
+        annotation: super::UNQUAL::annotation_e<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "defaultOpenContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield2 {
-        schemaTop: super::UNQUAL::schemaTop,
-        annotation: super::UNQUAL::annotation_e,
+    pub struct schema_e_inner__extension__seqfield2<'input> {
+        schemaTop: super::UNQUAL::schemaTop<'input>,
+        annotation: super::UNQUAL::annotation_e<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "schemaTop"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension {
-        composition: super::UNQUAL::composition,
-        seqfield1: schema_e_inner__extension__seqfield1,
-        seqfield2: schema_e_inner__extension__seqfield2,
+    pub struct schema_e_inner__extension<'input> {
+        composition: super::UNQUAL::composition<'input>,
+        seqfield1: schema_e_inner__extension__seqfield1<'input>,
+        seqfield2: schema_e_inner__extension__seqfield2<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "composition"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "defaultOpenContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }])) }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "schemaTop"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }])) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner {
-        BASE: super::UNQUAL::openAttrs,
-        EXTENSION: schema_e_inner__extension,
+    pub struct schema_e_inner<'input> {
+        BASE: super::UNQUAL::openAttrs<'input>,
+        EXTENSION: schema_e_inner__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e(schema_e_inner);
+    pub struct schema_e<'input>(schema_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "schema")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "openAttrs"), [SmallDef { name: "targetNamespace", type_: Some(Id(Some("xs"), "anyURI")), default: None }, SmallDef { name: "version", type_: Some(Id(Some("xs"), "token")), default: None }, SmallDef { name: "finalDefault", type_: Some(Id(Some("xs"), "fullDerivationSet")), default: Some("") }, SmallDef { name: "blockDefault", type_: Some(Id(Some("xs"), "blockSet")), default: Some("") }, SmallDef { name: "attributeFormDefault", type_: Some(Id(Some("xs"), "formChoice")), default: Some("unqualified") }, SmallDef { name: "elementFormDefault", type_: Some(Id(Some("xs"), "formChoice")), default: Some("unqualified") }, SmallDef { name: "defaultAttributes", type_: Some(Id(Some("xs"), "QName")), default: None }, SmallDef { name: "xpathDefaultNamespace", type_: Some(Id(Some("xs"), "xpathDefaultNamespace")), default: Some("##local") }, SmallDef { name: "id", type_: Some(Id(Some("xs"), "ID")), default: None }, Ref(Id(Some("xml"), "lang"))], Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "composition"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "defaultOpenContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }])) }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "schemaTop"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }])) }])))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct selector_e_inner {
-        BASE: super::UNQUAL::annotated,
+    pub struct selector_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct selector_e(selector_e_inner);
+    pub struct selector_e<'input>(selector_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "selector")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [LongDef { name: "xpath", default: None, inner: Element { name: None, attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "token"))) } }, SmallDef { name: "xpathDefaultNamespace", type_: Some(Id(Some("xs"), "xpathDefaultNamespace")), default: None }], None)) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct sequence_e(super::UNQUAL::explicitGroup);
+    pub struct sequence_e<'input>(super::UNQUAL::explicitGroup<'input>);
 
     // ^-- from Element { name: Some(Id(None, "sequence")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "explicitGroup"))) }
 
     #[derive(Debug, PartialEq)]
-    pub enum simpleContent_e_inner__extension {
-        restriction(Box<super::UNQUAL::simpleRestrictionType>),
-        extension(Box<super::UNQUAL::simpleExtensionType>),
+    pub enum simpleContent_e_inner__extension<'input> {
+        restriction(Box<super::UNQUAL::simpleRestrictionType<'input>>),
+        extension(Box<super::UNQUAL::simpleExtensionType<'input>>),
     }
 
-    impl Default for simpleContent_e_inner__extension { fn default() -> simpleContent_e_inner__extension { simpleContent_e_inner__extension::extension(Default::default()) } }
+    impl<'input> Default for simpleContent_e_inner__extension<'input> { fn default() -> simpleContent_e_inner__extension<'input> { simpleContent_e_inner__extension::extension(Default::default()) } }
 
     // ^-- from Choice([Element { name: Some(Id(None, "restriction")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "simpleRestrictionType"))) }, Element { name: Some(Id(None, "extension")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "simpleExtensionType"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e_inner {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: simpleContent_e_inner__extension,
+    pub struct simpleContent_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: simpleContent_e_inner__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e(simpleContent_e_inner);
+    pub struct simpleContent_e<'input>(simpleContent_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "simpleContent")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [], Some(Choice([Element { name: Some(Id(None, "restriction")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "simpleRestrictionType"))) }, Element { name: Some(Id(None, "extension")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "simpleExtensionType"))) }])))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleType_e(super::UNQUAL::topLevelSimpleType);
+    pub struct simpleType_e<'input>(super::UNQUAL::topLevelSimpleType<'input>);
 
     // ^-- from Element { name: Some(Id(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "topLevelSimpleType"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct totalDigits_e(super::UNQUAL::numFacet);
+    pub struct totalDigits_e<'input>(super::UNQUAL::numFacet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "totalDigits")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "numFacet"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct union_e_inner__extension {
-        simpleType: super::UNQUAL::localSimpleType,
+    pub struct union_e_inner__extension<'input> {
+        simpleType: super::UNQUAL::localSimpleType<'input>,
     }
 
     // ^-- from Sequence([Element { name: Some(Id(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localSimpleType"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct union_e_inner {
-        BASE: super::UNQUAL::annotated,
-        EXTENSION: union_e_inner__extension,
+    pub struct union_e_inner<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: union_e_inner__extension<'input>,
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct union_e(union_e_inner);
+    pub struct union_e<'input>(union_e_inner<'input>);
 
     // ^-- from Element { name: Some(Id(None, "union")), attrs: [], mixed: false, type_: Some(Extension(Id(Some("xs"), "annotated"), [LongDef { name: "memberTypes", default: None, inner: Element { name: None, attrs: [], mixed: false, type_: Some(SimpleList(Id(Some("xs"), "QName"))) } }], Some(Sequence([Element { name: Some(Id(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localSimpleType"))) }])))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct unique_e(super::UNQUAL::keybase);
+    pub struct unique_e<'input>(super::UNQUAL::keybase<'input>);
 
     // ^-- from Element { name: Some(Id(None, "unique")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "keybase"))) }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct whiteSpace_e(super::UNQUAL::facet);
+    pub struct whiteSpace_e<'input>(super::UNQUAL::facet<'input>);
 
     // ^-- from Element { name: Some(Id(None, "whiteSpace")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "facet"))) }
 
@@ -851,193 +873,193 @@ pub mod UNQUAL {
     /////////// groups
 
 
+    #[derive(Debug, PartialEq)]
+    pub enum redefinable<'input> {
+        simpleType(Box<super::UNQUAL::simpleType_e<'input>>),
+        complexType(Box<super::UNQUAL::complexType_e<'input>>),
+        group(Box<super::UNQUAL::group_e<'input>>),
+        attributeGroup(Box<super::UNQUAL::attributeGroup_e<'input>>),
+    }
+
+    impl<'input> Default for redefinable<'input> { fn default() -> redefinable<'input> { redefinable::attributeGroup(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "simpleType"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "complexType"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "group"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "attributeGroup"))) }])
+
+    #[derive(Debug, PartialEq)]
+    pub enum nestedParticle<'input> {
+        element(Box<super::UNQUAL::localElement<'input>>),
+        group(Box<super::UNQUAL::groupRef<'input>>),
+        choice(Box<super::UNQUAL::choice_e<'input>>),
+        sequence(Box<super::UNQUAL::sequence_e<'input>>),
+        any(Box<super::UNQUAL::any_e<'input>>),
+    }
+
+    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::any(Default::default()) } }
+
+    // ^-- from Choice([Element { name: Some(Id(None, "element")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localElement"))) }, Element { name: Some(Id(None, "group")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "groupRef"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "choice"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "sequence"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "any"))) }])
+
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexTypeModel__choicevariant2 {
-        openContent: super::UNQUAL::openContent_e,
-        typeDefParticle: super::UNQUAL::typeDefParticle,
-        attrDecls: super::UNQUAL::attrDecls,
-        assertions: super::UNQUAL::assertions,
+    pub struct complexTypeModel__choicevariant2<'input> {
+        openContent: super::UNQUAL::openContent_e<'input>,
+        typeDefParticle: super::UNQUAL::typeDefParticle<'input>,
+        attrDecls: super::UNQUAL::attrDecls<'input>,
+        assertions: super::UNQUAL::assertions<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "openContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "typeDefParticle"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "attrDecls"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "assertions"))) }])
 
     #[derive(Debug, PartialEq)]
-    pub enum complexTypeModel {
-        simpleContent(Box<super::UNQUAL::simpleContent_e>),
-        complexContent(Box<super::UNQUAL::complexContent_e>),
-        choicevariant2(Box<complexTypeModel__choicevariant2>),
+    pub enum complexTypeModel<'input> {
+        simpleContent(Box<super::UNQUAL::simpleContent_e<'input>>),
+        complexContent(Box<super::UNQUAL::complexContent_e<'input>>),
+        choicevariant2(Box<complexTypeModel__choicevariant2<'input>>),
     }
 
-    impl Default for complexTypeModel { fn default() -> complexTypeModel { complexTypeModel::choicevariant2(Default::default()) } }
+    impl<'input> Default for complexTypeModel<'input> { fn default() -> complexTypeModel<'input> { complexTypeModel::choicevariant2(Default::default()) } }
 
     // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "simpleContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "complexContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "openContent"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "typeDefParticle"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "attrDecls"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "assertions"))) }])) }])
 
-    #[derive(Debug, PartialEq)]
-    pub enum redefinable {
-        simpleType(Box<super::UNQUAL::simpleType_e>),
-        complexType(Box<super::UNQUAL::complexType_e>),
-        group(Box<super::UNQUAL::group_e>),
-        attributeGroup(Box<super::UNQUAL::attributeGroup_e>),
-    }
-
-    impl Default for redefinable { fn default() -> redefinable { redefinable::attributeGroup(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "simpleType"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "complexType"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "group"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "attributeGroup"))) }])
+    #[derive(Debug, PartialEq, Default)]
+    pub struct occurs<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq)]
-    pub enum simpleRestrictionModel__seqfield1 {
-        facet(Box<super::UNQUAL::facet_e>),
-        choicevariant1(Box<Vec<u8>>),
+    pub enum attrDecls__seqfield0<'input> {
+        attribute(Box<super::UNQUAL::attribute<'input>>),
+        attributeGroup(Box<super::UNQUAL::attributeGroupRef<'input>>),
     }
 
-    impl Default for simpleRestrictionModel__seqfield1 { fn default() -> simpleRestrictionModel__seqfield1 { simpleRestrictionModel__seqfield1::choicevariant1(Default::default()) } }
+    impl<'input> Default for attrDecls__seqfield0<'input> { fn default() -> attrDecls__seqfield0<'input> { attrDecls__seqfield0::attributeGroup(Default::default()) } }
+
+    // ^-- from Choice([Element { name: Some(Id(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "attribute"))) }, Element { name: Some(Id(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "attributeGroupRef"))) }])
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls<'input> {
+        seqfield0: attrDecls__seqfield0<'input>,
+        anyAttribute: super::UNQUAL::anyAttribute_e<'input>,
+    }
+
+    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(Id(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "attribute"))) }, Element { name: Some(Id(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "attributeGroupRef"))) }])) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "anyAttribute"))) }])
+
+    #[derive(Debug, PartialEq)]
+    pub enum schemaTop<'input> {
+        redefinable(Box<super::UNQUAL::redefinable<'input>>),
+        element(Box<super::UNQUAL::element_e<'input>>),
+        attribute(Box<super::UNQUAL::attribute_e<'input>>),
+        notation(Box<super::UNQUAL::notation_e<'input>>),
+    }
+
+    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::notation(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "redefinable"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "element"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "attribute"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "notation"))) }])
+
+    #[derive(Debug, PartialEq)]
+    pub enum typeDefParticle<'input> {
+        group(Box<super::UNQUAL::groupRef<'input>>),
+        all(Box<super::UNQUAL::all_e<'input>>),
+        choice(Box<super::UNQUAL::choice_e<'input>>),
+        sequence(Box<super::UNQUAL::sequence_e<'input>>),
+    }
+
+    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::sequence(Default::default()) } }
+
+    // ^-- from Choice([Element { name: Some(Id(None, "group")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "groupRef"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "all"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "choice"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "sequence"))) }])
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq)]
+    pub enum composition<'input> {
+        include(Box<super::UNQUAL::include_e<'input>>),
+        import(Box<super::UNQUAL::import_e<'input>>),
+        redefine(Box<super::UNQUAL::redefine_e<'input>>),
+        override_(Box<super::UNQUAL::override_e<'input>>),
+        annotation(Box<super::UNQUAL::annotation_e<'input>>),
+    }
+
+    impl<'input> Default for composition<'input> { fn default() -> composition<'input> { composition::annotation(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "include"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "import"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "redefine"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "override"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }])
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct defRef<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq)]
+    pub enum simpleDerivation<'input> {
+        restriction(Box<super::UNQUAL::restriction_e<'input>>),
+        list(Box<super::UNQUAL::list_e<'input>>),
+        union(Box<super::UNQUAL::union_e<'input>>),
+    }
+
+    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::union(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "restriction"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "list"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "union"))) }])
+
+    #[derive(Debug, PartialEq)]
+    pub enum simpleRestrictionModel__seqfield1<'input> {
+        facet(Box<super::UNQUAL::facet_e<'input>>),
+        choicevariant1(Box<SUPPORT_ANY<'input>>),
+    }
+
+    impl<'input> Default for simpleRestrictionModel__seqfield1<'input> { fn default() -> simpleRestrictionModel__seqfield1<'input> { simpleRestrictionModel__seqfield1::choicevariant1(Default::default()) } }
 
     // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "facet"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Any) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionModel {
-        simpleType: super::UNQUAL::localSimpleType,
-        seqfield1: simpleRestrictionModel__seqfield1,
+    pub struct simpleRestrictionModel<'input> {
+        simpleType: super::UNQUAL::localSimpleType<'input>,
+        seqfield1: simpleRestrictionModel__seqfield1<'input>,
     }
 
     // ^-- from Sequence([Element { name: Some(Id(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localSimpleType"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "facet"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Any) }])) }])
 
     #[derive(Debug, PartialEq)]
-    pub enum allModel__seqfield1 {
-        element(Box<super::UNQUAL::localElement>),
-        any(Box<super::UNQUAL::any_e>),
-        group(Box<super::UNQUAL::groupRef>),
+    pub enum allModel__seqfield1<'input> {
+        element(Box<super::UNQUAL::localElement<'input>>),
+        any(Box<super::UNQUAL::any_e<'input>>),
+        group(Box<super::UNQUAL::groupRef<'input>>),
     }
 
-    impl Default for allModel__seqfield1 { fn default() -> allModel__seqfield1 { allModel__seqfield1::group(Default::default()) } }
+    impl<'input> Default for allModel__seqfield1<'input> { fn default() -> allModel__seqfield1<'input> { allModel__seqfield1::group(Default::default()) } }
 
     // ^-- from Choice([Element { name: Some(Id(None, "element")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localElement"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "any"))) }, Element { name: Some(Id(None, "group")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "groupRef"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct allModel {
-        annotation: super::UNQUAL::annotation_e,
-        seqfield1: allModel__seqfield1,
+    pub struct allModel<'input> {
+        annotation: super::UNQUAL::annotation_e<'input>,
+        seqfield1: allModel__seqfield1<'input>,
     }
 
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(Id(None, "element")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localElement"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "any"))) }, Element { name: Some(Id(None, "group")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "groupRef"))) }])) }])
 
     #[derive(Debug, PartialEq)]
-    pub enum composition {
-        include(Box<super::UNQUAL::include_e>),
-        import(Box<super::UNQUAL::import_e>),
-        redefine(Box<super::UNQUAL::redefine_e>),
-        override_(Box<super::UNQUAL::override_e>),
-        annotation(Box<super::UNQUAL::annotation_e>),
+    pub enum identityConstraint<'input> {
+        unique(Box<super::UNQUAL::unique_e<'input>>),
+        key(Box<super::UNQUAL::key_e<'input>>),
+        keyref(Box<super::UNQUAL::keyref_e<'input>>),
     }
 
-    impl Default for composition { fn default() -> composition { composition::annotation(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "include"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "import"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "redefine"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "override"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "annotation"))) }])
-
-    #[derive(Debug, PartialEq)]
-    pub enum nestedParticle {
-        element(Box<super::UNQUAL::localElement>),
-        group(Box<super::UNQUAL::groupRef>),
-        choice(Box<super::UNQUAL::choice_e>),
-        sequence(Box<super::UNQUAL::sequence_e>),
-        any(Box<super::UNQUAL::any_e>),
-    }
-
-    impl Default for nestedParticle { fn default() -> nestedParticle { nestedParticle::any(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(Id(None, "element")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localElement"))) }, Element { name: Some(Id(None, "group")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "groupRef"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "choice"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "sequence"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "any"))) }])
-
-    #[derive(Debug, PartialEq)]
-    pub enum particle {
-        element(Box<super::UNQUAL::localElement>),
-        group(Box<super::UNQUAL::groupRef>),
-        all(Box<super::UNQUAL::all_e>),
-        choice(Box<super::UNQUAL::choice_e>),
-        sequence(Box<super::UNQUAL::sequence_e>),
-        any(Box<super::UNQUAL::any_e>),
-    }
-
-    impl Default for particle { fn default() -> particle { particle::any(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(Id(None, "element")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localElement"))) }, Element { name: Some(Id(None, "group")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "groupRef"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "all"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "choice"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "sequence"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "any"))) }])
-
-    #[derive(Debug, PartialEq)]
-    pub enum schemaTop {
-        redefinable(Box<super::UNQUAL::redefinable>),
-        element(Box<super::UNQUAL::element_e>),
-        attribute(Box<super::UNQUAL::attribute_e>),
-        notation(Box<super::UNQUAL::notation_e>),
-    }
-
-    impl Default for schemaTop { fn default() -> schemaTop { schemaTop::notation(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(Id(Some("xs"), "redefinable"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "element"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "attribute"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "notation"))) }])
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct occurs;
-
-    #[derive(Debug, PartialEq)]
-    pub enum identityConstraint {
-        unique(Box<super::UNQUAL::unique_e>),
-        key(Box<super::UNQUAL::key_e>),
-        keyref(Box<super::UNQUAL::keyref_e>),
-    }
-
-    impl Default for identityConstraint { fn default() -> identityConstraint { identityConstraint::keyref(Default::default()) } }
+    impl<'input> Default for identityConstraint<'input> { fn default() -> identityConstraint<'input> { identityConstraint::keyref(Default::default()) } }
 
     // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "unique"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "key"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "keyref"))) }])
 
     #[derive(Debug, PartialEq)]
-    pub enum simpleDerivation {
-        restriction(Box<super::UNQUAL::restriction_e>),
-        list(Box<super::UNQUAL::list_e>),
-        union(Box<super::UNQUAL::union_e>),
+    pub enum particle<'input> {
+        element(Box<super::UNQUAL::localElement<'input>>),
+        group(Box<super::UNQUAL::groupRef<'input>>),
+        all(Box<super::UNQUAL::all_e<'input>>),
+        choice(Box<super::UNQUAL::choice_e<'input>>),
+        sequence(Box<super::UNQUAL::sequence_e<'input>>),
+        any(Box<super::UNQUAL::any_e<'input>>),
     }
 
-    impl Default for simpleDerivation { fn default() -> simpleDerivation { simpleDerivation::union(Default::default()) } }
+    impl<'input> Default for particle<'input> { fn default() -> particle<'input> { particle::any(Default::default()) } }
 
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "restriction"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "list"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "union"))) }])
-
-    #[derive(Debug, PartialEq)]
-    pub enum typeDefParticle {
-        group(Box<super::UNQUAL::groupRef>),
-        all(Box<super::UNQUAL::all_e>),
-        choice(Box<super::UNQUAL::choice_e>),
-        sequence(Box<super::UNQUAL::sequence_e>),
-    }
-
-    impl Default for typeDefParticle { fn default() -> typeDefParticle { typeDefParticle::sequence(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(Id(None, "group")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "groupRef"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "all"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "choice"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "sequence"))) }])
+    // ^-- from Choice([Element { name: Some(Id(None, "element")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "localElement"))) }, Element { name: Some(Id(None, "group")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "groupRef"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "all"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "choice"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "sequence"))) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "any"))) }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct assertions {
-        assert: super::UNQUAL::assertion,
+    pub struct assertions<'input> {
+        assert: super::UNQUAL::assertion<'input>,
     }
 
     // ^-- from Sequence([Element { name: Some(Id(None, "assert")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "assertion"))) }])
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct anyAttrGroup;
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct defRef;
-
-    #[derive(Debug, PartialEq)]
-    pub enum attrDecls__seqfield0 {
-        attribute(Box<super::UNQUAL::attribute>),
-        attributeGroup(Box<super::UNQUAL::attributeGroupRef>),
-    }
-
-    impl Default for attrDecls__seqfield0 { fn default() -> attrDecls__seqfield0 { attrDecls__seqfield0::attributeGroup(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(Id(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "attribute"))) }, Element { name: Some(Id(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "attributeGroupRef"))) }])
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls {
-        seqfield0: attrDecls__seqfield0,
-        anyAttribute: super::UNQUAL::anyAttribute_e,
-    }
-
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(Id(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "attribute"))) }, Element { name: Some(Id(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(Id(Some("xs"), "attributeGroupRef"))) }])) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(Id(Some("xs"), "anyAttribute"))) }])
 }
