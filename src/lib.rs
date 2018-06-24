@@ -7,6 +7,8 @@ extern crate pretty_assertions;
 
 pub mod parser;
 
+pub mod parser_generator;
+
 pub fn parse_xsd(xsd: &str) -> parser::Document {
     let mut stream = xmlparser::Tokenizer::from(xsd);
     parser::Parser::parse_document(&mut stream)
