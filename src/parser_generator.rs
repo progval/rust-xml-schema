@@ -84,16 +84,22 @@ impl<'a> ParserGenerator<'a> {
         name.to_string()
     }
 
-    fn element(&mut self, element: &Element, name_prefix: Option<&str>) -> String {
+    fn element(&mut self, element: &Element, name_override: Option<&str>) -> String {
         let Element { name, attrs, mixed, type_ } = element;
-        let name = name.unwrap_or(Id(None, "ANONYMOUSELEMENT"));
-        let type_name = match name_prefix {
-            Some(name_prefix) => format!("{}__{}", name_prefix, name.1),
-            None => name.1.to_string(),
+        let type_name = match (name, name_override) {
+            (_, Some(name_override)) => name_override.to_string(),
+            (Some(name), None) => name.1.to_string(),
+            (n1, n2) => panic!(format!("Conflict: {:?} {:?}", n1, n2)),
         };
         let type_name = format!("{}_e", type_name);
-        let uri = name.0.and_then(|ns| self.ns_to_uri.get(ns)).unwrap_or(&self.target_uri).clone();
+        let uri = name.unwrap_or(Id(None, "")).0.and_then(|ns| self.ns_to_uri.get(ns)).unwrap_or(&self.target_uri).clone();
         match type_ {
+            Some(ElementType::Custom(id)) => {
+                let inner_type_name = self.id_to_type_name(*id);
+                let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
+                module.new_struct(&type_name).tuple_field(&inner_type_name);
+                module.scope().raw(&format!("// ^-- from {:?}", element));
+            }
             Some(type_) => {
                 let inner_type_name = self.type_(&format!("{}_inner", type_name), type_);
 
@@ -108,6 +114,34 @@ impl<'a> ParserGenerator<'a> {
         }
         type_name
     }
+
+    fn unbloat_element(&mut self, element: &Element, parent_name: &str, fallback_name: String) -> (String, String) {
+        let Element { name: element_name, type_: element_type, .. } = element;
+        match (element_name, element_type) {
+            (Some(id), _) => {
+                let element_name = id.1.to_string(); // TODO: deduplication
+                let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, element_name)));
+                (element_name, field_typename)
+            },
+            (None, Some(ElementType::Ref(id))) => {
+                let element_name = escape_keyword(id.1);
+                let n = format!("{}_e", id.1);
+                let field_typename: String = self.id_to_type_name(Id(id.0, &n));
+                (element_name, field_typename)
+            },
+            (None, Some(ElementType::Custom(id))) |
+            (None, Some(ElementType::GroupRef(id))) => {
+                let element_name = escape_keyword(id.1);
+                let field_typename = self.id_to_type_name(*id);
+                (element_name, field_typename)
+            },
+            (None, _) => {
+                let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, fallback_name)));
+                (fallback_name, field_typename)
+            }
+        }
+    }
+
     fn type_(&mut self, name: &str, type_tree: &ElementType) -> String {
         match type_tree {
             ElementType::String | ElementType::Date => {
@@ -116,12 +150,7 @@ impl<'a> ParserGenerator<'a> {
             ElementType::Sequence(items) => {
                 let mut s = cg::Struct::new(name);
                 for (i, item) in items.iter().enumerate() {
-                    let Element { name: element_name, .. } = item;
-                    let element_name = match element_name {
-                        Some(id) => id.1.to_string(), // TODO: deduplication
-                        None => format!("anonymous{}", i),
-                    };
-                    let field_typename = self.element(item, Some(&format!("{}__{}", name, element_name)));
+                    let (element_name, field_typename) = self.unbloat_element(item, name, format!("seqfield{}", i));
                     s.field(&element_name, field_typename); // TODO: make sure there is no name conflict
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
@@ -187,14 +216,13 @@ impl<'a> ParserGenerator<'a> {
                 if let Some(items) = items {
                     */
                     for (i, item) in items.iter().enumerate() {
-                        let item_name = format!("item{}", i);
-                        let item_type_name = format!("{}__item{}", name, i);
-                        let item_type_name = self.type_(&item_type_name, item.type_.as_ref().unwrap());
-                        e.new_variant(&item_name).tuple(&format!("Box<{}>", item_type_name));
+                        let (element_name, field_typename) = self.unbloat_element(item, name, format!("choicevariant{}", i));
+                        e.new_variant(&element_name).tuple(&format!("Box<{}>", field_typename));
                     }
                 //}
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_enum(e);
+                module.scope().raw(&format!("// ^-- from {:?}", type_tree));
                 enum_name
             },
             ElementType::ComplexList(mixed, item_type) => {
