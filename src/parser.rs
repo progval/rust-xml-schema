@@ -1,8 +1,20 @@
+use std::fmt;
 use std::marker::PhantomData;
 use std::collections::HashMap;
 
 use codegen;
 use xmlparser::{Token, Tokenizer, Error, StrSpan, ElementEnd};
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub struct Id<'a>(pub Option<&'a str>, pub &'a str);
+impl<'a> fmt::Display for Id<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self.0 {
+            Some(prefix) => write!(f, "{}:{}", prefix, self.1),
+            None => write!(f, "{}", self.1),
+        }
+    }
+}
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Document<'a> {
@@ -14,6 +26,7 @@ pub struct Document<'a> {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Schema<'a> {
+    pub target_namespace: &'a str,
     pub namespaces: HashMap<String, &'a str>,
     pub elements: Vec<Element<'a>>,
     pub types: HashMap<String, (Vec<Attribute<'a>>, bool, ElementType<'a>)>, // (attrs, mixed, type_)
@@ -22,7 +35,7 @@ pub struct Schema<'a> {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Element<'a> {
-    pub name: Option<&'a str>,
+    pub name: Option<Id<'a>>,
     pub attrs: Vec<Attribute<'a>>,
     pub mixed: bool,
     pub type_: Option<ElementType<'a>>, // XXX is sometimes None, something about abstract elements facets blah blah blah?
@@ -33,19 +46,19 @@ pub enum ElementType<'a> {
     Date,
     Any,
     Sequence(Vec<Element<'a>>),
-    Ref(&'a str),
-    Custom(Option<&'a str>, &'a str),
-    Extension((Option<&'a str>, &'a str), Vec<Attribute<'a>>, Option<Box<ElementType<'a>>>),
-    GroupRef(&'a str),
+    Ref(Id<'a>),
+    Custom(Id<'a>),
+    Extension(Id<'a>, Vec<Attribute<'a>>, Option<Box<ElementType<'a>>>),
+    GroupRef(Id<'a>),
     Choice(Vec<Element<'a>>),
-    Union(Option<Vec<(Option<&'a str>, &'a str)>>, Option<Vec<Element<'a>>>),
+    Union(Option<Vec<Id<'a>>>, Option<Vec<Element<'a>>>),
     List(bool, Box<ElementType<'a>>), // (mixed, inner_type)
 }
 #[derive(Debug, PartialEq, Eq)]
 pub enum Attribute<'a> {
     SmallDef {
         name: &'a str,
-        type_: Option<&'a str>,
+        type_: Option<Id<'a>>,
         default: Option<&'a str>,
     },
     LongDef {
@@ -53,19 +66,19 @@ pub enum Attribute<'a> {
         default: Option<&'a str>,
         inner: Element<'a>,
     },
-    Ref(&'a str),
-    GroupRef(&'a str),
+    Ref(Id<'a>),
+    GroupRef(Id<'a>),
     Any,
 }
 
 
-fn split_id(id: &str) -> (Option<&str>, &str) {
+fn split_id(id: &str) -> Id {
     let mut splitted_id = id.split(":");
     let v1 = splitted_id.next().expect(&format!("Empty id"));
     let v2 = splitted_id.next();
     match v2 {
-        None => (None, v1),
-        Some(v2) => (Some(v1), v2),
+        None => Id(None, v1),
+        Some(v2) => Id(Some(v1), v2),
     }
 }
 
@@ -124,22 +137,35 @@ pub(crate) fn parse_document(stream: &mut S) -> Document<'a> {
 }
 
 fn parse_schema(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Schema<'a> {
-    let mut schema = Schema { namespaces: HashMap::new(), elements: Vec::new(), types: HashMap::new(), groups: HashMap::new() };
+    let mut namespaces = HashMap::new();
+    let mut target_namespace = None;
 
     let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value: &str| {
         match (prefix, local) {
             ("xmlns", local) => {
-                schema.namespaces.insert(local.to_string(), value);
+                namespaces.insert(local.to_string(), value);
                 Ok(())
             },
             ("", "elementFormDefault") => Ok(()), // TODO
-            ("", "targetNamespace") => Ok(()), // TODO
+            ("", "targetNamespace") => {
+                assert_eq!(target_namespace, None);
+                target_namespace = Some(value);
+                Ok(())
+            },
             ("", "version") => Ok(()), // TODO
             ("xml", "lang") => Ok(()), // TODO
             _ => Err(format!("Unexpected token while parsing attribute in <{}:{}: {}:{}=\"{}\"", closing_tag.0, closing_tag.1, prefix, local, value))
         }
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
+
+    let mut schema = Schema {
+        namespaces: namespaces,
+        elements: Vec::new(),
+        types: HashMap::new(),
+        groups: HashMap::new(),
+        target_namespace: target_namespace.expect("Missing targetNamespace"),
+    };
 
     let main_namespace_uri = schema.namespaces.get(main_namespace).unwrap().clone();
     assert_eq!(main_namespace_uri, "http://www.w3.org/2001/XMLSchema");
@@ -218,23 +244,24 @@ fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
         match (prefix, local) {
             ("", "name") => {
                 assert_eq!(name, None);
-                name = Some(value);
+                name = Some(split_id(value));
                 Ok(())
             },
             ("", "type") => {
                 assert_eq!(type_, None);
-                let (value_prefix, value_local) = split_id(value);
-                type_ = Some(match value_local {
+                let id = split_id(value);
+                // TODO: handle namespace
+                type_ = Some(match id.1 {
                     "string" => ElementType::String,
                     "date" => ElementType::Date,
-                    _ => ElementType::Custom(value_prefix, value_local),
+                    _ => ElementType::Custom(id),
                 });
                 Ok(())
             },
             ("", "ref") => {
                 assert_eq!(type_, None);
-                type_ = Some(ElementType::Ref(value));
-                name = Some(value); // XXX is this correct?
+                type_ = Some(ElementType::Ref(split_id(value)));
+                name = Some(split_id(value)); // XXX is this correct?
                 Ok(())
             }
             ("", "minOccurs") => Ok(()), // TODO
@@ -362,14 +389,14 @@ fn parse_attribute_group_def(stream: &mut S, main_namespace: &str, closing_tag: 
     (name, attrs)
 }
 
-fn parse_attribute_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> &'a str {
+fn parse_attribute_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Id<'a> {
     let mut ref_ = None;
 
     let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "ref") => {
                 assert_eq!(ref_, None);
-                ref_ = Some(value);
+                ref_ = Some(split_id(value));
                 Ok(())
             },
             ("", "minOccurs") => Ok(()), // TODO
@@ -409,7 +436,7 @@ fn parse_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
         match (prefix, local) {
             ("", "ref") => {
                 assert_eq!(ref_, None);
-                ref_ = Some(value);
+                ref_ = Some(split_id(value));
                 Ok(())
             },
             ("", "minOccurs") => Ok(()), // TODO
@@ -490,7 +517,7 @@ fn parse_elements(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str
             },
             "simpleType" => {
                 let (name, attrs, type_) = Self::parse_simple_type(stream2, main_namespace, (prefix, local));
-                items.push(Element { name, attrs, mixed: false, type_: Some(type_) });
+                items.push(Element { name: name.map(split_id), attrs, mixed: false, type_: Some(type_) });
                 Ok(())
             },
             "sequence" => {
@@ -625,7 +652,7 @@ fn parse_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
             },
             ("", "type") => {
                 assert_eq!(type_, None);
-                type_ = Some(value);
+                type_ = Some(split_id(value));
                 Ok(())
             },
             ("", "fixed") => Ok(()), // TODO
@@ -637,7 +664,7 @@ fn parse_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
             },
             ("", "ref") => {
                 assert_eq!(ref_, None);
-                ref_ = Some(value);
+                ref_ = Some(split_id(value));
                 Ok(())
             },
             _ => Err(format!("Unknown attribute for <{}:{}: {}:{}=\"{}\"", closing_tag.0, closing_tag.1, prefix, local, value)),
@@ -754,8 +781,7 @@ fn parse_restriction(stream: &mut S, main_namespace: &str, closing_tag: (&str, &
         _ => panic!(format!("{:?}", element_end)),
     }
 
-    let (prefix, local) = split_id(name.unwrap());
-    ElementType::Custom(prefix, local)
+    ElementType::Custom(split_id(name.unwrap()))
 }
 
 fn parse_union(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> ElementType<'a> {
@@ -787,7 +813,7 @@ fn parse_list(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -
         match (prefix, local) {
             ("", "itemType") => {
                 assert_eq!(item_type, None);
-                item_type = Some(value);
+                item_type = Some(split_id(value));
                 Ok(())
             },
             _ => Err(format!("Unknown attribute for list: {:?}", (prefix, local, item_type))),
