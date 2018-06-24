@@ -1,5 +1,10 @@
+#[derive(Debug, PartialEq, Default)]
 pub struct token(String);
+#[derive(Debug, PartialEq, Default)]
 pub struct NMTOKEN(String);
+#[derive(Debug, PartialEq, Default)]
 pub struct QName(String);
+#[derive(Debug, PartialEq, Default)]
 pub struct anyURI(String);
+#[derive(Debug, PartialEq, Default)]
 pub struct nonNegativeInteger(String);
