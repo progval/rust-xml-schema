@@ -57,8 +57,8 @@ impl<'a> ParserGenerator<'a> {
         }
         let mut types: Vec<_> = self.schema.types.iter().collect();
         types.sort_by_key(|&(n,_)| n);
-        for (name, (attrs, mixed, type_tree)) in types {
-            self.type_(&name, &type_tree);
+        for (name, (min_occurs, max_occurs, attrs, mixed, type_tree)) in types {
+            self.type_occurs(*min_occurs, *max_occurs, &name, &type_tree);
         }
         self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// elements\n");
         let mut elements: Vec<_> = self.schema.elements.iter().collect();
@@ -67,9 +67,9 @@ impl<'a> ParserGenerator<'a> {
             self.element(&element, None);
         }
         self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// groups\n");
-        for (name, (attrs, type_tree)) in self.schema.groups.iter() {
+        for (name, (min_occurs, max_occurs, attrs, type_tree)) in self.schema.groups.iter() {
             match type_tree {
-                Some(tt) => self.type_(&name, &tt),
+                Some(tt) => self.type_occurs(*min_occurs, *max_occurs, &name, &tt),
                 None => self.empty_type(&name),
             };
         }
@@ -94,7 +94,7 @@ impl<'a> ParserGenerator<'a> {
     }
 
     fn element(&mut self, element: &Element, name_override: Option<&str>) -> String {
-        let Element { name, attrs, mixed, type_ } = element;
+        let Element { name, attrs, mixed, type_, min_occurs, max_occurs } = element;
         let type_name = match (name, name_override) {
             (_, Some(name_override)) => name_override.to_string(),
             (Some(name), None) => name.1.to_string(),
@@ -125,47 +125,77 @@ impl<'a> ParserGenerator<'a> {
     }
 
     fn unbloat_element(&mut self, element: &Element, parent_name: &str, fallback_name: String) -> (String, String) {
-        let Element { name: element_name, type_: element_type, .. } = element;
+        let Element { name: element_name, type_: element_type, min_occurs, max_occurs, .. } = element;
+        let can_unbloat = match (min_occurs, max_occurs) {
+            (None, None) | (None, Some(1)) | (Some(1), None) | (Some(1), Some(1)) => true,
+            _ => false,
+        };
         match (element_name, element_type) {
-            (Some(element_name), Some(ElementType::Ref(id))) => {
+            (Some(element_name), Some(ElementType::Ref(id))) if can_unbloat => {
                 let n = format!("{}_e", id.1);
                 let field_typename: String = self.id_to_type_name(QName(id.0, &n));
                 (element_name.to_string(), field_typename)
             },
             (Some(element_name), Some(ElementType::Custom(id))) |
-            (Some(element_name), Some(ElementType::GroupRef(id))) => {
+            (Some(element_name), Some(ElementType::GroupRef(id))) if can_unbloat => {
                 let field_typename = self.id_to_type_name(*id);
                 (element_name.to_string(), field_typename)
             },
-            (Some(id), _) => {
+            (Some(id), _) => { // Normal case, no unbloat
                 let element_name = id.1.to_string(); // TODO: deduplication
                 let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, element_name)));
                 (element_name, field_typename)
             },
-            (None, Some(ElementType::Ref(id))) => {
+            (None, Some(ElementType::Ref(id))) if can_unbloat => {
                 let element_name = escape_keyword(id.1);
                 let n = format!("{}_e", id.1);
                 let field_typename: String = self.id_to_type_name(QName(id.0, &n));
                 (element_name, field_typename)
             },
             (None, Some(ElementType::Custom(id))) |
-            (None, Some(ElementType::GroupRef(id))) => {
+            (None, Some(ElementType::GroupRef(id))) if can_unbloat => {
                 let element_name = escape_keyword(id.1);
                 let field_typename = self.id_to_type_name(*id);
                 (element_name, field_typename)
             },
-            (None, Some(tt)) => {
+            (None, Some(tt)) if can_unbloat => {
                 let field_typename = format!("{}__{}", parent_name, fallback_name);
                 let field_typename = self.type_(&field_typename, tt);
                 (fallback_name, field_typename)
             }
-            (None, _) => {
+            (None, _) => { // Normal case, no unbloat
                 let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, fallback_name)));
                 (fallback_name, field_typename)
             }
         }
     }
 
+    fn type_occurs(&mut self, min_occurs: Option<usize>, max_occurs: Option<usize>, name: &str, type_tree: &ElementType) -> String {
+        match (min_occurs, max_occurs) {
+            (None, None) | (None, Some(1)) | (Some(1), None) | (Some(1), Some(1)) =>
+                self.type_(name, type_tree),
+            (Some(0), None) | (Some(0), Some(1)) => {
+                let item_name = format!("{}_item", name);
+                let mut s = cg::Struct::new(name);
+                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
+                let child_typename = self.type_(&item_name, type_tree);
+                s.tuple_field(format!("Option<{}<'input>>", child_typename));
+                let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
+                module.push_struct(s);
+                name.to_string()
+            }
+            (_, _) => {
+                let item_name = format!("{}_item", name);
+                let mut s = cg::Struct::new(name);
+                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
+                let child_typename = self.type_(&item_name, type_tree);
+                s.tuple_field(format!("Vec<{}<'input>>", child_typename));
+                let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
+                module.push_struct(s);
+                name.to_string()
+            }
+        }
+    }
     fn type_(&mut self, name: &str, type_tree: &ElementType) -> String {
         match type_tree {
             ElementType::String | ElementType::Date => {
