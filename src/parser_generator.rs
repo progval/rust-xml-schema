@@ -49,11 +49,15 @@ impl<'a> ParserGenerator<'a> {
         self.nsuri_to_module.insert(self.target_uri, ("UNQUAL".to_string(), cg::Module::new("UNQUAL")));
         self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("use xml_schema::support::*;");
         self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// types\n");
-        for (name, (attrs, mixed, type_tree)) in self.schema.types.iter() {
+        let mut types: Vec<_> = self.schema.types.iter().collect();
+        types.sort_by_key(|&(n,_)| n);
+        for (name, (attrs, mixed, type_tree)) in types {
             self.type_(&name, &type_tree);
         }
         self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// elements\n");
-        for (i, element) in self.schema.elements.iter().enumerate() {
+        let mut elements: Vec<_> = self.schema.elements.iter().collect();
+        elements.sort_by_key(|&n| n.name);
+        for (i, element) in elements.iter().enumerate() {
             self.element(&element, None);
         }
         self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// groups\n");

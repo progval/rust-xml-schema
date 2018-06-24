@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use codegen;
 use xmlparser::{Token, Tokenizer, Error, StrSpan, ElementEnd};
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Id<'a>(pub Option<&'a str>, pub &'a str);
 impl<'a> fmt::Display for Id<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
