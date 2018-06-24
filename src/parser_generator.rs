@@ -163,9 +163,21 @@ impl<'a> ParserGenerator<'a> {
                 let field_typename = self.type_(&field_typename, tt);
                 (fallback_name, field_typename)
             }
-            (None, _) => { // Normal case, no unbloat
-                let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, fallback_name)));
-                (fallback_name, field_typename)
+            (None, tt) => { // Normal case, no unbloat
+                match tt {
+                    Some(ElementType::Custom(id)) |
+                    Some(ElementType::GroupRef(id)) |
+                    Some(ElementType::Ref(id)) => {
+                        let element_name = escape_keyword(id.1);
+                        let n = format!("{}_e", id.1);
+                        let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, element_name)));
+                        (fallback_name, field_typename)
+                    }
+                    _ => {
+                        let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, fallback_name)));
+                        (fallback_name, field_typename)
+                    }
+                }
             }
         }
     }
