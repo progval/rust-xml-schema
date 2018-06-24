@@ -52,7 +52,8 @@ pub enum ElementType<'a> {
     GroupRef(Id<'a>),
     Choice(Vec<Element<'a>>),
     Union(Option<Vec<Id<'a>>>, Option<Vec<Element<'a>>>),
-    List(bool, Box<ElementType<'a>>), // (mixed, inner_type)
+    ComplexList(bool, Box<ElementType<'a>>), // (mixed, inner_type)
+    SimpleList(Id<'a>),
 }
 #[derive(Debug, PartialEq, Eq)]
 pub enum Attribute<'a> {
@@ -261,7 +262,7 @@ fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
             ("", "ref") => {
                 assert_eq!(type_, None);
                 type_ = Some(ElementType::Ref(split_id(value)));
-                name = Some(split_id(value)); // XXX is this correct?
+                name = None;
                 Ok(())
             }
             ("", "minOccurs") => Ok(()), // TODO
@@ -272,7 +273,6 @@ fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
             _ => Err(format!("Unexpected attribute while parsing element: <{}:{}: {:?}", closing_tag.0, closing_tag.1, local))
         }
     ).unwrap();
- 
 
     let (type_, mixed, attrs) = if let ElementEnd::Open = element_end {
         let (newtype, mixed, newattrs) = Self::parse_subelement(stream, main_namespace, closing_tag);
@@ -295,8 +295,7 @@ fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
         (Some(type_), false, Vec::new())
     };
 
-    let name = name.expect(&format!("Element has no name."));
-    Element { name: Some(name), attrs, mixed, type_ }
+    Element { name: name, attrs, mixed, type_ }
 }
 
 fn parse_subelement(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<ElementType<'a>>, bool, Option<Vec<Attribute<'a>>>) {
@@ -824,7 +823,7 @@ fn parse_list(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -
         let (newtype, mixed, newattrs) = Self::parse_subelement(stream, main_namespace, closing_tag);
         assert!(newattrs == None || newattrs == Some(Vec::new()));
         if let Some(type_) = newtype {
-            return ElementType::List(mixed, Box::new(type_))
+            return ElementType::ComplexList(mixed, Box::new(type_))
         }
     }
     else {
@@ -832,7 +831,7 @@ fn parse_list(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -
     }
 
     let item_type = item_type.unwrap();
-    ElementType::List(false, Box::new(ElementType::Ref(item_type)))
+    ElementType::SimpleList(item_type)
 }
 
 fn parse_annotation(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) {

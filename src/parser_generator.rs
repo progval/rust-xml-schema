@@ -47,9 +47,15 @@ impl<'a> ParserGenerator<'a> {
 
     pub fn gen_unqual_module(&mut self) -> &mut (String, cg::Module) {
         self.nsuri_to_module.insert(self.target_uri, ("UNQUAL".to_string(), cg::Module::new("UNQUAL")));
+        self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// types\n");
         for (name, (attrs, mixed, type_tree)) in self.schema.types.iter() {
             self.type_(&name, &type_tree);
         }
+        self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// elements\n");
+        for (i, element) in self.schema.elements.iter().enumerate() {
+            self.element(&element, None);
+        }
+        self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// groups\n");
         for (name, (attrs, type_tree)) in self.schema.groups.iter() {
             match type_tree {
                 Some(tt) => self.type_(&name, &tt),
@@ -71,12 +77,36 @@ impl<'a> ParserGenerator<'a> {
     }
 
     fn empty_type(&mut self, name: &str) -> String {
-        let mut s = cg::Struct::new(name);
+        let s = cg::Struct::new(name);
         let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
         module.push_struct(s);
         name.to_string()
     }
 
+    fn element(&mut self, element: &Element, name_prefix: Option<&str>) -> String {
+        let Element { name, attrs, mixed, type_ } = element;
+        let name = name.unwrap_or(Id(None, "ANONYMOUSELEMENT"));
+        let type_name = match name_prefix {
+            Some(name_prefix) => format!("{}__{}", name_prefix, name.1),
+            None => name.1.to_string(),
+        };
+        let type_name = format!("{}_e", type_name);
+        let uri = name.0.and_then(|ns| self.ns_to_uri.get(ns)).unwrap_or(&self.target_uri).clone();
+        match type_ {
+            Some(type_) => {
+                let inner_type_name = self.type_(&format!("{}_inner", type_name), type_);
+
+                let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
+                module.new_struct(&type_name).tuple_field(&inner_type_name);
+                module.scope().raw(&format!("// ^-- from {:?}", element));
+            }
+            None => {
+                let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
+                module.new_struct(&type_name);
+            }
+        }
+        type_name
+    }
     fn type_(&mut self, name: &str, type_tree: &ElementType) -> String {
         match type_tree {
             ElementType::String | ElementType::Date => {
@@ -85,22 +115,24 @@ impl<'a> ParserGenerator<'a> {
             ElementType::Sequence(items) => {
                 let mut s = cg::Struct::new(name);
                 for (i, item) in items.iter().enumerate() {
-                    let Element { name: element_name, attrs, mixed, type_ } = item;
-                    let default_element_name = format!("anonymous{}", i);
-                    let element_name = element_name.unwrap_or(Id(None, &default_element_name));
-                    let type_name = match element_name.0 {
-                        Some(ns) => self.id_to_type_name(element_name),
-                        None => format!("{}__{}", name, element_name.1),
+                    let Element { name: element_name, .. } = item;
+                    let element_name = match element_name {
+                        Some(id) => id.1.to_string(), // TODO: deduplication
+                        None => format!("anonymous{}", i),
                     };
-                    let type_ = type_.as_ref().unwrap();
-                    let field_typename = self.type_(&type_name, type_);
-                    s.field(element_name.1, field_typename); // TODO: make sure there is no name conflict
+                    let field_typename = self.element(item, Some(&format!("{}__{}", name, element_name)));
+                    s.field(&element_name, field_typename); // TODO: make sure there is no name conflict
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
                 name.to_string()
             },
-            ElementType::Ref(id) | ElementType::GroupRef(id) => {
+            ElementType::Ref(id) => {
+                let escaped_name = escape_keyword(&format!("{}_e", id.1));
+                let mut id = Id(id.0, &escaped_name);
+                self.id_to_type_name(id)
+            },
+            ElementType::GroupRef(id) => {
                 self.id_to_type_name(*id)
             },
             ElementType::Custom(id_) => {
@@ -110,7 +142,8 @@ impl<'a> ParserGenerator<'a> {
                 name.to_string()
             }
             ElementType::Extension(base, attrs, inner) => {
-                let mut s = cg::Struct::new(name);
+                let struct_name = escape_keyword(name);
+                let mut s = cg::Struct::new(&struct_name);
                 s.field("base", self.id_to_type_name(*base));
                 if let Some(inner) = inner {
                     let inner_type_name = format!("{}__extension", name);
@@ -118,10 +151,11 @@ impl<'a> ParserGenerator<'a> {
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
-                name.to_string()
+                struct_name
             },
             ElementType::Union(member_types, items) => {
-                let mut e = cg::Struct::new(name);
+                let struct_name = escape_keyword(name);
+                let mut e = cg::Struct::new(&struct_name);
                 if let Some(member_types) = member_types {
                     for (i, member_type) in member_types.iter().enumerate() {
                         let member_name = format!("member{}", i);
@@ -137,10 +171,11 @@ impl<'a> ParserGenerator<'a> {
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(e);
-                name.to_string()
+                struct_name
             },
             ElementType::Choice(items) => {
-                let mut e = cg::Enum::new(name);
+                let enum_name = escape_keyword(name);
+                let mut e = cg::Enum::new(&enum_name);
                 /*
                 if let Some(member_types) = member_types {
                     for (i, member_type) in member_types.iter().enumerate() {
@@ -159,14 +194,23 @@ impl<'a> ParserGenerator<'a> {
                 //}
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_enum(e);
-                name.to_string()
+                enum_name
             },
-            ElementType::List(mixed, item_type) => {
+            ElementType::ComplexList(mixed, item_type) => {
+                let struct_name = escape_keyword(name);
                 let item_type_name = format!("{}__valuetype", name);
                 let type_ = self.type_(&item_type_name, item_type);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(name).tuple_field(&format!("Vec<{}>", type_));
-                name.to_string()
+                module.new_struct(&struct_name).tuple_field(&format!("Vec<{}>", type_));
+                module.scope().raw(&format!("// ^-- from {:?}", type_tree));
+                struct_name
+            },
+            ElementType::SimpleList(item_type) => {
+                let struct_name = escape_keyword(name);
+                let type_name = self.id_to_type_name(*item_type);
+                let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
+                module.new_struct(&struct_name).tuple_field(&format!("Vec<{}>", type_name));
+                struct_name
             },
             ElementType::Any => {
                 "Vec<u8>".to_string()
