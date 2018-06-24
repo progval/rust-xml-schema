@@ -6,7 +6,7 @@ extern crate codegen;
 extern crate pretty_assertions;
 
 pub mod parser;
-
+pub mod support;
 pub mod parser_generator;
 
 pub fn parse_xsd(xsd: &str) -> parser::Document {

@@ -47,6 +47,7 @@ impl<'a> ParserGenerator<'a> {
 
     pub fn gen_unqual_module(&mut self) -> &mut (String, cg::Module) {
         self.nsuri_to_module.insert(self.target_uri, ("UNQUAL".to_string(), cg::Module::new("UNQUAL")));
+        self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("use xml_schema::support::*;");
         self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// types\n");
         for (name, (attrs, mixed, type_tree)) in self.schema.types.iter() {
             self.type_(&name, &type_tree);
