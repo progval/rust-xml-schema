@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use codegen as cg;
 
 use parser::*;
+use support::QName;
 
 const KEYWORDS: &[&'static str] = &["override"];
 fn escape_keyword(name: &str) -> String {
@@ -75,7 +76,7 @@ impl<'a> ParserGenerator<'a> {
         self.nsuri_to_module.get_mut(self.target_uri).unwrap() // Won't panic because we inserted it before.
     }
 
-    fn id_to_type_name(&self, id: Id) -> String {
+    fn id_to_type_name(&self, id: QName) -> String {
         match id.0 {
             None => id.1.to_string(),
             Some(ns) => {
@@ -100,7 +101,7 @@ impl<'a> ParserGenerator<'a> {
             (n1, n2) => panic!(format!("Conflict: {:?} {:?}", n1, n2)),
         };
         let type_name = format!("{}_e", type_name);
-        let uri = name.unwrap_or(Id(None, "")).0.and_then(|ns| self.ns_to_uri.get(ns)).unwrap_or(&self.target_uri).clone();
+        let uri = name.unwrap_or(QName(None, "")).0.and_then(|ns| self.ns_to_uri.get(ns)).unwrap_or(&self.target_uri).clone();
         match type_ {
             Some(ElementType::Custom(id)) => {
                 let inner_type_name = self.id_to_type_name(*id);
@@ -128,7 +129,7 @@ impl<'a> ParserGenerator<'a> {
         match (element_name, element_type) {
             (Some(element_name), Some(ElementType::Ref(id))) => {
                 let n = format!("{}_e", id.1);
-                let field_typename: String = self.id_to_type_name(Id(id.0, &n));
+                let field_typename: String = self.id_to_type_name(QName(id.0, &n));
                 (element_name.to_string(), field_typename)
             },
             (Some(element_name), Some(ElementType::Custom(id))) |
@@ -144,7 +145,7 @@ impl<'a> ParserGenerator<'a> {
             (None, Some(ElementType::Ref(id))) => {
                 let element_name = escape_keyword(id.1);
                 let n = format!("{}_e", id.1);
-                let field_typename: String = self.id_to_type_name(Id(id.0, &n));
+                let field_typename: String = self.id_to_type_name(QName(id.0, &n));
                 (element_name, field_typename)
             },
             (None, Some(ElementType::Custom(id))) |
@@ -184,7 +185,7 @@ impl<'a> ParserGenerator<'a> {
             },
             ElementType::Ref(id) => {
                 let escaped_name = escape_keyword(&format!("{}_e", id.1));
-                let mut id = Id(id.0, &escaped_name);
+                let mut id = QName(id.0, &escaped_name);
                 self.id_to_type_name(id)
             },
             ElementType::GroupRef(id) => {

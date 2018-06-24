@@ -1,4 +1,3 @@
-use std::fmt;
 use std::marker::PhantomData;
 use std::collections::HashMap;
 
@@ -6,17 +5,7 @@ use codegen;
 use xmlparser::{Token, Tokenizer, Error, StrSpan, ElementEnd};
 
 use generated::UNQUAL::*;
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub struct Id<'a>(pub Option<&'a str>, pub &'a str);
-impl<'a> fmt::Display for Id<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.0 {
-            Some(prefix) => write!(f, "{}:{}", prefix, self.1),
-            None => write!(f, "{}", self.1),
-        }
-    }
-}
+use support::QName;
 
 #[derive(Debug, PartialEq)]
 pub struct Document<'a> {
@@ -37,7 +26,7 @@ pub struct Schema<'a> {
 
 #[derive(Debug, PartialEq)]
 pub struct Element<'a> {
-    pub name: Option<Id<'a>>,
+    pub name: Option<QName<'a>>,
     pub attrs: Vec<Attribute<'a>>,
     pub mixed: bool,
     pub type_: Option<ElementType<'a>>, // XXX is sometimes None, something about abstract elements facets blah blah blah?
@@ -48,20 +37,20 @@ pub enum ElementType<'a> {
     Date,
     Any,
     Sequence(Vec<Element<'a>>),
-    Ref(Id<'a>),
-    Custom(Id<'a>),
-    Extension(Id<'a>, Vec<Attribute<'a>>, Option<Box<ElementType<'a>>>),
-    GroupRef(Id<'a>),
+    Ref(QName<'a>),
+    Custom(QName<'a>),
+    Extension(QName<'a>, Vec<Attribute<'a>>, Option<Box<ElementType<'a>>>),
+    GroupRef(QName<'a>),
     Choice(Vec<Element<'a>>),
-    Union(Option<Vec<Id<'a>>>, Option<Vec<Element<'a>>>),
+    Union(Option<Vec<QName<'a>>>, Option<Vec<Element<'a>>>),
     ComplexList(bool, Box<ElementType<'a>>), // (mixed, inner_type)
-    SimpleList(Id<'a>),
+    SimpleList(QName<'a>),
 }
 #[derive(Debug, PartialEq)]
 pub enum Attribute<'a> {
     SmallDef {
         name: &'a str,
-        type_: Option<Id<'a>>,
+        type_: Option<QName<'a>>,
         default: Option<&'a str>,
     },
     LongDef {
@@ -69,20 +58,9 @@ pub enum Attribute<'a> {
         default: Option<&'a str>,
         inner: Element<'a>,
     },
-    Ref(Id<'a>),
-    GroupRef(Id<'a>),
+    Ref(QName<'a>),
+    GroupRef(QName<'a>),
     Any(anyAttribute_e<'a>),
-}
-
-
-fn split_id(id: &str) -> Id {
-    let mut splitted_id = id.split(":");
-    let v1 = splitted_id.next().expect(&format!("Empty id"));
-    let v2 = splitted_id.next();
-    match v2 {
-        None => Id(None, v1),
-        Some(v2) => Id(Some(v1), v2),
-    }
 }
 
 pub(crate) struct Parser<S>(PhantomData<S>);
@@ -247,12 +225,12 @@ fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
         match (prefix, local) {
             ("", "name") => {
                 assert_eq!(name, None);
-                name = Some(split_id(value));
+                name = Some(QName::from(value));
                 Ok(())
             },
             ("", "type") => {
                 assert_eq!(type_, None);
-                let id = split_id(value);
+                let id = QName::from(value);
                 // TODO: handle namespace
                 type_ = Some(match id.1 {
                     "string" => ElementType::String,
@@ -263,7 +241,7 @@ fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
             },
             ("", "ref") => {
                 assert_eq!(type_, None);
-                type_ = Some(ElementType::Ref(split_id(value)));
+                type_ = Some(ElementType::Ref(QName::from(value)));
                 name = None;
                 Ok(())
             }
@@ -390,14 +368,14 @@ fn parse_attribute_group_def(stream: &mut S, main_namespace: &str, closing_tag: 
     (name, attrs)
 }
 
-fn parse_attribute_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Id<'a> {
+fn parse_attribute_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> QName<'a> {
     let mut ref_ = None;
 
     let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "ref") => {
                 assert_eq!(ref_, None);
-                ref_ = Some(split_id(value));
+                ref_ = Some(QName::from(value));
                 Ok(())
             },
             ("", "minOccurs") => Ok(()), // TODO
@@ -437,7 +415,7 @@ fn parse_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
         match (prefix, local) {
             ("", "ref") => {
                 assert_eq!(ref_, None);
-                ref_ = Some(split_id(value));
+                ref_ = Some(QName::from(value));
                 Ok(())
             },
             ("", "minOccurs") => Ok(()), // TODO
@@ -518,7 +496,7 @@ fn parse_elements(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str
             },
             "simpleType" => {
                 let (name, attrs, type_) = Self::parse_simple_type(stream2, main_namespace, (prefix, local));
-                items.push(Element { name: name.map(split_id), attrs, mixed: false, type_: Some(type_) });
+                items.push(Element { name: name.map(QName::from), attrs, mixed: false, type_: Some(type_) });
                 Ok(())
             },
             "sequence" => {
@@ -597,7 +575,7 @@ fn parse_extension(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
     let (attrs, inner) = Self::parse_subtype(stream, main_namespace, closing_tag).unwrap();
-    ElementType::Extension(split_id(base.expect("Extension has no base.")), attrs, inner.map(Box::new))
+    ElementType::Extension(QName::from(base.expect("Extension has no base.")), attrs, inner.map(Box::new))
 }
 
 fn parse_any(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> ElementType<'a> {
@@ -653,7 +631,7 @@ fn parse_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
             },
             ("", "type") => {
                 assert_eq!(type_, None);
-                type_ = Some(split_id(value));
+                type_ = Some(QName::from(value));
                 Ok(())
             },
             ("", "fixed") => Ok(()), // TODO
@@ -665,7 +643,7 @@ fn parse_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
             },
             ("", "ref") => {
                 assert_eq!(ref_, None);
-                ref_ = Some(split_id(value));
+                ref_ = Some(QName::from(value));
                 Ok(())
             },
             _ => Err(format!("Unknown attribute for <{}:{}: {}:{}=\"{}\"", closing_tag.0, closing_tag.1, prefix, local, value)),
@@ -782,7 +760,7 @@ fn parse_restriction(stream: &mut S, main_namespace: &str, closing_tag: (&str, &
         _ => panic!(format!("{:?}", element_end)),
     }
 
-    ElementType::Custom(split_id(name.unwrap()))
+    ElementType::Custom(QName::from(name.unwrap()))
 }
 
 fn parse_union(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> ElementType<'a> {
@@ -804,7 +782,7 @@ fn parse_union(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) 
         _ => panic!(format!("{:?}", element_end)),
     };
 
-    let member_types = member_types.map(|s| s.split(" ").map(split_id).collect());
+    let member_types = member_types.map(|s| s.split(" ").map(QName::from).collect());
     ElementType::Union(member_types, items)
 }
 
@@ -814,7 +792,7 @@ fn parse_list(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -
         match (prefix, local) {
             ("", "itemType") => {
                 assert_eq!(item_type, None);
-                item_type = Some(split_id(value));
+                item_type = Some(QName::from(value));
                 Ok(())
             },
             _ => Err(format!("Unknown attribute for list: {:?}", (prefix, local, item_type))),
