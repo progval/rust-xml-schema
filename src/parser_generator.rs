@@ -46,9 +46,13 @@ impl<'a> ParserGenerator<'a> {
     */
 
     pub fn gen_unqual_module(&mut self) -> &mut (String, cg::Module) {
-        self.nsuri_to_module.insert(self.target_uri, ("UNQUAL".to_string(), cg::Module::new("UNQUAL")));
-        self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("use xml_schema::support::*;");
-        self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// types\n");
+        {
+            let mut module = cg::Module::new("UNQUAL");
+            module.vis("pub(crate)");
+            module.scope().raw("use support::*;");
+            module.scope().raw("\n/////////// types\n");
+            self.nsuri_to_module.insert(self.target_uri, ("UNQUAL".to_string(), module));
+        }
         let mut types: Vec<_> = self.schema.types.iter().collect();
         types.sort_by_key(|&(n,_)| n);
         for (name, (attrs, mixed, type_tree)) in types {
@@ -122,6 +126,16 @@ impl<'a> ParserGenerator<'a> {
     fn unbloat_element(&mut self, element: &Element, parent_name: &str, fallback_name: String) -> (String, String) {
         let Element { name: element_name, type_: element_type, .. } = element;
         match (element_name, element_type) {
+            (Some(element_name), Some(ElementType::Ref(id))) => {
+                let n = format!("{}_e", id.1);
+                let field_typename: String = self.id_to_type_name(Id(id.0, &n));
+                (element_name.to_string(), field_typename)
+            },
+            (Some(element_name), Some(ElementType::Custom(id))) |
+            (Some(element_name), Some(ElementType::GroupRef(id))) => {
+                let field_typename = self.id_to_type_name(*id);
+                (element_name.to_string(), field_typename)
+            },
             (Some(id), _) => {
                 let element_name = id.1.to_string(); // TODO: deduplication
                 let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, element_name)));
@@ -139,6 +153,11 @@ impl<'a> ParserGenerator<'a> {
                 let field_typename = self.id_to_type_name(*id);
                 (element_name, field_typename)
             },
+            (None, Some(tt)) => {
+                let field_typename = format!("{}__{}", parent_name, fallback_name);
+                let field_typename = self.type_(&field_typename, tt);
+                (fallback_name, field_typename)
+            }
             (None, _) => {
                 let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, fallback_name)));
                 (fallback_name, field_typename)
@@ -159,6 +178,7 @@ impl<'a> ParserGenerator<'a> {
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
+                module.scope().raw(&format!("// ^-- from {:?}", type_tree));
                 name.to_string()
             },
             ElementType::Ref(id) => {
@@ -178,7 +198,7 @@ impl<'a> ParserGenerator<'a> {
             ElementType::Extension(base, attrs, inner) => {
                 let struct_name = escape_keyword(name);
                 let mut s = cg::Struct::new(&struct_name);
-                s.field("base", self.id_to_type_name(*base));
+                s.field("BASE", self.id_to_type_name(*base));
                 if let Some(inner) = inner {
                     let inner_type_name = format!("{}__extension", name);
                     s.field("extension", self.type_(&inner_type_name, inner));
