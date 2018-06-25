@@ -13,7 +13,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for all<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::explicitGroup::parse_xml(stream, parse_context, parent_context).map(all)
         }
     }
@@ -23,7 +23,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for allNNI__item0<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::NMTOKEN::parse_xml(stream, parse_context, parent_context).map(allNNI__item0)
         }
     }
@@ -48,7 +48,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for altType_item__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -72,7 +72,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for altType_item<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(altType_item {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -92,7 +92,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for altType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(altType(altType_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
@@ -104,7 +104,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for annotated__extension__annotation_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(annotated__extension__annotation_e)
         }
     }
@@ -118,7 +118,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for annotated__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(annotated__extension {
 
 
@@ -139,7 +139,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for annotated<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(annotated {
                 BASE: super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)?,
 
@@ -161,7 +161,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for anyType__seqfield0_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             any::parse_xml(stream, parse_context, parent_context).map(anyType__seqfield0_e)
         }
     }
@@ -175,7 +175,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for anyType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(anyType {
 
 
@@ -195,7 +195,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for assertion<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(assertion {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -213,7 +213,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for attribute__extension__simpleType_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(attribute__extension__simpleType_e)
         }
     }
@@ -227,7 +227,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for attribute__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(attribute__extension {
 
 
@@ -248,7 +248,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for attribute<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(attribute {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -271,7 +271,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for attributeGroup<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(attributeGroup {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -291,7 +291,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for attributeGroupRef<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::attributeGroup::parse_xml(stream, parse_context, parent_context).map(attributeGroupRef)
         }
     }
@@ -301,7 +301,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for basicNamespaceList__valuetype__item0<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::token::parse_xml(stream, parse_context, parent_context).map(basicNamespaceList__valuetype__item0)
         }
     }
@@ -324,7 +324,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for blockSet__item0<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::token::parse_xml(stream, parse_context, parent_context).map(blockSet__item0)
         }
     }
@@ -334,7 +334,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for blockSet__item1__valuetype<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::derivationControl::parse_xml(stream, parse_context, parent_context).map(blockSet__item1__valuetype)
         }
     }
@@ -357,7 +357,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for complexRestrictionType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::restrictionType::parse_xml(stream, parse_context, parent_context).map(complexRestrictionType)
         }
     }
@@ -370,7 +370,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for complexType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(complexType {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -390,7 +390,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for derivationControl<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::NMTOKEN::parse_xml(stream, parse_context, parent_context).map(derivationControl)
         }
     }
@@ -400,7 +400,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for derivationSet__item0<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::token::parse_xml(stream, parse_context, parent_context).map(derivationSet__item0)
         }
     }
@@ -428,7 +428,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for element__extension__seqfield0_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -451,7 +451,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for element__extension__seqfield0_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             element__extension__seqfield0_e_inner::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0_e)
         }
     }
@@ -463,7 +463,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for element__extension__alternative_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::altType::parse_xml(stream, parse_context, parent_context).map(element__extension__alternative_e)
         }
     }
@@ -475,7 +475,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for element__extension__identityConstraint_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::identityConstraint::parse_xml(stream, parse_context, parent_context).map(element__extension__identityConstraint_e)
         }
     }
@@ -491,7 +491,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for element__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(element__extension {
 
 
@@ -520,7 +520,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for element<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(element {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -540,7 +540,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for explicitGroup<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::group::parse_xml(stream, parse_context, parent_context).map(explicitGroup)
         }
     }
@@ -552,7 +552,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for extensionType__extension__openContent_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context).map(extensionType__extension__openContent_e)
         }
     }
@@ -564,7 +564,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for extensionType__extension__typeDefParticle_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context).map(extensionType__extension__typeDefParticle_e)
         }
     }
@@ -581,7 +581,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for extensionType__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(extensionType__extension {
 
 
@@ -614,7 +614,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for extensionType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(extensionType {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -636,7 +636,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for facet<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(facet {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -652,7 +652,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for formChoice<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::NMTOKEN::parse_xml(stream, parse_context, parent_context).map(formChoice)
         }
     }
@@ -662,7 +662,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for fullDerivationSet__item0<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::token::parse_xml(stream, parse_context, parent_context).map(fullDerivationSet__item0)
         }
     }
@@ -686,7 +686,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for group_item<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(group_item {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -706,7 +706,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for group<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
             while let Some(new_item) = group_item::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
@@ -720,7 +720,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for groupRef<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::realGroup::parse_xml(stream, parse_context, parent_context).map(groupRef)
         }
     }
@@ -730,7 +730,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for intFacet<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(intFacet)
         }
     }
@@ -742,7 +742,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for keybase_item__extension__field_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::field_e::parse_xml(stream, parse_context, parent_context).map(keybase_item__extension__field_e)
         }
     }
@@ -757,7 +757,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for keybase_item__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(keybase_item__extension {
 
 
@@ -782,7 +782,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for keybase_item<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(keybase_item {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -802,7 +802,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for keybase<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(keybase(keybase_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
@@ -812,7 +812,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for localComplexType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::complexType::parse_xml(stream, parse_context, parent_context).map(localComplexType)
         }
     }
@@ -822,7 +822,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for localElement<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::element::parse_xml(stream, parse_context, parent_context).map(localElement)
         }
     }
@@ -832,7 +832,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for localSimpleType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::simpleType::parse_xml(stream, parse_context, parent_context).map(localSimpleType)
         }
     }
@@ -842,7 +842,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for namedAttributeGroup<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::attributeGroup::parse_xml(stream, parse_context, parent_context).map(namedAttributeGroup)
         }
     }
@@ -852,7 +852,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for namedGroup<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::realGroup::parse_xml(stream, parse_context, parent_context).map(namedGroup)
         }
     }
@@ -870,7 +870,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for noFixedFacet<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(noFixedFacet)
         }
     }
@@ -880,7 +880,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for numFacet<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(numFacet)
         }
     }
@@ -890,7 +890,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for openAttrs<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::anyType::parse_xml(stream, parse_context, parent_context).map(openAttrs)
         }
     }
@@ -900,7 +900,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for public<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::token::parse_xml(stream, parse_context, parent_context).map(public)
         }
     }
@@ -910,7 +910,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for qnameList__valuetype__item0<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::token::parse_xml(stream, parse_context, parent_context).map(qnameList__valuetype__item0)
         }
     }
@@ -933,7 +933,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for qnameListA__valuetype__item0<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::token::parse_xml(stream, parse_context, parent_context).map(qnameListA__valuetype__item0)
         }
     }
@@ -956,7 +956,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for realGroup<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::group::parse_xml(stream, parse_context, parent_context).map(realGroup)
         }
     }
@@ -966,7 +966,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for reducedDerivationControl<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::derivationControl::parse_xml(stream, parse_context, parent_context).map(reducedDerivationControl)
         }
     }
@@ -978,7 +978,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0_e_inner__choicevariant0__openContent_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context).map(restrictionType__extension__seqfield0_e_inner__choicevariant0__openContent_e)
         }
     }
@@ -993,7 +993,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0_e_inner__choicevariant0<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(restrictionType__extension__seqfield0_e_inner__choicevariant0 {
 
 
@@ -1022,7 +1022,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -1045,7 +1045,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             restrictionType__extension__seqfield0_e_inner::parse_xml(stream, parse_context, parent_context).map(restrictionType__extension__seqfield0_e)
         }
     }
@@ -1061,7 +1061,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for restrictionType__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(restrictionType__extension {
 
 
@@ -1090,7 +1090,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for restrictionType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(restrictionType {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1110,7 +1110,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for simpleDerivationSet__item0<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::token::parse_xml(stream, parse_context, parent_context).map(simpleDerivationSet__item0)
         }
     }
@@ -1120,7 +1120,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for simpleDerivationSet__item1__valuetype<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::derivationControl::parse_xml(stream, parse_context, parent_context).map(simpleDerivationSet__item1__valuetype)
         }
     }
@@ -1143,7 +1143,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for simpleExplicitGroup<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::explicitGroup::parse_xml(stream, parse_context, parent_context).map(simpleExplicitGroup)
         }
     }
@@ -1153,7 +1153,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for simpleExtensionType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::extensionType::parse_xml(stream, parse_context, parent_context).map(simpleExtensionType)
         }
     }
@@ -1163,7 +1163,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for simpleRestrictionType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::restrictionType::parse_xml(stream, parse_context, parent_context).map(simpleRestrictionType)
         }
     }
@@ -1176,7 +1176,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for simpleType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(simpleType {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1196,7 +1196,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for specialNamespaceList<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::token::parse_xml(stream, parse_context, parent_context).map(specialNamespaceList)
         }
     }
@@ -1206,7 +1206,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for topLevelAttribute<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::attribute::parse_xml(stream, parse_context, parent_context).map(topLevelAttribute)
         }
     }
@@ -1216,7 +1216,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for topLevelComplexType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::complexType::parse_xml(stream, parse_context, parent_context).map(topLevelComplexType)
         }
     }
@@ -1226,7 +1226,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for topLevelElement<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::element::parse_xml(stream, parse_context, parent_context).map(topLevelElement)
         }
     }
@@ -1236,7 +1236,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for topLevelSimpleType<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::simpleType::parse_xml(stream, parse_context, parent_context).map(topLevelSimpleType)
         }
     }
@@ -1246,7 +1246,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for typeDerivationControl<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::derivationControl::parse_xml(stream, parse_context, parent_context).map(typeDerivationControl)
         }
     }
@@ -1258,7 +1258,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for wildcard<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(wildcard {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1274,7 +1274,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for xpathDefaultNamespace__item0<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::token::parse_xml(stream, parse_context, parent_context).map(xpathDefaultNamespace__item0)
         }
     }
@@ -1298,7 +1298,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for all_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::all::parse_xml(stream, parse_context, parent_context).map(all_e)
         }
     }
@@ -1315,7 +1315,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for annotation_e_inner__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -1339,7 +1339,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for annotation_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(annotation_e_inner {
                 BASE: super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1361,7 +1361,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for annotation_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             annotation_e_inner::parse_xml(stream, parse_context, parent_context).map(annotation_e)
         }
     }
@@ -1373,7 +1373,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for any_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(any_e_inner {
                 BASE: super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1391,7 +1391,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for any_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             any_e_inner::parse_xml(stream, parse_context, parent_context).map(any_e)
         }
     }
@@ -1403,7 +1403,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for anyAttribute_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(anyAttribute_e_inner {
                 BASE: super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1421,7 +1421,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for anyAttribute_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             anyAttribute_e_inner::parse_xml(stream, parse_context, parent_context).map(anyAttribute_e)
         }
     }
@@ -1435,7 +1435,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for appinfo_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(appinfo_e_inner {
 
 
@@ -1455,7 +1455,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for appinfo_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             appinfo_e_inner::parse_xml(stream, parse_context, parent_context).map(appinfo_e)
         }
     }
@@ -1467,7 +1467,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for assertion_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::assertion::parse_xml(stream, parse_context, parent_context).map(assertion_e)
         }
     }
@@ -1479,7 +1479,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for attribute_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::topLevelAttribute::parse_xml(stream, parse_context, parent_context).map(attribute_e)
         }
     }
@@ -1491,7 +1491,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for attributeGroup_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::namedAttributeGroup::parse_xml(stream, parse_context, parent_context).map(attributeGroup_e)
         }
     }
@@ -1503,7 +1503,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for choice_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::explicitGroup::parse_xml(stream, parse_context, parent_context).map(choice_e)
         }
     }
@@ -1520,7 +1520,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for complexContent_e_inner__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -1544,7 +1544,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for complexContent_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(complexContent_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1566,7 +1566,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for complexContent_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             complexContent_e_inner::parse_xml(stream, parse_context, parent_context).map(complexContent_e)
         }
     }
@@ -1578,7 +1578,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for complexType_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::topLevelComplexType::parse_xml(stream, parse_context, parent_context).map(complexType_e)
         }
     }
@@ -1592,7 +1592,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(defaultOpenContent_e_inner__extension {
 
 
@@ -1613,7 +1613,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for defaultOpenContent_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(defaultOpenContent_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1635,7 +1635,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for defaultOpenContent_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             defaultOpenContent_e_inner::parse_xml(stream, parse_context, parent_context).map(defaultOpenContent_e)
         }
     }
@@ -1649,7 +1649,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for documentation_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(documentation_e_inner {
 
 
@@ -1669,7 +1669,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for documentation_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             documentation_e_inner::parse_xml(stream, parse_context, parent_context).map(documentation_e)
         }
     }
@@ -1681,7 +1681,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for element_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::topLevelElement::parse_xml(stream, parse_context, parent_context).map(element_e)
         }
     }
@@ -1693,7 +1693,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for enumeration_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::noFixedFacet::parse_xml(stream, parse_context, parent_context).map(enumeration_e)
         }
     }
@@ -1705,7 +1705,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for explicitTimezone_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(explicitTimezone_e)
         }
     }
@@ -1715,7 +1715,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for facet_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {
             Some(facet_e(Default::default()))
         }
     }
@@ -1727,7 +1727,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for field_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(field_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1745,7 +1745,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for field_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             field_e_inner::parse_xml(stream, parse_context, parent_context).map(field_e)
         }
     }
@@ -1757,7 +1757,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for fractionDigits_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(fractionDigits_e)
         }
     }
@@ -1769,7 +1769,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for group_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::namedGroup::parse_xml(stream, parse_context, parent_context).map(group_e)
         }
     }
@@ -1781,7 +1781,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for import_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(import_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1799,7 +1799,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for import_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             import_e_inner::parse_xml(stream, parse_context, parent_context).map(import_e)
         }
     }
@@ -1811,7 +1811,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for include_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(include_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1829,7 +1829,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for include_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             include_e_inner::parse_xml(stream, parse_context, parent_context).map(include_e)
         }
     }
@@ -1841,7 +1841,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for key_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::keybase::parse_xml(stream, parse_context, parent_context).map(key_e)
         }
     }
@@ -1853,7 +1853,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for keyref_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(keyref_e_inner {
                 BASE: super::UNQUAL::keybase::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1871,7 +1871,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for keyref_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             keyref_e_inner::parse_xml(stream, parse_context, parent_context).map(keyref_e)
         }
     }
@@ -1883,7 +1883,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for length_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(length_e)
         }
     }
@@ -1895,7 +1895,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for list_e_inner__extension__simpleType_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(list_e_inner__extension__simpleType_e)
         }
     }
@@ -1909,7 +1909,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for list_e_inner__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(list_e_inner__extension {
 
 
@@ -1930,7 +1930,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for list_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(list_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -1952,7 +1952,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for list_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             list_e_inner::parse_xml(stream, parse_context, parent_context).map(list_e)
         }
     }
@@ -1964,7 +1964,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for maxExclusive_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(maxExclusive_e)
         }
     }
@@ -1976,7 +1976,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for maxInclusive_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(maxInclusive_e)
         }
     }
@@ -1988,7 +1988,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for maxLength_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(maxLength_e)
         }
     }
@@ -2000,7 +2000,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for minExclusive_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(minExclusive_e)
         }
     }
@@ -2012,7 +2012,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for minInclusive_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(minInclusive_e)
         }
     }
@@ -2024,7 +2024,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for minLength_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(minLength_e)
         }
     }
@@ -2036,7 +2036,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for notation_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(notation_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -2054,7 +2054,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for notation_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             notation_e_inner::parse_xml(stream, parse_context, parent_context).map(notation_e)
         }
     }
@@ -2066,7 +2066,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for openContent_e_inner__extension__any_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context).map(openContent_e_inner__extension__any_e)
         }
     }
@@ -2080,7 +2080,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for openContent_e_inner__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(openContent_e_inner__extension {
 
 
@@ -2101,7 +2101,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for openContent_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(openContent_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -2123,7 +2123,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for openContent_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             openContent_e_inner::parse_xml(stream, parse_context, parent_context).map(openContent_e)
         }
     }
@@ -2135,7 +2135,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for override_e_inner__extension__annotation_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(override_e_inner__extension__annotation_e)
         }
     }
@@ -2147,7 +2147,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for override_e_inner__extension__schemaTop_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::schemaTop::parse_xml(stream, parse_context, parent_context).map(override_e_inner__extension__schemaTop_e)
         }
     }
@@ -2162,7 +2162,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for override_e_inner__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(override_e_inner__extension {
 
 
@@ -2187,7 +2187,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for override_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(override_e_inner {
                 BASE: super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)?,
 
@@ -2209,7 +2209,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for override_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             override_e_inner::parse_xml(stream, parse_context, parent_context).map(override_e)
         }
     }
@@ -2221,7 +2221,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for pattern_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::noFixedFacet::parse_xml(stream, parse_context, parent_context).map(pattern_e)
         }
     }
@@ -2238,7 +2238,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for redefine_e_inner__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -2262,7 +2262,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for redefine_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(redefine_e_inner {
                 BASE: super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)?,
 
@@ -2284,7 +2284,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for redefine_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             redefine_e_inner::parse_xml(stream, parse_context, parent_context).map(redefine_e)
         }
     }
@@ -2297,7 +2297,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for restriction_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(restriction_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -2319,7 +2319,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for restriction_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             restriction_e_inner::parse_xml(stream, parse_context, parent_context).map(restriction_e)
         }
     }
@@ -2331,7 +2331,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for schema_e_inner__extension__composition_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::composition::parse_xml(stream, parse_context, parent_context).map(schema_e_inner__extension__composition_e)
         }
     }
@@ -2343,7 +2343,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield1_e_inner__annotation_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(schema_e_inner__extension__seqfield1_e_inner__annotation_e)
         }
     }
@@ -2358,7 +2358,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield1_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(schema_e_inner__extension__seqfield1_e_inner {
 
 
@@ -2382,7 +2382,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield1_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             schema_e_inner__extension__seqfield1_e_inner::parse_xml(stream, parse_context, parent_context).map(schema_e_inner__extension__seqfield1_e)
         }
     }
@@ -2394,7 +2394,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield2_e_inner__annotation_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(schema_e_inner__extension__seqfield2_e_inner__annotation_e)
         }
     }
@@ -2409,7 +2409,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield2_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(schema_e_inner__extension__seqfield2_e_inner {
 
 
@@ -2433,7 +2433,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield2_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             schema_e_inner__extension__seqfield2_e_inner::parse_xml(stream, parse_context, parent_context).map(schema_e_inner__extension__seqfield2_e)
         }
     }
@@ -2449,7 +2449,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for schema_e_inner__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(schema_e_inner__extension {
 
 
@@ -2478,7 +2478,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for schema_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(schema_e_inner {
                 BASE: super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)?,
 
@@ -2500,7 +2500,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for schema_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             schema_e_inner::parse_xml(stream, parse_context, parent_context).map(schema_e)
         }
     }
@@ -2512,7 +2512,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for selector_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(selector_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -2530,7 +2530,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for selector_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             selector_e_inner::parse_xml(stream, parse_context, parent_context).map(selector_e)
         }
     }
@@ -2542,7 +2542,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for sequence_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::explicitGroup::parse_xml(stream, parse_context, parent_context).map(sequence_e)
         }
     }
@@ -2559,7 +2559,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for simpleContent_e_inner__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -2583,7 +2583,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for simpleContent_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(simpleContent_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -2605,7 +2605,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for simpleContent_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             simpleContent_e_inner::parse_xml(stream, parse_context, parent_context).map(simpleContent_e)
         }
     }
@@ -2617,7 +2617,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for simpleType_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::topLevelSimpleType::parse_xml(stream, parse_context, parent_context).map(simpleType_e)
         }
     }
@@ -2629,7 +2629,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for totalDigits_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(totalDigits_e)
         }
     }
@@ -2641,7 +2641,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for union_e_inner__extension__simpleType_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(union_e_inner__extension__simpleType_e)
         }
     }
@@ -2655,7 +2655,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for union_e_inner__extension<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(union_e_inner__extension {
 
 
@@ -2676,7 +2676,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for union_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(union_e_inner {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
@@ -2698,7 +2698,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for union_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             union_e_inner::parse_xml(stream, parse_context, parent_context).map(union_e)
         }
     }
@@ -2710,7 +2710,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for unique_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::keybase::parse_xml(stream, parse_context, parent_context).map(unique_e)
         }
     }
@@ -2722,7 +2722,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for whiteSpace_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(whiteSpace_e)
         }
     }
@@ -2731,8 +2731,204 @@ pub mod UNQUAL {
     /////////// groups
 
 
+    #[derive(Debug, PartialEq)]
+    pub enum attrDecls__seqfield0_e_inner<'input> {
+        attribute(Box<super::UNQUAL::attribute<'input>>),
+        attributeGroup(Box<super::UNQUAL::attributeGroupRef<'input>>),
+    }
+
+    impl<'input> Default for attrDecls__seqfield0_e_inner<'input> { fn default() -> attrDecls__seqfield0_e_inner<'input> { attrDecls__seqfield0_e_inner::attributeGroup(Default::default()) } }
+
+    // ^-- from Choice([Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }])
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_e_inner<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::attribute::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_e_inner::attribute(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::attributeGroupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_e_inner::attributeGroup(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
     #[derive(Debug, PartialEq, Default)]
-    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
+    pub struct attrDecls__seqfield0_e<'input>(attrDecls__seqfield0_e_inner<'input>);
+
+    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_e<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            attrDecls__seqfield0_e_inner::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_e)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__anyAttribute_e<'input>(super::UNQUAL::anyAttribute_e<'input>);
+
+    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "anyAttribute"))), min_occurs: Some(0), max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for attrDecls__anyAttribute_e<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::anyAttribute_e::parse_xml(stream, parse_context, parent_context).map(attrDecls__anyAttribute_e)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls<'input> {
+        seqfield0: attrDecls__seqfield0_e<'input>,
+        seqfield1: attrDecls__anyAttribute_e<'input>,
+    }
+
+    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "anyAttribute"))), min_occurs: Some(0), max_occurs: None }])
+
+
+    impl<'input> ParseXml<'input> for attrDecls<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(attrDecls {
+
+
+
+                seqfield0: attrDecls__seqfield0_e::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: attrDecls__anyAttribute_e::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__annotation_e<'input>(super::UNQUAL::annotation_e<'input>);
+
+    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for allModel__annotation_e<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(allModel__annotation_e)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum allModel__seqfield1_e_inner<'input> {
+        element(Box<super::UNQUAL::localElement<'input>>),
+        any(Box<super::UNQUAL::any_e<'input>>),
+        group(Box<super::UNQUAL::groupRef<'input>>),
+    }
+
+    impl<'input> Default for allModel__seqfield1_e_inner<'input> { fn default() -> allModel__seqfield1_e_inner<'input> { allModel__seqfield1_e_inner::group(Default::default()) } }
+
+    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_e_inner<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_e_inner::element(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_e_inner::any(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_e_inner::group(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_e<'input>(allModel__seqfield1_e_inner<'input>);
+
+    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_e<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            allModel__seqfield1_e_inner::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_e)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel<'input> {
+        seqfield0: allModel__annotation_e<'input>,
+        seqfield1: allModel__seqfield1_e<'input>,
+    }
+
+    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+
+
+    impl<'input> ParseXml<'input> for allModel<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(allModel {
+
+
+
+                seqfield0: allModel__annotation_e::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: allModel__seqfield1_e::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct defRef<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq)]
+    pub enum simpleDerivation<'input> {
+        restriction(Box<super::UNQUAL::restriction_e<'input>>),
+        list(Box<super::UNQUAL::list_e<'input>>),
+        union(Box<super::UNQUAL::union_e<'input>>),
+    }
+
+    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::union(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "restriction"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "list"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "union"))), min_occurs: None, max_occurs: None }])
+
+
+    impl<'input> ParseXml<'input> for simpleDerivation<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::restriction_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::restriction(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::list_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::list(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::union_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::union(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
 
     #[derive(Debug, PartialEq)]
     pub enum composition<'input> {
@@ -2749,7 +2945,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for composition<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -2777,8 +2973,201 @@ pub mod UNQUAL {
         }
     }
 
+    #[derive(Debug, PartialEq)]
+    pub enum redefinable<'input> {
+        simpleType(Box<super::UNQUAL::simpleType_e<'input>>),
+        complexType(Box<super::UNQUAL::complexType_e<'input>>),
+        group(Box<super::UNQUAL::group_e<'input>>),
+        attributeGroup(Box<super::UNQUAL::attributeGroup_e<'input>>),
+    }
+
+    impl<'input> Default for redefinable<'input> { fn default() -> redefinable<'input> { redefinable::attributeGroup(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "simpleType"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "complexType"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "group"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "attributeGroup"))), min_occurs: None, max_occurs: None }])
+
+
+    impl<'input> ParseXml<'input> for redefinable<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::simpleType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::simpleType(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::complexType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::complexType(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::group_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::group(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::attributeGroup_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::attributeGroup(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum typeDefParticle<'input> {
+        group(Box<super::UNQUAL::groupRef<'input>>),
+        all(Box<super::UNQUAL::all_e<'input>>),
+        choice(Box<super::UNQUAL::choice_e<'input>>),
+        sequence(Box<super::UNQUAL::sequence_e<'input>>),
+    }
+
+    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::sequence(Default::default()) } }
+
+    // ^-- from Choice([Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "all"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }])
+
+
+    impl<'input> ParseXml<'input> for typeDefParticle<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::group(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::all(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choice(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::sequence(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
     #[derive(Debug, PartialEq, Default)]
-    pub struct defRef<'input>(PhantomData<&'input ()>);
+    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel__simpleType_e<'input>(super::UNQUAL::localSimpleType<'input>);
+
+    // ^-- from Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for simpleRestrictionModel__simpleType_e<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(simpleRestrictionModel__simpleType_e)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum simpleRestrictionModel__seqfield1_e_inner<'input> {
+        facet(Box<super::UNQUAL::facet_e<'input>>),
+        choicevariant1(Box<any<'input>>),
+    }
+
+    impl<'input> Default for simpleRestrictionModel__seqfield1_e_inner<'input> { fn default() -> simpleRestrictionModel__seqfield1_e_inner<'input> { simpleRestrictionModel__seqfield1_e_inner::choicevariant1(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])
+
+
+    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield1_e_inner<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::facet_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleRestrictionModel__seqfield1_e_inner::facet(Box::new(r))), None => () }
+
+
+
+            match any::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleRestrictionModel__seqfield1_e_inner::choicevariant1(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel__seqfield1_e<'input>(simpleRestrictionModel__seqfield1_e_inner<'input>);
+
+    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+
+
+    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield1_e<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            simpleRestrictionModel__seqfield1_e_inner::parse_xml(stream, parse_context, parent_context).map(simpleRestrictionModel__seqfield1_e)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel<'input> {
+        simpleType: simpleRestrictionModel__simpleType_e<'input>,
+        seqfield1: simpleRestrictionModel__seqfield1_e<'input>,
+    }
+
+    // ^-- from Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+
+
+    impl<'input> ParseXml<'input> for simpleRestrictionModel<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(simpleRestrictionModel {
+
+
+
+                simpleType: simpleRestrictionModel__simpleType_e::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: simpleRestrictionModel__seqfield1_e::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum schemaTop<'input> {
+        redefinable(Box<super::UNQUAL::redefinable<'input>>),
+        element(Box<super::UNQUAL::element_e<'input>>),
+        attribute(Box<super::UNQUAL::attribute_e<'input>>),
+        notation(Box<super::UNQUAL::notation_e<'input>>),
+    }
+
+    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::notation(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "redefinable"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "element"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "notation"))), min_occurs: None, max_occurs: None }])
+
+
+    impl<'input> ParseXml<'input> for schemaTop<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::redefinable(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::element_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::element(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::attribute_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::attribute(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::notation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::notation(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct assertions__assert_e<'input>(super::UNQUAL::assertion<'input>);
@@ -2787,7 +3176,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for assertions__assert_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::assertion::parse_xml(stream, parse_context, parent_context).map(assertions__assert_e)
         }
     }
@@ -2801,7 +3190,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for assertions<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(assertions {
 
 
@@ -2815,81 +3204,45 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum attrDecls__seqfield0_e_inner<'input> {
-        attribute(Box<super::UNQUAL::attribute<'input>>),
-        attributeGroup(Box<super::UNQUAL::attributeGroupRef<'input>>),
+    pub enum nestedParticle<'input> {
+        element(Box<super::UNQUAL::localElement<'input>>),
+        group(Box<super::UNQUAL::groupRef<'input>>),
+        choice(Box<super::UNQUAL::choice_e<'input>>),
+        sequence(Box<super::UNQUAL::sequence_e<'input>>),
+        any(Box<super::UNQUAL::any_e<'input>>),
     }
 
-    impl<'input> Default for attrDecls__seqfield0_e_inner<'input> { fn default() -> attrDecls__seqfield0_e_inner<'input> { attrDecls__seqfield0_e_inner::attributeGroup(Default::default()) } }
+    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::any(Default::default()) } }
 
-    // ^-- from Choice([Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }])
 
 
-
-            match super::UNQUAL::attribute::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_e_inner::attribute(Box::new(r))), None => () }
+    impl<'input> ParseXml<'input> for nestedParticle<'input> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::attributeGroupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_e_inner::attributeGroup(Box::new(r))), None => () }
+            match super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::element(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::group(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choice(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::sequence(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::any(Box::new(r))), None => () }
 
 
 
             None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0_e<'input>(attrDecls__seqfield0_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            attrDecls__seqfield0_e_inner::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__anyAttribute_e<'input>(super::UNQUAL::anyAttribute_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "anyAttribute"))), min_occurs: Some(0), max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for attrDecls__anyAttribute_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::anyAttribute_e::parse_xml(stream, parse_context, parent_context).map(attrDecls__anyAttribute_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls<'input> {
-        seqfield0: attrDecls__seqfield0_e<'input>,
-        seqfield1: attrDecls__anyAttribute_e<'input>,
-    }
-
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "anyAttribute"))), min_occurs: Some(0), max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for attrDecls<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(attrDecls {
-
-
-
-                seqfield0: attrDecls__seqfield0_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: attrDecls__anyAttribute_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
         }
     }
 
@@ -2900,7 +3253,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__openContent_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context).map(complexTypeModel__choicevariant2__openContent_e)
         }
     }
@@ -2912,7 +3265,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__typeDefParticle_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context).map(complexTypeModel__choicevariant2__typeDefParticle_e)
         }
     }
@@ -2929,7 +3282,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(complexTypeModel__choicevariant2 {
 
 
@@ -2967,7 +3320,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for complexTypeModel<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -2987,43 +3340,8 @@ pub mod UNQUAL {
         }
     }
 
-    #[derive(Debug, PartialEq)]
-    pub enum typeDefParticle<'input> {
-        group(Box<super::UNQUAL::groupRef<'input>>),
-        all(Box<super::UNQUAL::all_e<'input>>),
-        choice(Box<super::UNQUAL::choice_e<'input>>),
-        sequence(Box<super::UNQUAL::sequence_e<'input>>),
-    }
-
-    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::sequence(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "all"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for typeDefParticle<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::group(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::all(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choice(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::sequence(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
+    #[derive(Debug, PartialEq, Default)]
+    pub struct occurs<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq)]
     pub enum identityConstraint<'input> {
@@ -3038,7 +3356,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for identityConstraint<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -3074,7 +3392,7 @@ pub mod UNQUAL {
 
 
     impl<'input> ParseXml<'input> for particle<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
@@ -3099,324 +3417,6 @@ pub mod UNQUAL {
 
 
             match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::any(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum redefinable<'input> {
-        simpleType(Box<super::UNQUAL::simpleType_e<'input>>),
-        complexType(Box<super::UNQUAL::complexType_e<'input>>),
-        group(Box<super::UNQUAL::group_e<'input>>),
-        attributeGroup(Box<super::UNQUAL::attributeGroup_e<'input>>),
-    }
-
-    impl<'input> Default for redefinable<'input> { fn default() -> redefinable<'input> { redefinable::attributeGroup(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "simpleType"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "complexType"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "group"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "attributeGroup"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for redefinable<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::simpleType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::simpleType(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::complexType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::complexType(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::group_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::group(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::attributeGroup_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::attributeGroup(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionModel__simpleType_e<'input>(super::UNQUAL::localSimpleType<'input>);
-
-    // ^-- from Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for simpleRestrictionModel__simpleType_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(simpleRestrictionModel__simpleType_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum simpleRestrictionModel__seqfield1_e_inner<'input> {
-        facet(Box<super::UNQUAL::facet_e<'input>>),
-        choicevariant1(Box<any<'input>>),
-    }
-
-    impl<'input> Default for simpleRestrictionModel__seqfield1_e_inner<'input> { fn default() -> simpleRestrictionModel__seqfield1_e_inner<'input> { simpleRestrictionModel__seqfield1_e_inner::choicevariant1(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield1_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::facet_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleRestrictionModel__seqfield1_e_inner::facet(Box::new(r))), None => () }
-
-
-
-            match any::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleRestrictionModel__seqfield1_e_inner::choicevariant1(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionModel__seqfield1_e<'input>(simpleRestrictionModel__seqfield1_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
-
-
-    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield1_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            simpleRestrictionModel__seqfield1_e_inner::parse_xml(stream, parse_context, parent_context).map(simpleRestrictionModel__seqfield1_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionModel<'input> {
-        simpleType: simpleRestrictionModel__simpleType_e<'input>,
-        seqfield1: simpleRestrictionModel__seqfield1_e<'input>,
-    }
-
-    // ^-- from Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
-
-
-    impl<'input> ParseXml<'input> for simpleRestrictionModel<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(simpleRestrictionModel {
-
-
-
-                simpleType: simpleRestrictionModel__simpleType_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: simpleRestrictionModel__seqfield1_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum schemaTop<'input> {
-        redefinable(Box<super::UNQUAL::redefinable<'input>>),
-        element(Box<super::UNQUAL::element_e<'input>>),
-        attribute(Box<super::UNQUAL::attribute_e<'input>>),
-        notation(Box<super::UNQUAL::notation_e<'input>>),
-    }
-
-    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::notation(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "redefinable"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "element"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "notation"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for schemaTop<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::redefinable(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::element_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::element(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::attribute_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::attribute(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::notation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::notation(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct occurs<'input>(PhantomData<&'input ()>);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__annotation_e<'input>(super::UNQUAL::annotation_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for allModel__annotation_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(allModel__annotation_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum allModel__seqfield1_e_inner<'input> {
-        element(Box<super::UNQUAL::localElement<'input>>),
-        any(Box<super::UNQUAL::any_e<'input>>),
-        group(Box<super::UNQUAL::groupRef<'input>>),
-    }
-
-    impl<'input> Default for allModel__seqfield1_e_inner<'input> { fn default() -> allModel__seqfield1_e_inner<'input> { allModel__seqfield1_e_inner::group(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield1_e_inner<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_e_inner::element(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_e_inner::any(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_e_inner::group(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_e<'input>(allModel__seqfield1_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield1_e<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            allModel__seqfield1_e_inner::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel<'input> {
-        seqfield0: allModel__annotation_e<'input>,
-        seqfield1: allModel__seqfield1_e<'input>,
-    }
-
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
-
-
-    impl<'input> ParseXml<'input> for allModel<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(allModel {
-
-
-
-                seqfield0: allModel__annotation_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: allModel__seqfield1_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum simpleDerivation<'input> {
-        restriction(Box<super::UNQUAL::restriction_e<'input>>),
-        list(Box<super::UNQUAL::list_e<'input>>),
-        union(Box<super::UNQUAL::union_e<'input>>),
-    }
-
-    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::union(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "restriction"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "list"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "union"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for simpleDerivation<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::restriction_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::restriction(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::list_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::list(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::union_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::union(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum nestedParticle<'input> {
-        element(Box<super::UNQUAL::localElement<'input>>),
-        group(Box<super::UNQUAL::groupRef<'input>>),
-        choice(Box<super::UNQUAL::choice_e<'input>>),
-        sequence(Box<super::UNQUAL::sequence_e<'input>>),
-        any(Box<super::UNQUAL::any_e<'input>>),
-    }
-
-    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::any(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for nestedParticle<'input> {
-        fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::element(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::group(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choice(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::sequence(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::any(Box::new(r))), None => () }
 
 
 
