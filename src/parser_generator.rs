@@ -67,7 +67,9 @@ impl<'a> ParserGenerator<'a> {
             self.element(&element, None);
         }
         self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// groups\n");
-        for (name, (min_occurs, max_occurs, attrs, type_tree)) in self.schema.groups.iter() {
+        let mut groups: Vec<_> = self.schema.groups.iter().collect();
+        elements.sort_by_key(|&n| n.name);
+        for (name, (min_occurs, max_occurs, attrs, type_tree)) in groups.iter() {
             match type_tree {
                 Some(tt) => self.type_occurs(*min_occurs, *max_occurs, &name, &tt),
                 None => self.empty_type(&name),
@@ -302,7 +304,7 @@ impl<'a> ParserGenerator<'a> {
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
                 enum_name
             },
-            ElementType::ComplexList(mixed, item_type) => {
+            ElementType::List(List::ComplexList(mixed, item_type)) => {
                 let struct_name = escape_keyword(name);
                 let item_type_name = format!("{}__valuetype", name);
                 let type_ = self.type_(&item_type_name, item_type);
@@ -311,7 +313,7 @@ impl<'a> ParserGenerator<'a> {
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
                 struct_name
             },
-            ElementType::SimpleList(item_type) => {
+            ElementType::List(List::SimpleList(item_type)) => {
                 let struct_name = escape_keyword(name);
                 let type_name = self.id_to_type_name(*item_type);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();

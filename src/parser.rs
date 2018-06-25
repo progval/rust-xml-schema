@@ -46,6 +46,10 @@ pub enum ElementType<'a> {
     GroupRef(QName<'a>),
     Choice(Vec<Element<'a>>),
     Union(Option<Vec<QName<'a>>>, Option<Vec<Element<'a>>>),
+    List(List<'a>),
+}
+#[derive(Debug, PartialEq)]
+pub enum List<'a> {
     ComplexList(bool, Box<ElementType<'a>>), // (mixed, inner_type)
     SimpleList(QName<'a>),
 }
@@ -132,6 +136,28 @@ pub(crate) fn parse_document(stream: &mut S) -> Document<'a> {
     }
 
     root
+}
+
+fn parse_annotation(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) {
+    Self::eat_block(stream, context, closing_tag) // TODO
+}
+fn eat_block(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) {
+    let mut stack = vec![closing_tag];
+
+    while stack.len() > 0 {
+        let token = stream.next().unwrap();
+        match token {
+            Ok(Token::ElementStart(start, end)) => stack.push((start.to_str(), end.to_str())),
+            Ok(Token::ElementEnd(ElementEnd::Empty)) => { stack.pop(); () },
+            Ok(Token::ElementEnd(ElementEnd::Close(start, end))) => {
+                let expected_tag = stack.pop().unwrap(); // unwrap can't panic, loop invariant
+                assert_eq!((start.to_str(), end.to_str()), expected_tag);
+                ()
+            }
+            Ok(_) => (),
+            Err(e) => panic!(format!("{:?}", e)),
+        }
+    }
 }
 
 fn parse_schema(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> Schema<'a> {
@@ -927,7 +953,7 @@ fn parse_list(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&s
         let (newtype, mixed, newattrs) = Self::parse_subelement(stream, context, closing_tag);
         assert!(newattrs == None || newattrs == Some(Vec::new()));
         if let Some(type_) = newtype {
-            return (None, None, ElementType::ComplexList(mixed, Box::new(type_)))
+            return (None, None, ElementType::List(List::ComplexList(mixed, Box::new(type_))))
         }
     }
     else {
@@ -935,29 +961,8 @@ fn parse_list(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&s
     }
 
     let item_type = item_type.unwrap();
-    (None, None, ElementType::SimpleList(item_type))
+    (None, None, ElementType::List(List::SimpleList(item_type)))
 }
 
-fn parse_annotation(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) {
-    Self::eat_block(stream, context, closing_tag) // TODO
-}
-fn eat_block(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) {
-    let mut stack = vec![closing_tag];
-
-    while stack.len() > 0 {
-        let token = stream.next().unwrap();
-        match token {
-            Ok(Token::ElementStart(start, end)) => stack.push((start.to_str(), end.to_str())),
-            Ok(Token::ElementEnd(ElementEnd::Empty)) => { stack.pop(); () },
-            Ok(Token::ElementEnd(ElementEnd::Close(start, end))) => {
-                let expected_tag = stack.pop().unwrap(); // unwrap can't panic, loop invariant
-                assert_eq!((start.to_str(), end.to_str()), expected_tag);
-                ()
-            }
-            Ok(_) => (),
-            Err(e) => panic!(format!("{:?}", e)),
-        }
-    }
-}
 
 }

@@ -48,5 +48,5 @@ pub trait ParseContext {
 }
 pub trait ParseXml {
     type Context: ParseContext;
-    fn parse_xml(stream: &mut Stream, context: &mut Self::Context, closingtag: &QName) -> Self;
+    fn parse_xml(stream: &mut Stream, context: &mut Self::Context, opening_tag: &QName) -> Self;
 }
