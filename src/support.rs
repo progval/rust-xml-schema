@@ -7,6 +7,7 @@ use xmlparser::{Token, ElementEnd, StrSpan, Tokenizer};
 pub struct token<'input>(StrSpan<'input>);
 
 impl<'input> ParseXml<'input> for token<'input> {
+    const NODE_NAME: &'static str = "token";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<token<'input>> {
         match stream.next() {
             Some(Token::Text(strspan)) => Some(token(strspan)),
@@ -24,6 +25,7 @@ impl<'input> Default for token<'input> {
 pub struct NMTOKEN<'input>(StrSpan<'input>);
 
 impl<'input> ParseXml<'input> for NMTOKEN<'input> {
+    const NODE_NAME: &'static str = "NMTOKEN";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<NMTOKEN<'input>> {
         match stream.next() {
             Some(Token::Text(strspan)) => Some(NMTOKEN(strspan)),
@@ -83,6 +85,7 @@ pub struct SUPPORT_ANY<'input>(Vec<Token<'input>>); // TODO: remove, temporary
 #[derive(Debug, PartialEq, Default)]
 pub struct any<'input>(Vec<Token<'input>>);
 impl<'input> ParseXml<'input> for any<'input> {
+    const NODE_NAME: &'static str = "any";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<any<'input>> {
         let mut tag_stack = Vec::new();
         let mut tokens = Vec::new();
@@ -115,6 +118,7 @@ impl<'input> ParseXml<'input> for any<'input> {
 pub struct XmlString<'input>(StrSpan<'input>);
 
 impl<'input> ParseXml<'input> for XmlString<'input> {
+    const NODE_NAME: &'static str = "string";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<XmlString<'input>> {
         match stream.next() {
             Some(Token::Text(strspan)) => Some(XmlString(strspan)),
@@ -151,8 +155,10 @@ impl<'input> Iterator for Stream<'input> {
 pub trait ParseContext {
 } // TODO: remove this
 pub trait ParseXml<'input>: Sized {
+    const NODE_NAME: &'static str;
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self>;
     fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        println!("Entering: {:?}", Self::NODE_NAME);
         Self::parse_self_xml(stream, parse_context, parent_context)
     }
 }
