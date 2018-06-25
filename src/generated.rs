@@ -116,7 +116,7 @@ pub mod UNQUAL {
     #[derive(Debug, PartialEq, Default)]
     pub struct basicNamespaceList<'input>(Vec<basicNamespaceList__valuetype<'input>>);
 
-    // ^-- from ComplexList(false, Union(Some([QName(Some("xs"), "anyURI")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }])))
+    // ^-- from List(ComplexList(false, Union(Some([QName(Some("xs"), "anyURI")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }]))))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct blockSet__item0<'input>(super::UNQUAL::token<'input>);
@@ -127,7 +127,7 @@ pub mod UNQUAL {
     #[derive(Debug, PartialEq, Default)]
     pub struct blockSet__item1<'input>(Vec<blockSet__item1__valuetype<'input>>);
 
-    // ^-- from ComplexList(false, Custom(QName(Some("xs"), "derivationControl")))
+    // ^-- from List(ComplexList(false, Custom(QName(Some("xs"), "derivationControl"))))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct blockSet<'input> {
@@ -135,7 +135,7 @@ pub mod UNQUAL {
         item1: blockSet__item1<'input>,
     }
 
-    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(ComplexList(false, Custom(QName(Some("xs"), "derivationControl")))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(List(ComplexList(false, Custom(QName(Some("xs"), "derivationControl"))))), min_occurs: None, max_occurs: None }]))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct complexRestrictionType<'input>(super::UNQUAL::restrictionType<'input>);
@@ -161,7 +161,7 @@ pub mod UNQUAL {
         item1: derivationSet__item1<'input>,
     }
 
-    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(SimpleList(QName(Some("xs"), "reducedDerivationControl"))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(List(SimpleList(QName(Some("xs"), "reducedDerivationControl")))), min_occurs: None, max_occurs: None }]))
 
     #[derive(Debug, PartialEq)]
     pub enum element__extension__seqfield0_e_inner<'input> {
@@ -252,7 +252,7 @@ pub mod UNQUAL {
         item1: fullDerivationSet__item1<'input>,
     }
 
-    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(SimpleList(QName(Some("xs"), "typeDerivationControl"))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(List(SimpleList(QName(Some("xs"), "typeDerivationControl")))), min_occurs: None, max_occurs: None }]))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct group_item<'input> {
@@ -340,7 +340,7 @@ pub mod UNQUAL {
     #[derive(Debug, PartialEq, Default)]
     pub struct qnameList<'input>(Vec<qnameList__valuetype<'input>>);
 
-    // ^-- from ComplexList(false, Union(Some([QName(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }])))
+    // ^-- from List(ComplexList(false, Union(Some([QName(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }]))))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct qnameListA__valuetype__item0<'input>(super::UNQUAL::token<'input>);
@@ -356,7 +356,7 @@ pub mod UNQUAL {
     #[derive(Debug, PartialEq, Default)]
     pub struct qnameListA<'input>(Vec<qnameListA__valuetype<'input>>);
 
-    // ^-- from ComplexList(false, Union(Some([QName(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }])))
+    // ^-- from List(ComplexList(false, Union(Some([QName(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }]))))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct realGroup<'input>(super::UNQUAL::group<'input>);
@@ -416,7 +416,7 @@ pub mod UNQUAL {
     #[derive(Debug, PartialEq, Default)]
     pub struct simpleDerivationSet__item1<'input>(Vec<simpleDerivationSet__item1__valuetype<'input>>);
 
-    // ^-- from ComplexList(false, Custom(QName(Some("xs"), "derivationControl")))
+    // ^-- from List(ComplexList(false, Custom(QName(Some("xs"), "derivationControl"))))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct simpleDerivationSet<'input> {
@@ -424,7 +424,7 @@ pub mod UNQUAL {
         item1: simpleDerivationSet__item1<'input>,
     }
 
-    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(ComplexList(false, Custom(QName(Some("xs"), "derivationControl")))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(List(ComplexList(false, Custom(QName(Some("xs"), "derivationControl"))))), min_occurs: None, max_occurs: None }]))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct simpleExplicitGroup<'input>(super::UNQUAL::explicitGroup<'input>);
@@ -971,7 +971,7 @@ pub mod UNQUAL {
     #[derive(Debug, PartialEq, Default)]
     pub struct union_e<'input>(union_e_inner<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "union")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [LongDef { name: "memberTypes", default: None, inner: Element { name: None, attrs: [], mixed: false, type_: Some(SimpleList(QName(Some("xs"), "QName"))), min_occurs: None, max_occurs: None } }], Some(Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: Some(QName(None, "union")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [LongDef { name: "memberTypes", default: None, inner: Element { name: None, attrs: [], mixed: false, type_: Some(List(SimpleList(QName(Some("xs"), "QName")))), min_occurs: None, max_occurs: None } }], Some(Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])))), min_occurs: None, max_occurs: None }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct unique_e<'input>(super::UNQUAL::keybase<'input>);
@@ -986,89 +986,6 @@ pub mod UNQUAL {
 
     /////////// groups
 
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionModel__simpleType_e<'input>(super::UNQUAL::localSimpleType<'input>);
-
-    // ^-- from Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
-
-    #[derive(Debug, PartialEq)]
-    pub enum simpleRestrictionModel__seqfield1_e_inner<'input> {
-        facet(Box<super::UNQUAL::facet_e<'input>>),
-        choicevariant1(Box<SUPPORT_ANY<'input>>),
-    }
-
-    impl<'input> Default for simpleRestrictionModel__seqfield1_e_inner<'input> { fn default() -> simpleRestrictionModel__seqfield1_e_inner<'input> { simpleRestrictionModel__seqfield1_e_inner::choicevariant1(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionModel__seqfield1_e<'input>(simpleRestrictionModel__seqfield1_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionModel<'input> {
-        simpleType: simpleRestrictionModel__simpleType_e<'input>,
-        seqfield1: simpleRestrictionModel__seqfield1_e<'input>,
-    }
-
-    // ^-- from Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
-
-    #[derive(Debug, PartialEq)]
-    pub enum typeDefParticle<'input> {
-        group(Box<super::UNQUAL::groupRef<'input>>),
-        all(Box<super::UNQUAL::all_e<'input>>),
-        choice(Box<super::UNQUAL::choice_e<'input>>),
-        sequence(Box<super::UNQUAL::sequence_e<'input>>),
-    }
-
-    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::sequence(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "all"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }])
-
-    #[derive(Debug, PartialEq)]
-    pub enum simpleDerivation<'input> {
-        restriction(Box<super::UNQUAL::restriction_e<'input>>),
-        list(Box<super::UNQUAL::list_e<'input>>),
-        union(Box<super::UNQUAL::union_e<'input>>),
-    }
-
-    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::union(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "restriction"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "list"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "union"))), min_occurs: None, max_occurs: None }])
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__annotation_e<'input>(super::UNQUAL::annotation_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }
-
-    #[derive(Debug, PartialEq)]
-    pub enum allModel__seqfield1_e_inner<'input> {
-        element(Box<super::UNQUAL::localElement<'input>>),
-        any(Box<super::UNQUAL::any_e<'input>>),
-        group(Box<super::UNQUAL::groupRef<'input>>),
-    }
-
-    impl<'input> Default for allModel__seqfield1_e_inner<'input> { fn default() -> allModel__seqfield1_e_inner<'input> { allModel__seqfield1_e_inner::group(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_e<'input>(allModel__seqfield1_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel<'input> {
-        seqfield0: allModel__annotation_e<'input>,
-        seqfield1: allModel__seqfield1_e<'input>,
-    }
-
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
 
     #[derive(Debug, PartialEq, Default)]
     pub struct complexTypeModel__choicevariant2__openContent_e<'input>(super::UNQUAL::openContent_e<'input>);
@@ -1102,20 +1019,44 @@ pub mod UNQUAL {
     // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "simpleContent"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "complexContent"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "typeDefParticle"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "attrDecls"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "assertions"))), min_occurs: None, max_occurs: None }])), min_occurs: None, max_occurs: None }])
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct occurs<'input>(PhantomData<&'input ()>);
+    pub struct allModel__annotation_e<'input>(super::UNQUAL::annotation_e<'input>);
+
+    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }
 
     #[derive(Debug, PartialEq)]
-    pub enum nestedParticle<'input> {
+    pub enum allModel__seqfield1_e_inner<'input> {
         element(Box<super::UNQUAL::localElement<'input>>),
-        group(Box<super::UNQUAL::groupRef<'input>>),
-        choice(Box<super::UNQUAL::choice_e<'input>>),
-        sequence(Box<super::UNQUAL::sequence_e<'input>>),
         any(Box<super::UNQUAL::any_e<'input>>),
+        group(Box<super::UNQUAL::groupRef<'input>>),
     }
 
-    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::any(Default::default()) } }
+    impl<'input> Default for allModel__seqfield1_e_inner<'input> { fn default() -> allModel__seqfield1_e_inner<'input> { allModel__seqfield1_e_inner::group(Default::default()) } }
 
-    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_e<'input>(allModel__seqfield1_e_inner<'input>);
+
+    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel<'input> {
+        seqfield0: allModel__annotation_e<'input>,
+        seqfield1: allModel__seqfield1_e<'input>,
+    }
+
+    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+
+    #[derive(Debug, PartialEq)]
+    pub enum identityConstraint<'input> {
+        unique(Box<super::UNQUAL::unique_e<'input>>),
+        key(Box<super::UNQUAL::key_e<'input>>),
+        keyref(Box<super::UNQUAL::keyref_e<'input>>),
+    }
+
+    impl<'input> Default for identityConstraint<'input> { fn default() -> identityConstraint<'input> { identityConstraint::keyref(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "unique"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "key"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "keyref"))), min_occurs: None, max_occurs: None }])
 
     #[derive(Debug, PartialEq)]
     pub enum attrDecls__seqfield0_e_inner<'input> {
@@ -1146,17 +1087,6 @@ pub mod UNQUAL {
     // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "anyAttribute"))), min_occurs: Some(0), max_occurs: None }])
 
     #[derive(Debug, PartialEq)]
-    pub enum identityConstraint<'input> {
-        unique(Box<super::UNQUAL::unique_e<'input>>),
-        key(Box<super::UNQUAL::key_e<'input>>),
-        keyref(Box<super::UNQUAL::keyref_e<'input>>),
-    }
-
-    impl<'input> Default for identityConstraint<'input> { fn default() -> identityConstraint<'input> { identityConstraint::keyref(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "unique"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "key"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "keyref"))), min_occurs: None, max_occurs: None }])
-
-    #[derive(Debug, PartialEq)]
     pub enum particle<'input> {
         element(Box<super::UNQUAL::localElement<'input>>),
         group(Box<super::UNQUAL::groupRef<'input>>),
@@ -1171,6 +1101,18 @@ pub mod UNQUAL {
     // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "all"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }])
 
     #[derive(Debug, PartialEq)]
+    pub enum typeDefParticle<'input> {
+        group(Box<super::UNQUAL::groupRef<'input>>),
+        all(Box<super::UNQUAL::all_e<'input>>),
+        choice(Box<super::UNQUAL::choice_e<'input>>),
+        sequence(Box<super::UNQUAL::sequence_e<'input>>),
+    }
+
+    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::sequence(Default::default()) } }
+
+    // ^-- from Choice([Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "all"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }])
+
+    #[derive(Debug, PartialEq)]
     pub enum schemaTop<'input> {
         redefinable(Box<super::UNQUAL::redefinable<'input>>),
         element(Box<super::UNQUAL::element_e<'input>>),
@@ -1182,29 +1124,8 @@ pub mod UNQUAL {
 
     // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "redefinable"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "element"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "notation"))), min_occurs: None, max_occurs: None }])
 
-    #[derive(Debug, PartialEq)]
-    pub enum redefinable<'input> {
-        simpleType(Box<super::UNQUAL::simpleType_e<'input>>),
-        complexType(Box<super::UNQUAL::complexType_e<'input>>),
-        group(Box<super::UNQUAL::group_e<'input>>),
-        attributeGroup(Box<super::UNQUAL::attributeGroup_e<'input>>),
-    }
-
-    impl<'input> Default for redefinable<'input> { fn default() -> redefinable<'input> { redefinable::attributeGroup(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "simpleType"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "complexType"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "group"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "attributeGroup"))), min_occurs: None, max_occurs: None }])
-
     #[derive(Debug, PartialEq, Default)]
-    pub struct assertions__assert_e<'input>(super::UNQUAL::assertion<'input>);
-
-    // ^-- from Element { name: Some(QName(None, "assert")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions<'input> {
-        assert: assertions__assert_e<'input>,
-    }
-
-    // ^-- from Sequence([Element { name: Some(QName(None, "assert")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+    pub struct defRef<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq)]
     pub enum composition<'input> {
@@ -1219,6 +1140,85 @@ pub mod UNQUAL {
 
     // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "include"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "import"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "redefine"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "override"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: None, max_occurs: None }])
 
+    #[derive(Debug, PartialEq)]
+    pub enum redefinable<'input> {
+        simpleType(Box<super::UNQUAL::simpleType_e<'input>>),
+        complexType(Box<super::UNQUAL::complexType_e<'input>>),
+        group(Box<super::UNQUAL::group_e<'input>>),
+        attributeGroup(Box<super::UNQUAL::attributeGroup_e<'input>>),
+    }
+
+    impl<'input> Default for redefinable<'input> { fn default() -> redefinable<'input> { redefinable::attributeGroup(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "simpleType"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "complexType"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "group"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "attributeGroup"))), min_occurs: None, max_occurs: None }])
+
     #[derive(Debug, PartialEq, Default)]
-    pub struct defRef<'input>(PhantomData<&'input ()>);
+    pub struct occurs<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq)]
+    pub enum simpleDerivation<'input> {
+        restriction(Box<super::UNQUAL::restriction_e<'input>>),
+        list(Box<super::UNQUAL::list_e<'input>>),
+        union(Box<super::UNQUAL::union_e<'input>>),
+    }
+
+    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::union(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "restriction"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "list"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "union"))), min_occurs: None, max_occurs: None }])
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel__simpleType_e<'input>(super::UNQUAL::localSimpleType<'input>);
+
+    // ^-- from Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
+
+    #[derive(Debug, PartialEq)]
+    pub enum simpleRestrictionModel__seqfield1_e_inner<'input> {
+        facet(Box<super::UNQUAL::facet_e<'input>>),
+        choicevariant1(Box<SUPPORT_ANY<'input>>),
+    }
+
+    impl<'input> Default for simpleRestrictionModel__seqfield1_e_inner<'input> { fn default() -> simpleRestrictionModel__seqfield1_e_inner<'input> { simpleRestrictionModel__seqfield1_e_inner::choicevariant1(Default::default()) } }
+
+    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel__seqfield1_e<'input>(simpleRestrictionModel__seqfield1_e_inner<'input>);
+
+    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel<'input> {
+        simpleType: simpleRestrictionModel__simpleType_e<'input>,
+        seqfield1: simpleRestrictionModel__seqfield1_e<'input>,
+    }
+
+    // ^-- from Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions__assert_e<'input>(super::UNQUAL::assertion<'input>);
+
+    // ^-- from Element { name: Some(QName(None, "assert")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions<'input> {
+        assert: assertions__assert_e<'input>,
+    }
+
+    // ^-- from Sequence([Element { name: Some(QName(None, "assert")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+
+    #[derive(Debug, PartialEq)]
+    pub enum nestedParticle<'input> {
+        element(Box<super::UNQUAL::localElement<'input>>),
+        group(Box<super::UNQUAL::groupRef<'input>>),
+        choice(Box<super::UNQUAL::choice_e<'input>>),
+        sequence(Box<super::UNQUAL::sequence_e<'input>>),
+        any(Box<super::UNQUAL::any_e<'input>>),
+    }
+
+    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::any(Default::default()) } }
+
+    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }])
 }
