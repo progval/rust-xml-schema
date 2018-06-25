@@ -1,15 +1,15 @@
 use std::fmt;
 
 use xmlparser::Error as XmlParserError;
-use xmlparser::{Token, ElementEnd, StrSpan};
+use xmlparser::{Token, ElementEnd, StrSpan, Tokenizer};
 
 #[derive(Debug, PartialEq)]
 pub struct token<'input>(StrSpan<'input>);
 
 impl<'input> ParseXml<'input> for token<'input> {
-    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<token<'input>> {
+    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<token<'input>> {
         match stream.next() {
-            Some(Ok(Token::Text(strspan))) => Some(token(strspan)),
+            Some(Token::Text(strspan)) => Some(token(strspan)),
             _ => None,
         }
     }
@@ -24,9 +24,9 @@ impl<'input> Default for token<'input> {
 pub struct NMTOKEN<'input>(StrSpan<'input>);
 
 impl<'input> ParseXml<'input> for NMTOKEN<'input> {
-    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<NMTOKEN<'input>> {
+    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<NMTOKEN<'input>> {
         match stream.next() {
-            Some(Ok(Token::Text(strspan))) => Some(NMTOKEN(strspan)),
+            Some(Token::Text(strspan)) => Some(NMTOKEN(strspan)),
             _ => None,
         }
     }
@@ -83,17 +83,17 @@ pub struct SUPPORT_ANY<'input>(Vec<Token<'input>>); // TODO: remove, temporary
 #[derive(Debug, PartialEq, Default)]
 pub struct any<'input>(Vec<Token<'input>>);
 impl<'input> ParseXml<'input> for any<'input> {
-    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<any<'input>> {
+    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<any<'input>> {
         let mut tag_stack = Vec::new();
         let mut tokens = Vec::new();
-        let tok = stream.next().unwrap().unwrap();
+        let tok = stream.next()?;
         tokens.push(tok);
         match tok {
             Token::ElementStart(prefix, name) => tag_stack.push(QName::from_strspans(prefix, name)),
             _ => return None, // TODO: put it back in the stream
         }
         while tag_stack.len() > 0 {
-            let tok = stream.next().unwrap().unwrap();
+            let tok = stream.next().unwrap();
             tokens.push(tok);
             match tok {
                 Token::ElementStart(prefix, name) => tag_stack.push(QName::from_strspans(prefix, name)),
@@ -115,9 +115,9 @@ impl<'input> ParseXml<'input> for any<'input> {
 pub struct XmlString<'input>(StrSpan<'input>);
 
 impl<'input> ParseXml<'input> for XmlString<'input> {
-    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<XmlString<'input>> {
+    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<XmlString<'input>> {
         match stream.next() {
-            Some(Ok(Token::Text(strspan))) => Some(XmlString(strspan)),
+            Some(Token::Text(strspan)) => Some(XmlString(strspan)),
             _ => None, // TODO: put it back in the stream
         }
     }
@@ -129,9 +129,30 @@ impl<'input> Default for XmlString<'input> {
     }
 }
 
-pub type Stream<'input> = Iterator<Item=Result<Token<'input>, XmlParserError>>;
+pub type InnerStream<'input> = Iterator<Item=Result<Token<'input>, XmlParserError>>;
+pub struct Stream<'input>(Tokenizer<'input>);
+
+impl<'input> Stream<'input> {
+    pub fn new(tokenizer: Tokenizer<'input>) -> Stream<'input> {
+        Stream(tokenizer)
+    }
+}
+
+impl<'input> Iterator for Stream<'input> {
+    type Item = Token<'input>;
+    fn next(&mut self) -> Option<Self::Item> {
+        let tok = self.0.next()?.unwrap();
+        println!("Reading token: {:?}", tok);
+        Some(tok)
+    }
+}
+
+
 pub trait ParseContext {
 } // TODO: remove this
 pub trait ParseXml<'input>: Sized {
-    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self>;
+    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self>;
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        Self::parse_self_xml(stream, parse_context, parent_context)
+    }
 }
