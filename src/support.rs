@@ -1,3 +1,5 @@
+use std::io::Write;
+use std::collections::VecDeque;
 use std::fmt;
 
 use xmlparser::Error as XmlParserError;
@@ -136,21 +138,54 @@ impl<'input> Default for XmlString<'input> {
     }
 }
 
-pub type InnerStream<'input> = Iterator<Item=Result<Token<'input>, XmlParserError>>;
-pub struct Stream<'input>(Tokenizer<'input>);
+pub type Stream<'input> = Box<InnerStream<'input>>;
+pub struct InnerStream<'input> {
+    index: usize,
+    tokens: Vec<Token<'input>>,
+}
 
-impl<'input> Stream<'input> {
-    pub fn new(tokenizer: Tokenizer<'input>) -> Stream<'input> {
-        Stream(tokenizer)
+impl<'input> InnerStream<'input> {
+    pub fn new(tokenizer: Tokenizer<'input>) -> InnerStream<'input> {
+        InnerStream { index: 0, tokens: tokenizer.into_iter().map(|o| o.unwrap()).collect() }
+    }
+
+    #[inline]
+    pub fn transaction(&self) -> Transaction {
+        Transaction { initial_index: self.index }
     }
 }
 
-impl<'input> Iterator for Stream<'input> {
+#[must_use]
+pub struct Transaction {
+    initial_index: usize,
+}
+
+impl Transaction {
+    #[inline]
+    pub fn commit(self) {
+    }
+
+    #[inline]
+    pub fn rollback(self, stream: &mut InnerStream) {
+        println!("Rolling back {} tokens", stream.index - self.initial_index);
+        ::std::io::stdout().flush().ok().expect("Could not flush stdout");
+        stream.index = self.initial_index
+    }
+}
+
+impl<'input> Iterator for InnerStream<'input> {
     type Item = Token<'input>;
     fn next(&mut self) -> Option<Self::Item> {
-        let tok = self.0.next()?.unwrap();
-        println!("Reading token: {:?}", tok);
-        Some(tok)
+        let tok = self.tokens.get(self.index);
+        println!("Reading {:?}", tok);
+        ::std::io::stdout().flush().ok().expect("Could not flush stdout");
+        match tok {
+            Some(res) => {
+                self.index += 1;
+                Some(res.clone())
+            }
+            None => None
+        }
     }
 }
 
@@ -162,6 +197,10 @@ pub trait ParseXml<'input>: Sized {
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self>;
     fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
         println!("Entering: {:?}", Self::NODE_NAME);
-        Self::parse_self_xml(stream, parse_context, parent_context)
+        ::std::io::stdout().flush().ok().expect("Could not flush stdout");
+        let ret = Self::parse_self_xml(stream, parse_context, parent_context);
+        println!("Leaving: {:?}", Self::NODE_NAME);
+        ::std::io::stdout().flush().ok().expect("Could not flush stdout");
+        ret
     }
 }

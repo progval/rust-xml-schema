@@ -6,6 +6,8 @@ pub mod UNQUAL {
 
     use xmlparser::{Token, ElementEnd};
 
+    macro_rules! try_rollback { ($stream:expr, $tx:expr, $e:expr) => { match $e { Some(i) => i, None => { $tx.rollback($stream); return None } } } }
+
 
     /////////// types
 
@@ -41,24 +43,154 @@ pub mod UNQUAL {
     // ^-- from Union(Some([QName(Some("xs"), "nonNegativeInteger")]), Some([(None, None, Custom(QName(Some("xs"), "NMTOKEN")))]))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType__extension__seqfield0_item__choicevariant0<'input>(super::UNQUAL::localSimpleType<'input>);
+    pub struct altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
+
+
+    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct altType__extension__seqfield0_item__choicevariant0__simpleType_e<'input> {
+        child: altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant0__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) altType__extension__seqfield0_item__choicevariant0__simpleType_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "simpleType" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(altType__extension__seqfield0_item__choicevariant0__simpleType_e {
+                                        child: try_rollback!(stream, tx, altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct altType__extension__seqfield0_item__choicevariant0<'input>(altType__extension__seqfield0_item__choicevariant0__simpleType_e<'input>);
 
 
     impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant0<'input> {
         const NODE_NAME: &'static str = "elementtype element altType__extension__seqfield0_item__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant0)
+            altType__extension__seqfield0_item__choicevariant0__simpleType_e::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType__extension__seqfield0_item__choicevariant1<'input>(super::UNQUAL::localComplexType<'input>);
+    pub struct altType__extension__seqfield0_item__choicevariant1__complexType_e_inner<'input>(super::UNQUAL::localComplexType<'input>);
+
+
+    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant1__complexType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom altType__extension__seqfield0_item__choicevariant1__complexType_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant1__complexType_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct altType__extension__seqfield0_item__choicevariant1__complexType_e<'input> {
+        child: altType__extension__seqfield0_item__choicevariant1__complexType_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant1__complexType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) altType__extension__seqfield0_item__choicevariant1__complexType_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "complexType" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(altType__extension__seqfield0_item__choicevariant1__complexType_e {
+                                        child: try_rollback!(stream, tx, altType__extension__seqfield0_item__choicevariant1__complexType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct altType__extension__seqfield0_item__choicevariant1<'input>(altType__extension__seqfield0_item__choicevariant1__complexType_e<'input>);
 
 
     impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant1<'input> {
         const NODE_NAME: &'static str = "elementtype element altType__extension__seqfield0_item__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant1)
+            altType__extension__seqfield0_item__choicevariant1__complexType_e::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant1)
         }
     }
 
@@ -113,11 +245,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for altType__extension<'input> {
         const NODE_NAME: &'static str = "sequence altType__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(altType__extension {
 
 
 
-                seqfield0: altType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, altType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -137,12 +270,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for altType<'input> {
         const NODE_NAME: &'static str = "extension altType";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(altType {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: altType__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, altType__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -173,11 +307,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for annotated__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence annotated__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(annotated__extension__seqfield0 {
 
 
 
-                seqfield0: annotated__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, annotated__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -196,11 +331,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for annotated__extension<'input> {
         const NODE_NAME: &'static str = "sequence annotated__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(annotated__extension {
 
 
 
-                seqfield0: annotated__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, annotated__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -220,12 +356,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for annotated<'input> {
         const NODE_NAME: &'static str = "extension annotated";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(annotated {
-                BASE: super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: annotated__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, annotated__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -260,11 +397,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for anyType<'input> {
         const NODE_NAME: &'static str = "sequence anyType";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(anyType {
 
 
 
-                seqfield0: anyType__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, anyType__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -281,6 +419,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for assertion__extension<'input> {
         const NODE_NAME: &'static str = "sequence assertion__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(assertion__extension {
 
 
@@ -305,12 +444,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for assertion<'input> {
         const NODE_NAME: &'static str = "extension assertion";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(assertion {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: assertion__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, assertion__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -341,7 +481,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for attribute__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
         const NODE_NAME: &'static str = "element (normal) attribute__extension__seqfield0__seqfield0_item__simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "simpleType" {
@@ -351,9 +500,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(attribute__extension__seqfield0__seqfield0_item__simpleType_e {
-                                        child: attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -363,6 +515,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -404,11 +557,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for attribute__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence attribute__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(attribute__extension__seqfield0 {
 
 
 
-                seqfield0: attribute__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, attribute__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -427,11 +581,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for attribute__extension<'input> {
         const NODE_NAME: &'static str = "sequence attribute__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(attribute__extension {
 
 
 
-                seqfield0: attribute__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, attribute__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -451,12 +606,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for attribute<'input> {
         const NODE_NAME: &'static str = "extension attribute";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(attribute {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: attribute__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, attribute__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -476,11 +632,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for attributeGroup__extension<'input> {
         const NODE_NAME: &'static str = "sequence attributeGroup__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(attributeGroup__extension {
 
 
 
-                seqfield0: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -500,12 +657,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for attributeGroup<'input> {
         const NODE_NAME: &'static str = "extension attributeGroup";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(attributeGroup {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: attributeGroup__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, attributeGroup__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -606,11 +764,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for complexType__extension<'input> {
         const NODE_NAME: &'static str = "sequence complexType__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(complexType__extension {
 
 
 
-                seqfield0: super::UNQUAL::complexTypeModel::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, super::UNQUAL::complexTypeModel::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -630,12 +789,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for complexType<'input> {
         const NODE_NAME: &'static str = "extension complexType";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(complexType {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: complexType__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, complexType__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -678,24 +838,154 @@ pub mod UNQUAL {
     // ^-- from Union(None, Some([(None, None, Custom(QName(Some("xs"), "token"))), (None, None, List(SimpleList(QName(Some("xs"), "reducedDerivationControl"))))]))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield0_item__choicevariant0<'input>(super::UNQUAL::localSimpleType<'input>);
+    pub struct element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
+
+
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e<'input> {
+        child: element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "simpleType" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e {
+                                        child: try_rollback!(stream, tx, element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element__extension__seqfield0__seqfield0_item__choicevariant0<'input>(element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e<'input>);
 
 
     impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant0<'input> {
         const NODE_NAME: &'static str = "elementtype element element__extension__seqfield0__seqfield0_item__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant0)
+            element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield0_item__choicevariant1<'input>(super::UNQUAL::localComplexType<'input>);
+    pub struct element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner<'input>(super::UNQUAL::localComplexType<'input>);
+
+
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e<'input> {
+        child: element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "complexType" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e {
+                                        child: try_rollback!(stream, tx, element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element__extension__seqfield0__seqfield0_item__choicevariant1<'input>(element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e<'input>);
 
 
     impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant1<'input> {
         const NODE_NAME: &'static str = "elementtype element element__extension__seqfield0__seqfield0_item__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant1)
+            element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant1)
         }
     }
 
@@ -761,7 +1051,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield1_item__alternative_e<'input> {
         const NODE_NAME: &'static str = "element (normal) element__extension__seqfield0__seqfield1_item__alternative_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "alternative" {
@@ -771,9 +1070,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(element__extension__seqfield0__seqfield1_item__alternative_e {
-                                        child: element__extension__seqfield0__seqfield1_item__alternative_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, element__extension__seqfield0__seqfield1_item__alternative_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -783,6 +1085,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -845,19 +1148,20 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for element__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence element__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(element__extension__seqfield0 {
 
 
 
-                seqfield0: element__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, element__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: element__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: try_rollback!(stream, tx, element__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield2: element__extension__seqfield0__seqfield2::parse_xml(stream, parse_context, parent_context)?,
+                seqfield2: try_rollback!(stream, tx, element__extension__seqfield0__seqfield2::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -876,11 +1180,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for element__extension<'input> {
         const NODE_NAME: &'static str = "sequence element__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(element__extension {
 
 
 
-                seqfield0: element__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, element__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -900,12 +1205,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for element<'input> {
         const NODE_NAME: &'static str = "extension element";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(element {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: element__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, element__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -961,23 +1267,24 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for extensionType__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence extensionType__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(extensionType__extension__seqfield0 {
 
 
 
-                seqfield0: extensionType__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, extensionType__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: extensionType__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: try_rollback!(stream, tx, extensionType__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield2: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
+                seqfield2: try_rollback!(stream, tx, super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield3: super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)?,
+                seqfield3: try_rollback!(stream, tx, super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -996,11 +1303,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for extensionType__extension<'input> {
         const NODE_NAME: &'static str = "sequence extensionType__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(extensionType__extension {
 
 
 
-                seqfield0: extensionType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, extensionType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1020,12 +1328,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for extensionType<'input> {
         const NODE_NAME: &'static str = "extension extensionType";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(extensionType {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: extensionType__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, extensionType__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1043,6 +1352,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for facet__extension<'input> {
         const NODE_NAME: &'static str = "sequence facet__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(facet__extension {
 
 
@@ -1067,12 +1377,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for facet<'input> {
         const NODE_NAME: &'static str = "extension facet";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(facet {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: facet__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, facet__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1140,11 +1451,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for group__extension<'input> {
         const NODE_NAME: &'static str = "sequence group__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(group__extension {
 
 
 
-                seqfield0: group__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, group__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1164,12 +1476,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for group<'input> {
         const NODE_NAME: &'static str = "extension group";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(group {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: group__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, group__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1227,15 +1540,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for keybase__extension__seqfield0_item<'input> {
         const NODE_NAME: &'static str = "sequence keybase__extension__seqfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(keybase__extension__seqfield0_item {
 
 
 
-                seqfield0: super::UNQUAL::selector_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, super::UNQUAL::selector_e::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: keybase__extension__seqfield0_item__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: try_rollback!(stream, tx, keybase__extension__seqfield0_item__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1265,11 +1579,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for keybase__extension<'input> {
         const NODE_NAME: &'static str = "sequence keybase__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(keybase__extension {
 
 
 
-                seqfield0: keybase__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, keybase__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1289,12 +1604,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for keybase<'input> {
         const NODE_NAME: &'static str = "extension keybase";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(keybase {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: keybase__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, keybase__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1503,15 +1819,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0__seqfield0_item__choicevariant0<'input> {
         const NODE_NAME: &'static str = "sequence restrictionType__extension__seqfield0__seqfield0_item__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(restrictionType__extension__seqfield0__seqfield0_item__choicevariant0 {
 
 
 
-                seqfield0: restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: try_rollback!(stream, tx, super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1572,19 +1889,20 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence restrictionType__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(restrictionType__extension__seqfield0 {
 
 
 
-                seqfield0: restrictionType__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, restrictionType__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: try_rollback!(stream, tx, super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield2: super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)?,
+                seqfield2: try_rollback!(stream, tx, super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1603,11 +1921,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for restrictionType__extension<'input> {
         const NODE_NAME: &'static str = "sequence restrictionType__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(restrictionType__extension {
 
 
 
-                seqfield0: restrictionType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, restrictionType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1627,12 +1946,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for restrictionType<'input> {
         const NODE_NAME: &'static str = "extension restrictionType";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(restrictionType {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: restrictionType__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, restrictionType__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1720,11 +2040,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for simpleType__extension<'input> {
         const NODE_NAME: &'static str = "sequence simpleType__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(simpleType__extension {
 
 
 
-                seqfield0: super::UNQUAL::simpleDerivation::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, super::UNQUAL::simpleDerivation::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1744,12 +2065,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for simpleType<'input> {
         const NODE_NAME: &'static str = "extension simpleType";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(simpleType {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: simpleType__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, simpleType__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1833,6 +2155,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for wildcard__extension<'input> {
         const NODE_NAME: &'static str = "sequence wildcard__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(wildcard__extension {
 
 
@@ -1857,12 +2180,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for wildcard<'input> {
         const NODE_NAME: &'static str = "extension wildcard";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(wildcard {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: wildcard__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, wildcard__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1916,7 +2240,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for all_e<'input> {
         const NODE_NAME: &'static str = "element (normal) all_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "all" {
@@ -1926,9 +2259,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(all_e {
-                                        child: all_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, all_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1938,6 +2274,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2001,11 +2338,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for annotation_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence annotation_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(annotation_e_inner__extension {
 
 
 
-                seqfield0: annotation_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, annotation_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2025,12 +2363,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for annotation_e_inner<'input> {
         const NODE_NAME: &'static str = "extension annotation_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(annotation_e_inner {
-                BASE: super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: annotation_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, annotation_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2050,7 +2389,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for annotation_e<'input> {
         const NODE_NAME: &'static str = "element (normal) annotation_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "annotation" {
@@ -2060,9 +2408,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(annotation_e {
-                                        child: annotation_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, annotation_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2072,6 +2423,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2089,6 +2441,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for any_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence any_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(any_e_inner__extension {
 
 
@@ -2113,12 +2466,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for any_e_inner<'input> {
         const NODE_NAME: &'static str = "extension any_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(any_e_inner {
-                BASE: super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: any_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, any_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2138,7 +2492,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for any_e<'input> {
         const NODE_NAME: &'static str = "element (normal) any_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "any" {
@@ -2148,9 +2511,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(any_e {
-                                        child: any_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, any_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2160,6 +2526,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2177,6 +2544,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for anyAttribute_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence anyAttribute_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(anyAttribute_e_inner__extension {
 
 
@@ -2201,12 +2569,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for anyAttribute_e_inner<'input> {
         const NODE_NAME: &'static str = "extension anyAttribute_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(anyAttribute_e_inner {
-                BASE: super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: anyAttribute_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, anyAttribute_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2226,7 +2595,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for anyAttribute_e<'input> {
         const NODE_NAME: &'static str = "element (normal) anyAttribute_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "anyAttribute" {
@@ -2236,9 +2614,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(anyAttribute_e {
-                                        child: anyAttribute_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, anyAttribute_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2248,6 +2629,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2267,11 +2649,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for appinfo_e_inner<'input> {
         const NODE_NAME: &'static str = "sequence appinfo_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(appinfo_e_inner {
 
 
 
-                seqfield0: any_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, any_e::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2291,7 +2674,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for appinfo_e<'input> {
         const NODE_NAME: &'static str = "element (normal) appinfo_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "appinfo" {
@@ -2305,9 +2697,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(appinfo_e {
-                                        child: appinfo_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, appinfo_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2321,6 +2716,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2351,7 +2747,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for assertion_e<'input> {
         const NODE_NAME: &'static str = "element (normal) assertion_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "assertion" {
@@ -2361,9 +2766,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(assertion_e {
-                                        child: assertion_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, assertion_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2373,6 +2781,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2403,7 +2812,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for attribute_e<'input> {
         const NODE_NAME: &'static str = "element (normal) attribute_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "attribute" {
@@ -2413,9 +2831,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(attribute_e {
-                                        child: attribute_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, attribute_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2425,6 +2846,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2455,7 +2877,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for attributeGroup_e<'input> {
         const NODE_NAME: &'static str = "element (normal) attributeGroup_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "attributeGroup" {
@@ -2465,9 +2896,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(attributeGroup_e {
-                                        child: attributeGroup_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, attributeGroup_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2477,6 +2911,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2507,7 +2942,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for choice_e<'input> {
         const NODE_NAME: &'static str = "element (normal) choice_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "choice" {
@@ -2517,9 +2961,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(choice_e {
-                                        child: choice_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, choice_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2529,6 +2976,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2538,24 +2986,154 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e_inner__extension__seqfield0__choicevariant0<'input>(super::UNQUAL::complexRestrictionType<'input>);
+    pub struct complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input>(super::UNQUAL::complexRestrictionType<'input>);
+
+
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::complexRestrictionType::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input> {
+        child: complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "restriction" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e {
+                                        child: try_rollback!(stream, tx, complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexContent_e_inner__extension__seqfield0__choicevariant0<'input>(complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input>);
 
 
     impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant0<'input> {
         const NODE_NAME: &'static str = "elementtype element complexContent_e_inner__extension__seqfield0__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::complexRestrictionType::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant0)
+            complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e_inner__extension__seqfield0__choicevariant1<'input>(super::UNQUAL::extensionType<'input>);
+    pub struct complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input>(super::UNQUAL::extensionType<'input>);
+
+
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::extensionType::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input> {
+        child: complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "extension" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e {
+                                        child: try_rollback!(stream, tx, complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexContent_e_inner__extension__seqfield0__choicevariant1<'input>(complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input>);
 
 
     impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant1<'input> {
         const NODE_NAME: &'static str = "elementtype element complexContent_e_inner__extension__seqfield0__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::extensionType::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant1)
+            complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant1)
         }
     }
 
@@ -2599,11 +3177,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for complexContent_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence complexContent_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(complexContent_e_inner__extension {
 
 
 
-                seqfield0: complexContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, complexContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2623,12 +3202,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for complexContent_e_inner<'input> {
         const NODE_NAME: &'static str = "extension complexContent_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(complexContent_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: complexContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, complexContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2648,7 +3228,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for complexContent_e<'input> {
         const NODE_NAME: &'static str = "element (normal) complexContent_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "complexContent" {
@@ -2658,9 +3247,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(complexContent_e {
-                                        child: complexContent_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, complexContent_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2670,6 +3262,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2700,7 +3293,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for complexType_e<'input> {
         const NODE_NAME: &'static str = "element (normal) complexType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "complexType" {
@@ -2710,9 +3312,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(complexType_e {
-                                        child: complexType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, complexType_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2722,6 +3327,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2731,13 +3337,78 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct defaultOpenContent_e_inner__extension__seqfield0__seqfield0<'input>(super::UNQUAL::wildcard<'input>);
+    pub struct defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner<'input>(super::UNQUAL::wildcard<'input>);
+
+
+    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context).map(defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e<'input> {
+        child: defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "any" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e {
+                                        child: try_rollback!(stream, tx, defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct defaultOpenContent_e_inner__extension__seqfield0__seqfield0<'input>(defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e<'input>);
 
 
     impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension__seqfield0__seqfield0<'input> {
         const NODE_NAME: &'static str = "elementtype element defaultOpenContent_e_inner__extension__seqfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context).map(defaultOpenContent_e_inner__extension__seqfield0__seqfield0)
+            defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e::parse_xml(stream, parse_context, parent_context).map(defaultOpenContent_e_inner__extension__seqfield0__seqfield0)
         }
     }
 
@@ -2752,11 +3423,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence defaultOpenContent_e_inner__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(defaultOpenContent_e_inner__extension__seqfield0 {
 
 
 
-                seqfield0: defaultOpenContent_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, defaultOpenContent_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2775,11 +3447,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence defaultOpenContent_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(defaultOpenContent_e_inner__extension {
 
 
 
-                seqfield0: defaultOpenContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, defaultOpenContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2799,12 +3472,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for defaultOpenContent_e_inner<'input> {
         const NODE_NAME: &'static str = "extension defaultOpenContent_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(defaultOpenContent_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: defaultOpenContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, defaultOpenContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2824,7 +3498,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for defaultOpenContent_e<'input> {
         const NODE_NAME: &'static str = "element (normal) defaultOpenContent_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "defaultOpenContent" {
@@ -2834,9 +3517,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(defaultOpenContent_e {
-                                        child: defaultOpenContent_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, defaultOpenContent_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2846,6 +3532,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2865,11 +3552,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for documentation_e_inner<'input> {
         const NODE_NAME: &'static str = "sequence documentation_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(documentation_e_inner {
 
 
 
-                seqfield0: any_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, any_e::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2889,7 +3577,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for documentation_e<'input> {
         const NODE_NAME: &'static str = "element (normal) documentation_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "documentation" {
@@ -2903,9 +3600,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(documentation_e {
-                                        child: documentation_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, documentation_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2919,6 +3619,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -2949,7 +3650,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for element_e<'input> {
         const NODE_NAME: &'static str = "element (normal) element_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "element" {
@@ -2959,9 +3669,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(element_e {
-                                        child: element_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, element_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2971,6 +3684,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3001,7 +3715,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for enumeration_e<'input> {
         const NODE_NAME: &'static str = "element (normal) enumeration_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "enumeration" {
@@ -3011,9 +3734,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(enumeration_e {
-                                        child: enumeration_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, enumeration_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3023,6 +3749,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3053,7 +3780,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for explicitTimezone_e<'input> {
         const NODE_NAME: &'static str = "element (normal) explicitTimezone_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "explicitTimezone" {
@@ -3063,9 +3799,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(explicitTimezone_e {
-                                        child: explicitTimezone_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, explicitTimezone_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3075,6 +3814,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3103,6 +3843,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for field_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence field_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(field_e_inner__extension {
 
 
@@ -3127,12 +3868,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for field_e_inner<'input> {
         const NODE_NAME: &'static str = "extension field_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(field_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: field_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, field_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3152,7 +3894,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for field_e<'input> {
         const NODE_NAME: &'static str = "element (normal) field_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "field" {
@@ -3162,9 +3913,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(field_e {
-                                        child: field_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, field_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3174,6 +3928,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3204,7 +3959,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for fractionDigits_e<'input> {
         const NODE_NAME: &'static str = "element (normal) fractionDigits_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "fractionDigits" {
@@ -3214,9 +3978,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(fractionDigits_e {
-                                        child: fractionDigits_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, fractionDigits_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3226,6 +3993,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3256,7 +4024,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for group_e<'input> {
         const NODE_NAME: &'static str = "element (normal) group_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "group" {
@@ -3266,9 +4043,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(group_e {
-                                        child: group_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, group_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3278,6 +4058,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3295,6 +4076,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for import_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence import_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(import_e_inner__extension {
 
 
@@ -3319,12 +4101,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for import_e_inner<'input> {
         const NODE_NAME: &'static str = "extension import_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(import_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: import_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, import_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3344,7 +4127,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for import_e<'input> {
         const NODE_NAME: &'static str = "element (normal) import_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "import" {
@@ -3354,9 +4146,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(import_e {
-                                        child: import_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, import_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3366,6 +4161,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3383,6 +4179,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for include_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence include_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(include_e_inner__extension {
 
 
@@ -3407,12 +4204,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for include_e_inner<'input> {
         const NODE_NAME: &'static str = "extension include_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(include_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: include_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, include_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3432,7 +4230,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for include_e<'input> {
         const NODE_NAME: &'static str = "element (normal) include_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "include" {
@@ -3442,9 +4249,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(include_e {
-                                        child: include_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, include_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3454,6 +4264,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3484,7 +4295,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for key_e<'input> {
         const NODE_NAME: &'static str = "element (normal) key_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "key" {
@@ -3494,9 +4314,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(key_e {
-                                        child: key_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, key_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3506,6 +4329,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3523,6 +4347,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for keyref_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence keyref_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(keyref_e_inner__extension {
 
 
@@ -3547,12 +4372,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for keyref_e_inner<'input> {
         const NODE_NAME: &'static str = "extension keyref_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(keyref_e_inner {
-                BASE: super::UNQUAL::keybase::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::keybase::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: keyref_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, keyref_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3572,7 +4398,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for keyref_e<'input> {
         const NODE_NAME: &'static str = "element (normal) keyref_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "keyref" {
@@ -3582,9 +4417,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(keyref_e {
-                                        child: keyref_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, keyref_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3594,6 +4432,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3624,7 +4463,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for length_e<'input> {
         const NODE_NAME: &'static str = "element (normal) length_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "length" {
@@ -3634,9 +4482,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(length_e {
-                                        child: length_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, length_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3646,6 +4497,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3676,7 +4528,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
         const NODE_NAME: &'static str = "element (normal) list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "simpleType" {
@@ -3686,9 +4547,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e {
-                                        child: list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3698,6 +4562,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3739,11 +4604,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence list_e_inner__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(list_e_inner__extension__seqfield0 {
 
 
 
-                seqfield0: list_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, list_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3762,11 +4628,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for list_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence list_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(list_e_inner__extension {
 
 
 
-                seqfield0: list_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, list_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3786,12 +4653,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for list_e_inner<'input> {
         const NODE_NAME: &'static str = "extension list_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(list_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: list_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, list_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3811,7 +4679,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for list_e<'input> {
         const NODE_NAME: &'static str = "element (normal) list_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "list" {
@@ -3821,9 +4698,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(list_e {
-                                        child: list_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, list_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3833,6 +4713,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3863,7 +4744,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for maxExclusive_e<'input> {
         const NODE_NAME: &'static str = "element (normal) maxExclusive_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "maxExclusive" {
@@ -3873,9 +4763,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(maxExclusive_e {
-                                        child: maxExclusive_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, maxExclusive_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3885,6 +4778,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3915,7 +4809,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for maxInclusive_e<'input> {
         const NODE_NAME: &'static str = "element (normal) maxInclusive_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "maxInclusive" {
@@ -3925,9 +4828,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(maxInclusive_e {
-                                        child: maxInclusive_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, maxInclusive_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3937,6 +4843,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -3967,7 +4874,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for maxLength_e<'input> {
         const NODE_NAME: &'static str = "element (normal) maxLength_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "maxLength" {
@@ -3977,9 +4893,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(maxLength_e {
-                                        child: maxLength_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, maxLength_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3989,6 +4908,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4019,7 +4939,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for minExclusive_e<'input> {
         const NODE_NAME: &'static str = "element (normal) minExclusive_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "minExclusive" {
@@ -4029,9 +4958,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(minExclusive_e {
-                                        child: minExclusive_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, minExclusive_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4041,6 +4973,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4071,7 +5004,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for minInclusive_e<'input> {
         const NODE_NAME: &'static str = "element (normal) minInclusive_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "minInclusive" {
@@ -4081,9 +5023,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(minInclusive_e {
-                                        child: minInclusive_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, minInclusive_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4093,6 +5038,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4123,7 +5069,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for minLength_e<'input> {
         const NODE_NAME: &'static str = "element (normal) minLength_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "minLength" {
@@ -4133,9 +5088,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(minLength_e {
-                                        child: minLength_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, minLength_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4145,6 +5103,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4162,6 +5121,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for notation_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence notation_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(notation_e_inner__extension {
 
 
@@ -4186,12 +5146,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for notation_e_inner<'input> {
         const NODE_NAME: &'static str = "extension notation_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(notation_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: notation_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, notation_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4211,7 +5172,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for notation_e<'input> {
         const NODE_NAME: &'static str = "element (normal) notation_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "notation" {
@@ -4221,9 +5191,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(notation_e {
-                                        child: notation_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, notation_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4233,6 +5206,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4263,7 +5237,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0__seqfield0_item__any_e<'input> {
         const NODE_NAME: &'static str = "element (normal) openContent_e_inner__extension__seqfield0__seqfield0_item__any_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "any" {
@@ -4273,9 +5256,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(openContent_e_inner__extension__seqfield0__seqfield0_item__any_e {
-                                        child: openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4285,6 +5271,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4326,11 +5313,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence openContent_e_inner__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(openContent_e_inner__extension__seqfield0 {
 
 
 
-                seqfield0: openContent_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, openContent_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4349,11 +5337,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for openContent_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence openContent_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(openContent_e_inner__extension {
 
 
 
-                seqfield0: openContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, openContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4373,12 +5362,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for openContent_e_inner<'input> {
         const NODE_NAME: &'static str = "extension openContent_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(openContent_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: openContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, openContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4398,7 +5388,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for openContent_e<'input> {
         const NODE_NAME: &'static str = "element (normal) openContent_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "openContent" {
@@ -4408,9 +5407,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(openContent_e {
-                                        child: openContent_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, openContent_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4420,6 +5422,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4466,15 +5469,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for override_e_inner__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence override_e_inner__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(override_e_inner__extension__seqfield0 {
 
 
 
-                seqfield0: override_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, override_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: override_e_inner__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: try_rollback!(stream, tx, override_e_inner__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4493,11 +5497,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for override_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence override_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(override_e_inner__extension {
 
 
 
-                seqfield0: override_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, override_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4517,12 +5522,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for override_e_inner<'input> {
         const NODE_NAME: &'static str = "extension override_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(override_e_inner {
-                BASE: super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: override_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, override_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4542,7 +5548,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for override_e<'input> {
         const NODE_NAME: &'static str = "element (normal) override_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "override" {
@@ -4552,9 +5567,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(override_e {
-                                        child: override_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, override_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4564,6 +5582,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4594,7 +5613,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for pattern_e<'input> {
         const NODE_NAME: &'static str = "element (normal) pattern_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "pattern" {
@@ -4604,9 +5632,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(pattern_e {
-                                        child: pattern_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, pattern_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4616,6 +5647,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4679,11 +5711,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for redefine_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence redefine_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(redefine_e_inner__extension {
 
 
 
-                seqfield0: redefine_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, redefine_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4703,12 +5736,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for redefine_e_inner<'input> {
         const NODE_NAME: &'static str = "extension redefine_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(redefine_e_inner {
-                BASE: super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: redefine_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, redefine_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4728,7 +5762,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for redefine_e<'input> {
         const NODE_NAME: &'static str = "element (normal) redefine_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "redefine" {
@@ -4738,9 +5781,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(redefine_e {
-                                        child: redefine_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, redefine_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4750,6 +5796,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4769,11 +5816,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for restriction_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence restriction_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(restriction_e_inner__extension {
 
 
 
-                seqfield0: super::UNQUAL::simpleRestrictionModel::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, super::UNQUAL::simpleRestrictionModel::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4793,12 +5841,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for restriction_e_inner<'input> {
         const NODE_NAME: &'static str = "extension restriction_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(restriction_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: restriction_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, restriction_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4818,7 +5867,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for restriction_e<'input> {
         const NODE_NAME: &'static str = "element (normal) restriction_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "restriction" {
@@ -4828,9 +5886,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(restriction_e {
-                                        child: restriction_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, restriction_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4840,6 +5901,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -4890,15 +5952,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield1_item<'input> {
         const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield0__seqfield1_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(schema_e_inner__extension__seqfield0__seqfield1_item {
 
 
 
-                seqfield0: super::UNQUAL::defaultOpenContent_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, super::UNQUAL::defaultOpenContent_e::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4944,15 +6007,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield2_item<'input> {
         const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield0__seqfield2_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(schema_e_inner__extension__seqfield0__seqfield2_item {
 
 
 
-                seqfield0: super::UNQUAL::schemaTop::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, super::UNQUAL::schemaTop::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4988,19 +6052,20 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(schema_e_inner__extension__seqfield0 {
 
 
 
-                seqfield0: schema_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: schema_e_inner__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield2: schema_e_inner__extension__seqfield0__seqfield2::parse_xml(stream, parse_context, parent_context)?,
+                seqfield2: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0__seqfield2::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5019,11 +6084,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for schema_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence schema_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(schema_e_inner__extension {
 
 
 
-                seqfield0: schema_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5043,12 +6109,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for schema_e_inner<'input> {
         const NODE_NAME: &'static str = "extension schema_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(schema_e_inner {
-                BASE: super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::openAttrs::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: schema_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, schema_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5068,7 +6135,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for schema_e<'input> {
         const NODE_NAME: &'static str = "element (normal) schema_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "schema" {
@@ -5078,9 +6154,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(schema_e {
-                                        child: schema_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, schema_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5090,6 +6169,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5107,6 +6187,7 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for selector_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence selector_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(selector_e_inner__extension {
 
 
@@ -5131,12 +6212,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for selector_e_inner<'input> {
         const NODE_NAME: &'static str = "extension selector_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(selector_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: selector_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, selector_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5156,7 +6238,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for selector_e<'input> {
         const NODE_NAME: &'static str = "element (normal) selector_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "selector" {
@@ -5166,9 +6257,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(selector_e {
-                                        child: selector_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, selector_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5178,6 +6272,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5208,7 +6303,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for sequence_e<'input> {
         const NODE_NAME: &'static str = "element (normal) sequence_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "sequence" {
@@ -5218,9 +6322,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(sequence_e {
-                                        child: sequence_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, sequence_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5230,6 +6337,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5239,24 +6347,154 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant0<'input>(super::UNQUAL::simpleRestrictionType<'input>);
+    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input>(super::UNQUAL::simpleRestrictionType<'input>);
+
+
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::simpleRestrictionType::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input> {
+        child: simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "restriction" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e {
+                                        child: try_rollback!(stream, tx, simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant0<'input>(simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input>);
 
 
     impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant0<'input> {
         const NODE_NAME: &'static str = "elementtype element simpleContent_e_inner__extension__seqfield0__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::simpleRestrictionType::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant0)
+            simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant1<'input>(super::UNQUAL::simpleExtensionType<'input>);
+    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input>(super::UNQUAL::simpleExtensionType<'input>);
+
+
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::simpleExtensionType::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input> {
+        child: simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "extension" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e {
+                                        child: try_rollback!(stream, tx, simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant1<'input>(simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input>);
 
 
     impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant1<'input> {
         const NODE_NAME: &'static str = "elementtype element simpleContent_e_inner__extension__seqfield0__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::simpleExtensionType::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant1)
+            simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant1)
         }
     }
 
@@ -5300,11 +6538,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for simpleContent_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence simpleContent_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(simpleContent_e_inner__extension {
 
 
 
-                seqfield0: simpleContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, simpleContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5324,12 +6563,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for simpleContent_e_inner<'input> {
         const NODE_NAME: &'static str = "extension simpleContent_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(simpleContent_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: simpleContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, simpleContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5349,7 +6589,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for simpleContent_e<'input> {
         const NODE_NAME: &'static str = "element (normal) simpleContent_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "simpleContent" {
@@ -5359,9 +6608,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(simpleContent_e {
-                                        child: simpleContent_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, simpleContent_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5371,6 +6623,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5401,7 +6654,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for simpleType_e<'input> {
         const NODE_NAME: &'static str = "element (normal) simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "simpleType" {
@@ -5411,9 +6673,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(simpleType_e {
-                                        child: simpleType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5423,6 +6688,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5453,7 +6719,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for totalDigits_e<'input> {
         const NODE_NAME: &'static str = "element (normal) totalDigits_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "totalDigits" {
@@ -5463,9 +6738,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(totalDigits_e {
-                                        child: totalDigits_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, totalDigits_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5475,6 +6753,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5505,7 +6784,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
         const NODE_NAME: &'static str = "element (normal) union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "simpleType" {
@@ -5515,9 +6803,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e {
-                                        child: union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5527,6 +6818,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5572,11 +6864,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0<'input> {
         const NODE_NAME: &'static str = "sequence union_e_inner__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(union_e_inner__extension__seqfield0 {
 
 
 
-                seqfield0: union_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, union_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5595,11 +6888,12 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for union_e_inner__extension<'input> {
         const NODE_NAME: &'static str = "sequence union_e_inner__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(union_e_inner__extension {
 
 
 
-                seqfield0: union_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, union_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5619,12 +6913,13 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for union_e_inner<'input> {
         const NODE_NAME: &'static str = "extension union_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(union_e_inner {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+                BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                EXTENSION: union_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: try_rollback!(stream, tx, union_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5644,7 +6939,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for union_e<'input> {
         const NODE_NAME: &'static str = "element (normal) union_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "union" {
@@ -5654,9 +6958,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(union_e {
-                                        child: union_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, union_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5666,6 +6973,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5696,7 +7004,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for unique_e<'input> {
         const NODE_NAME: &'static str = "element (normal) unique_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "unique" {
@@ -5706,9 +7023,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(unique_e {
-                                        child: unique_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, unique_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5718,6 +7038,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5748,7 +7069,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for whiteSpace_e<'input> {
         const NODE_NAME: &'static str = "element (normal) whiteSpace_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "whiteSpace" {
@@ -5758,9 +7088,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(whiteSpace_e {
-                                        child: whiteSpace_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, whiteSpace_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5770,6 +7103,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5781,6 +7115,207 @@ pub mod UNQUAL {
 
     /////////// groups
 
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant0__element_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom particle__choicevariant0__element_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0__element_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant0__element_e<'input> {
+        child: particle__choicevariant0__element_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant0__element_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) particle__choicevariant0__element_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "element" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(particle__choicevariant0__element_e {
+                                        child: try_rollback!(stream, tx, particle__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant0<'input>(particle__choicevariant0__element_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element particle__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            particle__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant1__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant1__group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom particle__choicevariant1__group_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1__group_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant1__group_e<'input> {
+        child: particle__choicevariant1__group_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant1__group_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) particle__choicevariant1__group_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "group" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(particle__choicevariant1__group_e {
+                                        child: try_rollback!(stream, tx, particle__choicevariant1__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant1<'input>(particle__choicevariant1__group_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element particle__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            particle__choicevariant1__group_e::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum particle<'input> {
+        choicevariant0(Box<particle__choicevariant0<'input>>),
+        choicevariant1(Box<particle__choicevariant1<'input>>),
+        choicevariant2(Box<super::UNQUAL::all_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::choice_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::sequence_e<'input>>),
+        choicevariant5(Box<super::UNQUAL::any_e<'input>>),
+    }
+
+    impl<'input> Default for particle<'input> { fn default() -> particle<'input> { particle::choicevariant5(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
+
+
+    impl<'input> ParseXml<'input> for particle<'input> {
+        const NODE_NAME: &'static str = "choice particle";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match particle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match particle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant3(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant4(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant5(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
 
     #[derive(Debug, PartialEq)]
     pub enum redefinable<'input> {
@@ -5822,6 +7357,912 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct occurs<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option allModel__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(allModel__seqfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0__element_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom allModel__seqfield1_item__choicevariant0__element_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant0__element_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant0__element_e<'input> {
+        child: allModel__seqfield1_item__choicevariant0__element_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0__element_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) allModel__seqfield1_item__choicevariant0__element_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "element" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(allModel__seqfield1_item__choicevariant0__element_e {
+                                        child: try_rollback!(stream, tx, allModel__seqfield1_item__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant0<'input>(allModel__seqfield1_item__choicevariant0__element_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element allModel__seqfield1_item__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            allModel__seqfield1_item__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant2__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2__group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom allModel__seqfield1_item__choicevariant2__group_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant2__group_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant2__group_e<'input> {
+        child: allModel__seqfield1_item__choicevariant2__group_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2__group_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) allModel__seqfield1_item__choicevariant2__group_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "group" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(allModel__seqfield1_item__choicevariant2__group_e {
+                                        child: try_rollback!(stream, tx, allModel__seqfield1_item__choicevariant2__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant2<'input>(allModel__seqfield1_item__choicevariant2__group_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2<'input> {
+        const NODE_NAME: &'static str = "elementtype element allModel__seqfield1_item__choicevariant2";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            allModel__seqfield1_item__choicevariant2__group_e::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant2)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum allModel__seqfield1_item<'input> {
+        choicevariant0(Box<allModel__seqfield1_item__choicevariant0<'input>>),
+        choicevariant1(Box<super::UNQUAL::any_e<'input>>),
+        choicevariant2(Box<allModel__seqfield1_item__choicevariant2<'input>>),
+    }
+
+    impl<'input> Default for allModel__seqfield1_item<'input> { fn default() -> allModel__seqfield1_item<'input> { allModel__seqfield1_item::choicevariant2(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "any"))), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }))])
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item<'input> {
+        const NODE_NAME: &'static str = "choice allModel__seqfield1_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match allModel__seqfield1_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match allModel__seqfield1_item__choicevariant2::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1<'input>(Vec<allModel__seqfield1_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec allModel__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = allModel__seqfield1_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(allModel__seqfield1(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel<'input> {
+        seqfield0: allModel__seqfield0<'input>,
+        seqfield1: allModel__seqfield1<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "any"))), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }))]))])
+
+
+    impl<'input> ParseXml<'input> for allModel<'input> {
+        const NODE_NAME: &'static str = "sequence allModel";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            Some(allModel {
+
+
+
+                seqfield0: try_rollback!(stream, tx, allModel__seqfield0::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                seqfield1: try_rollback!(stream, tx, allModel__seqfield1::parse_xml(stream, parse_context, parent_context)),
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions__seqfield0_item__assert_e_inner<'input>(super::UNQUAL::assertion<'input>);
+
+
+    impl<'input> ParseXml<'input> for assertions__seqfield0_item__assert_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom assertions__seqfield0_item__assert_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::assertion::parse_xml(stream, parse_context, parent_context).map(assertions__seqfield0_item__assert_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions__seqfield0_item__assert_e<'input> {
+        child: assertions__seqfield0_item__assert_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "assert"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+
+
+    impl<'input> ParseXml<'input> for assertions__seqfield0_item__assert_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) assertions__seqfield0_item__assert_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "assert" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(assertions__seqfield0_item__assert_e {
+                                        child: try_rollback!(stream, tx, assertions__seqfield0_item__assert_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions__seqfield0_item<'input>(assertions__seqfield0_item__assert_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for assertions__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element assertions__seqfield0_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            assertions__seqfield0_item__assert_e::parse_xml(stream, parse_context, parent_context).map(assertions__seqfield0_item)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions__seqfield0<'input>(Vec<assertions__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for assertions__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec assertions__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = assertions__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(assertions__seqfield0(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions<'input> {
+        seqfield0: assertions__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "assert"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))])
+
+
+    impl<'input> ParseXml<'input> for assertions<'input> {
+        const NODE_NAME: &'static str = "sequence assertions";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            Some(assertions {
+
+
+
+                seqfield0: try_rollback!(stream, tx, assertions__seqfield0::parse_xml(stream, parse_context, parent_context)),
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct typeDefParticle__choicevariant0__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0__group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom typeDefParticle__choicevariant0__group_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(typeDefParticle__choicevariant0__group_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct typeDefParticle__choicevariant0__group_e<'input> {
+        child: typeDefParticle__choicevariant0__group_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0__group_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) typeDefParticle__choicevariant0__group_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "group" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(typeDefParticle__choicevariant0__group_e {
+                                        child: try_rollback!(stream, tx, typeDefParticle__choicevariant0__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct typeDefParticle__choicevariant0<'input>(typeDefParticle__choicevariant0__group_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element typeDefParticle__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            typeDefParticle__choicevariant0__group_e::parse_xml(stream, parse_context, parent_context).map(typeDefParticle__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum typeDefParticle<'input> {
+        choicevariant0(Box<typeDefParticle__choicevariant0<'input>>),
+        choicevariant1(Box<super::UNQUAL::all_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
+    }
+
+    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::choicevariant3(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence")))])
+
+
+    impl<'input> ParseXml<'input> for typeDefParticle<'input> {
+        const NODE_NAME: &'static str = "choice typeDefParticle";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match typeDefParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant3(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant0__attribute_e_inner<'input>(super::UNQUAL::attribute<'input>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0__attribute_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom attrDecls__seqfield0_item__choicevariant0__attribute_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::attribute::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant0__attribute_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant0__attribute_e<'input> {
+        child: attrDecls__seqfield0_item__choicevariant0__attribute_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0__attribute_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) attrDecls__seqfield0_item__choicevariant0__attribute_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "attribute" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(attrDecls__seqfield0_item__choicevariant0__attribute_e {
+                                        child: try_rollback!(stream, tx, attrDecls__seqfield0_item__choicevariant0__attribute_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant0<'input>(attrDecls__seqfield0_item__choicevariant0__attribute_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element attrDecls__seqfield0_item__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            attrDecls__seqfield0_item__choicevariant0__attribute_e::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner<'input>(super::UNQUAL::attributeGroupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::attributeGroupRef::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant1__attributeGroup_e<'input> {
+        child: attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1__attributeGroup_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) attrDecls__seqfield0_item__choicevariant1__attributeGroup_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "attributeGroup" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(attrDecls__seqfield0_item__choicevariant1__attributeGroup_e {
+                                        child: try_rollback!(stream, tx, attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant1<'input>(attrDecls__seqfield0_item__choicevariant1__attributeGroup_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element attrDecls__seqfield0_item__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            attrDecls__seqfield0_item__choicevariant1__attributeGroup_e::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant1)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum attrDecls__seqfield0_item<'input> {
+        choicevariant0(Box<attrDecls__seqfield0_item__choicevariant0<'input>>),
+        choicevariant1(Box<attrDecls__seqfield0_item__choicevariant1<'input>>),
+    }
+
+    impl<'input> Default for attrDecls__seqfield0_item<'input> { fn default() -> attrDecls__seqfield0_item<'input> { attrDecls__seqfield0_item::choicevariant1(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }))])
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice attrDecls__seqfield0_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match attrDecls__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_item::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match attrDecls__seqfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_item::choicevariant1(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0<'input>(Vec<attrDecls__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec attrDecls__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = attrDecls__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(attrDecls__seqfield0(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield1<'input>(Option<super::UNQUAL::anyAttribute_e<'input>>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield1<'input> {
+        const NODE_NAME: &'static str = "option attrDecls__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(attrDecls__seqfield1(super::UNQUAL::anyAttribute_e::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls<'input> {
+        seqfield0: attrDecls__seqfield0<'input>,
+        seqfield1: attrDecls__seqfield1<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Element(Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }))])), (Some(0), None, Ref(QName(Some("xs"), "anyAttribute")))])
+
+
+    impl<'input> ParseXml<'input> for attrDecls<'input> {
+        const NODE_NAME: &'static str = "sequence attrDecls";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            Some(attrDecls {
+
+
+
+                seqfield0: try_rollback!(stream, tx, attrDecls__seqfield0::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                seqfield1: try_rollback!(stream, tx, attrDecls__seqfield1::parse_xml(stream, parse_context, parent_context)),
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0__element_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom nestedParticle__choicevariant0__element_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0__element_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant0__element_e<'input> {
+        child: nestedParticle__choicevariant0__element_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0__element_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) nestedParticle__choicevariant0__element_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "element" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(nestedParticle__choicevariant0__element_e {
+                                        child: try_rollback!(stream, tx, nestedParticle__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant0<'input>(nestedParticle__choicevariant0__element_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            nestedParticle__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant1__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1__group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom nestedParticle__choicevariant1__group_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1__group_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant1__group_e<'input> {
+        child: nestedParticle__choicevariant1__group_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1__group_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) nestedParticle__choicevariant1__group_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "group" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(nestedParticle__choicevariant1__group_e {
+                                        child: try_rollback!(stream, tx, nestedParticle__choicevariant1__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant1<'input>(nestedParticle__choicevariant1__group_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            nestedParticle__choicevariant1__group_e::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum nestedParticle<'input> {
+        choicevariant0(Box<nestedParticle__choicevariant0<'input>>),
+        choicevariant1(Box<nestedParticle__choicevariant1<'input>>),
+        choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::any_e<'input>>),
+    }
+
+    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::choicevariant4(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
+
+
+    impl<'input> ParseXml<'input> for nestedParticle<'input> {
+        const NODE_NAME: &'static str = "choice nestedParticle";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match nestedParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match nestedParticle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant3(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant4(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct simpleRestrictionModel__seqfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
 
 
@@ -5843,7 +8284,16 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield0_item__simpleType_e<'input> {
         const NODE_NAME: &'static str = "element (normal) simpleRestrictionModel__seqfield0_item__simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
             match tok {
                 Token::ElementStart(prefix, name) => {
                     if name.to_str() == "simpleType" {
@@ -5853,9 +8303,12 @@ pub mod UNQUAL {
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
                                     return Some(simpleRestrictionModel__seqfield0_item__simpleType_e {
-                                        child: simpleRestrictionModel__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+                                        child: try_rollback!(stream, tx, simpleRestrictionModel__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5865,6 +8318,7 @@ pub mod UNQUAL {
                         }
                     }
                     else {
+                        tx.rollback(stream);
                         None
                     }
                 },
@@ -5951,734 +8405,22 @@ pub mod UNQUAL {
     impl<'input> ParseXml<'input> for simpleRestrictionModel<'input> {
         const NODE_NAME: &'static str = "sequence simpleRestrictionModel";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
             Some(simpleRestrictionModel {
 
 
 
-                seqfield0: simpleRestrictionModel__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: try_rollback!(stream, tx, simpleRestrictionModel__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: simpleRestrictionModel__seqfield1::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions__seqfield0_item__assert_e_inner<'input>(super::UNQUAL::assertion<'input>);
-
-
-    impl<'input> ParseXml<'input> for assertions__seqfield0_item__assert_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom assertions__seqfield0_item__assert_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::assertion::parse_xml(stream, parse_context, parent_context).map(assertions__seqfield0_item__assert_e_inner)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions__seqfield0_item__assert_e<'input> {
-        child: assertions__seqfield0_item__assert_e_inner<'input>,
-    }
-
-    // ^-- from Element { name: QName(None, "assert"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
-
-
-    impl<'input> ParseXml<'input> for assertions__seqfield0_item__assert_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) assertions__seqfield0_item__assert_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tok = stream.next().unwrap();
-            match tok {
-                Token::ElementStart(prefix, name) => {
-                    if name.to_str() == "assert" {
-
-
-
-                        loop {
-                            let tok = stream.next().unwrap();
-                            match tok {
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(assertions__seqfield0_item__assert_e {
-                                        child: assertions__seqfield0_item__assert_e_inner::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                                    }),
-                                _ => panic!(format!("Did not expect token {:?}", tok)),
-                            }
-                        }
-                    }
-                    else {
-                        None
-                    }
-                },
-                _ => panic!(format!("Did not expect token {:?}", tok)),
-            }
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions__seqfield0_item<'input>(assertions__seqfield0_item__assert_e<'input>);
-
-
-    impl<'input> ParseXml<'input> for assertions__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "elementtype element assertions__seqfield0_item";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            assertions__seqfield0_item__assert_e::parse_xml(stream, parse_context, parent_context).map(assertions__seqfield0_item)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions__seqfield0<'input>(Vec<assertions__seqfield0_item<'input>>);
-
-
-    impl<'input> ParseXml<'input> for assertions__seqfield0<'input> {
-        const NODE_NAME: &'static str = "vec assertions__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let mut items = Vec::new();
-            while let Some(new_item) = assertions__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
-                items.push(new_item);
-            }
-            Some(assertions__seqfield0(items))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions<'input> {
-        seqfield0: assertions__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "assert"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))])
-
-
-    impl<'input> ParseXml<'input> for assertions<'input> {
-        const NODE_NAME: &'static str = "sequence assertions";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(assertions {
-
-
-
-                seqfield0: assertions__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: try_rollback!(stream, tx, simpleRestrictionModel__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
             })
         }
     }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0_item__choicevariant0<'input>(super::UNQUAL::attribute<'input>);
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element attrDecls__seqfield0_item__choicevariant0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::attribute::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant0)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0_item__choicevariant1<'input>(super::UNQUAL::attributeGroupRef<'input>);
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element attrDecls__seqfield0_item__choicevariant1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::attributeGroupRef::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant1)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum attrDecls__seqfield0_item<'input> {
-        choicevariant0(Box<attrDecls__seqfield0_item__choicevariant0<'input>>),
-        choicevariant1(Box<attrDecls__seqfield0_item__choicevariant1<'input>>),
-    }
-
-    impl<'input> Default for attrDecls__seqfield0_item<'input> { fn default() -> attrDecls__seqfield0_item<'input> { attrDecls__seqfield0_item::choicevariant1(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }))])
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "choice attrDecls__seqfield0_item";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match attrDecls__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_item::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match attrDecls__seqfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_item::choicevariant1(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0<'input>(Vec<attrDecls__seqfield0_item<'input>>);
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0<'input> {
-        const NODE_NAME: &'static str = "vec attrDecls__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let mut items = Vec::new();
-            while let Some(new_item) = attrDecls__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
-                items.push(new_item);
-            }
-            Some(attrDecls__seqfield0(items))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield1<'input>(Option<super::UNQUAL::anyAttribute_e<'input>>);
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield1<'input> {
-        const NODE_NAME: &'static str = "option attrDecls__seqfield1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(attrDecls__seqfield1(super::UNQUAL::anyAttribute_e::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls<'input> {
-        seqfield0: attrDecls__seqfield0<'input>,
-        seqfield1: attrDecls__seqfield1<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Element(Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }))])), (Some(0), None, Ref(QName(Some("xs"), "anyAttribute")))])
-
-
-    impl<'input> ParseXml<'input> for attrDecls<'input> {
-        const NODE_NAME: &'static str = "sequence attrDecls";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(attrDecls {
-
-
-
-                seqfield0: attrDecls__seqfield0::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: attrDecls__seqfield1::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum identityConstraint<'input> {
-        choicevariant0(Box<super::UNQUAL::unique_e<'input>>),
-        choicevariant1(Box<super::UNQUAL::key_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::keyref_e<'input>>),
-    }
-
-    impl<'input> Default for identityConstraint<'input> { fn default() -> identityConstraint<'input> { identityConstraint::choicevariant2(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "unique"))), (None, None, Ref(QName(Some("xs"), "key"))), (None, None, Ref(QName(Some("xs"), "keyref")))])
-
-
-    impl<'input> ParseXml<'input> for identityConstraint<'input> {
-        const NODE_NAME: &'static str = "choice identityConstraint";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::unique_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::key_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::keyref_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::choicevariant2(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct occurs<'input>(PhantomData<&'input ()>);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant0<'input>(super::UNQUAL::localElement<'input>);
-
-
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant1<'input>(super::UNQUAL::groupRef<'input>);
-
-
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum nestedParticle<'input> {
-        choicevariant0(Box<nestedParticle__choicevariant0<'input>>),
-        choicevariant1(Box<nestedParticle__choicevariant1<'input>>),
-        choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
-        choicevariant4(Box<super::UNQUAL::any_e<'input>>),
-    }
-
-    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::choicevariant4(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
-
-
-    impl<'input> ParseXml<'input> for nestedParticle<'input> {
-        const NODE_NAME: &'static str = "choice nestedParticle";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match nestedParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match nestedParticle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant2(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant3(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant4(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum simpleDerivation<'input> {
-        choicevariant0(Box<super::UNQUAL::restriction_e<'input>>),
-        choicevariant1(Box<super::UNQUAL::list_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::union_e<'input>>),
-    }
-
-    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::choicevariant2(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "restriction"))), (None, None, Ref(QName(Some("xs"), "list"))), (None, None, Ref(QName(Some("xs"), "union")))])
-
-
-    impl<'input> ParseXml<'input> for simpleDerivation<'input> {
-        const NODE_NAME: &'static str = "choice simpleDerivation";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::restriction_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::list_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::union_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant2(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option allModel__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(allModel__seqfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_item__choicevariant0<'input>(super::UNQUAL::localElement<'input>);
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element allModel__seqfield1_item__choicevariant0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant0)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_item__choicevariant2<'input>(super::UNQUAL::groupRef<'input>);
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2<'input> {
-        const NODE_NAME: &'static str = "elementtype element allModel__seqfield1_item__choicevariant2";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant2)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum allModel__seqfield1_item<'input> {
-        choicevariant0(Box<allModel__seqfield1_item__choicevariant0<'input>>),
-        choicevariant1(Box<super::UNQUAL::any_e<'input>>),
-        choicevariant2(Box<allModel__seqfield1_item__choicevariant2<'input>>),
-    }
-
-    impl<'input> Default for allModel__seqfield1_item<'input> { fn default() -> allModel__seqfield1_item<'input> { allModel__seqfield1_item::choicevariant2(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "any"))), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }))])
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield1_item<'input> {
-        const NODE_NAME: &'static str = "choice allModel__seqfield1_item";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match allModel__seqfield1_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match allModel__seqfield1_item__choicevariant2::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant2(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1<'input>(Vec<allModel__seqfield1_item<'input>>);
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield1<'input> {
-        const NODE_NAME: &'static str = "vec allModel__seqfield1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let mut items = Vec::new();
-            while let Some(new_item) = allModel__seqfield1_item::parse_xml(stream, parse_context, parent_context) {
-                items.push(new_item);
-            }
-            Some(allModel__seqfield1(items))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel<'input> {
-        seqfield0: allModel__seqfield0<'input>,
-        seqfield1: allModel__seqfield1<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "any"))), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }))]))])
-
-
-    impl<'input> ParseXml<'input> for allModel<'input> {
-        const NODE_NAME: &'static str = "sequence allModel";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(allModel {
-
-
-
-                seqfield0: allModel__seqfield0::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: allModel__seqfield1::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum schemaTop<'input> {
-        choicevariant0(Box<super::UNQUAL::redefinable<'input>>),
-        choicevariant1(Box<super::UNQUAL::element_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::attribute_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::notation_e<'input>>),
-    }
-
-    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::choicevariant3(Default::default()) } }
-
-    // ^-- from Choice([(None, None, GroupRef(QName(Some("xs"), "redefinable"))), (None, None, Ref(QName(Some("xs"), "element"))), (None, None, Ref(QName(Some("xs"), "attribute"))), (None, None, Ref(QName(Some("xs"), "notation")))])
-
-
-    impl<'input> ParseXml<'input> for schemaTop<'input> {
-        const NODE_NAME: &'static str = "choice schemaTop";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::element_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::attribute_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant2(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::notation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant3(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct defRef<'input>(PhantomData<&'input ()>);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct complexTypeModel__choicevariant2__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
-
-
-    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option complexTypeModel__choicevariant2__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(complexTypeModel__choicevariant2__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct complexTypeModel__choicevariant2__seqfield1<'input>(Option<super::UNQUAL::typeDefParticle<'input>>);
-
-
-    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__seqfield1<'input> {
-        const NODE_NAME: &'static str = "option complexTypeModel__choicevariant2__seqfield1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(complexTypeModel__choicevariant2__seqfield1(super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct complexTypeModel__choicevariant2<'input> {
-        seqfield0: complexTypeModel__choicevariant2__seqfield0<'input>,
-        seqfield1: complexTypeModel__choicevariant2__seqfield1<'input>,
-        seqfield2: super::UNQUAL::attrDecls<'input>,
-        seqfield3: super::UNQUAL::assertions<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))])
-
-
-    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2<'input> {
-        const NODE_NAME: &'static str = "sequence complexTypeModel__choicevariant2";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(complexTypeModel__choicevariant2 {
-
-
-
-                seqfield0: complexTypeModel__choicevariant2__seqfield0::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: complexTypeModel__choicevariant2__seqfield1::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield2: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield3: super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum complexTypeModel<'input> {
-        choicevariant0(Box<super::UNQUAL::simpleContent_e<'input>>),
-        choicevariant1(Box<super::UNQUAL::complexContent_e<'input>>),
-        choicevariant2(Box<complexTypeModel__choicevariant2<'input>>),
-    }
-
-    impl<'input> Default for complexTypeModel<'input> { fn default() -> complexTypeModel<'input> { complexTypeModel::choicevariant2(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "simpleContent"))), (None, None, Ref(QName(Some("xs"), "complexContent"))), (None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
-
-
-    impl<'input> ParseXml<'input> for complexTypeModel<'input> {
-        const NODE_NAME: &'static str = "choice complexTypeModel";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::simpleContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::complexContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match complexTypeModel__choicevariant2::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant2(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant0<'input>(super::UNQUAL::localElement<'input>);
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element particle__choicevariant0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant1<'input>(super::UNQUAL::groupRef<'input>);
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element particle__choicevariant1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum particle<'input> {
-        choicevariant0(Box<particle__choicevariant0<'input>>),
-        choicevariant1(Box<particle__choicevariant1<'input>>),
-        choicevariant2(Box<super::UNQUAL::all_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::choice_e<'input>>),
-        choicevariant4(Box<super::UNQUAL::sequence_e<'input>>),
-        choicevariant5(Box<super::UNQUAL::any_e<'input>>),
-    }
-
-    impl<'input> Default for particle<'input> { fn default() -> particle<'input> { particle::choicevariant5(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
-
-
-    impl<'input> ParseXml<'input> for particle<'input> {
-        const NODE_NAME: &'static str = "choice particle";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match particle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match particle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant2(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant3(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant4(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant5(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct typeDefParticle__choicevariant0<'input>(super::UNQUAL::groupRef<'input>);
-
-
-    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element typeDefParticle__choicevariant0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(typeDefParticle__choicevariant0)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum typeDefParticle<'input> {
-        choicevariant0(Box<typeDefParticle__choicevariant0<'input>>),
-        choicevariant1(Box<super::UNQUAL::all_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
-    }
-
-    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::choicevariant3(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence")))])
-
-
-    impl<'input> ParseXml<'input> for typeDefParticle<'input> {
-        const NODE_NAME: &'static str = "choice typeDefParticle";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match typeDefParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant2(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant3(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq)]
     pub enum composition<'input> {
@@ -6723,4 +8465,212 @@ pub mod UNQUAL {
             None
         }
     }
+
+    #[derive(Debug, PartialEq)]
+    pub enum identityConstraint<'input> {
+        choicevariant0(Box<super::UNQUAL::unique_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::key_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::keyref_e<'input>>),
+    }
+
+    impl<'input> Default for identityConstraint<'input> { fn default() -> identityConstraint<'input> { identityConstraint::choicevariant2(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "unique"))), (None, None, Ref(QName(Some("xs"), "key"))), (None, None, Ref(QName(Some("xs"), "keyref")))])
+
+
+    impl<'input> ParseXml<'input> for identityConstraint<'input> {
+        const NODE_NAME: &'static str = "choice identityConstraint";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::unique_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::key_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::keyref_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexTypeModel__choicevariant2__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
+
+
+    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option complexTypeModel__choicevariant2__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(complexTypeModel__choicevariant2__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexTypeModel__choicevariant2__seqfield1<'input>(Option<super::UNQUAL::typeDefParticle<'input>>);
+
+
+    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__seqfield1<'input> {
+        const NODE_NAME: &'static str = "option complexTypeModel__choicevariant2__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(complexTypeModel__choicevariant2__seqfield1(super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexTypeModel__choicevariant2<'input> {
+        seqfield0: complexTypeModel__choicevariant2__seqfield0<'input>,
+        seqfield1: complexTypeModel__choicevariant2__seqfield1<'input>,
+        seqfield2: super::UNQUAL::attrDecls<'input>,
+        seqfield3: super::UNQUAL::assertions<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))])
+
+
+    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2<'input> {
+        const NODE_NAME: &'static str = "sequence complexTypeModel__choicevariant2";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            Some(complexTypeModel__choicevariant2 {
+
+
+
+                seqfield0: try_rollback!(stream, tx, complexTypeModel__choicevariant2__seqfield0::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                seqfield1: try_rollback!(stream, tx, complexTypeModel__choicevariant2__seqfield1::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                seqfield2: try_rollback!(stream, tx, super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                seqfield3: try_rollback!(stream, tx, super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)),
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum complexTypeModel<'input> {
+        choicevariant0(Box<super::UNQUAL::simpleContent_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::complexContent_e<'input>>),
+        choicevariant2(Box<complexTypeModel__choicevariant2<'input>>),
+    }
+
+    impl<'input> Default for complexTypeModel<'input> { fn default() -> complexTypeModel<'input> { complexTypeModel::choicevariant2(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "simpleContent"))), (None, None, Ref(QName(Some("xs"), "complexContent"))), (None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
+
+
+    impl<'input> ParseXml<'input> for complexTypeModel<'input> {
+        const NODE_NAME: &'static str = "choice complexTypeModel";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::simpleContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::complexContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match complexTypeModel__choicevariant2::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq)]
+    pub enum simpleDerivation<'input> {
+        choicevariant0(Box<super::UNQUAL::restriction_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::list_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::union_e<'input>>),
+    }
+
+    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::choicevariant2(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "restriction"))), (None, None, Ref(QName(Some("xs"), "list"))), (None, None, Ref(QName(Some("xs"), "union")))])
+
+
+    impl<'input> ParseXml<'input> for simpleDerivation<'input> {
+        const NODE_NAME: &'static str = "choice simpleDerivation";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::restriction_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::list_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::union_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum schemaTop<'input> {
+        choicevariant0(Box<super::UNQUAL::redefinable<'input>>),
+        choicevariant1(Box<super::UNQUAL::element_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::attribute_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::notation_e<'input>>),
+    }
+
+    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::choicevariant3(Default::default()) } }
+
+    // ^-- from Choice([(None, None, GroupRef(QName(Some("xs"), "redefinable"))), (None, None, Ref(QName(Some("xs"), "element"))), (None, None, Ref(QName(Some("xs"), "attribute"))), (None, None, Ref(QName(Some("xs"), "notation")))])
+
+
+    impl<'input> ParseXml<'input> for schemaTop<'input> {
+        const NODE_NAME: &'static str = "choice schemaTop";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::element_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::attribute_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::notation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant3(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct defRef<'input>(PhantomData<&'input ()>);
 }

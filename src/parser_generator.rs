@@ -53,6 +53,7 @@ impl<'a> ParserGenerator<'a> {
             module.scope().raw("use std::marker::PhantomData;");
             module.scope().raw("use support::*;");
             module.scope().raw("use xmlparser::{Token, ElementEnd};");
+            module.scope().raw("macro_rules! try_rollback { ($stream:expr, $tx:expr, $e:expr) => { match $e { Some(i) => i, None => { $tx.rollback($stream); return None } } } }");
             module.scope().raw("\n/////////// types\n");
             self.nsuri_to_module.insert(self.target_uri, ("UNQUAL".to_string(), module));
         }
@@ -134,7 +135,16 @@ impl<'a> ParserGenerator<'a> {
 impl<'input> ParseXml<'input> for {}<'input> {{
     const NODE_NAME: &'static str = "element (normal) {}";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
-        let tok = stream.next().unwrap();
+        let tx = stream.transaction();
+        let mut tok = stream.next().unwrap();
+        loop {{
+            match tok {{
+                Token::Whitespaces(_) => (),
+                Token::Comment(_) => (),
+                _ => break,
+            }}
+            tok = stream.next().unwrap();
+        }}
         match tok {{
             Token::ElementStart(prefix, name) => {{
                 if name.to_str() == {:?} {{
@@ -148,9 +158,12 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                     loop {{
                         let tok = stream.next().unwrap();
                         match tok {{
+                            Token::Whitespaces(_) => (),
+                            Token::Comment(_) => (),
+                            Token::Attribute(_, _) => (),
                             Token::ElementEnd(ElementEnd::Open) =>
                                 return Some({} {{
-                                    child: {}::parse_xml(stream, parse_context, parent_context)?,
+                                    child: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
 "#,             type_name, inner_type_name));
                 for (name, type_) in attrs_types {
                     module.scope().raw(&format!(r#"
@@ -164,6 +177,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                     }}
                 }}
                 else {{
+                    tx.rollback(stream);
                     None
                 }}
             }},
@@ -194,7 +208,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
             _ => false,
         };
         match element_type {
-            Some(ElementType::Ref(id)) if can_unbloat => {
+            /*Some(ElementType::Ref(id)) if can_unbloat => {
                 let n = format!("{}_e", id.1);
                 let field_typename: String = self.id_to_type_name(QName(id.0, &n));
                 (element_name.to_string(), field_typename)
@@ -204,6 +218,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 let field_typename = self.id_to_type_name(*id);
                 (element_name.to_string(), field_typename)
             },
+            */
             _ => { // Normal case, no unbloat
                 let element_name = element_name.1.to_string(); // TODO: deduplication
                 let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, element_name)));
@@ -279,6 +294,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
 impl<'input> ParseXml<'input> for {}<'input> {{
     const NODE_NAME: &'static str = "sequence {}";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+        let tx = stream.transaction();
         Some({} {{
 "#,             name, name, name));
                 if fields.len() == 0 {
@@ -288,7 +304,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 }
                 for (item_name, item_typename) in fields {
                     module.scope().raw(&format!(r#"
-            {}: {}::parse_xml(stream, parse_context, parent_context)?,
+            {}: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
 "#,                 item_name, item_typename));
                 }
                 module.scope().raw(&format!(r#"
@@ -334,11 +350,12 @@ impl<'input> ParseXml<'input> for {}<'input> {{
 impl<'input> ParseXml<'input> for {}<'input> {{
     const NODE_NAME: &'static str = "extension {}";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+        let tx = stream.transaction();
         Some({} {{
-            BASE: {}::parse_xml(stream, parse_context, parent_context)?,
+            BASE: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
 "#,             name, name, name, base_typename));
                 module.scope().raw(&format!(r#"
-            EXTENSION: {}::parse_xml(stream, parse_context, parent_context)?,
+            EXTENSION: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
 "#,             extension_type_name));
                 module.scope().raw(&format!(r#"
         }})
