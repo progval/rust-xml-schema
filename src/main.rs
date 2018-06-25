@@ -9,7 +9,7 @@ use xml_schema::parser_generator::*;
 
 fn main() {
     let mut s = String::new();
-    stdin().read_to_string(&mut s);
+    stdin().read_to_string(&mut s).unwrap();
     let doc = parse_xsd(&s);
     let mut gen = ParserGenerator::new(&doc);
     let mut scope = codegen::Scope::new();
@@ -18,5 +18,5 @@ fn main() {
         println!("{} {:?}", name, v);
     }*/
     scope.push_module(gen.nsuri_to_module.remove(doc.schema.as_ref().unwrap().target_namespace).unwrap().1);
-    println!("{}", scope.to_string());
+    println!("#[allow(bad_style)]\n{}", scope.to_string());
 }

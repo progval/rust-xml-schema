@@ -110,6 +110,12 @@ impl<'a> ParserGenerator<'a> {
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
                 module.new_struct(&type_name).tuple_field(&format!("{}<'input>", &inner_type_name)).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
                 module.scope().raw(&format!("// ^-- from {:?}", element));
+                module.scope().raw(&format!(r#"
+impl<'input> ParseXml<'input> for {}<'input> {{
+    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+        {}::parse_xml(stream, parse_context, parent_context).map({})
+    }}
+}}"#,           type_name, inner_type_name, type_name));
             }
             Some(type_) => {
                 let inner_type_name = self.type_(&format!("{}_inner", type_name), type_);
@@ -117,10 +123,22 @@ impl<'a> ParserGenerator<'a> {
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
                 module.new_struct(&type_name).tuple_field(&format!("{}<'input>", inner_type_name)).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
                 module.scope().raw(&format!("// ^-- from {:?}", element));
+                module.scope().raw(&format!(r#"
+impl<'input> ParseXml<'input> for {}<'input> {{
+    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+        {}::parse_xml(stream, parse_context, parent_context).map({})
+    }}
+}}"#,           type_name, inner_type_name, type_name));
             }
             None => {
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
                 module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field("PhantomData<&'input ()>");
+                module.scope().raw(&format!(r#"
+impl<'input> ParseXml<'input> for {}<'input> {{
+    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {{
+        Some({}(Default::default()))
+    }}
+}}"#,           type_name, type_name));
             }
         }
         type_name
@@ -196,6 +214,12 @@ impl<'a> ParserGenerator<'a> {
                 s.tuple_field(format!("Option<{}<'input>>", child_typename));
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
+                module.scope().raw(&format!(r#"
+impl<'input> ParseXml<'input> for {}<'input> {{
+    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+        Some({}({}::parse_xml(stream, parse_context, parent_context)))
+    }}
+}}"#,           name, name, child_typename));
                 name.to_string()
             }
             (_, _) => {
@@ -206,6 +230,16 @@ impl<'a> ParserGenerator<'a> {
                 s.tuple_field(format!("Vec<{}<'input>>", child_typename));
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
+                module.scope().raw(&format!(r#"
+impl<'input> ParseXml<'input> for {}<'input> {{
+    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+        let mut items = Vec::new();
+        while let Some(new_item) = {}::parse_xml(stream, parse_context, parent_context) {{
+            items.push(new_item);
+        }}
+        Some({}(items))
+    }}
+}}"#,           name, child_typename, name)); // TODO: validate the size
                 name.to_string()
             }
         }
@@ -213,18 +247,34 @@ impl<'a> ParserGenerator<'a> {
     fn type_(&mut self, name: &str, type_tree: &ElementType) -> String {
         match type_tree {
             ElementType::String | ElementType::Date => {
-                "String".to_string()
+                "XmlString".to_string()
             }
             ElementType::Sequence(items) => {
                 let mut s = cg::Struct::new(name);
                 s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
+                let mut fields = Vec::new();
                 for (i, item) in items.iter().enumerate() {
                     let (element_name, field_typename) = self.unbloat_element(item, name, format!("seqfield{}", i));
                     s.field(&element_name, &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
+                    fields.push((element_name, field_typename));
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
+                module.scope().raw(&format!(r#"
+impl<'input> ParseXml<'input> for {}<'input> {{
+    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+        Some({} {{
+"#,             name, name));
+                for (item_name, item_typename) in fields {
+                    module.scope().raw(&format!(r#"
+            {}: {}::parse_xml(stream, parse_context, parent_context)?,
+"#,                 item_name, item_typename));
+                }
+                module.scope().raw(&format!(r#"
+        }})
+    }}
+}}"#,           ));
                 name.to_string()
             },
             ElementType::Ref(id) => {
@@ -239,19 +289,44 @@ impl<'a> ParserGenerator<'a> {
                 let type_name = self.id_to_type_name(*id_);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("{}<'input>", type_name));
+                module.scope().raw(&format!(r#"
+impl<'input> ParseXml<'input> for {}<'input> {{
+    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+        {}::parse_xml(stream, parse_context, parent_context).map({})
+    }}
+}}"#,           name, type_name, name));
                 name.to_string()
             }
             ElementType::Extension(base, attrs, inner) => {
                 let struct_name = escape_keyword(name);
                 let mut s = cg::Struct::new(&struct_name);
                 s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
-                s.field("BASE", format!("{}<'input>", self.id_to_type_name(*base)));
-                if let Some(inner) = inner {
-                    let inner_type_name = format!("{}__extension", name);
-                    s.field("EXTENSION", format!("{}<'input>", self.type_(&inner_type_name, inner)));
-                }
+                let base_typename = self.id_to_type_name(*base);
+                s.field("BASE", format!("{}<'input>", base_typename));
+                let extension_type_name = inner.as_ref().map(|inner2| {
+                    let extension_type_name = format!("{}__extension", name);
+                    let extension_type_name = self.type_(&extension_type_name, inner2);
+                    s.field("EXTENSION", format!("{}<'input>", extension_type_name));
+                    extension_type_name
+                });
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
+                module.scope().raw(&format!(r#"
+impl<'input> ParseXml<'input> for {}<'input> {{
+    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+        Some({} {{
+            BASE: {}::parse_xml(stream, parse_context, parent_context)?,
+"#,             name, name, base_typename));
+                if let Some(extension_type_name) = extension_type_name {
+                    module.scope().raw(&format!(r#"
+            EXTENSION: {}::parse_xml(stream, parse_context, parent_context)?,
+"#,                 extension_type_name));
+                }
+                module.scope().raw(&format!(r#"
+        }})
+    }}
+}}
+"#,             ));
                 struct_name
             },
             ElementType::Union(member_types, items) => {
@@ -282,26 +357,31 @@ impl<'a> ParserGenerator<'a> {
                 let mut e = cg::Enum::new(&enum_name);
                 e.vis("pub").derive("Debug").derive("PartialEq").generic("'input");
                 let mut last_item_name = None;
-                /*
-                if let Some(member_types) = member_types {
-                    for (i, member_type) in member_types.iter().enumerate() {
-                        let member_name = format!("member{}", i);
-                        e.new_variant(&member_name).tuple(&self.id_to_type_name(member_type));
-                    }
+                let mut variants = Vec::new();
+                for (i, item) in items.iter().enumerate() {
+                    let (element_name, field_typename) = self.unbloat_element(item, name, format!("choicevariant{}", i));
+                    e.new_variant(&element_name).tuple(&format!("Box<{}<'input>>", field_typename));
+                    last_item_name = Some(element_name.clone());
+                    variants.push((element_name, field_typename));
                 }
-                if let Some(items) = items {
-                    */
-                    for (i, item) in items.iter().enumerate() {
-                        let (element_name, field_typename) = self.unbloat_element(item, name, format!("choicevariant{}", i));
-                        e.new_variant(&element_name).tuple(&format!("Box<{}<'input>>", field_typename));
-                        last_item_name = Some(element_name);
-                    }
-                //}
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_enum(e);
                 let last_item_name = last_item_name.expect(&format!("enum {} has no variant", enum_name));
                 module.scope().raw(&format!("impl<'input> Default for {}<'input> {{ fn default() -> {}<'input> {{ {}::{}(Default::default()) }} }}", enum_name, enum_name, enum_name, last_item_name )); // TODO: remove this, that's a temporary hack
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
+                module.scope().raw(&format!(r#"
+impl<'input> ParseXml<'input> for {}<'input> {{
+    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+"#,             enum_name));
+                for (item_name, item_typename) in variants {
+                    module.scope().raw(&format!(r#"
+        match {}::parse_xml(stream, parse_context, parent_context) {{ Some(r) => return Some({}::{}(Box::new(r))), None => () }}
+"#,                 item_typename, enum_name, item_name));
+                }
+                module.scope().raw(&format!(r#"
+        None
+    }}
+}}"#,           ));
                 enum_name
             },
             ElementType::List(List::ComplexList(mixed, item_type)) => {
@@ -321,7 +401,7 @@ impl<'a> ParserGenerator<'a> {
                 struct_name
             },
             ElementType::Any => {
-                "SUPPORT_ANY".to_string()
+                "any".to_string()
             },
             _ => unimplemented!("{:?}", type_tree),
         }
