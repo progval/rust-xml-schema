@@ -1,0 +1,28 @@
+
+extern crate xmlparser;
+extern crate xml_schema;
+use xml_schema::parse_xsd;
+use xml_schema::parser::*;
+use xml_schema::generated::UNQUAL;
+use xml_schema::support::*;
+
+const PERSON_XSD: &'static str = r#"
+  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="foo">
+    <xs:element name="person">
+      <xs:complexType>
+        <xs:sequence>
+          <xs:element name="name" type="xs:string" />
+          <xs:element name="firstname" type="xs:string" />
+          <xs:element name="birthdate" type="xs:date" />
+        </xs:sequence>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>"#;
+
+#[test]
+fn generated_parses_person_xsd() {
+    let tokenizer = xmlparser::Tokenizer::from(PERSON_XSD);
+    let mut stream = Box::new(InnerStream::new(tokenizer));
+    let doc = UNQUAL::schema_e::parse_xml(&mut stream, &mut (), &());
+    assert_ne!(doc, None);
+}

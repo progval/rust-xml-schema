@@ -165,13 +165,15 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                                 return Some({} {{
                                     child: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
 "#,             type_name, inner_type_name));
-                for (name, type_) in attrs_types {
+                for (name, type_) in attrs_types.iter() {
                     module.scope().raw(&format!(r#"
                                     {},
 "#,                 name));
                 }
                 module.scope().raw(&format!(r#"
                                 }}),
+                            Token::ElementEnd(_) =>
+                                return Default::default(), // TODO
                             _ => panic!(format!("Did not expect token {{:?}}", tok)),
                         }}
                     }}
