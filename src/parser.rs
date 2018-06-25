@@ -75,11 +75,15 @@ fn parse_max_occurs(s: &str) -> Result<usize, ParseIntError> {
     }
 }
 
+struct SchemaParseContext<'input> {
+    main_namespace: &'input str
+}
+
 pub(crate) struct Parser<S>(PhantomData<S>);
 
 impl<'a, S: Iterator<Item=Result<Token<'a>, Error>>> Parser<S> { // To avoid that boilerplate on each function
 
-fn parse_attributes<E, P>(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str), mut predicate: P)
+fn parse_attributes<E, P>(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str), mut predicate: P)
         -> Result<ElementEnd<'a>, E>
         where P: FnMut(&'a str, &'a str, &'a str) -> Result<(), E> {
     loop {
@@ -116,7 +120,8 @@ pub(crate) fn parse_document(stream: &mut S) -> Document<'a> {
                     Ok(Token::ElementStart(prefix, local)) => {
                         assert_eq!(local.to_str(), "schema");
                         let main_namespace = prefix.to_str();
-                        root.schema = Some(Self::parse_schema(stream, main_namespace, (prefix.to_str(), local.to_str())));
+                        let mut context = SchemaParseContext { main_namespace };
+                        root.schema = Some(Self::parse_schema(stream, &mut context, (prefix.to_str(), local.to_str())));
                     },
                     Ok(Token::DtdStart(_, _)) => (),
                     Ok(Token::DtdEnd) => (),
@@ -129,11 +134,11 @@ pub(crate) fn parse_document(stream: &mut S) -> Document<'a> {
     root
 }
 
-fn parse_schema(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Schema<'a> {
+fn parse_schema(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> Schema<'a> {
     let mut namespaces = HashMap::new();
     let mut target_namespace = None;
 
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value: &str| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value: &str| {
         match (prefix, local) {
             ("xmlns", local) => {
                 namespaces.insert(local.to_string(), value);
@@ -160,51 +165,51 @@ fn parse_schema(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str))
         target_namespace: target_namespace.expect("Missing targetNamespace"),
     };
 
-    let main_namespace_uri = schema.namespaces.get(main_namespace).unwrap().clone();
+    let main_namespace_uri = schema.namespaces.get(context.main_namespace).unwrap().clone();
     assert_eq!(main_namespace_uri, "http://www.w3.org/2001/XMLSchema");
 
-    Self::parse_children(stream, main_namespace, closing_tag, |stream2, prefix, local| {
+    Self::parse_children(stream, context, closing_tag, |stream2, context, prefix, local| {
         match local {
-            "element" if prefix == main_namespace => {
-                schema.elements.push(Self::parse_element(stream2, main_namespace, (prefix, local)));
+            "element" if prefix == context.main_namespace => {
+                schema.elements.push(Self::parse_element(stream2, context, (prefix, local)));
                 Ok(())
             },
-            "annotation" if prefix == main_namespace => {
-                Self::parse_annotation(stream2, &main_namespace, (prefix, local));
+            "annotation" if prefix == context.main_namespace => {
+                Self::parse_annotation(stream2, context, (prefix, local));
                 Ok(())
             }
-            "complexType" if prefix == main_namespace => {
-                let (min_occurs, max_occurs, name, attrs, mixed, def) = Self::parse_complex_type(stream2, main_namespace, (prefix, local));
+            "complexType" if prefix == context.main_namespace => {
+                let (min_occurs, max_occurs, name, attrs, mixed, def) = Self::parse_complex_type(stream2, context, (prefix, local));
                 let name = name.unwrap();
                 assert_eq!(schema.types.get(name), None);
                 schema.types.insert(name.to_string(), (min_occurs, max_occurs, attrs, mixed, def));
                 Ok(())
             },
-            "simpleType" if prefix == main_namespace => {
-                let (min_occurs, max_occurs, name, attrs, def) = Self::parse_simple_type(stream2, main_namespace, (prefix, local));
+            "simpleType" if prefix == context.main_namespace => {
+                let (min_occurs, max_occurs, name, attrs, def) = Self::parse_simple_type(stream2, context, (prefix, local));
                 let name = name.unwrap();
                 assert_eq!(schema.types.get(name), None);
                 schema.types.insert(name.to_string(), (min_occurs, max_occurs, attrs, false, def));
                 Ok(())
             },
-            "group" if prefix == main_namespace => {
-                let (min_occurs, max_occurs, name, attrs, def) = Self::parse_group_def(stream2, main_namespace, (prefix, local));
+            "group" if prefix == context.main_namespace => {
+                let (min_occurs, max_occurs, name, attrs, def) = Self::parse_group_def(stream2, context, (prefix, local));
                 assert_eq!(schema.groups.get(name), None);
                 schema.groups.insert(name.to_string(), (min_occurs, max_occurs, attrs, Some(def)));
                 Ok(())
             },
-            "attributeGroup" if prefix == main_namespace => {
-                let (min_occurs, max_occurs, name, attrs) = Self::parse_attribute_group_def(stream2, main_namespace, (prefix, local));
+            "attributeGroup" if prefix == context.main_namespace => {
+                let (min_occurs, max_occurs, name, attrs) = Self::parse_attribute_group_def(stream2, context, (prefix, local));
                 assert_eq!(schema.groups.get(name), None);
                 schema.groups.insert(name.to_string(), (min_occurs, max_occurs, attrs, None));
                 Ok(())
             },
-            "import" if prefix == main_namespace => {
-                Self::eat_block(stream2, main_namespace, (prefix, local)); // TODO
+            "import" if prefix == context.main_namespace => {
+                Self::eat_block(stream2, context, (prefix, local)); // TODO
                 Ok(())
             }
-            "notation" if prefix == main_namespace => {
-                Self::eat_block(stream2, main_namespace, (prefix, local)); // TODO
+            "notation" if prefix == context.main_namespace => {
+                Self::eat_block(stream2, context, (prefix, local)); // TODO
                 Ok(())
             }
             _ => Err(format!("Unexpected tag while parsing schema elements: <{}:{}", prefix, local)),
@@ -213,29 +218,29 @@ fn parse_schema(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str))
 
     schema
 }
-fn parse_children<E, P>(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str), mut predicate: P)
+fn parse_children<E, P>(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str), mut predicate: P)
         -> Result<(), E>
-        where P: FnMut(&mut S, &'a str, &'a str) -> Result<(), E> {
+        where P: FnMut(&mut S, &mut SchemaParseContext, &'a str, &'a str) -> Result<(), E> {
     loop {
         let token = stream.next().expect("Unexpected end while parsing attributes");
         match token {
             Ok(Token::Whitespaces(_)) => (),
             Ok(Token::Comment(_)) => (),
-            Ok(Token::ElementStart(prefix, local)) => predicate(stream, prefix.to_str(), local.to_str())?,
+            Ok(Token::ElementStart(prefix, local)) => predicate(stream, context, prefix.to_str(), local.to_str())?,
             Ok(Token::ElementEnd(ElementEnd::Close(prefix, local))) if (prefix.to_str(), local.to_str()) == closing_tag => return Ok(()),
             _ => panic!(format!("Unexpected token while parsing <{}:{}'s children: {:?}", closing_tag.0, closing_tag.1, token)),
         }
     }
 }
 
-fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Element<'a> {
+fn parse_element(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> Element<'a> {
     let mut name = None;
     let mut type_ = None;
     let mut attrs = None;
     let mut min_occurs = None;
     let mut max_occurs = None;
 
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value: &str|
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value: &str|
         match (prefix, local) {
             ("", "name") => {
                 assert_eq!(name, None);
@@ -277,7 +282,7 @@ fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
     ).unwrap();
 
     let (type_, mixed, attrs) = if let ElementEnd::Open = element_end {
-        let (newtype, mixed, newattrs) = Self::parse_subelement(stream, main_namespace, closing_tag);
+        let (newtype, mixed, newattrs) = Self::parse_subelement(stream, context, closing_tag);
         let type_ = match (type_, newtype) {
             (Some(t), None) => Some(t),
             (None, Some(t)) => Some(t),
@@ -300,14 +305,14 @@ fn parse_element(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
     Element { name: name, attrs, mixed, type_, min_occurs, max_occurs }
 }
 
-fn parse_subelement(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<ElementType<'a>>, bool, Option<Vec<Attribute<'a>>>) {
+fn parse_subelement(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<ElementType<'a>>, bool, Option<Vec<Attribute<'a>>>) {
     let mut type_ = None;
     let mut attrs = None;
     let mut mixed = None;
     let mut min_occurs = None;
     let mut max_occurs = None;
-    Self::parse_children(stream, main_namespace, closing_tag, |stream2, prefix, local| {
-        assert_eq!(prefix, main_namespace);
+    Self::parse_children(stream, context, closing_tag, |stream2, context, prefix, local| {
+        assert_eq!(prefix, context.main_namespace);
         match local {
             "complexType" => {
                 assert_eq!(type_, None);
@@ -315,7 +320,7 @@ fn parse_subelement(stream: &mut S, main_namespace: &str, closing_tag: (&str, &s
                 assert_eq!(mixed, None);
                 assert_eq!(min_occurs, None);
                 assert_eq!(max_occurs, None);
-                let (min, max, name, attrs_def, newmixed, def) = Self::parse_complex_type(stream2, main_namespace, (prefix, local));
+                let (min, max, name, attrs_def, newmixed, def) = Self::parse_complex_type(stream2, context, (prefix, local));
                 assert_eq!(name, None);
                 type_ = Some(def);
                 attrs = Some(attrs_def);
@@ -329,7 +334,7 @@ fn parse_subelement(stream: &mut S, main_namespace: &str, closing_tag: (&str, &s
                 assert_eq!(attrs, None);
                 assert_eq!(min_occurs, None);
                 assert_eq!(max_occurs, None);
-                let (min, max, name, attrs_def, def) = Self::parse_simple_type(stream2, main_namespace, (prefix, local));
+                let (min, max, name, attrs_def, def) = Self::parse_simple_type(stream2, context, (prefix, local));
                 assert_eq!(name, None);
                 type_ = Some(def);
                 attrs = Some(attrs_def);
@@ -338,11 +343,11 @@ fn parse_subelement(stream: &mut S, main_namespace: &str, closing_tag: (&str, &s
                 Ok(())
             },
             "annotation" => {
-                Self::parse_annotation(stream2, main_namespace, (prefix, local));
+                Self::parse_annotation(stream2, context, (prefix, local));
                 Ok(())
             },
             "key" => {
-                Self::eat_block(stream2, main_namespace, (prefix, local)); // TODO
+                Self::eat_block(stream2, context, (prefix, local)); // TODO
                 Ok(())
             },
             _ => Err(format!("Unknown element type: {}:{}", prefix, local)),
@@ -353,11 +358,11 @@ fn parse_subelement(stream: &mut S, main_namespace: &str, closing_tag: (&str, &s
 }
 
 
-fn parse_complex_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Option<&'a str>, Vec<Attribute<'a>>, bool, ElementType<'a>) {
+fn parse_complex_type(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Option<&'a str>, Vec<Attribute<'a>>, bool, ElementType<'a>) {
     let mut name = None;
     let mut mixed = None;
 
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "name") => {
                 assert_eq!(name, None);
@@ -374,15 +379,15 @@ fn parse_complex_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, 
         }
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
-    let (min_occurs, max_occurs, attributes, type_) = Self::parse_subtype(stream, main_namespace, closing_tag).unwrap();
+    let (min_occurs, max_occurs, attributes, type_) = Self::parse_subtype(stream, context, closing_tag).unwrap();
     let mixed = match mixed { None | Some("false") => false, Some("true") => true, _ => panic!(format!("{:?}", mixed)) };
     (min_occurs, max_occurs, name, attributes, mixed, type_.expect("complexType has no subtype."))
 }
 
-fn parse_attribute_group_def(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, &'a str, Vec<Attribute<'a>>) {
+fn parse_attribute_group_def(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, &'a str, Vec<Attribute<'a>>) {
     let mut name = None;
 
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "name") => {
                 assert_eq!(name, None);
@@ -394,16 +399,16 @@ fn parse_attribute_group_def(stream: &mut S, main_namespace: &str, closing_tag: 
     });
 
     assert_eq!(element_end, Ok(ElementEnd::Open));
-    let (min_occurs, max_occurs, attrs, items) = Self::parse_subtype(stream, main_namespace, closing_tag).unwrap();
+    let (min_occurs, max_occurs, attrs, items) = Self::parse_subtype(stream, context, closing_tag).unwrap();
     let name = name.expect("AttributeGroup def has no name");
     assert_eq!(items, None);
     (min_occurs, max_occurs, name, attrs)
 }
 
-fn parse_attribute_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> QName<'a> {
+fn parse_attribute_group_ref(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> QName<'a> {
     let mut ref_ = None;
 
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "ref") => {
                 assert_eq!(ref_, None);
@@ -420,10 +425,10 @@ fn parse_attribute_group_ref(stream: &mut S, main_namespace: &str, closing_tag: 
     ref_.expect("AttributeGroup ref has no name")
 }
 
-fn parse_group_def(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, &'a str, Vec<Attribute<'a>>, ElementType<'a>) {
+fn parse_group_def(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, &'a str, Vec<Attribute<'a>>, ElementType<'a>) {
     let mut name = None;
 
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "name") => {
                 assert_eq!(name, None);
@@ -435,17 +440,17 @@ fn parse_group_def(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
     });
 
     assert_eq!(element_end, Ok(ElementEnd::Open));
-    let (min_occurs, max_occurs, attrs, items) = Self::parse_subtype(stream, main_namespace, closing_tag).unwrap();
+    let (min_occurs, max_occurs, attrs, items) = Self::parse_subtype(stream, context, closing_tag).unwrap();
     let name = name.expect("Group def has no name");
     (min_occurs, max_occurs, name, attrs, items.expect("Missing inner element type"))
 }
 
-fn parse_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
+fn parse_group_ref(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
     let mut ref_ = None;
     let mut min_occurs = None;
     let mut max_occurs = None;
 
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "ref") => {
                 assert_eq!(ref_, None);
@@ -471,47 +476,47 @@ fn parse_group_ref(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
     (min_occurs, max_occurs, ElementType::GroupRef(ref_))
 }
 
-fn parse_subtype(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Result<(Option<usize>, Option<usize>, Vec<Attribute<'a>>, Option<ElementType<'a>>), String> {
+fn parse_subtype(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> Result<(Option<usize>, Option<usize>, Vec<Attribute<'a>>, Option<ElementType<'a>>), String> {
     let mut inner = None;
     let mut attributes = Vec::new();
 
-    Self::parse_children(stream, main_namespace, closing_tag, |stream2, prefix, local| {
-        assert_eq!(prefix, main_namespace);
+    Self::parse_children(stream, context, closing_tag, |stream2, context, prefix, local| {
+        assert_eq!(prefix, context.main_namespace);
         match local {
             "annotation" => {
-                Self::parse_annotation(stream2, main_namespace, (prefix, local));
+                Self::parse_annotation(stream2, context, (prefix, local));
                 Ok(())
             }
             "sequence" => {
                 assert_eq!(inner, None);
-                inner = Some(Self::parse_sequence(stream2, main_namespace, (prefix, local)));
+                inner = Some(Self::parse_sequence(stream2, context, (prefix, local)));
                 Ok(())
             }
             "choice" => {
                 assert_eq!(inner, None);
-                inner = Some(Self::parse_choice(stream2, main_namespace, (prefix, local)));
+                inner = Some(Self::parse_choice(stream2, context, (prefix, local)));
                 Ok(())
             }
             "group" => {
                 assert_eq!(inner, None);
-                inner = Some(Self::parse_group_ref(stream2, main_namespace, (prefix, local)));
+                inner = Some(Self::parse_group_ref(stream2, context, (prefix, local)));
                 Ok(())
             }
             "attributeGroup" => {
-                attributes.push(Attribute::GroupRef(Self::parse_attribute_group_ref(stream2, main_namespace, (prefix, local))));
+                attributes.push(Attribute::GroupRef(Self::parse_attribute_group_ref(stream2, context, (prefix, local))));
                 Ok(())
             }
             "complexContent" => {
                 assert_eq!(inner, None);
-                inner = Some(Self::parse_complex_content(stream2, main_namespace, (prefix, local)));
+                inner = Some(Self::parse_complex_content(stream2, context, (prefix, local)));
                 Ok(())
             }
             "attribute" => {
-                attributes.push(Self::parse_attribute(stream2, main_namespace, (prefix, local)));
+                attributes.push(Self::parse_attribute(stream2, context, (prefix, local)));
                 Ok(())
             }
             "anyAttribute" => {
-                attributes.push(Self::parse_any_attribute(stream2, main_namespace, (prefix, local)));
+                attributes.push(Self::parse_any_attribute(stream2, context, (prefix, local)));
                 Ok(())
             }
             _ => Err(format!("Unknown subtype: {}:{}", prefix, local)),
@@ -524,48 +529,48 @@ fn parse_subtype(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)
     }
 }
 
-fn parse_elements(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Vec<Element<'a>> {
+fn parse_elements(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> Vec<Element<'a>> {
     let mut items = Vec::new();
 
-    Self::parse_children(stream, main_namespace, closing_tag, |stream2, prefix, local| {
-        assert_eq!(prefix, main_namespace);
+    Self::parse_children(stream, context, closing_tag, |stream2, context, prefix, local| {
+        assert_eq!(prefix, context.main_namespace);
         match local {
             "element" => {
-                items.push(Self::parse_element(stream2, main_namespace, (prefix, local)));
+                items.push(Self::parse_element(stream2, context, (prefix, local)));
                 Ok(())
             },
             "group" => {
-                let (min_occurs, max_occurs, type_) = Self::parse_group_ref(stream2, main_namespace, (prefix, local));
+                let (min_occurs, max_occurs, type_) = Self::parse_group_ref(stream2, context, (prefix, local));
                 items.push(Element { name: None, attrs: Vec::new(), mixed: false, type_: Some(type_), min_occurs, max_occurs });
                 Ok(())
             },
             "simpleType" => {
-                let (min_occurs, max_occurs, name, attrs, type_) = Self::parse_simple_type(stream2, main_namespace, (prefix, local));
+                let (min_occurs, max_occurs, name, attrs, type_) = Self::parse_simple_type(stream2, context, (prefix, local));
                 items.push(Element { name: name.map(QName::from), attrs, mixed: false, type_: Some(type_), min_occurs, max_occurs });
                 Ok(())
             },
             "sequence" => {
-                let (min_occurs, max_occurs, type_) = Self::parse_sequence(stream2, main_namespace, (prefix, local));
+                let (min_occurs, max_occurs, type_) = Self::parse_sequence(stream2, context, (prefix, local));
                 items.push(Element { name: None, attrs: Vec::new(), mixed: false, type_: Some(type_), min_occurs, max_occurs });
                 Ok(())
             },
             "choice" => {
-                let (min_occurs, max_occurs, type_) = Self::parse_choice(stream2, main_namespace, (prefix, local));
+                let (min_occurs, max_occurs, type_) = Self::parse_choice(stream2, context, (prefix, local));
                 items.push(Element { name: None, attrs: Vec::new(), mixed: false, type_: Some(type_), min_occurs, max_occurs });
                 Ok(())
             }
             "extension" => {
-                let (min_occurs, max_occurs, type_) = Self::parse_extension(stream2, main_namespace, (prefix, local));
+                let (min_occurs, max_occurs, type_) = Self::parse_extension(stream2, context, (prefix, local));
                 items.push(Element { name: None, attrs: Vec::new(), mixed: false, type_: Some(type_), min_occurs, max_occurs });
                 Ok(())
             },
             "any" => {
-                let (min_occurs, max_occurs, type_) = Self::parse_any(stream2, main_namespace, (prefix, local));
+                let (min_occurs, max_occurs, type_) = Self::parse_any(stream2, context, (prefix, local));
                 items.push(Element { name: None, attrs: Vec::new(), mixed: false, type_: Some(type_), min_occurs, max_occurs });
                 Ok(())
             },
             "annotation" => {
-                Self::parse_annotation(stream2, main_namespace, (prefix, local));
+                Self::parse_annotation(stream2, context, (prefix, local));
                 Ok(())
             },
             _ => Err(format!("Unknown tag in sequence: {}:{}", prefix, local)),
@@ -575,10 +580,10 @@ fn parse_elements(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str
     items
 }
 
-fn parse_sequence(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
+fn parse_sequence(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
     let mut min_occurs = None;
     let mut max_occurs = None;
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "minOccurs") => {
                 assert_eq!(min_occurs, None);
@@ -595,15 +600,15 @@ fn parse_sequence(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
     
-    let items = Self::parse_elements(stream, main_namespace, closing_tag);
+    let items = Self::parse_elements(stream, context, closing_tag);
 
     (min_occurs, max_occurs, ElementType::Sequence(items))
 }
 
-fn parse_choice(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
+fn parse_choice(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
     let mut min_occurs = None;
     let mut max_occurs = None;
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "minOccurs") => {
                 assert_eq!(min_occurs, None);
@@ -620,17 +625,17 @@ fn parse_choice(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str))
     });
     assert_eq!(element_end, Ok(ElementEnd::Open), "{:?}", closing_tag);
 
-    let items = Self::parse_elements(stream, main_namespace, closing_tag);
+    let items = Self::parse_elements(stream, context, closing_tag);
 
     (min_occurs, max_occurs, ElementType::Choice(items))
 }
 
-fn parse_extension(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
+fn parse_extension(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
     let mut base = None;
     let mut min_occurs: Option<usize> = None;
     let mut max_occurs: Option<usize> = None;
 
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "base") => {
                 assert_eq!(base, None);
@@ -651,15 +656,15 @@ fn parse_extension(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
         }
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
-    let (min_occurs, max_occurs, attrs, inner) = Self::parse_subtype(stream, main_namespace, closing_tag).unwrap();
+    let (min_occurs, max_occurs, attrs, inner) = Self::parse_subtype(stream, context, closing_tag).unwrap();
     // TODO: wtf should I do with these duplicated min_occurs and max_occurs?
     (min_occurs, max_occurs, ElementType::Extension(QName::from(base.expect("Extension has no base.")), attrs, inner.map(Box::new)))
 }
 
-fn parse_any(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
+fn parse_any(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
     let mut min_occurs = None;
     let mut max_occurs = None;
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "processContents") => Ok(()), // TODO
             ("", "namespace") => Ok(()), // TODO
@@ -680,19 +685,19 @@ fn parse_any(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) ->
     (min_occurs, max_occurs, ElementType::Any)
 }
 
-fn parse_complex_content(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
+fn parse_complex_content(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
     let mut type_ = None;
     let mut min_occurs = None;
     let mut max_occurs = None;
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |_, _, _| Err(()));
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |_, _, _| Err(()));
     assert_eq!(element_end, Ok(ElementEnd::Open));
 
-    Self::parse_children(stream, main_namespace, closing_tag, |stream2, prefix, local| {
-        assert_eq!(prefix, main_namespace);
+    Self::parse_children(stream, context, closing_tag, |stream2, context, prefix, local| {
+        assert_eq!(prefix, context.main_namespace);
         match local {
             "restriction" => {
                 assert_eq!(type_, None);
-                let (min, max, t) = Self::parse_restriction(stream2, &main_namespace, (prefix, local));
+                let (min, max, t) = Self::parse_restriction(stream2, context, (prefix, local));
                 min_occurs = min;
                 max_occurs = max;
                 type_ = Some(t);
@@ -700,7 +705,7 @@ fn parse_complex_content(stream: &mut S, main_namespace: &str, closing_tag: (&st
             },
             "extension" => {
                 assert_eq!(type_, None);
-                let (min, max, t) = Self::parse_extension(stream2, main_namespace, (prefix, local));
+                let (min, max, t) = Self::parse_extension(stream2, context, (prefix, local));
                 min_occurs = min;
                 max_occurs = max;
                 type_ = Some(t);
@@ -713,12 +718,12 @@ fn parse_complex_content(stream: &mut S, main_namespace: &str, closing_tag: (&st
     (min_occurs, max_occurs, type_.expect("Empty complexContent"))
 }
 
-fn parse_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Attribute<'a> {
+fn parse_attribute(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> Attribute<'a> {
     let mut name = None;
     let mut type_ = None;
     let mut default = None;
     let mut ref_ = None;
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "name") => {
                 assert_eq!(name, None);
@@ -758,7 +763,7 @@ fn parse_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
         },
         (&Ok(ElementEnd::Open), None) => {
             let name = name.expect("Attribute has no name.");
-            let (newtype, mixed, attrs) = Self::parse_subelement(stream, main_namespace, closing_tag);
+            let (newtype, mixed, attrs) = Self::parse_subelement(stream, context, closing_tag);
             assert_eq!(mixed, false);
             let (attrs, type_) = match (type_, newtype) {
                 (Some(t), None) => {
@@ -775,8 +780,8 @@ fn parse_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str, &st
     }
 }
 
-fn parse_any_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> Attribute<'a> {
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+fn parse_any_attribute(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> Attribute<'a> {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "namespace") => Ok(()), // TODO
             ("", "processContents") => Ok(()), // TODO
@@ -789,14 +794,14 @@ fn parse_any_attribute(stream: &mut S, main_namespace: &str, closing_tag: (&str,
     Attribute::Any
 }
 
-fn parse_simple_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Option<&'a str>, Vec<Attribute<'a>>, ElementType<'a>) {
+fn parse_simple_type(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Option<&'a str>, Vec<Attribute<'a>>, ElementType<'a>) {
     let mut type_ = None;
     let mut name = None;
     let mut min_occurs = None;
     let mut max_occurs = None;
     let mut attributes = Vec::new();
 
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "name") => {
                 name = Some(value);
@@ -806,12 +811,12 @@ fn parse_simple_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, &
         }
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
-    Self::parse_children(stream, main_namespace, closing_tag, |stream2, prefix, local| {
-        assert_eq!(prefix, main_namespace);
+    Self::parse_children(stream, context, closing_tag, |stream2, context, prefix, local| {
+        assert_eq!(prefix, context.main_namespace);
         match local {
             "restriction" => {
                 assert_eq!(type_, None);
-                let (min, max, t) = Self::parse_restriction(stream2, &main_namespace, (prefix, local));
+                let (min, max, t) = Self::parse_restriction(stream2, context, (prefix, local));
                 min_occurs = min;
                 max_occurs = max;
                 type_ = Some(t);
@@ -819,7 +824,7 @@ fn parse_simple_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, &
             },
             "union" => {
                 assert_eq!(type_, None);
-                let (min, max, t) = Self::parse_union(stream2, main_namespace, (prefix, local));
+                let (min, max, t) = Self::parse_union(stream2, context, (prefix, local));
                 min_occurs = min;
                 max_occurs = max;
                 type_ = Some(t);
@@ -827,18 +832,18 @@ fn parse_simple_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, &
             }
             "list" => {
                 assert_eq!(type_, None);
-                let (min, max, t) = Self::parse_list(stream2, main_namespace, (prefix, local));
+                let (min, max, t) = Self::parse_list(stream2, context, (prefix, local));
                 min_occurs = min;
                 max_occurs = max;
                 type_ = Some(t);
                 Ok(())
             }
             "attribute" => {
-                attributes.push(Self::parse_attribute(stream2, main_namespace, (prefix, local)));
+                attributes.push(Self::parse_attribute(stream2, context, (prefix, local)));
                 Ok(())
             },
             "annotation" => {
-                Self::parse_annotation(stream2, main_namespace, (prefix, local));
+                Self::parse_annotation(stream2, context, (prefix, local));
                 Ok(())
             },
             _ => Err(format!("Unknown simpleType type: {}:{}", prefix, local)),
@@ -848,11 +853,11 @@ fn parse_simple_type(stream: &mut S, main_namespace: &str, closing_tag: (&str, &
     (min_occurs, max_occurs, name, attributes, type_.expect("Missing type for complexType"))
 }
 
-fn parse_restriction(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
+fn parse_restriction(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
     let mut name = None;
     let mut min_occurs = None;
     let mut max_occurs = None;
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "base") => {
                 assert_eq!(name, None);
@@ -874,7 +879,7 @@ fn parse_restriction(stream: &mut S, main_namespace: &str, closing_tag: (&str, &
     });
 
     match element_end {
-        Ok(ElementEnd::Open) => Self::eat_block(stream, main_namespace, closing_tag), // TODO
+        Ok(ElementEnd::Open) => Self::eat_block(stream, context, closing_tag), // TODO
         Ok(ElementEnd::Empty) => (), // yeah, it happens sometimes
         _ => panic!(format!("{:?}", element_end)),
     }
@@ -882,9 +887,9 @@ fn parse_restriction(stream: &mut S, main_namespace: &str, closing_tag: (&str, &
     (min_occurs, max_occurs, ElementType::Custom(QName::from(name.unwrap())))
 }
 
-fn parse_union(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
+fn parse_union(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
     let mut member_types = None;
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "memberTypes") => {
                 assert_eq!(member_types, None);
@@ -897,7 +902,7 @@ fn parse_union(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) 
 
     let items = match element_end {
         Ok(ElementEnd::Empty) => None,
-        Ok(ElementEnd::Open) => Some(Self::parse_elements(stream, main_namespace, closing_tag)),
+        Ok(ElementEnd::Open) => Some(Self::parse_elements(stream, context, closing_tag)),
         _ => panic!(format!("{:?}", element_end)),
     };
 
@@ -905,9 +910,9 @@ fn parse_union(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) 
     (None, None, ElementType::Union(member_types, items))
 }
 
-fn parse_list(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
+fn parse_list(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
     let mut item_type = None;
-    let element_end = Self::parse_attributes(stream, main_namespace, closing_tag, |prefix, local, value| {
+    let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
             ("", "itemType") => {
                 assert_eq!(item_type, None);
@@ -919,7 +924,7 @@ fn parse_list(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -
     });
     if let Ok(ElementEnd::Open) = element_end {
         assert_eq!(item_type, None);
-        let (newtype, mixed, newattrs) = Self::parse_subelement(stream, main_namespace, closing_tag);
+        let (newtype, mixed, newattrs) = Self::parse_subelement(stream, context, closing_tag);
         assert!(newattrs == None || newattrs == Some(Vec::new()));
         if let Some(type_) = newtype {
             return (None, None, ElementType::ComplexList(mixed, Box::new(type_)))
@@ -933,10 +938,10 @@ fn parse_list(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) -
     (None, None, ElementType::SimpleList(item_type))
 }
 
-fn parse_annotation(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) {
-    Self::eat_block(stream, main_namespace, closing_tag) // TODO
+fn parse_annotation(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) {
+    Self::eat_block(stream, context, closing_tag) // TODO
 }
-fn eat_block(stream: &mut S, main_namespace: &str, closing_tag: (&str, &str)) {
+fn eat_block(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) {
     let mut stack = vec![closing_tag];
 
     while stack.len() > 0 {
