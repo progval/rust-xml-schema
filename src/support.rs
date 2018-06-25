@@ -1,5 +1,8 @@
 use std::fmt;
 
+use xmlparser::Error as XmlParserError;
+use xmlparser::Token as XmlParserToken;
+
 #[derive(Debug, PartialEq, Default)]
 pub struct token<'input>(&'input str);
 
@@ -39,3 +42,11 @@ pub struct nonNegativeInteger<'input>(&'input str);
 
 #[derive(Debug, PartialEq, Default)]
 pub struct SUPPORT_ANY<'input>(&'input str);
+
+type Stream<'input> = Iterator<Item=Result<XmlParserToken<'input>, XmlParserError>>;
+pub trait ParseContext {
+}
+pub trait ParseXml {
+    type Context: ParseContext;
+    fn parse_xml(stream: &mut Stream, context: &mut Self::Context, closingtag: &QName) -> Self;
+}
