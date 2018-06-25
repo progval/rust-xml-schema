@@ -77,6 +77,9 @@ impl<'input> fmt::Display for QName<'input> {
 pub struct anyURI<'input>(&'input str);
 
 #[derive(Debug, PartialEq, Default)]
+pub struct anyURI_e<'input>(&'input str);
+
+#[derive(Debug, PartialEq, Default)]
 pub struct nonNegativeInteger<'input>(&'input str);
 
 #[derive(Debug, PartialEq, Default)]

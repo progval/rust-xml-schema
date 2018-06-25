@@ -4,6 +4,8 @@ pub mod UNQUAL {
 
     use support::*;
 
+    use xmlparser::{Token, ElementEnd};
+
 
     /////////// types
 
@@ -36,30 +38,52 @@ pub mod UNQUAL {
         item0: allNNI__item0<'input>,
     }
 
-    // ^-- from Union(Some([QName(Some("xs"), "nonNegativeInteger")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "NMTOKEN"))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(Some([QName(Some("xs"), "nonNegativeInteger")]), Some([(None, None, Custom(QName(Some("xs"), "NMTOKEN")))]))
 
-    #[derive(Debug, PartialEq)]
-    pub enum altType_item__extension<'input> {
-        simpleType(Box<super::UNQUAL::localSimpleType<'input>>),
-        complexType(Box<super::UNQUAL::localComplexType<'input>>),
+    #[derive(Debug, PartialEq, Default)]
+    pub struct altType__extension__seqfield0_item__choicevariant0<'input>(super::UNQUAL::localSimpleType<'input>);
+
+
+    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element altType__extension__seqfield0_item__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant0)
+        }
     }
 
-    impl<'input> Default for altType_item__extension<'input> { fn default() -> altType_item__extension<'input> { altType_item__extension::complexType(Default::default()) } }
+    #[derive(Debug, PartialEq, Default)]
+    pub struct altType__extension__seqfield0_item__choicevariant1<'input>(super::UNQUAL::localComplexType<'input>);
 
-    // ^-- from Choice([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "complexType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }])
+
+    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element altType__extension__seqfield0_item__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant1)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum altType__extension__seqfield0_item<'input> {
+        choicevariant0(Box<altType__extension__seqfield0_item__choicevariant0<'input>>),
+        choicevariant1(Box<altType__extension__seqfield0_item__choicevariant1<'input>>),
+    }
+
+    impl<'input> Default for altType__extension__seqfield0_item<'input> { fn default() -> altType__extension__seqfield0_item<'input> { altType__extension__seqfield0_item::choicevariant1(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])
 
 
-    impl<'input> ParseXml<'input> for altType_item__extension<'input> {
-        const NODE_NAME: &'static str = "choice altType_item__extension";
+    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice altType__extension__seqfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(altType_item__extension::simpleType(Box::new(r))), None => () }
+            match altType__extension__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(altType__extension__seqfield0_item::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(altType_item__extension::complexType(Box::new(r))), None => () }
+            match altType__extension__seqfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(altType__extension__seqfield0_item::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -68,21 +92,57 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType_item<'input> {
-        BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: altType_item__extension<'input>,
+    pub struct altType__extension__seqfield0<'input>(Option<altType__extension__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for altType__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option altType__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(altType__extension__seqfield0(altType__extension__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
+        }
     }
 
+    #[derive(Debug, PartialEq, Default)]
+    pub struct altType__extension<'input> {
+        seqfield0: altType__extension__seqfield0<'input>,
+    }
 
-    impl<'input> ParseXml<'input> for altType_item<'input> {
-        const NODE_NAME: &'static str = "extension altType_item";
+    // ^-- from Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))]))])
+
+
+    impl<'input> ParseXml<'input> for altType__extension<'input> {
+        const NODE_NAME: &'static str = "sequence altType__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(altType_item {
+            Some(altType__extension {
+
+
+
+                seqfield0: altType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct altType<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: altType__extension<'input>,
+    }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))]))]))
+
+
+    impl<'input> ParseXml<'input> for altType<'input> {
+        const NODE_NAME: &'static str = "extension altType";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(altType {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
 
 
-                EXTENSION: altType_item__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: altType__extension::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -92,35 +152,45 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType<'input>(Option<altType_item<'input>>);
+    pub struct annotated__extension__seqfield0__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for altType<'input> {
-        const NODE_NAME: &'static str = "option altType";
+    impl<'input> ParseXml<'input> for annotated__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option annotated__extension__seqfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(altType(altType_item::parse_xml(stream, parse_context, parent_context)))
+            Some(annotated__extension__seqfield0__seqfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct annotated__extension__annotation_e<'input>(super::UNQUAL::annotation_e<'input>);
+    pub struct annotated__extension__seqfield0<'input> {
+        seqfield0: annotated__extension__seqfield0__seqfield0<'input>,
+    }
 
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }
+    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation")))])
 
 
-    impl<'input> ParseXml<'input> for annotated__extension__annotation_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) annotated__extension__annotation_e";
+    impl<'input> ParseXml<'input> for annotated__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence annotated__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(annotated__extension__annotation_e)
+            Some(annotated__extension__seqfield0 {
+
+
+
+                seqfield0: annotated__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct annotated__extension<'input> {
-        seqfield0: annotated__extension__annotation_e<'input>,
+        seqfield0: annotated__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }])
+    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation")))]))])
 
 
     impl<'input> ParseXml<'input> for annotated__extension<'input> {
@@ -130,7 +200,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield0: annotated__extension__annotation_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: annotated__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -143,6 +213,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::openAttrs<'input>,
         EXTENSION: annotated__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "openAttrs"), Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation")))]))]))
 
 
     impl<'input> ParseXml<'input> for annotated<'input> {
@@ -163,24 +235,26 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct anyType__seqfield0_e<'input>(any<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    pub struct anyType__seqfield0<'input>(Vec<any_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for anyType__seqfield0_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) anyType__seqfield0_e";
+    impl<'input> ParseXml<'input> for anyType__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec anyType__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            any::parse_xml(stream, parse_context, parent_context).map(anyType__seqfield0_e)
+            let mut items = Vec::new();
+            while let Some(new_item) = any_e::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(anyType__seqfield0(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct anyType<'input> {
-        seqfield0: anyType__seqfield0_e<'input>,
+        seqfield0: anyType__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Ref(QName(None, "any")))])
 
 
     impl<'input> ParseXml<'input> for anyType<'input> {
@@ -190,7 +264,28 @@ pub mod UNQUAL {
 
 
 
-                seqfield0: anyType__seqfield0_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: anyType__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertion__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for assertion__extension<'input> {
+        const NODE_NAME: &'static str = "sequence assertion__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(assertion__extension {
+
+
+
+                0: Default::default()
 
 
 
@@ -201,7 +296,10 @@ pub mod UNQUAL {
     #[derive(Debug, PartialEq, Default)]
     pub struct assertion<'input> {
         BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: assertion__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for assertion<'input> {
@@ -212,30 +310,118 @@ pub mod UNQUAL {
 
 
 
+                EXTENSION: assertion__extension::parse_xml(stream, parse_context, parent_context)?,
+
+
+
             })
         }
     }
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attribute__extension__simpleType_e<'input>(super::UNQUAL::localSimpleType<'input>);
-
-    // ^-- from Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
+    pub struct attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
 
 
-    impl<'input> ParseXml<'input> for attribute__extension__simpleType_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) attribute__extension__simpleType_e";
+    impl<'input> ParseXml<'input> for attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(attribute__extension__simpleType_e)
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attribute__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
+        child: attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for attribute__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) attribute__extension__seqfield0__seqfield0_item__simpleType_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "simpleType" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(attribute__extension__seqfield0__seqfield0_item__simpleType_e {
+                                        child: attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attribute__extension__seqfield0__seqfield0_item<'input>(attribute__extension__seqfield0__seqfield0_item__simpleType_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for attribute__extension__seqfield0__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element attribute__extension__seqfield0__seqfield0_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            attribute__extension__seqfield0__seqfield0_item__simpleType_e::parse_xml(stream, parse_context, parent_context).map(attribute__extension__seqfield0__seqfield0_item)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attribute__extension__seqfield0__seqfield0<'input>(Option<attribute__extension__seqfield0__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for attribute__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option attribute__extension__seqfield0__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(attribute__extension__seqfield0__seqfield0(attribute__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attribute__extension__seqfield0<'input> {
+        seqfield0: attribute__extension__seqfield0__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))])
+
+
+    impl<'input> ParseXml<'input> for attribute__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence attribute__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(attribute__extension__seqfield0 {
+
+
+
+                seqfield0: attribute__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct attribute__extension<'input> {
-        simpleType: attribute__extension__simpleType_e<'input>,
+        seqfield0: attribute__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }])
+    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))]))])
 
 
     impl<'input> ParseXml<'input> for attribute__extension<'input> {
@@ -245,7 +431,7 @@ pub mod UNQUAL {
 
 
 
-                simpleType: attribute__extension__simpleType_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: attribute__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -258,6 +444,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::annotated<'input>,
         EXTENSION: attribute__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))]))]))
 
 
     impl<'input> ParseXml<'input> for attribute<'input> {
@@ -278,10 +466,35 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct attributeGroup__extension<'input> {
+        seqfield0: super::UNQUAL::attrDecls<'input>,
+    }
+
+    // ^-- from Sequence([(None, None, GroupRef(QName(Some("xs"), "attrDecls")))])
+
+
+    impl<'input> ParseXml<'input> for attributeGroup__extension<'input> {
+        const NODE_NAME: &'static str = "sequence attributeGroup__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(attributeGroup__extension {
+
+
+
+                seqfield0: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct attributeGroup<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: super::UNQUAL::attrDecls<'input>,
+        EXTENSION: attributeGroup__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, GroupRef(QName(Some("xs"), "attrDecls")))]))
 
 
     impl<'input> ParseXml<'input> for attributeGroup<'input> {
@@ -292,7 +505,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: attributeGroup__extension::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -329,12 +542,12 @@ pub mod UNQUAL {
         item0: basicNamespaceList__valuetype__item0<'input>,
     }
 
-    // ^-- from Union(Some([QName(Some("xs"), "anyURI")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(Some([QName(Some("xs"), "anyURI")]), Some([(None, None, Custom(QName(Some("xs"), "token")))]))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct basicNamespaceList<'input>(Vec<basicNamespaceList__valuetype<'input>>);
 
-    // ^-- from List(ComplexList(false, Union(Some([QName(Some("xs"), "anyURI")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }]))))
+    // ^-- from List(ComplexList(false, Union(Some([QName(Some("xs"), "anyURI")]), Some([(None, None, Custom(QName(Some("xs"), "token")))]))))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct blockSet__item0<'input>(super::UNQUAL::token<'input>);
@@ -369,7 +582,7 @@ pub mod UNQUAL {
         item1: blockSet__item1<'input>,
     }
 
-    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(List(ComplexList(false, Custom(QName(Some("xs"), "derivationControl"))))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(None, Some([(None, None, Custom(QName(Some("xs"), "token"))), (None, None, List(ComplexList(false, Custom(QName(Some("xs"), "derivationControl")))))]))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct complexRestrictionType<'input>(super::UNQUAL::restrictionType<'input>);
@@ -383,10 +596,35 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct complexType__extension<'input> {
+        seqfield0: super::UNQUAL::complexTypeModel<'input>,
+    }
+
+    // ^-- from Sequence([(None, None, GroupRef(QName(Some("xs"), "complexTypeModel")))])
+
+
+    impl<'input> ParseXml<'input> for complexType__extension<'input> {
+        const NODE_NAME: &'static str = "sequence complexType__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(complexType__extension {
+
+
+
+                seqfield0: super::UNQUAL::complexTypeModel::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct complexType<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: super::UNQUAL::complexTypeModel<'input>,
+        EXTENSION: complexType__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, GroupRef(QName(Some("xs"), "complexTypeModel")))]))
 
 
     impl<'input> ParseXml<'input> for complexType<'input> {
@@ -397,7 +635,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: super::UNQUAL::complexTypeModel::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: complexType__extension::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -437,30 +675,52 @@ pub mod UNQUAL {
         item1: derivationSet__item1<'input>,
     }
 
-    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(List(SimpleList(QName(Some("xs"), "reducedDerivationControl")))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(None, Some([(None, None, Custom(QName(Some("xs"), "token"))), (None, None, List(SimpleList(QName(Some("xs"), "reducedDerivationControl"))))]))
 
-    #[derive(Debug, PartialEq)]
-    pub enum element__extension__seqfield0_e_inner<'input> {
-        simpleType(Box<super::UNQUAL::localSimpleType<'input>>),
-        complexType(Box<super::UNQUAL::localComplexType<'input>>),
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element__extension__seqfield0__seqfield0_item__choicevariant0<'input>(super::UNQUAL::localSimpleType<'input>);
+
+
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element element__extension__seqfield0__seqfield0_item__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant0)
+        }
     }
 
-    impl<'input> Default for element__extension__seqfield0_e_inner<'input> { fn default() -> element__extension__seqfield0_e_inner<'input> { element__extension__seqfield0_e_inner::complexType(Default::default()) } }
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element__extension__seqfield0__seqfield0_item__choicevariant1<'input>(super::UNQUAL::localComplexType<'input>);
 
-    // ^-- from Choice([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "complexType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }])
+
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element element__extension__seqfield0__seqfield0_item__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant1)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum element__extension__seqfield0__seqfield0_item<'input> {
+        choicevariant0(Box<element__extension__seqfield0__seqfield0_item__choicevariant0<'input>>),
+        choicevariant1(Box<element__extension__seqfield0__seqfield0_item__choicevariant1<'input>>),
+    }
+
+    impl<'input> Default for element__extension__seqfield0__seqfield0_item<'input> { fn default() -> element__extension__seqfield0__seqfield0_item<'input> { element__extension__seqfield0__seqfield0_item::choicevariant1(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0_e_inner<'input> {
-        const NODE_NAME: &'static str = "choice element__extension__seqfield0_e_inner";
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice element__extension__seqfield0__seqfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(element__extension__seqfield0_e_inner::simpleType(Box::new(r))), None => () }
+            match element__extension__seqfield0__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(element__extension__seqfield0__seqfield0_item::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(element__extension__seqfield0_e_inner::complexType(Box::new(r))), None => () }
+            match element__extension__seqfield0__seqfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(element__extension__seqfield0__seqfield0_item::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -469,52 +729,148 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0_e<'input>(element__extension__seqfield0_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "complexType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: None }
+    pub struct element__extension__seqfield0__seqfield0<'input>(Option<element__extension__seqfield0__seqfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) element__extension__seqfield0_e";
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option element__extension__seqfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            element__extension__seqfield0_e_inner::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0_e)
+            Some(element__extension__seqfield0__seqfield0(element__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__alternative_e<'input>(super::UNQUAL::altType<'input>);
-
-    // ^-- from Element { name: Some(QName(None, "alternative")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    pub struct element__extension__seqfield0__seqfield1_item__alternative_e_inner<'input>(super::UNQUAL::altType<'input>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__alternative_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) element__extension__alternative_e";
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield1_item__alternative_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom element__extension__seqfield0__seqfield1_item__alternative_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::altType::parse_xml(stream, parse_context, parent_context).map(element__extension__alternative_e)
+            super::UNQUAL::altType::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield1_item__alternative_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__identityConstraint_e<'input>(super::UNQUAL::identityConstraint<'input>);
+    pub struct element__extension__seqfield0__seqfield1_item__alternative_e<'input> {
+        child: element__extension__seqfield0__seqfield1_item__alternative_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "identityConstraint"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    // ^-- from Element { name: QName(None, "alternative"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
 
 
-    impl<'input> ParseXml<'input> for element__extension__identityConstraint_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) element__extension__identityConstraint_e";
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield1_item__alternative_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) element__extension__seqfield0__seqfield1_item__alternative_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::identityConstraint::parse_xml(stream, parse_context, parent_context).map(element__extension__identityConstraint_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "alternative" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(element__extension__seqfield0__seqfield1_item__alternative_e {
+                                        child: element__extension__seqfield0__seqfield1_item__alternative_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element__extension__seqfield0__seqfield1_item<'input>(element__extension__seqfield0__seqfield1_item__alternative_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield1_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element element__extension__seqfield0__seqfield1_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            element__extension__seqfield0__seqfield1_item__alternative_e::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield1_item)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element__extension__seqfield0__seqfield1<'input>(Vec<element__extension__seqfield0__seqfield1_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec element__extension__seqfield0__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = element__extension__seqfield0__seqfield1_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(element__extension__seqfield0__seqfield1(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element__extension__seqfield0__seqfield2<'input>(Vec<super::UNQUAL::identityConstraint<'input>>);
+
+
+    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield2<'input> {
+        const NODE_NAME: &'static str = "vec element__extension__seqfield0__seqfield2";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = super::UNQUAL::identityConstraint::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(element__extension__seqfield0__seqfield2(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element__extension__seqfield0<'input> {
+        seqfield0: element__extension__seqfield0__seqfield0<'input>,
+        seqfield1: element__extension__seqfield0__seqfield1<'input>,
+        seqfield2: element__extension__seqfield0__seqfield2<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])), (Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "alternative"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) })), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "identityConstraint")))])
+
+
+    impl<'input> ParseXml<'input> for element__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence element__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(element__extension__seqfield0 {
+
+
+
+                seqfield0: element__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: element__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield2: element__extension__seqfield0__seqfield2::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct element__extension<'input> {
-        seqfield0: element__extension__seqfield0_e<'input>,
-        alternative: element__extension__alternative_e<'input>,
-        seqfield2: element__extension__identityConstraint_e<'input>,
+        seqfield0: element__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "complexType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: None }, Element { name: Some(QName(None, "alternative")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "identityConstraint"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])), (Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "alternative"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) })), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "identityConstraint")))]))])
 
 
     impl<'input> ParseXml<'input> for element__extension<'input> {
@@ -524,15 +880,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield0: element__extension__seqfield0_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                alternative: element__extension__alternative_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield2: element__extension__identityConstraint_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: element__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -545,6 +893,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::annotated<'input>,
         EXTENSION: element__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])), (Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "alternative"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) })), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "identityConstraint")))]))]))
 
 
     impl<'input> ParseXml<'input> for element<'input> {
@@ -576,40 +926,71 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct extensionType__extension__openContent_e<'input>(super::UNQUAL::openContent_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }
+    pub struct extensionType__extension__seqfield0__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for extensionType__extension__openContent_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) extensionType__extension__openContent_e";
+    impl<'input> ParseXml<'input> for extensionType__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option extensionType__extension__seqfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context).map(extensionType__extension__openContent_e)
+            Some(extensionType__extension__seqfield0__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct extensionType__extension__typeDefParticle_e<'input>(super::UNQUAL::typeDefParticle<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "typeDefParticle"))), min_occurs: Some(0), max_occurs: None }
+    pub struct extensionType__extension__seqfield0__seqfield1<'input>(Option<super::UNQUAL::typeDefParticle<'input>>);
 
 
-    impl<'input> ParseXml<'input> for extensionType__extension__typeDefParticle_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) extensionType__extension__typeDefParticle_e";
+    impl<'input> ParseXml<'input> for extensionType__extension__seqfield0__seqfield1<'input> {
+        const NODE_NAME: &'static str = "option extensionType__extension__seqfield0__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context).map(extensionType__extension__typeDefParticle_e)
+            Some(extensionType__extension__seqfield0__seqfield1(super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct extensionType__extension__seqfield0<'input> {
+        seqfield0: extensionType__extension__seqfield0__seqfield0<'input>,
+        seqfield1: extensionType__extension__seqfield0__seqfield1<'input>,
+        seqfield2: super::UNQUAL::attrDecls<'input>,
+        seqfield3: super::UNQUAL::assertions<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))])
+
+
+    impl<'input> ParseXml<'input> for extensionType__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence extensionType__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(extensionType__extension__seqfield0 {
+
+
+
+                seqfield0: extensionType__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: extensionType__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield2: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield3: super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct extensionType__extension<'input> {
-        seqfield0: extensionType__extension__openContent_e<'input>,
-        seqfield1: extensionType__extension__typeDefParticle_e<'input>,
-        attrDecls: super::UNQUAL::attrDecls<'input>,
-        assertions: super::UNQUAL::assertions<'input>,
+        seqfield0: extensionType__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "typeDefParticle"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "attrDecls"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "assertions"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
 
 
     impl<'input> ParseXml<'input> for extensionType__extension<'input> {
@@ -619,19 +1000,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield0: extensionType__extension__openContent_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: extensionType__extension__typeDefParticle_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                attrDecls: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                assertions: super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: extensionType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -644,6 +1013,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::annotated<'input>,
         EXTENSION: extensionType__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))]))
 
 
     impl<'input> ParseXml<'input> for extensionType<'input> {
@@ -664,9 +1035,33 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct facet__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for facet__extension<'input> {
+        const NODE_NAME: &'static str = "sequence facet__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(facet__extension {
+
+
+
+                0: Default::default()
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct facet<'input> {
         BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: facet__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for facet<'input> {
@@ -674,6 +1069,10 @@ pub mod UNQUAL {
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(facet {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                EXTENSION: facet__extension::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -713,24 +1112,39 @@ pub mod UNQUAL {
         item1: fullDerivationSet__item1<'input>,
     }
 
-    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(List(SimpleList(QName(Some("xs"), "typeDerivationControl")))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(None, Some([(None, None, Custom(QName(Some("xs"), "token"))), (None, None, List(SimpleList(QName(Some("xs"), "typeDerivationControl"))))]))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct group_item<'input> {
-        BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: super::UNQUAL::particle<'input>,
+    pub struct group__extension__seqfield0<'input>(Vec<super::UNQUAL::particle<'input>>);
+
+
+    impl<'input> ParseXml<'input> for group__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec group__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = super::UNQUAL::particle::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(group__extension__seqfield0(items))
+        }
     }
 
+    #[derive(Debug, PartialEq, Default)]
+    pub struct group__extension<'input> {
+        seqfield0: group__extension__seqfield0<'input>,
+    }
 
-    impl<'input> ParseXml<'input> for group_item<'input> {
-        const NODE_NAME: &'static str = "extension group_item";
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "particle")))])
+
+
+    impl<'input> ParseXml<'input> for group__extension<'input> {
+        const NODE_NAME: &'static str = "sequence group__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(group_item {
-                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+            Some(group__extension {
 
 
 
-                EXTENSION: super::UNQUAL::particle::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: group__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -738,21 +1152,31 @@ pub mod UNQUAL {
         }
     }
 
-
     #[derive(Debug, PartialEq, Default)]
-    pub struct group<'input>(Vec<group_item<'input>>);
+    pub struct group<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: group__extension<'input>,
+    }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "particle")))]))
 
 
     impl<'input> ParseXml<'input> for group<'input> {
-        const NODE_NAME: &'static str = "vec group";
+        const NODE_NAME: &'static str = "extension group";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let mut items = Vec::new();
-            while let Some(new_item) = group_item::parse_xml(stream, parse_context, parent_context) {
-                items.push(new_item);
-            }
-            Some(group(items))
+            Some(group {
+                BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                EXTENSION: group__extension::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
+
 
     #[derive(Debug, PartialEq, Default)]
     pub struct groupRef<'input>(super::UNQUAL::realGroup<'input>);
@@ -777,39 +1201,41 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keybase_item__extension__field_e<'input>(super::UNQUAL::field_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "field"))), min_occurs: Some(1), max_occurs: Some(18446744073709551615) }
+    pub struct keybase__extension__seqfield0_item__seqfield1<'input>(Vec<super::UNQUAL::field_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for keybase_item__extension__field_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) keybase_item__extension__field_e";
+    impl<'input> ParseXml<'input> for keybase__extension__seqfield0_item__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec keybase__extension__seqfield0_item__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::field_e::parse_xml(stream, parse_context, parent_context).map(keybase_item__extension__field_e)
+            let mut items = Vec::new();
+            while let Some(new_item) = super::UNQUAL::field_e::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(keybase__extension__seqfield0_item__seqfield1(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keybase_item__extension<'input> {
-        selector: super::UNQUAL::selector_e<'input>,
-        seqfield1: keybase_item__extension__field_e<'input>,
+    pub struct keybase__extension__seqfield0_item<'input> {
+        seqfield0: super::UNQUAL::selector_e<'input>,
+        seqfield1: keybase__extension__seqfield0_item__seqfield1<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "selector"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "field"))), min_occurs: Some(1), max_occurs: Some(18446744073709551615) }])
+    // ^-- from Sequence([(None, None, Ref(QName(Some("xs"), "selector"))), (Some(1), Some(18446744073709551615), Ref(QName(Some("xs"), "field")))])
 
 
-    impl<'input> ParseXml<'input> for keybase_item__extension<'input> {
-        const NODE_NAME: &'static str = "sequence keybase_item__extension";
+    impl<'input> ParseXml<'input> for keybase__extension__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "sequence keybase__extension__seqfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(keybase_item__extension {
+            Some(keybase__extension__seqfield0_item {
 
 
 
-                selector: super::UNQUAL::selector_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: super::UNQUAL::selector_e::parse_xml(stream, parse_context, parent_context)?,
 
 
 
-                seqfield1: keybase_item__extension__field_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: keybase__extension__seqfield0_item__seqfield1::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -818,21 +1244,57 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keybase_item<'input> {
-        BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: keybase_item__extension<'input>,
+    pub struct keybase__extension__seqfield0<'input>(Option<keybase__extension__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for keybase__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option keybase__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(keybase__extension__seqfield0(keybase__extension__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
+        }
     }
 
+    #[derive(Debug, PartialEq, Default)]
+    pub struct keybase__extension<'input> {
+        seqfield0: keybase__extension__seqfield0<'input>,
+    }
 
-    impl<'input> ParseXml<'input> for keybase_item<'input> {
-        const NODE_NAME: &'static str = "extension keybase_item";
+    // ^-- from Sequence([(Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "selector"))), (Some(1), Some(18446744073709551615), Ref(QName(Some("xs"), "field")))]))])
+
+
+    impl<'input> ParseXml<'input> for keybase__extension<'input> {
+        const NODE_NAME: &'static str = "sequence keybase__extension";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(keybase_item {
+            Some(keybase__extension {
+
+
+
+                seqfield0: keybase__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct keybase<'input> {
+        BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: keybase__extension<'input>,
+    }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "selector"))), (Some(1), Some(18446744073709551615), Ref(QName(Some("xs"), "field")))]))]))
+
+
+    impl<'input> ParseXml<'input> for keybase<'input> {
+        const NODE_NAME: &'static str = "extension keybase";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(keybase {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
 
 
 
-                EXTENSION: keybase_item__extension::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: keybase__extension::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -840,17 +1302,6 @@ pub mod UNQUAL {
         }
     }
 
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct keybase<'input>(Option<keybase_item<'input>>);
-
-
-    impl<'input> ParseXml<'input> for keybase<'input> {
-        const NODE_NAME: &'static str = "option keybase";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(keybase(keybase_item::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct localComplexType<'input>(super::UNQUAL::complexType<'input>);
@@ -976,12 +1427,12 @@ pub mod UNQUAL {
         item0: qnameList__valuetype__item0<'input>,
     }
 
-    // ^-- from Union(Some([QName(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(Some([QName(Some("xs"), "QName")]), Some([(None, None, Custom(QName(Some("xs"), "token")))]))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct qnameList<'input>(Vec<qnameList__valuetype<'input>>);
 
-    // ^-- from List(ComplexList(false, Union(Some([QName(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }]))))
+    // ^-- from List(ComplexList(false, Union(Some([QName(Some("xs"), "QName")]), Some([(None, None, Custom(QName(Some("xs"), "token")))]))))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct qnameListA__valuetype__item0<'input>(super::UNQUAL::token<'input>);
@@ -1000,12 +1451,12 @@ pub mod UNQUAL {
         item0: qnameListA__valuetype__item0<'input>,
     }
 
-    // ^-- from Union(Some([QName(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(Some([QName(Some("xs"), "QName")]), Some([(None, None, Custom(QName(Some("xs"), "token")))]))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct qnameListA<'input>(Vec<qnameListA__valuetype<'input>>);
 
-    // ^-- from List(ComplexList(false, Union(Some([QName(Some("xs"), "QName")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }]))))
+    // ^-- from List(ComplexList(false, Union(Some([QName(Some("xs"), "QName")]), Some([(None, None, Custom(QName(Some("xs"), "token")))]))))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct realGroup<'input>(super::UNQUAL::group<'input>);
@@ -1030,39 +1481,37 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType__extension__seqfield0_e_inner__choicevariant0__openContent_e<'input>(super::UNQUAL::openContent_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }
+    pub struct restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0_e_inner__choicevariant0__openContent_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) restrictionType__extension__seqfield0_e_inner__choicevariant0__openContent_e";
+    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context).map(restrictionType__extension__seqfield0_e_inner__choicevariant0__openContent_e)
+            Some(restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType__extension__seqfield0_e_inner__choicevariant0<'input> {
-        seqfield0: restrictionType__extension__seqfield0_e_inner__choicevariant0__openContent_e<'input>,
-        typeDefParticle: super::UNQUAL::typeDefParticle<'input>,
+    pub struct restrictionType__extension__seqfield0__seqfield0_item__choicevariant0<'input> {
+        seqfield0: restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0<'input>,
+        seqfield1: super::UNQUAL::typeDefParticle<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "typeDefParticle"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])
 
 
-    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0_e_inner__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "sequence restrictionType__extension__seqfield0_e_inner__choicevariant0";
+    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0__seqfield0_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "sequence restrictionType__extension__seqfield0__seqfield0_item__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(restrictionType__extension__seqfield0_e_inner__choicevariant0 {
+            Some(restrictionType__extension__seqfield0__seqfield0_item__choicevariant0 {
 
 
 
-                seqfield0: restrictionType__extension__seqfield0_e_inner__choicevariant0__openContent_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
-                typeDefParticle: super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -1071,27 +1520,27 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum restrictionType__extension__seqfield0_e_inner<'input> {
-        choicevariant0(Box<restrictionType__extension__seqfield0_e_inner__choicevariant0<'input>>),
-        simpleRestrictionModel(Box<super::UNQUAL::simpleRestrictionModel<'input>>),
+    pub enum restrictionType__extension__seqfield0__seqfield0_item<'input> {
+        choicevariant0(Box<restrictionType__extension__seqfield0__seqfield0_item__choicevariant0<'input>>),
+        choicevariant1(Box<super::UNQUAL::simpleRestrictionModel<'input>>),
     }
 
-    impl<'input> Default for restrictionType__extension__seqfield0_e_inner<'input> { fn default() -> restrictionType__extension__seqfield0_e_inner<'input> { restrictionType__extension__seqfield0_e_inner::simpleRestrictionModel(Default::default()) } }
+    impl<'input> Default for restrictionType__extension__seqfield0__seqfield0_item<'input> { fn default() -> restrictionType__extension__seqfield0__seqfield0_item<'input> { restrictionType__extension__seqfield0__seqfield0_item::choicevariant1(Default::default()) } }
 
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "typeDefParticle"))), min_occurs: None, max_occurs: None }])), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "simpleRestrictionModel"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Choice([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])), (None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])
 
 
-    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0_e_inner<'input> {
-        const NODE_NAME: &'static str = "choice restrictionType__extension__seqfield0_e_inner";
+    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice restrictionType__extension__seqfield0__seqfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match restrictionType__extension__seqfield0_e_inner__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(restrictionType__extension__seqfield0_e_inner::choicevariant0(Box::new(r))), None => () }
+            match restrictionType__extension__seqfield0__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(restrictionType__extension__seqfield0__seqfield0_item::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::simpleRestrictionModel::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(restrictionType__extension__seqfield0_e_inner::simpleRestrictionModel(Box::new(r))), None => () }
+            match super::UNQUAL::simpleRestrictionModel::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(restrictionType__extension__seqfield0__seqfield0_item::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -1100,26 +1549,55 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType__extension__seqfield0_e<'input>(restrictionType__extension__seqfield0_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "typeDefParticle"))), min_occurs: None, max_occurs: None }])), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "simpleRestrictionModel"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: None }
+    pub struct restrictionType__extension__seqfield0__seqfield0<'input>(Option<restrictionType__extension__seqfield0__seqfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) restrictionType__extension__seqfield0_e";
+    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option restrictionType__extension__seqfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            restrictionType__extension__seqfield0_e_inner::parse_xml(stream, parse_context, parent_context).map(restrictionType__extension__seqfield0_e)
+            Some(restrictionType__extension__seqfield0__seqfield0(restrictionType__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct restrictionType__extension__seqfield0<'input> {
+        seqfield0: restrictionType__extension__seqfield0__seqfield0<'input>,
+        seqfield1: super::UNQUAL::attrDecls<'input>,
+        seqfield2: super::UNQUAL::assertions<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Choice([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])), (None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))])
+
+
+    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence restrictionType__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(restrictionType__extension__seqfield0 {
+
+
+
+                seqfield0: restrictionType__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield2: super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct restrictionType__extension<'input> {
-        seqfield0: restrictionType__extension__seqfield0_e<'input>,
-        attrDecls: super::UNQUAL::attrDecls<'input>,
-        assertions: super::UNQUAL::assertions<'input>,
+        seqfield0: restrictionType__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "typeDefParticle"))), min_occurs: None, max_occurs: None }])), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "simpleRestrictionModel"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "attrDecls"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "assertions"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Choice([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])), (None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
 
 
     impl<'input> ParseXml<'input> for restrictionType__extension<'input> {
@@ -1129,15 +1607,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield0: restrictionType__extension__seqfield0_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                attrDecls: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                assertions: super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: restrictionType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -1150,6 +1620,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::annotated<'input>,
         EXTENSION: restrictionType__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Choice([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])), (None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))]))
 
 
     impl<'input> ParseXml<'input> for restrictionType<'input> {
@@ -1202,7 +1674,7 @@ pub mod UNQUAL {
         item1: simpleDerivationSet__item1<'input>,
     }
 
-    // ^-- from Union(None, Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(List(ComplexList(false, Custom(QName(Some("xs"), "derivationControl"))))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(None, Some([(None, None, Custom(QName(Some("xs"), "token"))), (None, None, List(ComplexList(false, Custom(QName(Some("xs"), "derivationControl")))))]))
 
     #[derive(Debug, PartialEq, Default)]
     pub struct simpleExplicitGroup<'input>(super::UNQUAL::explicitGroup<'input>);
@@ -1238,10 +1710,35 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct simpleType__extension<'input> {
+        seqfield0: super::UNQUAL::simpleDerivation<'input>,
+    }
+
+    // ^-- from Sequence([(None, None, GroupRef(QName(Some("xs"), "simpleDerivation")))])
+
+
+    impl<'input> ParseXml<'input> for simpleType__extension<'input> {
+        const NODE_NAME: &'static str = "sequence simpleType__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(simpleType__extension {
+
+
+
+                seqfield0: super::UNQUAL::simpleDerivation::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct simpleType<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: super::UNQUAL::simpleDerivation<'input>,
+        EXTENSION: simpleType__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, GroupRef(QName(Some("xs"), "simpleDerivation")))]))
 
 
     impl<'input> ParseXml<'input> for simpleType<'input> {
@@ -1252,7 +1749,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: super::UNQUAL::simpleDerivation::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: simpleType__extension::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -1328,9 +1825,33 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct wildcard__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for wildcard__extension<'input> {
+        const NODE_NAME: &'static str = "sequence wildcard__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(wildcard__extension {
+
+
+
+                0: Default::default()
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct wildcard<'input> {
         BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: wildcard__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for wildcard<'input> {
@@ -1338,6 +1859,10 @@ pub mod UNQUAL {
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             Some(wildcard {
                 BASE: super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                EXTENSION: wildcard__extension::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -1363,47 +1888,86 @@ pub mod UNQUAL {
         item0: xpathDefaultNamespace__item0<'input>,
     }
 
-    // ^-- from Union(Some([QName(Some("xs"), "anyURI")]), Some([Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None }]))
+    // ^-- from Union(Some([QName(Some("xs"), "anyURI")]), Some([(None, None, Custom(QName(Some("xs"), "token")))]))
 
 
     /////////// elements
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct all_e<'input>(super::UNQUAL::all<'input>);
+    pub struct all_e_inner<'input>(super::UNQUAL::all<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "all")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "all"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for all_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom all_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::all::parse_xml(stream, parse_context, parent_context).map(all_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct all_e<'input> {
+        child: all_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "all"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "all"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for all_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) all_e";
+        const NODE_NAME: &'static str = "element (normal) all_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::all::parse_xml(stream, parse_context, parent_context).map(all_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "all" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(all_e {
+                                        child: all_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum annotation_e_inner__extension<'input> {
-        appinfo(Box<super::UNQUAL::appinfo_e<'input>>),
-        documentation(Box<super::UNQUAL::documentation_e<'input>>),
+    pub enum annotation_e_inner__extension__seqfield0_item<'input> {
+        choicevariant0(Box<super::UNQUAL::appinfo_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::documentation_e<'input>>),
     }
 
-    impl<'input> Default for annotation_e_inner__extension<'input> { fn default() -> annotation_e_inner__extension<'input> { annotation_e_inner__extension::documentation(Default::default()) } }
+    impl<'input> Default for annotation_e_inner__extension__seqfield0_item<'input> { fn default() -> annotation_e_inner__extension__seqfield0_item<'input> { annotation_e_inner__extension__seqfield0_item::choicevariant1(Default::default()) } }
 
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "appinfo"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "documentation"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "appinfo"))), (None, None, Ref(QName(Some("xs"), "documentation")))])
 
 
-    impl<'input> ParseXml<'input> for annotation_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "choice annotation_e_inner__extension";
+    impl<'input> ParseXml<'input> for annotation_e_inner__extension__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice annotation_e_inner__extension__seqfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::appinfo_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(annotation_e_inner__extension::appinfo(Box::new(r))), None => () }
+            match super::UNQUAL::appinfo_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(annotation_e_inner__extension__seqfield0_item::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::documentation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(annotation_e_inner__extension::documentation(Box::new(r))), None => () }
+            match super::UNQUAL::documentation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(annotation_e_inner__extension__seqfield0_item::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -1412,10 +1976,50 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct annotation_e_inner__extension__seqfield0<'input>(Vec<annotation_e_inner__extension__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for annotation_e_inner__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec annotation_e_inner__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = annotation_e_inner__extension__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(annotation_e_inner__extension__seqfield0(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct annotation_e_inner__extension<'input> {
+        seqfield0: annotation_e_inner__extension__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "appinfo"))), (None, None, Ref(QName(Some("xs"), "documentation")))]))])
+
+
+    impl<'input> ParseXml<'input> for annotation_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence annotation_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(annotation_e_inner__extension {
+
+
+
+                seqfield0: annotation_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct annotation_e_inner<'input> {
         BASE: super::UNQUAL::openAttrs<'input>,
         EXTENSION: annotation_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "openAttrs"), Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "appinfo"))), (None, None, Ref(QName(Some("xs"), "documentation")))]))]))
 
 
     impl<'input> ParseXml<'input> for annotation_e_inner<'input> {
@@ -1436,22 +2040,74 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct annotation_e<'input>(annotation_e_inner<'input>);
+    pub struct annotation_e<'input> {
+        child: annotation_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "annotation")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), [SmallDef { name: "id", type_: Some(QName(Some("xs"), "ID")), default: None }], Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "appinfo"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "documentation"))), min_occurs: None, max_occurs: None }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "annotation"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "appinfo"))), (None, None, Ref(QName(Some("xs"), "documentation")))]))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for annotation_e<'input> {
         const NODE_NAME: &'static str = "element (normal) annotation_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            annotation_e_inner::parse_xml(stream, parse_context, parent_context).map(annotation_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "annotation" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(annotation_e {
+                                        child: annotation_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct any_e_inner__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for any_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence any_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(any_e_inner__extension {
+
+
+
+                0: Default::default()
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct any_e_inner<'input> {
         BASE: super::UNQUAL::wildcard<'input>,
+        EXTENSION: any_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "wildcard"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for any_e_inner<'input> {
@@ -1462,28 +2118,84 @@ pub mod UNQUAL {
 
 
 
+                EXTENSION: any_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+
+
+
             })
         }
     }
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct any_e<'input>(any_e_inner<'input>);
+    pub struct any_e<'input> {
+        child: any_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "any")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "wildcard"), [SmallDef { name: "notQName", type_: Some(QName(Some("xs"), "qnameList")), default: None }, GroupRef(QName(Some("xs"), "occurs"))], None)), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "wildcard"), Sequence([]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for any_e<'input> {
         const NODE_NAME: &'static str = "element (normal) any_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            any_e_inner::parse_xml(stream, parse_context, parent_context).map(any_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "any" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(any_e {
+                                        child: any_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct anyAttribute_e_inner__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for anyAttribute_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence anyAttribute_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(anyAttribute_e_inner__extension {
+
+
+
+                0: Default::default()
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct anyAttribute_e_inner<'input> {
         BASE: super::UNQUAL::wildcard<'input>,
+        EXTENSION: anyAttribute_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "wildcard"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for anyAttribute_e_inner<'input> {
@@ -1494,30 +2206,62 @@ pub mod UNQUAL {
 
 
 
+                EXTENSION: anyAttribute_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+
+
+
             })
         }
     }
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct anyAttribute_e<'input>(anyAttribute_e_inner<'input>);
+    pub struct anyAttribute_e<'input> {
+        child: anyAttribute_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "anyAttribute")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "wildcard"), [SmallDef { name: "notQName", type_: Some(QName(Some("xs"), "qnameListA")), default: None }], None)), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "anyAttribute"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "wildcard"), Sequence([]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for anyAttribute_e<'input> {
         const NODE_NAME: &'static str = "element (normal) anyAttribute_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            anyAttribute_e_inner::parse_xml(stream, parse_context, parent_context).map(anyAttribute_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "anyAttribute" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(anyAttribute_e {
+                                        child: anyAttribute_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct appinfo_e_inner<'input> {
-        seqfield0: any<'input>,
+        seqfield0: any_e<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])
+    // ^-- from Sequence([(None, None, Ref(QName(None, "any")))])
 
 
     impl<'input> ParseXml<'input> for appinfo_e_inner<'input> {
@@ -1527,7 +2271,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield0: any::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: any_e::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -1536,92 +2280,307 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct appinfo_e<'input>(appinfo_e_inner<'input>);
+    pub struct appinfo_e<'input> {
+        child: appinfo_e_inner<'input>,
+        source: Option<super::UNQUAL::anyURI_e<'input>>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "appinfo")), attrs: [SmallDef { name: "source", type_: Some(QName(Some("xs"), "anyURI")), default: None }, Any], mixed: true, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "appinfo"), attrs: [Def { name: "source", type_: Some(Ref(QName(Some("xs"), "anyURI"))), default: None }, Any], mixed: true, type_: Some(Sequence([(None, None, Ref(QName(None, "any")))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for appinfo_e<'input> {
         const NODE_NAME: &'static str = "element (normal) appinfo_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            appinfo_e_inner::parse_xml(stream, parse_context, parent_context).map(appinfo_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "appinfo" {
+
+
+
+                            let source: Option<super::UNQUAL::anyURI_e> = None;
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(appinfo_e {
+                                        child: appinfo_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                        source,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct assertion_e<'input>(super::UNQUAL::assertion<'input>);
+    pub struct assertion_e_inner<'input>(super::UNQUAL::assertion<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "assertion")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for assertion_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom assertion_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::assertion::parse_xml(stream, parse_context, parent_context).map(assertion_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertion_e<'input> {
+        child: assertion_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "assertion"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for assertion_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) assertion_e";
+        const NODE_NAME: &'static str = "element (normal) assertion_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::assertion::parse_xml(stream, parse_context, parent_context).map(assertion_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "assertion" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(assertion_e {
+                                        child: assertion_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attribute_e<'input>(super::UNQUAL::topLevelAttribute<'input>);
+    pub struct attribute_e_inner<'input>(super::UNQUAL::topLevelAttribute<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "topLevelAttribute"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for attribute_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom attribute_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::topLevelAttribute::parse_xml(stream, parse_context, parent_context).map(attribute_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attribute_e<'input> {
+        child: attribute_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "topLevelAttribute"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for attribute_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) attribute_e";
+        const NODE_NAME: &'static str = "element (normal) attribute_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::topLevelAttribute::parse_xml(stream, parse_context, parent_context).map(attribute_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "attribute" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(attribute_e {
+                                        child: attribute_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attributeGroup_e<'input>(super::UNQUAL::namedAttributeGroup<'input>);
+    pub struct attributeGroup_e_inner<'input>(super::UNQUAL::namedAttributeGroup<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "namedAttributeGroup"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for attributeGroup_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom attributeGroup_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::namedAttributeGroup::parse_xml(stream, parse_context, parent_context).map(attributeGroup_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attributeGroup_e<'input> {
+        child: attributeGroup_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "namedAttributeGroup"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for attributeGroup_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) attributeGroup_e";
+        const NODE_NAME: &'static str = "element (normal) attributeGroup_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::namedAttributeGroup::parse_xml(stream, parse_context, parent_context).map(attributeGroup_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "attributeGroup" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(attributeGroup_e {
+                                        child: attributeGroup_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct choice_e<'input>(super::UNQUAL::explicitGroup<'input>);
+    pub struct choice_e_inner<'input>(super::UNQUAL::explicitGroup<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "choice")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "explicitGroup"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for choice_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom choice_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::explicitGroup::parse_xml(stream, parse_context, parent_context).map(choice_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct choice_e<'input> {
+        child: choice_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "choice"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "explicitGroup"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for choice_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) choice_e";
+        const NODE_NAME: &'static str = "element (normal) choice_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::explicitGroup::parse_xml(stream, parse_context, parent_context).map(choice_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "choice" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(choice_e {
+                                        child: choice_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexContent_e_inner__extension__seqfield0__choicevariant0<'input>(super::UNQUAL::complexRestrictionType<'input>);
+
+
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element complexContent_e_inner__extension__seqfield0__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::complexRestrictionType::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexContent_e_inner__extension__seqfield0__choicevariant1<'input>(super::UNQUAL::extensionType<'input>);
+
+
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element complexContent_e_inner__extension__seqfield0__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::extensionType::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant1)
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum complexContent_e_inner__extension<'input> {
-        restriction(Box<super::UNQUAL::complexRestrictionType<'input>>),
-        extension(Box<super::UNQUAL::extensionType<'input>>),
+    pub enum complexContent_e_inner__extension__seqfield0<'input> {
+        choicevariant0(Box<complexContent_e_inner__extension__seqfield0__choicevariant0<'input>>),
+        choicevariant1(Box<complexContent_e_inner__extension__seqfield0__choicevariant1<'input>>),
     }
 
-    impl<'input> Default for complexContent_e_inner__extension<'input> { fn default() -> complexContent_e_inner__extension<'input> { complexContent_e_inner__extension::extension(Default::default()) } }
+    impl<'input> Default for complexContent_e_inner__extension__seqfield0<'input> { fn default() -> complexContent_e_inner__extension__seqfield0<'input> { complexContent_e_inner__extension__seqfield0::choicevariant1(Default::default()) } }
 
-    // ^-- from Choice([Element { name: Some(QName(None, "restriction")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "extension")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }))])
 
 
-    impl<'input> ParseXml<'input> for complexContent_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "choice complexContent_e_inner__extension";
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "choice complexContent_e_inner__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::complexRestrictionType::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexContent_e_inner__extension::restriction(Box::new(r))), None => () }
+            match complexContent_e_inner__extension__seqfield0__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexContent_e_inner__extension__seqfield0::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::extensionType::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexContent_e_inner__extension::extension(Box::new(r))), None => () }
+            match complexContent_e_inner__extension__seqfield0__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexContent_e_inner__extension__seqfield0::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -1630,10 +2589,35 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct complexContent_e_inner__extension<'input> {
+        seqfield0: complexContent_e_inner__extension__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }))]))])
+
+
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence complexContent_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(complexContent_e_inner__extension {
+
+
+
+                seqfield0: complexContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct complexContent_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
         EXTENSION: complexContent_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }))]))]))
 
 
     impl<'input> ParseXml<'input> for complexContent_e_inner<'input> {
@@ -1654,37 +2638,138 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e<'input>(complexContent_e_inner<'input>);
+    pub struct complexContent_e<'input> {
+        child: complexContent_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "complexContent")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [LongDef { name: "mixed", default: None, inner: Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "boolean"))), min_occurs: None, max_occurs: None } }], Some(Choice([Element { name: Some(QName(None, "restriction")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "extension")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "complexContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }))]))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for complexContent_e<'input> {
         const NODE_NAME: &'static str = "element (normal) complexContent_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            complexContent_e_inner::parse_xml(stream, parse_context, parent_context).map(complexContent_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "complexContent" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(complexContent_e {
+                                        child: complexContent_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexType_e<'input>(super::UNQUAL::topLevelComplexType<'input>);
+    pub struct complexType_e_inner<'input>(super::UNQUAL::topLevelComplexType<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "complexType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "topLevelComplexType"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for complexType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom complexType_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::topLevelComplexType::parse_xml(stream, parse_context, parent_context).map(complexType_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexType_e<'input> {
+        child: complexType_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "topLevelComplexType"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for complexType_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) complexType_e";
+        const NODE_NAME: &'static str = "element (normal) complexType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::topLevelComplexType::parse_xml(stream, parse_context, parent_context).map(complexType_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "complexType" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(complexType_e {
+                                        child: complexType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct defaultOpenContent_e_inner__extension__seqfield0__seqfield0<'input>(super::UNQUAL::wildcard<'input>);
+
+
+    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "elementtype element defaultOpenContent_e_inner__extension__seqfield0__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context).map(defaultOpenContent_e_inner__extension__seqfield0__seqfield0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct defaultOpenContent_e_inner__extension__seqfield0<'input> {
+        seqfield0: defaultOpenContent_e_inner__extension__seqfield0__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(None, None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }))])
+
+
+    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence defaultOpenContent_e_inner__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(defaultOpenContent_e_inner__extension__seqfield0 {
+
+
+
+                seqfield0: defaultOpenContent_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct defaultOpenContent_e_inner__extension<'input> {
-        any: super::UNQUAL::wildcard<'input>,
+        seqfield0: defaultOpenContent_e_inner__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: Some(QName(None, "any")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Sequence([(None, None, Sequence([(None, None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }))]))])
 
 
     impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension<'input> {
@@ -1694,7 +2779,7 @@ pub mod UNQUAL {
 
 
 
-                any: super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: defaultOpenContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -1707,6 +2792,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::annotated<'input>,
         EXTENSION: defaultOpenContent_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(None, None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }))]))]))
 
 
     impl<'input> ParseXml<'input> for defaultOpenContent_e_inner<'input> {
@@ -1727,24 +2814,52 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct defaultOpenContent_e<'input>(defaultOpenContent_e_inner<'input>);
+    pub struct defaultOpenContent_e<'input> {
+        child: defaultOpenContent_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "defaultOpenContent")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [SmallDef { name: "appliesToEmpty", type_: Some(QName(Some("xs"), "boolean")), default: Some("false") }, LongDef { name: "mode", default: Some("interleave"), inner: Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "NMTOKEN"))), min_occurs: None, max_occurs: None } }], Some(Sequence([Element { name: Some(QName(None, "any")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "defaultOpenContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(None, None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }))]))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for defaultOpenContent_e<'input> {
         const NODE_NAME: &'static str = "element (normal) defaultOpenContent_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            defaultOpenContent_e_inner::parse_xml(stream, parse_context, parent_context).map(defaultOpenContent_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "defaultOpenContent" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(defaultOpenContent_e {
+                                        child: defaultOpenContent_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct documentation_e_inner<'input> {
-        seqfield0: any<'input>,
+        seqfield0: any_e<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])
+    // ^-- from Sequence([(None, None, Ref(QName(None, "any")))])
 
 
     impl<'input> ParseXml<'input> for documentation_e_inner<'input> {
@@ -1754,7 +2869,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield0: any::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: any_e::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -1763,54 +2878,208 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct documentation_e<'input>(documentation_e_inner<'input>);
+    pub struct documentation_e<'input> {
+        child: documentation_e_inner<'input>,
+        source: Option<super::UNQUAL::anyURI_e<'input>>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "documentation")), attrs: [SmallDef { name: "source", type_: Some(QName(Some("xs"), "anyURI")), default: None }, Ref(QName(Some("xml"), "lang")), Any], mixed: true, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "documentation"), attrs: [Def { name: "source", type_: Some(Ref(QName(Some("xs"), "anyURI"))), default: None }, Ref(QName(Some("xml"), "lang")), Any], mixed: true, type_: Some(Sequence([(None, None, Ref(QName(None, "any")))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for documentation_e<'input> {
         const NODE_NAME: &'static str = "element (normal) documentation_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            documentation_e_inner::parse_xml(stream, parse_context, parent_context).map(documentation_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "documentation" {
+
+
+
+                            let source: Option<super::UNQUAL::anyURI_e> = None;
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(documentation_e {
+                                        child: documentation_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                        source,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element_e<'input>(super::UNQUAL::topLevelElement<'input>);
+    pub struct element_e_inner<'input>(super::UNQUAL::topLevelElement<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "topLevelElement"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for element_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom element_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::topLevelElement::parse_xml(stream, parse_context, parent_context).map(element_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct element_e<'input> {
+        child: element_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "topLevelElement"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for element_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) element_e";
+        const NODE_NAME: &'static str = "element (normal) element_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::topLevelElement::parse_xml(stream, parse_context, parent_context).map(element_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "element" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(element_e {
+                                        child: element_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct enumeration_e<'input>(super::UNQUAL::noFixedFacet<'input>);
+    pub struct enumeration_e_inner<'input>(super::UNQUAL::noFixedFacet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "enumeration")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "noFixedFacet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for enumeration_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom enumeration_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::noFixedFacet::parse_xml(stream, parse_context, parent_context).map(enumeration_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct enumeration_e<'input> {
+        child: enumeration_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "enumeration"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "noFixedFacet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for enumeration_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) enumeration_e";
+        const NODE_NAME: &'static str = "element (normal) enumeration_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::noFixedFacet::parse_xml(stream, parse_context, parent_context).map(enumeration_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "enumeration" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(enumeration_e {
+                                        child: enumeration_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct explicitTimezone_e<'input>(super::UNQUAL::facet<'input>);
+    pub struct explicitTimezone_e_inner<'input>(super::UNQUAL::facet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "explicitTimezone")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for explicitTimezone_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom explicitTimezone_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(explicitTimezone_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct explicitTimezone_e<'input> {
+        child: explicitTimezone_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "explicitTimezone"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for explicitTimezone_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) explicitTimezone_e";
+        const NODE_NAME: &'static str = "element (normal) explicitTimezone_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(explicitTimezone_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "explicitTimezone" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(explicitTimezone_e {
+                                        child: explicitTimezone_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
@@ -1826,9 +3095,33 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct field_e_inner__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for field_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence field_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(field_e_inner__extension {
+
+
+
+                0: Default::default()
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct field_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: field_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for field_e_inner<'input> {
@@ -1839,54 +3132,188 @@ pub mod UNQUAL {
 
 
 
+                EXTENSION: field_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+
+
+
             })
         }
     }
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct field_e<'input>(field_e_inner<'input>);
+    pub struct field_e<'input> {
+        child: field_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "field")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [LongDef { name: "xpath", default: None, inner: Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None } }, SmallDef { name: "xpathDefaultNamespace", type_: Some(QName(Some("xs"), "xpathDefaultNamespace")), default: None }], None)), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "field"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for field_e<'input> {
         const NODE_NAME: &'static str = "element (normal) field_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            field_e_inner::parse_xml(stream, parse_context, parent_context).map(field_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "field" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(field_e {
+                                        child: field_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct fractionDigits_e<'input>(super::UNQUAL::numFacet<'input>);
+    pub struct fractionDigits_e_inner<'input>(super::UNQUAL::numFacet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "fractionDigits")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "numFacet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for fractionDigits_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom fractionDigits_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(fractionDigits_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct fractionDigits_e<'input> {
+        child: fractionDigits_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "fractionDigits"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "numFacet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for fractionDigits_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) fractionDigits_e";
+        const NODE_NAME: &'static str = "element (normal) fractionDigits_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(fractionDigits_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "fractionDigits" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(fractionDigits_e {
+                                        child: fractionDigits_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct group_e<'input>(super::UNQUAL::namedGroup<'input>);
+    pub struct group_e_inner<'input>(super::UNQUAL::namedGroup<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "namedGroup"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom group_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::namedGroup::parse_xml(stream, parse_context, parent_context).map(group_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct group_e<'input> {
+        child: group_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "namedGroup"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for group_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) group_e";
+        const NODE_NAME: &'static str = "element (normal) group_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::namedGroup::parse_xml(stream, parse_context, parent_context).map(group_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "group" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(group_e {
+                                        child: group_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct import_e_inner__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for import_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence import_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(import_e_inner__extension {
+
+
+
+                0: Default::default()
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct import_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: import_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for import_e_inner<'input> {
@@ -1897,28 +3324,84 @@ pub mod UNQUAL {
 
 
 
+                EXTENSION: import_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+
+
+
             })
         }
     }
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct import_e<'input>(import_e_inner<'input>);
+    pub struct import_e<'input> {
+        child: import_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "import")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [SmallDef { name: "namespace", type_: Some(QName(Some("xs"), "anyURI")), default: None }, SmallDef { name: "schemaLocation", type_: Some(QName(Some("xs"), "anyURI")), default: None }], None)), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "import"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for import_e<'input> {
         const NODE_NAME: &'static str = "element (normal) import_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            import_e_inner::parse_xml(stream, parse_context, parent_context).map(import_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "import" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(import_e {
+                                        child: import_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct include_e_inner__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for include_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence include_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(include_e_inner__extension {
+
+
+
+                0: Default::default()
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct include_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: include_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for include_e_inner<'input> {
@@ -1929,41 +3412,136 @@ pub mod UNQUAL {
 
 
 
+                EXTENSION: include_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+
+
+
             })
         }
     }
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct include_e<'input>(include_e_inner<'input>);
+    pub struct include_e<'input> {
+        child: include_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "include")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [SmallDef { name: "schemaLocation", type_: Some(QName(Some("xs"), "anyURI")), default: None }], None)), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "include"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for include_e<'input> {
         const NODE_NAME: &'static str = "element (normal) include_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            include_e_inner::parse_xml(stream, parse_context, parent_context).map(include_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "include" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(include_e {
+                                        child: include_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct key_e<'input>(super::UNQUAL::keybase<'input>);
+    pub struct key_e_inner<'input>(super::UNQUAL::keybase<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "key")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "keybase"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for key_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom key_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::keybase::parse_xml(stream, parse_context, parent_context).map(key_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct key_e<'input> {
+        child: key_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "key"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "keybase"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for key_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) key_e";
+        const NODE_NAME: &'static str = "element (normal) key_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::keybase::parse_xml(stream, parse_context, parent_context).map(key_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "key" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(key_e {
+                                        child: key_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct keyref_e_inner__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for keyref_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence keyref_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(keyref_e_inner__extension {
+
+
+
+                0: Default::default()
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct keyref_e_inner<'input> {
         BASE: super::UNQUAL::keybase<'input>,
+        EXTENSION: keyref_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "keybase"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for keyref_e_inner<'input> {
@@ -1974,56 +3552,211 @@ pub mod UNQUAL {
 
 
 
+                EXTENSION: keyref_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+
+
+
             })
         }
     }
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keyref_e<'input>(keyref_e_inner<'input>);
+    pub struct keyref_e<'input> {
+        child: keyref_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "keyref")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "keybase"), [SmallDef { name: "refer", type_: Some(QName(Some("xs"), "QName")), default: None }], None)), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "keyref"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "keybase"), Sequence([]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for keyref_e<'input> {
         const NODE_NAME: &'static str = "element (normal) keyref_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            keyref_e_inner::parse_xml(stream, parse_context, parent_context).map(keyref_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "keyref" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(keyref_e {
+                                        child: keyref_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct length_e<'input>(super::UNQUAL::numFacet<'input>);
+    pub struct length_e_inner<'input>(super::UNQUAL::numFacet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "length")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "numFacet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for length_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom length_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(length_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct length_e<'input> {
+        child: length_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "length"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "numFacet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for length_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) length_e";
+        const NODE_NAME: &'static str = "element (normal) length_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(length_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "length" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(length_e {
+                                        child: length_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct list_e_inner__extension__simpleType_e<'input>(super::UNQUAL::localSimpleType<'input>);
-
-    // ^-- from Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
+    pub struct list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
 
 
-    impl<'input> ParseXml<'input> for list_e_inner__extension__simpleType_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) list_e_inner__extension__simpleType_e";
+    impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(list_e_inner__extension__simpleType_e)
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
+        child: list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "simpleType" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e {
+                                        child: list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct list_e_inner__extension__seqfield0__seqfield0_item<'input>(list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element list_e_inner__extension__seqfield0__seqfield0_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e::parse_xml(stream, parse_context, parent_context).map(list_e_inner__extension__seqfield0__seqfield0_item)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct list_e_inner__extension__seqfield0__seqfield0<'input>(Option<list_e_inner__extension__seqfield0__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option list_e_inner__extension__seqfield0__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(list_e_inner__extension__seqfield0__seqfield0(list_e_inner__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct list_e_inner__extension__seqfield0<'input> {
+        seqfield0: list_e_inner__extension__seqfield0__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))])
+
+
+    impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence list_e_inner__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(list_e_inner__extension__seqfield0 {
+
+
+
+                seqfield0: list_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct list_e_inner__extension<'input> {
-        simpleType: list_e_inner__extension__simpleType_e<'input>,
+        seqfield0: list_e_inner__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }])
+    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))]))])
 
 
     impl<'input> ParseXml<'input> for list_e_inner__extension<'input> {
@@ -2033,7 +3766,7 @@ pub mod UNQUAL {
 
 
 
-                simpleType: list_e_inner__extension__simpleType_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: list_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -2046,6 +3779,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::annotated<'input>,
         EXTENSION: list_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))]))]))
 
 
     impl<'input> ParseXml<'input> for list_e_inner<'input> {
@@ -2066,100 +3801,386 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct list_e<'input>(list_e_inner<'input>);
+    pub struct list_e<'input> {
+        child: list_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "list")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [SmallDef { name: "itemType", type_: Some(QName(Some("xs"), "QName")), default: None }], Some(Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "list"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))]))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for list_e<'input> {
         const NODE_NAME: &'static str = "element (normal) list_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            list_e_inner::parse_xml(stream, parse_context, parent_context).map(list_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "list" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(list_e {
+                                        child: list_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct maxExclusive_e<'input>(super::UNQUAL::facet<'input>);
+    pub struct maxExclusive_e_inner<'input>(super::UNQUAL::facet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "maxExclusive")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for maxExclusive_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom maxExclusive_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(maxExclusive_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct maxExclusive_e<'input> {
+        child: maxExclusive_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "maxExclusive"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for maxExclusive_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) maxExclusive_e";
+        const NODE_NAME: &'static str = "element (normal) maxExclusive_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(maxExclusive_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "maxExclusive" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(maxExclusive_e {
+                                        child: maxExclusive_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct maxInclusive_e<'input>(super::UNQUAL::facet<'input>);
+    pub struct maxInclusive_e_inner<'input>(super::UNQUAL::facet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "maxInclusive")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for maxInclusive_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom maxInclusive_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(maxInclusive_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct maxInclusive_e<'input> {
+        child: maxInclusive_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "maxInclusive"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for maxInclusive_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) maxInclusive_e";
+        const NODE_NAME: &'static str = "element (normal) maxInclusive_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(maxInclusive_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "maxInclusive" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(maxInclusive_e {
+                                        child: maxInclusive_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct maxLength_e<'input>(super::UNQUAL::numFacet<'input>);
+    pub struct maxLength_e_inner<'input>(super::UNQUAL::numFacet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "maxLength")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "numFacet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for maxLength_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom maxLength_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(maxLength_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct maxLength_e<'input> {
+        child: maxLength_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "maxLength"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "numFacet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for maxLength_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) maxLength_e";
+        const NODE_NAME: &'static str = "element (normal) maxLength_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(maxLength_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "maxLength" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(maxLength_e {
+                                        child: maxLength_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct minExclusive_e<'input>(super::UNQUAL::facet<'input>);
+    pub struct minExclusive_e_inner<'input>(super::UNQUAL::facet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "minExclusive")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for minExclusive_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom minExclusive_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(minExclusive_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct minExclusive_e<'input> {
+        child: minExclusive_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "minExclusive"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for minExclusive_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) minExclusive_e";
+        const NODE_NAME: &'static str = "element (normal) minExclusive_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(minExclusive_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "minExclusive" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(minExclusive_e {
+                                        child: minExclusive_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct minInclusive_e<'input>(super::UNQUAL::facet<'input>);
+    pub struct minInclusive_e_inner<'input>(super::UNQUAL::facet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "minInclusive")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for minInclusive_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom minInclusive_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(minInclusive_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct minInclusive_e<'input> {
+        child: minInclusive_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "minInclusive"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for minInclusive_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) minInclusive_e";
+        const NODE_NAME: &'static str = "element (normal) minInclusive_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(minInclusive_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "minInclusive" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(minInclusive_e {
+                                        child: minInclusive_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct minLength_e<'input>(super::UNQUAL::numFacet<'input>);
+    pub struct minLength_e_inner<'input>(super::UNQUAL::numFacet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "minLength")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "numFacet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for minLength_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom minLength_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(minLength_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct minLength_e<'input> {
+        child: minLength_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "minLength"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "numFacet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for minLength_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) minLength_e";
+        const NODE_NAME: &'static str = "element (normal) minLength_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(minLength_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "minLength" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(minLength_e {
+                                        child: minLength_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct notation_e_inner__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for notation_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence notation_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(notation_e_inner__extension {
+
+
+
+                0: Default::default()
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct notation_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: notation_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for notation_e_inner<'input> {
@@ -2170,43 +4191,159 @@ pub mod UNQUAL {
 
 
 
+                EXTENSION: notation_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+
+
+
             })
         }
     }
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct notation_e<'input>(notation_e_inner<'input>);
+    pub struct notation_e<'input> {
+        child: notation_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "notation")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [SmallDef { name: "name", type_: Some(QName(Some("xs"), "NCName")), default: None }, SmallDef { name: "public", type_: Some(QName(Some("xs"), "public")), default: None }, SmallDef { name: "system", type_: Some(QName(Some("xs"), "anyURI")), default: None }], None)), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "notation"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for notation_e<'input> {
         const NODE_NAME: &'static str = "element (normal) notation_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            notation_e_inner::parse_xml(stream, parse_context, parent_context).map(notation_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "notation" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(notation_e {
+                                        child: notation_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e_inner__extension__any_e<'input>(super::UNQUAL::wildcard<'input>);
-
-    // ^-- from Element { name: Some(QName(None, "any")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }
+    pub struct openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner<'input>(super::UNQUAL::wildcard<'input>);
 
 
-    impl<'input> ParseXml<'input> for openContent_e_inner__extension__any_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) openContent_e_inner__extension__any_e";
+    impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context).map(openContent_e_inner__extension__any_e)
+            super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context).map(openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct openContent_e_inner__extension__seqfield0__seqfield0_item__any_e<'input> {
+        child: openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0__seqfield0_item__any_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) openContent_e_inner__extension__seqfield0__seqfield0_item__any_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "any" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(openContent_e_inner__extension__seqfield0__seqfield0_item__any_e {
+                                        child: openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct openContent_e_inner__extension__seqfield0__seqfield0_item<'input>(openContent_e_inner__extension__seqfield0__seqfield0_item__any_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element openContent_e_inner__extension__seqfield0__seqfield0_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            openContent_e_inner__extension__seqfield0__seqfield0_item__any_e::parse_xml(stream, parse_context, parent_context).map(openContent_e_inner__extension__seqfield0__seqfield0_item)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct openContent_e_inner__extension__seqfield0__seqfield0<'input>(Option<openContent_e_inner__extension__seqfield0__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option openContent_e_inner__extension__seqfield0__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(openContent_e_inner__extension__seqfield0__seqfield0(openContent_e_inner__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct openContent_e_inner__extension__seqfield0<'input> {
+        seqfield0: openContent_e_inner__extension__seqfield0__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }))])
+
+
+    impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence openContent_e_inner__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(openContent_e_inner__extension__seqfield0 {
+
+
+
+                seqfield0: openContent_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct openContent_e_inner__extension<'input> {
-        any: openContent_e_inner__extension__any_e<'input>,
+        seqfield0: openContent_e_inner__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: Some(QName(None, "any")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }])
+    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }))]))])
 
 
     impl<'input> ParseXml<'input> for openContent_e_inner__extension<'input> {
@@ -2216,7 +4353,7 @@ pub mod UNQUAL {
 
 
 
-                any: openContent_e_inner__extension__any_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: openContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -2229,6 +4366,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::annotated<'input>,
         EXTENSION: openContent_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }))]))]))
 
 
     impl<'input> ParseXml<'input> for openContent_e_inner<'input> {
@@ -2249,51 +4388,106 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e<'input>(openContent_e_inner<'input>);
+    pub struct openContent_e<'input> {
+        child: openContent_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "openContent")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [LongDef { name: "mode", default: Some("interleave"), inner: Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "NMTOKEN"))), min_occurs: None, max_occurs: None } }], Some(Sequence([Element { name: Some(QName(None, "any")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "openContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }))]))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for openContent_e<'input> {
         const NODE_NAME: &'static str = "element (normal) openContent_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            openContent_e_inner::parse_xml(stream, parse_context, parent_context).map(openContent_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "openContent" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(openContent_e {
+                                        child: openContent_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct override_e_inner__extension__annotation_e<'input>(super::UNQUAL::annotation_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }
+    pub struct override_e_inner__extension__seqfield0__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for override_e_inner__extension__annotation_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) override_e_inner__extension__annotation_e";
+    impl<'input> ParseXml<'input> for override_e_inner__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option override_e_inner__extension__seqfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(override_e_inner__extension__annotation_e)
+            Some(override_e_inner__extension__seqfield0__seqfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct override_e_inner__extension__schemaTop_e<'input>(super::UNQUAL::schemaTop<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "schemaTop"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    pub struct override_e_inner__extension__seqfield0__seqfield1<'input>(Vec<super::UNQUAL::schemaTop<'input>>);
 
 
-    impl<'input> ParseXml<'input> for override_e_inner__extension__schemaTop_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) override_e_inner__extension__schemaTop_e";
+    impl<'input> ParseXml<'input> for override_e_inner__extension__seqfield0__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec override_e_inner__extension__seqfield0__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::schemaTop::parse_xml(stream, parse_context, parent_context).map(override_e_inner__extension__schemaTop_e)
+            let mut items = Vec::new();
+            while let Some(new_item) = super::UNQUAL::schemaTop::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(override_e_inner__extension__seqfield0__seqfield1(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct override_e_inner__extension__seqfield0<'input> {
+        seqfield0: override_e_inner__extension__seqfield0__seqfield0<'input>,
+        seqfield1: override_e_inner__extension__seqfield0__seqfield1<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "schemaTop")))])
+
+
+    impl<'input> ParseXml<'input> for override_e_inner__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence override_e_inner__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(override_e_inner__extension__seqfield0 {
+
+
+
+                seqfield0: override_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: override_e_inner__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct override_e_inner__extension<'input> {
-        seqfield0: override_e_inner__extension__annotation_e<'input>,
-        seqfield1: override_e_inner__extension__schemaTop_e<'input>,
+        seqfield0: override_e_inner__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "schemaTop"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "schemaTop")))]))])
 
 
     impl<'input> ParseXml<'input> for override_e_inner__extension<'input> {
@@ -2303,11 +4497,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield0: override_e_inner__extension__annotation_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: override_e_inner__extension__schemaTop_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: override_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -2320,6 +4510,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::openAttrs<'input>,
         EXTENSION: override_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "openAttrs"), Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "schemaTop")))]))]))
 
 
     impl<'input> ParseXml<'input> for override_e_inner<'input> {
@@ -2340,53 +4532,120 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct override_e<'input>(override_e_inner<'input>);
+    pub struct override_e<'input> {
+        child: override_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "override")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), [SmallDef { name: "schemaLocation", type_: Some(QName(Some("xs"), "anyURI")), default: None }, SmallDef { name: "id", type_: Some(QName(Some("xs"), "ID")), default: None }], Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "schemaTop"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "override"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "schemaTop")))]))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for override_e<'input> {
         const NODE_NAME: &'static str = "element (normal) override_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            override_e_inner::parse_xml(stream, parse_context, parent_context).map(override_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "override" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(override_e {
+                                        child: override_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct pattern_e<'input>(super::UNQUAL::noFixedFacet<'input>);
+    pub struct pattern_e_inner<'input>(super::UNQUAL::noFixedFacet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "pattern")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "noFixedFacet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for pattern_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom pattern_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::noFixedFacet::parse_xml(stream, parse_context, parent_context).map(pattern_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct pattern_e<'input> {
+        child: pattern_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "pattern"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "noFixedFacet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for pattern_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) pattern_e";
+        const NODE_NAME: &'static str = "element (normal) pattern_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::noFixedFacet::parse_xml(stream, parse_context, parent_context).map(pattern_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "pattern" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(pattern_e {
+                                        child: pattern_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum redefine_e_inner__extension<'input> {
-        annotation(Box<super::UNQUAL::annotation_e<'input>>),
-        redefinable(Box<super::UNQUAL::redefinable<'input>>),
+    pub enum redefine_e_inner__extension__seqfield0_item<'input> {
+        choicevariant0(Box<super::UNQUAL::annotation_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::redefinable<'input>>),
     }
 
-    impl<'input> Default for redefine_e_inner__extension<'input> { fn default() -> redefine_e_inner__extension<'input> { redefine_e_inner__extension::redefinable(Default::default()) } }
+    impl<'input> Default for redefine_e_inner__extension__seqfield0_item<'input> { fn default() -> redefine_e_inner__extension__seqfield0_item<'input> { redefine_e_inner__extension__seqfield0_item::choicevariant1(Default::default()) } }
 
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "redefinable"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "annotation"))), (None, None, GroupRef(QName(Some("xs"), "redefinable")))])
 
 
-    impl<'input> ParseXml<'input> for redefine_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "choice redefine_e_inner__extension";
+    impl<'input> ParseXml<'input> for redefine_e_inner__extension__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice redefine_e_inner__extension__seqfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefine_e_inner__extension::annotation(Box::new(r))), None => () }
+            match super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefine_e_inner__extension__seqfield0_item::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefine_e_inner__extension::redefinable(Box::new(r))), None => () }
+            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefine_e_inner__extension__seqfield0_item::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -2395,10 +4654,50 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct redefine_e_inner__extension__seqfield0<'input>(Vec<redefine_e_inner__extension__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for redefine_e_inner__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec redefine_e_inner__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = redefine_e_inner__extension__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(redefine_e_inner__extension__seqfield0(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct redefine_e_inner__extension<'input> {
+        seqfield0: redefine_e_inner__extension__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "annotation"))), (None, None, GroupRef(QName(Some("xs"), "redefinable")))]))])
+
+
+    impl<'input> ParseXml<'input> for redefine_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence redefine_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(redefine_e_inner__extension {
+
+
+
+                seqfield0: redefine_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct redefine_e_inner<'input> {
         BASE: super::UNQUAL::openAttrs<'input>,
         EXTENSION: redefine_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "openAttrs"), Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "annotation"))), (None, None, GroupRef(QName(Some("xs"), "redefinable")))]))]))
 
 
     impl<'input> ParseXml<'input> for redefine_e_inner<'input> {
@@ -2419,23 +4718,76 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct redefine_e<'input>(redefine_e_inner<'input>);
+    pub struct redefine_e<'input> {
+        child: redefine_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "redefine")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), [SmallDef { name: "schemaLocation", type_: Some(QName(Some("xs"), "anyURI")), default: None }, SmallDef { name: "id", type_: Some(QName(Some("xs"), "ID")), default: None }], Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "redefinable"))), min_occurs: None, max_occurs: None }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "redefine"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "annotation"))), (None, None, GroupRef(QName(Some("xs"), "redefinable")))]))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for redefine_e<'input> {
         const NODE_NAME: &'static str = "element (normal) redefine_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            redefine_e_inner::parse_xml(stream, parse_context, parent_context).map(redefine_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "redefine" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(redefine_e {
+                                        child: redefine_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct restriction_e_inner__extension<'input> {
+        seqfield0: super::UNQUAL::simpleRestrictionModel<'input>,
+    }
+
+    // ^-- from Sequence([(None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])
+
+
+    impl<'input> ParseXml<'input> for restriction_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence restriction_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(restriction_e_inner__extension {
+
+
+
+                seqfield0: super::UNQUAL::simpleRestrictionModel::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct restriction_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: super::UNQUAL::simpleRestrictionModel<'input>,
+        EXTENSION: restriction_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))]))
 
 
     impl<'input> ParseXml<'input> for restriction_e_inner<'input> {
@@ -2446,7 +4798,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: super::UNQUAL::simpleRestrictionModel::parse_xml(stream, parse_context, parent_context)?,
+                EXTENSION: restriction_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -2456,65 +4808,97 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restriction_e<'input>(restriction_e_inner<'input>);
+    pub struct restriction_e<'input> {
+        child: restriction_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "restriction")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [SmallDef { name: "base", type_: Some(QName(Some("xs"), "QName")), default: None }], Some(GroupRef(QName(Some("xs"), "simpleRestrictionModel"))))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for restriction_e<'input> {
         const NODE_NAME: &'static str = "element (normal) restriction_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            restriction_e_inner::parse_xml(stream, parse_context, parent_context).map(restriction_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "restriction" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(restriction_e {
+                                        child: restriction_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__composition_e<'input>(super::UNQUAL::composition<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "composition"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    pub struct schema_e_inner__extension__seqfield0__seqfield0<'input>(Vec<super::UNQUAL::composition<'input>>);
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__composition_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) schema_e_inner__extension__composition_e";
+    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec schema_e_inner__extension__seqfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::composition::parse_xml(stream, parse_context, parent_context).map(schema_e_inner__extension__composition_e)
+            let mut items = Vec::new();
+            while let Some(new_item) = super::UNQUAL::composition::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(schema_e_inner__extension__seqfield0__seqfield0(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield1_e_inner__annotation_e<'input>(super::UNQUAL::annotation_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    pub struct schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1<'input>(Vec<super::UNQUAL::annotation_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield1_e_inner__annotation_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) schema_e_inner__extension__seqfield1_e_inner__annotation_e";
+    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(schema_e_inner__extension__seqfield1_e_inner__annotation_e)
+            let mut items = Vec::new();
+            while let Some(new_item) = super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield1_e_inner<'input> {
-        defaultOpenContent: super::UNQUAL::defaultOpenContent_e<'input>,
-        seqfield1: schema_e_inner__extension__seqfield1_e_inner__annotation_e<'input>,
+    pub struct schema_e_inner__extension__seqfield0__seqfield1_item<'input> {
+        seqfield0: super::UNQUAL::defaultOpenContent_e<'input>,
+        seqfield1: schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "defaultOpenContent"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+    // ^-- from Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield1_e_inner<'input> {
-        const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield1_e_inner";
+    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield1_item<'input> {
+        const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield0__seqfield1_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(schema_e_inner__extension__seqfield1_e_inner {
+            Some(schema_e_inner__extension__seqfield0__seqfield1_item {
 
 
 
-                defaultOpenContent: super::UNQUAL::defaultOpenContent_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: super::UNQUAL::defaultOpenContent_e::parse_xml(stream, parse_context, parent_context)?,
 
 
 
-                seqfield1: schema_e_inner__extension__seqfield1_e_inner__annotation_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -2523,52 +4907,52 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield1_e<'input>(schema_e_inner__extension__seqfield1_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "defaultOpenContent"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])), min_occurs: Some(0), max_occurs: None }
+    pub struct schema_e_inner__extension__seqfield0__seqfield1<'input>(Option<schema_e_inner__extension__seqfield0__seqfield1_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield1_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) schema_e_inner__extension__seqfield1_e";
+    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield1<'input> {
+        const NODE_NAME: &'static str = "option schema_e_inner__extension__seqfield0__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            schema_e_inner__extension__seqfield1_e_inner::parse_xml(stream, parse_context, parent_context).map(schema_e_inner__extension__seqfield1_e)
+            Some(schema_e_inner__extension__seqfield0__seqfield1(schema_e_inner__extension__seqfield0__seqfield1_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield2_e_inner__annotation_e<'input>(super::UNQUAL::annotation_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    pub struct schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1<'input>(Vec<super::UNQUAL::annotation_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield2_e_inner__annotation_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) schema_e_inner__extension__seqfield2_e_inner__annotation_e";
+    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(schema_e_inner__extension__seqfield2_e_inner__annotation_e)
+            let mut items = Vec::new();
+            while let Some(new_item) = super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield2_e_inner<'input> {
-        schemaTop: super::UNQUAL::schemaTop<'input>,
-        seqfield1: schema_e_inner__extension__seqfield2_e_inner__annotation_e<'input>,
+    pub struct schema_e_inner__extension__seqfield0__seqfield2_item<'input> {
+        seqfield0: super::UNQUAL::schemaTop<'input>,
+        seqfield1: schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "schemaTop"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+    // ^-- from Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield2_e_inner<'input> {
-        const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield2_e_inner";
+    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield2_item<'input> {
+        const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield0__seqfield2_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(schema_e_inner__extension__seqfield2_e_inner {
+            Some(schema_e_inner__extension__seqfield0__seqfield2_item {
 
 
 
-                schemaTop: super::UNQUAL::schemaTop::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: super::UNQUAL::schemaTop::parse_xml(stream, parse_context, parent_context)?,
 
 
 
-                seqfield1: schema_e_inner__extension__seqfield2_e_inner__annotation_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -2577,26 +4961,59 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield2_e<'input>(schema_e_inner__extension__seqfield2_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "schemaTop"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    pub struct schema_e_inner__extension__seqfield0__seqfield2<'input>(Vec<schema_e_inner__extension__seqfield0__seqfield2_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield2_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) schema_e_inner__extension__seqfield2_e";
+    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield2<'input> {
+        const NODE_NAME: &'static str = "vec schema_e_inner__extension__seqfield0__seqfield2";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            schema_e_inner__extension__seqfield2_e_inner::parse_xml(stream, parse_context, parent_context).map(schema_e_inner__extension__seqfield2_e)
+            let mut items = Vec::new();
+            while let Some(new_item) = schema_e_inner__extension__seqfield0__seqfield2_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(schema_e_inner__extension__seqfield0__seqfield2(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct schema_e_inner__extension__seqfield0<'input> {
+        seqfield0: schema_e_inner__extension__seqfield0__seqfield0<'input>,
+        seqfield1: schema_e_inner__extension__seqfield0__seqfield1<'input>,
+        seqfield2: schema_e_inner__extension__seqfield0__seqfield2<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "composition"))), (Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])), (Some(0), Some(18446744073709551615), Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))]))])
+
+
+    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(schema_e_inner__extension__seqfield0 {
+
+
+
+                seqfield0: schema_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: schema_e_inner__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield2: schema_e_inner__extension__seqfield0__seqfield2::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct schema_e_inner__extension<'input> {
-        seqfield0: schema_e_inner__extension__composition_e<'input>,
-        seqfield1: schema_e_inner__extension__seqfield1_e<'input>,
-        seqfield2: schema_e_inner__extension__seqfield2_e<'input>,
+        seqfield0: schema_e_inner__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "composition"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "defaultOpenContent"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "schemaTop"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+    // ^-- from Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "composition"))), (Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])), (Some(0), Some(18446744073709551615), Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))]))]))])
 
 
     impl<'input> ParseXml<'input> for schema_e_inner__extension<'input> {
@@ -2606,15 +5023,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield0: schema_e_inner__extension__composition_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: schema_e_inner__extension__seqfield1_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield2: schema_e_inner__extension__seqfield2_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: schema_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -2627,6 +5036,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::openAttrs<'input>,
         EXTENSION: schema_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "openAttrs"), Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "composition"))), (Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])), (Some(0), Some(18446744073709551615), Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))]))]))]))
 
 
     impl<'input> ParseXml<'input> for schema_e_inner<'input> {
@@ -2647,22 +5058,74 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e<'input>(schema_e_inner<'input>);
+    pub struct schema_e<'input> {
+        child: schema_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "schema")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), [SmallDef { name: "targetNamespace", type_: Some(QName(Some("xs"), "anyURI")), default: None }, SmallDef { name: "version", type_: Some(QName(Some("xs"), "token")), default: None }, SmallDef { name: "finalDefault", type_: Some(QName(Some("xs"), "fullDerivationSet")), default: Some("") }, SmallDef { name: "blockDefault", type_: Some(QName(Some("xs"), "blockSet")), default: Some("") }, SmallDef { name: "attributeFormDefault", type_: Some(QName(Some("xs"), "formChoice")), default: Some("unqualified") }, SmallDef { name: "elementFormDefault", type_: Some(QName(Some("xs"), "formChoice")), default: Some("unqualified") }, SmallDef { name: "defaultAttributes", type_: Some(QName(Some("xs"), "QName")), default: None }, SmallDef { name: "xpathDefaultNamespace", type_: Some(QName(Some("xs"), "xpathDefaultNamespace")), default: Some("##local") }, SmallDef { name: "id", type_: Some(QName(Some("xs"), "ID")), default: None }, Ref(QName(Some("xml"), "lang"))], Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "composition"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "defaultOpenContent"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "schemaTop"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "schema"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "composition"))), (Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])), (Some(0), Some(18446744073709551615), Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))]))]))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for schema_e<'input> {
         const NODE_NAME: &'static str = "element (normal) schema_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            schema_e_inner::parse_xml(stream, parse_context, parent_context).map(schema_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "schema" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(schema_e {
+                                        child: schema_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct selector_e_inner__extension<'input>(PhantomData<&'input ()>);
+
+    // ^-- from Sequence([])
+
+
+    impl<'input> ParseXml<'input> for selector_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence selector_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(selector_e_inner__extension {
+
+
+
+                0: Default::default()
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct selector_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
+        EXTENSION: selector_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
 
 
     impl<'input> ParseXml<'input> for selector_e_inner<'input> {
@@ -2673,59 +5136,152 @@ pub mod UNQUAL {
 
 
 
+                EXTENSION: selector_e_inner__extension::parse_xml(stream, parse_context, parent_context)?,
+
+
+
             })
         }
     }
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct selector_e<'input>(selector_e_inner<'input>);
+    pub struct selector_e<'input> {
+        child: selector_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "selector")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [LongDef { name: "xpath", default: None, inner: Element { name: None, attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "token"))), min_occurs: None, max_occurs: None } }, SmallDef { name: "xpathDefaultNamespace", type_: Some(QName(Some("xs"), "xpathDefaultNamespace")), default: None }], None)), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "selector"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for selector_e<'input> {
         const NODE_NAME: &'static str = "element (normal) selector_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            selector_e_inner::parse_xml(stream, parse_context, parent_context).map(selector_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "selector" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(selector_e {
+                                        child: selector_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct sequence_e<'input>(super::UNQUAL::explicitGroup<'input>);
+    pub struct sequence_e_inner<'input>(super::UNQUAL::explicitGroup<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "sequence")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "explicitGroup"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for sequence_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom sequence_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::explicitGroup::parse_xml(stream, parse_context, parent_context).map(sequence_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct sequence_e<'input> {
+        child: sequence_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "sequence"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "explicitGroup"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for sequence_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) sequence_e";
+        const NODE_NAME: &'static str = "element (normal) sequence_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::explicitGroup::parse_xml(stream, parse_context, parent_context).map(sequence_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "sequence" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(sequence_e {
+                                        child: sequence_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant0<'input>(super::UNQUAL::simpleRestrictionType<'input>);
+
+
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element simpleContent_e_inner__extension__seqfield0__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::simpleRestrictionType::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant1<'input>(super::UNQUAL::simpleExtensionType<'input>);
+
+
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element simpleContent_e_inner__extension__seqfield0__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::simpleExtensionType::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant1)
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum simpleContent_e_inner__extension<'input> {
-        restriction(Box<super::UNQUAL::simpleRestrictionType<'input>>),
-        extension(Box<super::UNQUAL::simpleExtensionType<'input>>),
+    pub enum simpleContent_e_inner__extension__seqfield0<'input> {
+        choicevariant0(Box<simpleContent_e_inner__extension__seqfield0__choicevariant0<'input>>),
+        choicevariant1(Box<simpleContent_e_inner__extension__seqfield0__choicevariant1<'input>>),
     }
 
-    impl<'input> Default for simpleContent_e_inner__extension<'input> { fn default() -> simpleContent_e_inner__extension<'input> { simpleContent_e_inner__extension::extension(Default::default()) } }
+    impl<'input> Default for simpleContent_e_inner__extension__seqfield0<'input> { fn default() -> simpleContent_e_inner__extension__seqfield0<'input> { simpleContent_e_inner__extension__seqfield0::choicevariant1(Default::default()) } }
 
-    // ^-- from Choice([Element { name: Some(QName(None, "restriction")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "extension")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }))])
 
 
-    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "choice simpleContent_e_inner__extension";
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "choice simpleContent_e_inner__extension__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::simpleRestrictionType::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleContent_e_inner__extension::restriction(Box::new(r))), None => () }
+            match simpleContent_e_inner__extension__seqfield0__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleContent_e_inner__extension__seqfield0::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::simpleExtensionType::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleContent_e_inner__extension::extension(Box::new(r))), None => () }
+            match simpleContent_e_inner__extension__seqfield0__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleContent_e_inner__extension__seqfield0::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -2734,10 +5290,35 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
+    pub struct simpleContent_e_inner__extension<'input> {
+        seqfield0: simpleContent_e_inner__extension__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }))]))])
+
+
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension<'input> {
+        const NODE_NAME: &'static str = "sequence simpleContent_e_inner__extension";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(simpleContent_e_inner__extension {
+
+
+
+                seqfield0: simpleContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
     pub struct simpleContent_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
         EXTENSION: simpleContent_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }))]))]))
 
 
     impl<'input> ParseXml<'input> for simpleContent_e_inner<'input> {
@@ -2758,63 +5339,257 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e<'input>(simpleContent_e_inner<'input>);
+    pub struct simpleContent_e<'input> {
+        child: simpleContent_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "simpleContent")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [], Some(Choice([Element { name: Some(QName(None, "restriction")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "extension")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "simpleContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }))]))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for simpleContent_e<'input> {
         const NODE_NAME: &'static str = "element (normal) simpleContent_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            simpleContent_e_inner::parse_xml(stream, parse_context, parent_context).map(simpleContent_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "simpleContent" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(simpleContent_e {
+                                        child: simpleContent_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleType_e<'input>(super::UNQUAL::topLevelSimpleType<'input>);
+    pub struct simpleType_e_inner<'input>(super::UNQUAL::topLevelSimpleType<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "topLevelSimpleType"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom simpleType_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::topLevelSimpleType::parse_xml(stream, parse_context, parent_context).map(simpleType_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleType_e<'input> {
+        child: simpleType_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "topLevelSimpleType"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for simpleType_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) simpleType_e";
+        const NODE_NAME: &'static str = "element (normal) simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::topLevelSimpleType::parse_xml(stream, parse_context, parent_context).map(simpleType_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "simpleType" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(simpleType_e {
+                                        child: simpleType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct totalDigits_e<'input>(super::UNQUAL::numFacet<'input>);
+    pub struct totalDigits_e_inner<'input>(super::UNQUAL::numFacet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "totalDigits")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "numFacet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for totalDigits_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom totalDigits_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(totalDigits_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct totalDigits_e<'input> {
+        child: totalDigits_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "totalDigits"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "numFacet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for totalDigits_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) totalDigits_e";
+        const NODE_NAME: &'static str = "element (normal) totalDigits_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::numFacet::parse_xml(stream, parse_context, parent_context).map(totalDigits_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "totalDigits" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(totalDigits_e {
+                                        child: totalDigits_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct union_e_inner__extension__simpleType_e<'input>(super::UNQUAL::localSimpleType<'input>);
-
-    // ^-- from Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    pub struct union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
 
 
-    impl<'input> ParseXml<'input> for union_e_inner__extension__simpleType_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) union_e_inner__extension__simpleType_e";
+    impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(union_e_inner__extension__simpleType_e)
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
+        child: union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+
+
+    impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "simpleType" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e {
+                                        child: union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct union_e_inner__extension__seqfield0__seqfield0_item<'input>(union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element union_e_inner__extension__seqfield0__seqfield0_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e::parse_xml(stream, parse_context, parent_context).map(union_e_inner__extension__seqfield0__seqfield0_item)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct union_e_inner__extension__seqfield0__seqfield0<'input>(Vec<union_e_inner__extension__seqfield0__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec union_e_inner__extension__seqfield0__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = union_e_inner__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(union_e_inner__extension__seqfield0__seqfield0(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct union_e_inner__extension__seqfield0<'input> {
+        seqfield0: union_e_inner__extension__seqfield0__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))])
+
+
+    impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0<'input> {
+        const NODE_NAME: &'static str = "sequence union_e_inner__extension__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(union_e_inner__extension__seqfield0 {
+
+
+
+                seqfield0: union_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct union_e_inner__extension<'input> {
-        simpleType: union_e_inner__extension__simpleType_e<'input>,
+        seqfield0: union_e_inner__extension__seqfield0<'input>,
     }
 
-    // ^-- from Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
+    // ^-- from Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))]))])
 
 
     impl<'input> ParseXml<'input> for union_e_inner__extension<'input> {
@@ -2824,7 +5599,7 @@ pub mod UNQUAL {
 
 
 
-                simpleType: union_e_inner__extension__simpleType_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: union_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -2837,6 +5612,8 @@ pub mod UNQUAL {
         BASE: super::UNQUAL::annotated<'input>,
         EXTENSION: union_e_inner__extension<'input>,
     }
+
+    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))]))]))
 
 
     impl<'input> ParseXml<'input> for union_e_inner<'input> {
@@ -2857,41 +5634,147 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct union_e<'input>(union_e_inner<'input>);
+    pub struct union_e<'input> {
+        child: union_e_inner<'input>,
+    }
 
-    // ^-- from Element { name: Some(QName(None, "union")), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [LongDef { name: "memberTypes", default: None, inner: Element { name: None, attrs: [], mixed: false, type_: Some(List(SimpleList(QName(Some("xs"), "QName")))), min_occurs: None, max_occurs: None } }], Some(Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "union"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))]))]))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for union_e<'input> {
         const NODE_NAME: &'static str = "element (normal) union_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            union_e_inner::parse_xml(stream, parse_context, parent_context).map(union_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "union" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(union_e {
+                                        child: union_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct unique_e<'input>(super::UNQUAL::keybase<'input>);
+    pub struct unique_e_inner<'input>(super::UNQUAL::keybase<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "unique")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "keybase"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for unique_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom unique_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::keybase::parse_xml(stream, parse_context, parent_context).map(unique_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct unique_e<'input> {
+        child: unique_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "unique"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "keybase"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for unique_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) unique_e";
+        const NODE_NAME: &'static str = "element (normal) unique_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::keybase::parse_xml(stream, parse_context, parent_context).map(unique_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "unique" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(unique_e {
+                                        child: unique_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct whiteSpace_e<'input>(super::UNQUAL::facet<'input>);
+    pub struct whiteSpace_e_inner<'input>(super::UNQUAL::facet<'input>);
 
-    // ^-- from Element { name: Some(QName(None, "whiteSpace")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
+
+    impl<'input> ParseXml<'input> for whiteSpace_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom whiteSpace_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(whiteSpace_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct whiteSpace_e<'input> {
+        child: whiteSpace_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "whiteSpace"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for whiteSpace_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) whiteSpace_e";
+        const NODE_NAME: &'static str = "element (normal) whiteSpace_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::facet::parse_xml(stream, parse_context, parent_context).map(whiteSpace_e)
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "whiteSpace" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(whiteSpace_e {
+                                        child: whiteSpace_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
         }
     }
 
@@ -2899,41 +5782,717 @@ pub mod UNQUAL {
     /////////// groups
 
 
-    #[derive(Debug, PartialEq, Default)]
-    pub struct complexTypeModel__choicevariant2__openContent_e<'input>(super::UNQUAL::openContent_e<'input>);
+    #[derive(Debug, PartialEq)]
+    pub enum redefinable<'input> {
+        choicevariant0(Box<super::UNQUAL::simpleType_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::complexType_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::group_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::attributeGroup_e<'input>>),
+    }
 
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }
+    impl<'input> Default for redefinable<'input> { fn default() -> redefinable<'input> { redefinable::choicevariant3(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "simpleType"))), (None, None, Ref(QName(Some("xs"), "complexType"))), (None, None, Ref(QName(Some("xs"), "group"))), (None, None, Ref(QName(Some("xs"), "attributeGroup")))])
 
 
-    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__openContent_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) complexTypeModel__choicevariant2__openContent_e";
+    impl<'input> ParseXml<'input> for redefinable<'input> {
+        const NODE_NAME: &'static str = "choice redefinable";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context).map(complexTypeModel__choicevariant2__openContent_e)
+
+
+
+            match super::UNQUAL::simpleType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::complexType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::group_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::attributeGroup_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant3(Box::new(r))), None => () }
+
+
+
+            None
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexTypeModel__choicevariant2__typeDefParticle_e<'input>(super::UNQUAL::typeDefParticle<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "typeDefParticle"))), min_occurs: Some(0), max_occurs: None }
+    pub struct simpleRestrictionModel__seqfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
 
 
-    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__typeDefParticle_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) complexTypeModel__choicevariant2__typeDefParticle_e";
+    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield0_item__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom simpleRestrictionModel__seqfield0_item__simpleType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context).map(complexTypeModel__choicevariant2__typeDefParticle_e)
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(simpleRestrictionModel__seqfield0_item__simpleType_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel__seqfield0_item__simpleType_e<'input> {
+        child: simpleRestrictionModel__seqfield0_item__simpleType_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield0_item__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) simpleRestrictionModel__seqfield0_item__simpleType_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "simpleType" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(simpleRestrictionModel__seqfield0_item__simpleType_e {
+                                        child: simpleRestrictionModel__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel__seqfield0_item<'input>(simpleRestrictionModel__seqfield0_item__simpleType_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element simpleRestrictionModel__seqfield0_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            simpleRestrictionModel__seqfield0_item__simpleType_e::parse_xml(stream, parse_context, parent_context).map(simpleRestrictionModel__seqfield0_item)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel__seqfield0<'input>(Option<simpleRestrictionModel__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option simpleRestrictionModel__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(simpleRestrictionModel__seqfield0(simpleRestrictionModel__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum simpleRestrictionModel__seqfield1_item<'input> {
+        choicevariant0(Box<super::UNQUAL::facet_e<'input>>),
+        choicevariant1(Box<any_e<'input>>),
+    }
+
+    impl<'input> Default for simpleRestrictionModel__seqfield1_item<'input> { fn default() -> simpleRestrictionModel__seqfield1_item<'input> { simpleRestrictionModel__seqfield1_item::choicevariant1(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "facet"))), (None, None, Ref(QName(None, "any")))])
+
+
+    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield1_item<'input> {
+        const NODE_NAME: &'static str = "choice simpleRestrictionModel__seqfield1_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::facet_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleRestrictionModel__seqfield1_item::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleRestrictionModel__seqfield1_item::choicevariant1(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel__seqfield1<'input>(Vec<simpleRestrictionModel__seqfield1_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec simpleRestrictionModel__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = simpleRestrictionModel__seqfield1_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(simpleRestrictionModel__seqfield1(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct simpleRestrictionModel<'input> {
+        seqfield0: simpleRestrictionModel__seqfield0<'input>,
+        seqfield1: simpleRestrictionModel__seqfield1<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None })), (Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "facet"))), (None, None, Ref(QName(None, "any")))]))])
+
+
+    impl<'input> ParseXml<'input> for simpleRestrictionModel<'input> {
+        const NODE_NAME: &'static str = "sequence simpleRestrictionModel";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(simpleRestrictionModel {
+
+
+
+                seqfield0: simpleRestrictionModel__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: simpleRestrictionModel__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions__seqfield0_item__assert_e_inner<'input>(super::UNQUAL::assertion<'input>);
+
+
+    impl<'input> ParseXml<'input> for assertions__seqfield0_item__assert_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom assertions__seqfield0_item__assert_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::assertion::parse_xml(stream, parse_context, parent_context).map(assertions__seqfield0_item__assert_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions__seqfield0_item__assert_e<'input> {
+        child: assertions__seqfield0_item__assert_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "assert"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+
+
+    impl<'input> ParseXml<'input> for assertions__seqfield0_item__assert_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) assertions__seqfield0_item__assert_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tok = stream.next().unwrap();
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "assert" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(assertions__seqfield0_item__assert_e {
+                                        child: assertions__seqfield0_item__assert_e_inner::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                                    }),
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions__seqfield0_item<'input>(assertions__seqfield0_item__assert_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for assertions__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element assertions__seqfield0_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            assertions__seqfield0_item__assert_e::parse_xml(stream, parse_context, parent_context).map(assertions__seqfield0_item)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions__seqfield0<'input>(Vec<assertions__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for assertions__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec assertions__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = assertions__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(assertions__seqfield0(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions<'input> {
+        seqfield0: assertions__seqfield0<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "assert"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))])
+
+
+    impl<'input> ParseXml<'input> for assertions<'input> {
+        const NODE_NAME: &'static str = "sequence assertions";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(assertions {
+
+
+
+                seqfield0: assertions__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant0<'input>(super::UNQUAL::attribute<'input>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element attrDecls__seqfield0_item__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::attribute::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant1<'input>(super::UNQUAL::attributeGroupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element attrDecls__seqfield0_item__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::attributeGroupRef::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant1)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum attrDecls__seqfield0_item<'input> {
+        choicevariant0(Box<attrDecls__seqfield0_item__choicevariant0<'input>>),
+        choicevariant1(Box<attrDecls__seqfield0_item__choicevariant1<'input>>),
+    }
+
+    impl<'input> Default for attrDecls__seqfield0_item<'input> { fn default() -> attrDecls__seqfield0_item<'input> { attrDecls__seqfield0_item::choicevariant1(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }))])
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice attrDecls__seqfield0_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match attrDecls__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_item::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match attrDecls__seqfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_item::choicevariant1(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0<'input>(Vec<attrDecls__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec attrDecls__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = attrDecls__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(attrDecls__seqfield0(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield1<'input>(Option<super::UNQUAL::anyAttribute_e<'input>>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield1<'input> {
+        const NODE_NAME: &'static str = "option attrDecls__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(attrDecls__seqfield1(super::UNQUAL::anyAttribute_e::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls<'input> {
+        seqfield0: attrDecls__seqfield0<'input>,
+        seqfield1: attrDecls__seqfield1<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Element(Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }))])), (Some(0), None, Ref(QName(Some("xs"), "anyAttribute")))])
+
+
+    impl<'input> ParseXml<'input> for attrDecls<'input> {
+        const NODE_NAME: &'static str = "sequence attrDecls";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(attrDecls {
+
+
+
+                seqfield0: attrDecls__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: attrDecls__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum identityConstraint<'input> {
+        choicevariant0(Box<super::UNQUAL::unique_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::key_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::keyref_e<'input>>),
+    }
+
+    impl<'input> Default for identityConstraint<'input> { fn default() -> identityConstraint<'input> { identityConstraint::choicevariant2(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "unique"))), (None, None, Ref(QName(Some("xs"), "key"))), (None, None, Ref(QName(Some("xs"), "keyref")))])
+
+
+    impl<'input> ParseXml<'input> for identityConstraint<'input> {
+        const NODE_NAME: &'static str = "choice identityConstraint";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::unique_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::key_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::keyref_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct occurs<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant0<'input>(super::UNQUAL::localElement<'input>);
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant1<'input>(super::UNQUAL::groupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum nestedParticle<'input> {
+        choicevariant0(Box<nestedParticle__choicevariant0<'input>>),
+        choicevariant1(Box<nestedParticle__choicevariant1<'input>>),
+        choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::any_e<'input>>),
+    }
+
+    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::choicevariant4(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
+
+
+    impl<'input> ParseXml<'input> for nestedParticle<'input> {
+        const NODE_NAME: &'static str = "choice nestedParticle";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match nestedParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match nestedParticle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant3(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant4(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum simpleDerivation<'input> {
+        choicevariant0(Box<super::UNQUAL::restriction_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::list_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::union_e<'input>>),
+    }
+
+    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::choicevariant2(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "restriction"))), (None, None, Ref(QName(Some("xs"), "list"))), (None, None, Ref(QName(Some("xs"), "union")))])
+
+
+    impl<'input> ParseXml<'input> for simpleDerivation<'input> {
+        const NODE_NAME: &'static str = "choice simpleDerivation";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::restriction_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::list_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::union_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option allModel__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(allModel__seqfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant0<'input>(super::UNQUAL::localElement<'input>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element allModel__seqfield1_item__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant2<'input>(super::UNQUAL::groupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2<'input> {
+        const NODE_NAME: &'static str = "elementtype element allModel__seqfield1_item__choicevariant2";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant2)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum allModel__seqfield1_item<'input> {
+        choicevariant0(Box<allModel__seqfield1_item__choicevariant0<'input>>),
+        choicevariant1(Box<super::UNQUAL::any_e<'input>>),
+        choicevariant2(Box<allModel__seqfield1_item__choicevariant2<'input>>),
+    }
+
+    impl<'input> Default for allModel__seqfield1_item<'input> { fn default() -> allModel__seqfield1_item<'input> { allModel__seqfield1_item::choicevariant2(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "any"))), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }))])
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item<'input> {
+        const NODE_NAME: &'static str = "choice allModel__seqfield1_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match allModel__seqfield1_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match allModel__seqfield1_item__choicevariant2::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1<'input>(Vec<allModel__seqfield1_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec allModel__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = allModel__seqfield1_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(allModel__seqfield1(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel<'input> {
+        seqfield0: allModel__seqfield0<'input>,
+        seqfield1: allModel__seqfield1<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "any"))), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }))]))])
+
+
+    impl<'input> ParseXml<'input> for allModel<'input> {
+        const NODE_NAME: &'static str = "sequence allModel";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(allModel {
+
+
+
+                seqfield0: allModel__seqfield0::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+                seqfield1: allModel__seqfield1::parse_xml(stream, parse_context, parent_context)?,
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum schemaTop<'input> {
+        choicevariant0(Box<super::UNQUAL::redefinable<'input>>),
+        choicevariant1(Box<super::UNQUAL::element_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::attribute_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::notation_e<'input>>),
+    }
+
+    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::choicevariant3(Default::default()) } }
+
+    // ^-- from Choice([(None, None, GroupRef(QName(Some("xs"), "redefinable"))), (None, None, Ref(QName(Some("xs"), "element"))), (None, None, Ref(QName(Some("xs"), "attribute"))), (None, None, Ref(QName(Some("xs"), "notation")))])
+
+
+    impl<'input> ParseXml<'input> for schemaTop<'input> {
+        const NODE_NAME: &'static str = "choice schemaTop";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::element_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::attribute_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::notation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant3(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct defRef<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexTypeModel__choicevariant2__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
+
+
+    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option complexTypeModel__choicevariant2__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(complexTypeModel__choicevariant2__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexTypeModel__choicevariant2__seqfield1<'input>(Option<super::UNQUAL::typeDefParticle<'input>>);
+
+
+    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__seqfield1<'input> {
+        const NODE_NAME: &'static str = "option complexTypeModel__choicevariant2__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(complexTypeModel__choicevariant2__seqfield1(super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct complexTypeModel__choicevariant2<'input> {
-        seqfield0: complexTypeModel__choicevariant2__openContent_e<'input>,
-        seqfield1: complexTypeModel__choicevariant2__typeDefParticle_e<'input>,
-        attrDecls: super::UNQUAL::attrDecls<'input>,
-        assertions: super::UNQUAL::assertions<'input>,
+        seqfield0: complexTypeModel__choicevariant2__seqfield0<'input>,
+        seqfield1: complexTypeModel__choicevariant2__seqfield1<'input>,
+        seqfield2: super::UNQUAL::attrDecls<'input>,
+        seqfield3: super::UNQUAL::assertions<'input>,
     }
 
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "typeDefParticle"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "attrDecls"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "assertions"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))])
 
 
     impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2<'input> {
@@ -2943,19 +6502,19 @@ pub mod UNQUAL {
 
 
 
-                seqfield0: complexTypeModel__choicevariant2__openContent_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield0: complexTypeModel__choicevariant2__seqfield0::parse_xml(stream, parse_context, parent_context)?,
 
 
 
-                seqfield1: complexTypeModel__choicevariant2__typeDefParticle_e::parse_xml(stream, parse_context, parent_context)?,
+                seqfield1: complexTypeModel__choicevariant2__seqfield1::parse_xml(stream, parse_context, parent_context)?,
 
 
 
-                attrDecls: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
+                seqfield2: super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)?,
 
 
 
-                assertions: super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)?,
+                seqfield3: super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)?,
 
 
 
@@ -2965,14 +6524,14 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq)]
     pub enum complexTypeModel<'input> {
-        simpleContent(Box<super::UNQUAL::simpleContent_e<'input>>),
-        complexContent(Box<super::UNQUAL::complexContent_e<'input>>),
+        choicevariant0(Box<super::UNQUAL::simpleContent_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::complexContent_e<'input>>),
         choicevariant2(Box<complexTypeModel__choicevariant2<'input>>),
     }
 
     impl<'input> Default for complexTypeModel<'input> { fn default() -> complexTypeModel<'input> { complexTypeModel::choicevariant2(Default::default()) } }
 
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "simpleContent"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "complexContent"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "openContent"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "typeDefParticle"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "attrDecls"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "assertions"))), min_occurs: None, max_occurs: None }])), min_occurs: None, max_occurs: None }])
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "simpleContent"))), (None, None, Ref(QName(Some("xs"), "complexContent"))), (None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
 
 
     impl<'input> ParseXml<'input> for complexTypeModel<'input> {
@@ -2981,11 +6540,11 @@ pub mod UNQUAL {
 
 
 
-            match super::UNQUAL::simpleContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::simpleContent(Box::new(r))), None => () }
+            match super::UNQUAL::simpleContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::complexContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::complexContent(Box::new(r))), None => () }
+            match super::UNQUAL::complexContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -2997,320 +6556,41 @@ pub mod UNQUAL {
         }
     }
 
-    #[derive(Debug, PartialEq)]
-    pub enum nestedParticle<'input> {
-        element(Box<super::UNQUAL::localElement<'input>>),
-        group(Box<super::UNQUAL::groupRef<'input>>),
-        choice(Box<super::UNQUAL::choice_e<'input>>),
-        sequence(Box<super::UNQUAL::sequence_e<'input>>),
-        any(Box<super::UNQUAL::any_e<'input>>),
-    }
-
-    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::any(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }])
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant0<'input>(super::UNQUAL::localElement<'input>);
 
 
-    impl<'input> ParseXml<'input> for nestedParticle<'input> {
-        const NODE_NAME: &'static str = "choice nestedParticle";
+    impl<'input> ParseXml<'input> for particle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element particle__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::element(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::group(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choice(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::sequence(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::any(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum attrDecls__seqfield0_e_inner<'input> {
-        attribute(Box<super::UNQUAL::attribute<'input>>),
-        attributeGroup(Box<super::UNQUAL::attributeGroupRef<'input>>),
-    }
-
-    impl<'input> Default for attrDecls__seqfield0_e_inner<'input> { fn default() -> attrDecls__seqfield0_e_inner<'input> { attrDecls__seqfield0_e_inner::attributeGroup(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_e_inner<'input> {
-        const NODE_NAME: &'static str = "choice attrDecls__seqfield0_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::attribute::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_e_inner::attribute(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::attributeGroupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_e_inner::attributeGroup(Box::new(r))), None => () }
-
-
-
-            None
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0_e<'input>(attrDecls__seqfield0_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    pub struct particle__choicevariant1<'input>(super::UNQUAL::groupRef<'input>);
 
 
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) attrDecls__seqfield0_e";
+    impl<'input> ParseXml<'input> for particle__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element particle__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            attrDecls__seqfield0_e_inner::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_e)
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1)
         }
     }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__anyAttribute_e<'input>(super::UNQUAL::anyAttribute_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "anyAttribute"))), min_occurs: Some(0), max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for attrDecls__anyAttribute_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) attrDecls__anyAttribute_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::anyAttribute_e::parse_xml(stream, parse_context, parent_context).map(attrDecls__anyAttribute_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls<'input> {
-        seqfield0: attrDecls__seqfield0_e<'input>,
-        seqfield1: attrDecls__anyAttribute_e<'input>,
-    }
-
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "attribute")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "attributeGroup")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "anyAttribute"))), min_occurs: Some(0), max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for attrDecls<'input> {
-        const NODE_NAME: &'static str = "sequence attrDecls";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(attrDecls {
-
-
-
-                seqfield0: attrDecls__seqfield0_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: attrDecls__anyAttribute_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__annotation_e<'input>(super::UNQUAL::annotation_e<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for allModel__annotation_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) allModel__annotation_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context).map(allModel__annotation_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum allModel__seqfield1_e_inner<'input> {
-        element(Box<super::UNQUAL::localElement<'input>>),
-        any(Box<super::UNQUAL::any_e<'input>>),
-        group(Box<super::UNQUAL::groupRef<'input>>),
-    }
-
-    impl<'input> Default for allModel__seqfield1_e_inner<'input> { fn default() -> allModel__seqfield1_e_inner<'input> { allModel__seqfield1_e_inner::group(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield1_e_inner<'input> {
-        const NODE_NAME: &'static str = "choice allModel__seqfield1_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_e_inner::element(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_e_inner::any(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_e_inner::group(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_e<'input>(allModel__seqfield1_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield1_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) allModel__seqfield1_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            allModel__seqfield1_e_inner::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel<'input> {
-        seqfield0: allModel__annotation_e<'input>,
-        seqfield1: allModel__seqfield1_e<'input>,
-    }
-
-    // ^-- from Sequence([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
-
-
-    impl<'input> ParseXml<'input> for allModel<'input> {
-        const NODE_NAME: &'static str = "sequence allModel";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(allModel {
-
-
-
-                seqfield0: allModel__annotation_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: allModel__seqfield1_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionModel__simpleType_e<'input>(super::UNQUAL::localSimpleType<'input>);
-
-    // ^-- from Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for simpleRestrictionModel__simpleType_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) simpleRestrictionModel__simpleType_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(simpleRestrictionModel__simpleType_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum simpleRestrictionModel__seqfield1_e_inner<'input> {
-        facet(Box<super::UNQUAL::facet_e<'input>>),
-        choicevariant1(Box<any<'input>>),
-    }
-
-    impl<'input> Default for simpleRestrictionModel__seqfield1_e_inner<'input> { fn default() -> simpleRestrictionModel__seqfield1_e_inner<'input> { simpleRestrictionModel__seqfield1_e_inner::choicevariant1(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield1_e_inner<'input> {
-        const NODE_NAME: &'static str = "choice simpleRestrictionModel__seqfield1_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::facet_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleRestrictionModel__seqfield1_e_inner::facet(Box::new(r))), None => () }
-
-
-
-            match any::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleRestrictionModel__seqfield1_e_inner::choicevariant1(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionModel__seqfield1_e<'input>(simpleRestrictionModel__seqfield1_e_inner<'input>);
-
-    // ^-- from Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
-
-
-    impl<'input> ParseXml<'input> for simpleRestrictionModel__seqfield1_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) simpleRestrictionModel__seqfield1_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            simpleRestrictionModel__seqfield1_e_inner::parse_xml(stream, parse_context, parent_context).map(simpleRestrictionModel__seqfield1_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct simpleRestrictionModel<'input> {
-        simpleType: simpleRestrictionModel__simpleType_e<'input>,
-        seqfield1: simpleRestrictionModel__seqfield1_e<'input>,
-    }
-
-    // ^-- from Sequence([Element { name: Some(QName(None, "simpleType")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "facet"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Any), min_occurs: None, max_occurs: None }])), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
-
-
-    impl<'input> ParseXml<'input> for simpleRestrictionModel<'input> {
-        const NODE_NAME: &'static str = "sequence simpleRestrictionModel";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(simpleRestrictionModel {
-
-
-
-                simpleType: simpleRestrictionModel__simpleType_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-                seqfield1: simpleRestrictionModel__seqfield1_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct occurs<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq)]
     pub enum particle<'input> {
-        element(Box<super::UNQUAL::localElement<'input>>),
-        group(Box<super::UNQUAL::groupRef<'input>>),
-        all(Box<super::UNQUAL::all_e<'input>>),
-        choice(Box<super::UNQUAL::choice_e<'input>>),
-        sequence(Box<super::UNQUAL::sequence_e<'input>>),
-        any(Box<super::UNQUAL::any_e<'input>>),
+        choicevariant0(Box<particle__choicevariant0<'input>>),
+        choicevariant1(Box<particle__choicevariant1<'input>>),
+        choicevariant2(Box<super::UNQUAL::all_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::choice_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::sequence_e<'input>>),
+        choicevariant5(Box<super::UNQUAL::any_e<'input>>),
     }
 
-    impl<'input> Default for particle<'input> { fn default() -> particle<'input> { particle::any(Default::default()) } }
+    impl<'input> Default for particle<'input> { fn default() -> particle<'input> { particle::choicevariant5(Default::default()) } }
 
-    // ^-- from Choice([Element { name: Some(QName(None, "element")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }, Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "all"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "any"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
 
 
     impl<'input> ParseXml<'input> for particle<'input> {
@@ -3319,64 +6599,27 @@ pub mod UNQUAL {
 
 
 
-            match super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::element(Box::new(r))), None => () }
+            match particle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::group(Box::new(r))), None => () }
+            match particle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant1(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::all(Box::new(r))), None => () }
+            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant2(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choice(Box::new(r))), None => () }
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant3(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::sequence(Box::new(r))), None => () }
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant4(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::any(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct defRef<'input>(PhantomData<&'input ()>);
-
-    #[derive(Debug, PartialEq)]
-    pub enum identityConstraint<'input> {
-        unique(Box<super::UNQUAL::unique_e<'input>>),
-        key(Box<super::UNQUAL::key_e<'input>>),
-        keyref(Box<super::UNQUAL::keyref_e<'input>>),
-    }
-
-    impl<'input> Default for identityConstraint<'input> { fn default() -> identityConstraint<'input> { identityConstraint::keyref(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "unique"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "key"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "keyref"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for identityConstraint<'input> {
-        const NODE_NAME: &'static str = "choice identityConstraint";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::unique_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::unique(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::key_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::key(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::keyref_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::keyref(Box::new(r))), None => () }
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant5(Box::new(r))), None => () }
 
 
 
@@ -3385,73 +6628,48 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct assertions__assert_e<'input>(super::UNQUAL::assertion<'input>);
-
-    // ^-- from Element { name: Some(QName(None, "assert")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+    pub struct typeDefParticle__choicevariant0<'input>(super::UNQUAL::groupRef<'input>);
 
 
-    impl<'input> ParseXml<'input> for assertions__assert_e<'input> {
-        const NODE_NAME: &'static str = "element (custom) assertions__assert_e";
+    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element typeDefParticle__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::assertion::parse_xml(stream, parse_context, parent_context).map(assertions__assert_e)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions<'input> {
-        assert: assertions__assert_e<'input>,
-    }
-
-    // ^-- from Sequence([Element { name: Some(QName(None, "assert")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }])
-
-
-    impl<'input> ParseXml<'input> for assertions<'input> {
-        const NODE_NAME: &'static str = "sequence assertions";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(assertions {
-
-
-
-                assert: assertions__assert_e::parse_xml(stream, parse_context, parent_context)?,
-
-
-
-            })
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(typeDefParticle__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum schemaTop<'input> {
-        redefinable(Box<super::UNQUAL::redefinable<'input>>),
-        element(Box<super::UNQUAL::element_e<'input>>),
-        attribute(Box<super::UNQUAL::attribute_e<'input>>),
-        notation(Box<super::UNQUAL::notation_e<'input>>),
+    pub enum typeDefParticle<'input> {
+        choicevariant0(Box<typeDefParticle__choicevariant0<'input>>),
+        choicevariant1(Box<super::UNQUAL::all_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
     }
 
-    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::notation(Default::default()) } }
+    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::choicevariant3(Default::default()) } }
 
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(GroupRef(QName(Some("xs"), "redefinable"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "element"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "notation"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence")))])
 
 
-    impl<'input> ParseXml<'input> for schemaTop<'input> {
-        const NODE_NAME: &'static str = "choice schemaTop";
+    impl<'input> ParseXml<'input> for typeDefParticle<'input> {
+        const NODE_NAME: &'static str = "choice typeDefParticle";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::redefinable(Box::new(r))), None => () }
+            match typeDefParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::element_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::element(Box::new(r))), None => () }
+            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant1(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::attribute_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::attribute(Box::new(r))), None => () }
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant2(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::notation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::notation(Box::new(r))), None => () }
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant3(Box::new(r))), None => () }
 
 
 
@@ -3463,95 +6681,17 @@ pub mod UNQUAL {
     pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq)]
-    pub enum redefinable<'input> {
-        simpleType(Box<super::UNQUAL::simpleType_e<'input>>),
-        complexType(Box<super::UNQUAL::complexType_e<'input>>),
-        group(Box<super::UNQUAL::group_e<'input>>),
-        attributeGroup(Box<super::UNQUAL::attributeGroup_e<'input>>),
-    }
-
-    impl<'input> Default for redefinable<'input> { fn default() -> redefinable<'input> { redefinable::attributeGroup(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "simpleType"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "complexType"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "group"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "attributeGroup"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for redefinable<'input> {
-        const NODE_NAME: &'static str = "choice redefinable";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::simpleType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::simpleType(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::complexType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::complexType(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::group_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::group(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::attributeGroup_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::attributeGroup(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum typeDefParticle<'input> {
-        group(Box<super::UNQUAL::groupRef<'input>>),
-        all(Box<super::UNQUAL::all_e<'input>>),
-        choice(Box<super::UNQUAL::choice_e<'input>>),
-        sequence(Box<super::UNQUAL::sequence_e<'input>>),
-    }
-
-    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::sequence(Default::default()) } }
-
-    // ^-- from Choice([Element { name: Some(QName(None, "group")), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "all"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "choice"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "sequence"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for typeDefParticle<'input> {
-        const NODE_NAME: &'static str = "choice typeDefParticle";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::group(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::all(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choice(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::sequence(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
     pub enum composition<'input> {
-        include(Box<super::UNQUAL::include_e<'input>>),
-        import(Box<super::UNQUAL::import_e<'input>>),
-        redefine(Box<super::UNQUAL::redefine_e<'input>>),
-        override_(Box<super::UNQUAL::override_e<'input>>),
-        annotation(Box<super::UNQUAL::annotation_e<'input>>),
+        choicevariant0(Box<super::UNQUAL::include_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::import_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::redefine_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::override_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::annotation_e<'input>>),
     }
 
-    impl<'input> Default for composition<'input> { fn default() -> composition<'input> { composition::annotation(Default::default()) } }
+    impl<'input> Default for composition<'input> { fn default() -> composition<'input> { composition::choicevariant4(Default::default()) } }
 
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "include"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "import"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "redefine"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "override"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "annotation"))), min_occurs: None, max_occurs: None }])
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "include"))), (None, None, Ref(QName(Some("xs"), "import"))), (None, None, Ref(QName(Some("xs"), "redefine"))), (None, None, Ref(QName(Some("xs"), "override"))), (None, None, Ref(QName(Some("xs"), "annotation")))])
 
 
     impl<'input> ParseXml<'input> for composition<'input> {
@@ -3560,57 +6700,23 @@ pub mod UNQUAL {
 
 
 
-            match super::UNQUAL::include_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::include(Box::new(r))), None => () }
+            match super::UNQUAL::include_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::import_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::import(Box::new(r))), None => () }
+            match super::UNQUAL::import_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant1(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::redefine_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::redefine(Box::new(r))), None => () }
+            match super::UNQUAL::redefine_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant2(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::override_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::override_(Box::new(r))), None => () }
+            match super::UNQUAL::override_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant3(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::annotation(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum simpleDerivation<'input> {
-        restriction(Box<super::UNQUAL::restriction_e<'input>>),
-        list(Box<super::UNQUAL::list_e<'input>>),
-        union(Box<super::UNQUAL::union_e<'input>>),
-    }
-
-    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::union(Default::default()) } }
-
-    // ^-- from Choice([Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "restriction"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "list"))), min_occurs: None, max_occurs: None }, Element { name: None, attrs: [], mixed: false, type_: Some(Ref(QName(Some("xs"), "union"))), min_occurs: None, max_occurs: None }])
-
-
-    impl<'input> ParseXml<'input> for simpleDerivation<'input> {
-        const NODE_NAME: &'static str = "choice simpleDerivation";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::restriction_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::restriction(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::list_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::list(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::union_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::union(Box::new(r))), None => () }
+            match super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant4(Box::new(r))), None => () }
 
 
 
