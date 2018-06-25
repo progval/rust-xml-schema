@@ -54,34 +54,34 @@ mod tests {
                     Element {
                         min_occurs: None,
                         max_occurs: None,
-                        name: Some("person".into()),
+                        name: "person".into(),
                         attrs: vec![],
                         mixed: false,
                         type_: Some(ElementType::Sequence(vec![
-                            Element {
+                            (None, None, ElementType::Element(Box::new(Element {
                                 min_occurs: None,
                                 max_occurs: None,
-                                name: Some("name".into()),
+                                name: "name".into(),
                                 attrs: vec![],
                                 mixed: false,
                                 type_: Some(ElementType::String),
-                            },
-                            Element {
+                            }))),
+                            (None, None, ElementType::Element(Box::new(Element {
                                 min_occurs: None,
                                 max_occurs: None,
-                                name: Some("firstname".into()),
+                                name: "firstname".into(),
                                 attrs: vec![],
                                 mixed: false,
                                 type_: Some(ElementType::String),
-                            },
-                            Element {
+                            }))),
+                            (None, None, ElementType::Element(Box::new(Element {
                                 min_occurs: None,
                                 max_occurs: None,
-                                name: Some("birthdate".into()),
+                                name: "birthdate".into(),
                                 attrs: vec![],
                                 mixed: false,
                                 type_: Some(ElementType::Date),
-                            },
+                            }))),
                         ]))
                     },
                 ],
