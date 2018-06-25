@@ -3,7 +3,7 @@ use xml_schema::parse_xsd;
 use xml_schema::parser::*;
 
 const PO_XSD: &'static str = r#"
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="foo">
 
   <xsd:annotation>
     <xsd:documentation xml:lang="en">
