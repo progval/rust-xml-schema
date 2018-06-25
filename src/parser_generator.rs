@@ -112,7 +112,7 @@ impl<'a> ParserGenerator<'a> {
                 module.scope().raw(&format!("// ^-- from {:?}", element));
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
         {}::parse_xml(stream, parse_context, parent_context).map({})
     }}
 }}"#,           type_name, inner_type_name, type_name));
@@ -125,7 +125,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 module.scope().raw(&format!("// ^-- from {:?}", element));
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
         {}::parse_xml(stream, parse_context, parent_context).map({})
     }}
 }}"#,           type_name, inner_type_name, type_name));
@@ -135,7 +135,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field("PhantomData<&'input ()>");
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {{
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {{
         Some({}(Default::default()))
     }}
 }}"#,           type_name, type_name));
@@ -216,7 +216,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 module.push_struct(s);
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
         Some({}({}::parse_xml(stream, parse_context, parent_context)))
     }}
 }}"#,           name, name, child_typename));
@@ -232,7 +232,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 module.push_struct(s);
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
         let mut items = Vec::new();
         while let Some(new_item) = {}::parse_xml(stream, parse_context, parent_context) {{
             items.push(new_item);
@@ -263,7 +263,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
         Some({} {{
 "#,             name, name));
                 for (item_name, item_typename) in fields {
@@ -291,7 +291,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("{}<'input>", type_name));
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
         {}::parse_xml(stream, parse_context, parent_context).map({})
     }}
 }}"#,           name, type_name, name));
@@ -313,7 +313,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 module.push_struct(s);
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
         Some({} {{
             BASE: {}::parse_xml(stream, parse_context, parent_context)?,
 "#,             name, name, base_typename));
@@ -371,7 +371,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
 "#,             enum_name));
                 for (item_name, item_typename) in variants {
                     module.scope().raw(&format!(r#"

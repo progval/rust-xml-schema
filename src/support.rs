@@ -7,7 +7,7 @@ use xmlparser::{Token, ElementEnd, StrSpan};
 pub struct token<'input>(StrSpan<'input>);
 
 impl<'input> ParseXml<'input> for token<'input> {
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<token<'input>> {
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<token<'input>> {
         match stream.next() {
             Some(Ok(Token::Text(strspan))) => Some(token(strspan)),
             _ => None,
@@ -24,7 +24,7 @@ impl<'input> Default for token<'input> {
 pub struct NMTOKEN<'input>(StrSpan<'input>);
 
 impl<'input> ParseXml<'input> for NMTOKEN<'input> {
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<NMTOKEN<'input>> {
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<NMTOKEN<'input>> {
         match stream.next() {
             Some(Ok(Token::Text(strspan))) => Some(NMTOKEN(strspan)),
             _ => None,
@@ -83,7 +83,7 @@ pub struct SUPPORT_ANY<'input>(Vec<Token<'input>>); // TODO: remove, temporary
 #[derive(Debug, PartialEq, Default)]
 pub struct any<'input>(Vec<Token<'input>>);
 impl<'input> ParseXml<'input> for any<'input> {
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<any<'input>> {
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<any<'input>> {
         let mut tag_stack = Vec::new();
         let mut tokens = Vec::new();
         let tok = stream.next().unwrap().unwrap();
@@ -115,7 +115,7 @@ impl<'input> ParseXml<'input> for any<'input> {
 pub struct XmlString<'input>(StrSpan<'input>);
 
 impl<'input> ParseXml<'input> for XmlString<'input> {
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<XmlString<'input>> {
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<XmlString<'input>> {
         match stream.next() {
             Some(Ok(Token::Text(strspan))) => Some(XmlString(strspan)),
             _ => None, // TODO: put it back in the stream
@@ -131,7 +131,7 @@ impl<'input> Default for XmlString<'input> {
 
 pub type Stream<'input> = Iterator<Item=Result<Token<'input>, XmlParserError>>;
 pub trait ParseContext {
-}
+} // TODO: remove this
 pub trait ParseXml<'input>: Sized {
-    fn parse_xml<TParseContext: ParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self>;
+    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self>;
 }
