@@ -25,7 +25,7 @@ mod tests {
 
 	const PERSON_XSD: &'static str = r#"
 	  <?xml version="1.0" encoding="UTF-8"?>
-	  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	  <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="foo">
 		<xs:element name="person">
 		  <xs:complexType>
 			<xs:sequence>
@@ -48,27 +48,36 @@ mod tests {
             standalone: None,
             schema: Some(Schema {
                 namespaces: namespaces,
+                target_namespace: "foo",
                 groups: HashMap::new(),
                 elements: vec![
                     Element {
-                        name: Some("person"),
+                        min_occurs: None,
+                        max_occurs: None,
+                        name: Some("person".into()),
                         attrs: vec![],
                         mixed: false,
                         type_: Some(ElementType::Sequence(vec![
                             Element {
-                                name: Some("name"),
+                                min_occurs: None,
+                                max_occurs: None,
+                                name: Some("name".into()),
                                 attrs: vec![],
                                 mixed: false,
                                 type_: Some(ElementType::String),
                             },
                             Element {
-                                name: Some("firstname"),
+                                min_occurs: None,
+                                max_occurs: None,
+                                name: Some("firstname".into()),
                                 attrs: vec![],
                                 mixed: false,
                                 type_: Some(ElementType::String),
                             },
                             Element {
-                                name: Some("birthdate"),
+                                min_occurs: None,
+                                max_occurs: None,
+                                name: Some("birthdate".into()),
                                 attrs: vec![],
                                 mixed: false,
                                 type_: Some(ElementType::Date),
