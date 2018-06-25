@@ -140,7 +140,7 @@ impl<'input> Default for XmlString<'input> {
 
 pub type Stream<'input> = Box<InnerStream<'input>>;
 pub struct InnerStream<'input> {
-    index: usize,
+    pub(crate) index: usize,
     tokens: Vec<Token<'input>>,
 }
 

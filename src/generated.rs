@@ -93,6 +93,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -169,6 +171,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -510,6 +514,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -888,6 +894,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -964,6 +972,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -1080,6 +1090,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2269,6 +2281,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2418,6 +2432,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2521,6 +2537,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2624,6 +2642,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2711,6 +2731,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2776,6 +2798,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2841,6 +2865,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2906,6 +2932,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2971,6 +2999,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3036,6 +3066,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3112,6 +3144,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3257,6 +3291,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3322,6 +3358,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3387,6 +3425,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3527,6 +3567,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3614,6 +3656,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3679,6 +3723,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3744,6 +3790,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3809,6 +3857,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3923,6 +3973,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3988,6 +4040,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4053,6 +4107,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4156,6 +4212,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4259,6 +4317,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4324,6 +4384,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4427,6 +4489,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4492,6 +4556,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4557,6 +4623,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4708,6 +4776,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4773,6 +4843,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4838,6 +4910,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4903,6 +4977,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4968,6 +5044,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5033,6 +5111,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5098,6 +5178,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5201,6 +5283,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5266,6 +5350,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5417,6 +5503,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5577,6 +5665,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5642,6 +5732,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5791,6 +5883,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5896,6 +5990,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6164,6 +6260,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6267,6 +6365,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6332,6 +6432,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6397,6 +6499,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6473,6 +6577,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6618,6 +6724,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6683,6 +6791,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6748,6 +6858,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6813,6 +6925,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6968,6 +7082,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7033,6 +7149,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7098,6 +7216,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7117,199 +7237,48 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant0__element_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom particle__choicevariant0__element_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0__element_e_inner)
-        }
-    }
+    pub struct defRef<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant0__element_e<'input> {
-        child: particle__choicevariant0__element_e_inner<'input>,
-    }
-
-    // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant0__element_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) particle__choicevariant0__element_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            let mut tok = stream.next().unwrap();
-            loop {
-                match tok {
-                    Token::Whitespaces(_) => (),
-                    Token::Comment(_) => (),
-                    _ => break,
-                }
-                tok = stream.next().unwrap();
-            }
-            match tok {
-                Token::ElementStart(prefix, name) => {
-                    if name.to_str() == "element" {
-
-
-
-                        loop {
-                            let tok = stream.next().unwrap();
-                            match tok {
-                                Token::Whitespaces(_) => (),
-                                Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(particle__choicevariant0__element_e {
-                                        child: try_rollback!(stream, tx, particle__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                                    }),
-                                _ => panic!(format!("Did not expect token {:?}", tok)),
-                            }
-                        }
-                    }
-                    else {
-                        tx.rollback(stream);
-                        None
-                    }
-                },
-                _ => panic!(format!("Did not expect token {:?}", tok)),
-            }
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant0<'input>(particle__choicevariant0__element_e<'input>);
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element particle__choicevariant0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            particle__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant1__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant1__group_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom particle__choicevariant1__group_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1__group_e_inner)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant1__group_e<'input> {
-        child: particle__choicevariant1__group_e_inner<'input>,
-    }
-
-    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant1__group_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) particle__choicevariant1__group_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            let mut tok = stream.next().unwrap();
-            loop {
-                match tok {
-                    Token::Whitespaces(_) => (),
-                    Token::Comment(_) => (),
-                    _ => break,
-                }
-                tok = stream.next().unwrap();
-            }
-            match tok {
-                Token::ElementStart(prefix, name) => {
-                    if name.to_str() == "group" {
-
-
-
-                        loop {
-                            let tok = stream.next().unwrap();
-                            match tok {
-                                Token::Whitespaces(_) => (),
-                                Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(particle__choicevariant1__group_e {
-                                        child: try_rollback!(stream, tx, particle__choicevariant1__group_e_inner::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                                    }),
-                                _ => panic!(format!("Did not expect token {:?}", tok)),
-                            }
-                        }
-                    }
-                    else {
-                        tx.rollback(stream);
-                        None
-                    }
-                },
-                _ => panic!(format!("Did not expect token {:?}", tok)),
-            }
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant1<'input>(particle__choicevariant1__group_e<'input>);
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element particle__choicevariant1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            particle__choicevariant1__group_e::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1)
-        }
-    }
+    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq)]
-    pub enum particle<'input> {
-        choicevariant0(Box<particle__choicevariant0<'input>>),
-        choicevariant1(Box<particle__choicevariant1<'input>>),
-        choicevariant2(Box<super::UNQUAL::all_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::choice_e<'input>>),
-        choicevariant4(Box<super::UNQUAL::sequence_e<'input>>),
-        choicevariant5(Box<super::UNQUAL::any_e<'input>>),
+    pub enum composition<'input> {
+        choicevariant0(Box<super::UNQUAL::include_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::import_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::redefine_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::override_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::annotation_e<'input>>),
     }
 
-    impl<'input> Default for particle<'input> { fn default() -> particle<'input> { particle::choicevariant5(Default::default()) } }
+    impl<'input> Default for composition<'input> { fn default() -> composition<'input> { composition::choicevariant4(Default::default()) } }
 
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "include"))), (None, None, Ref(QName(Some("xs"), "import"))), (None, None, Ref(QName(Some("xs"), "redefine"))), (None, None, Ref(QName(Some("xs"), "override"))), (None, None, Ref(QName(Some("xs"), "annotation")))])
 
 
-    impl<'input> ParseXml<'input> for particle<'input> {
-        const NODE_NAME: &'static str = "choice particle";
+    impl<'input> ParseXml<'input> for composition<'input> {
+        const NODE_NAME: &'static str = "choice composition";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match particle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant0(Box::new(r))), None => () }
+            match super::UNQUAL::include_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match particle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant1(Box::new(r))), None => () }
+            match super::UNQUAL::import_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant1(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant2(Box::new(r))), None => () }
+            match super::UNQUAL::redefine_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant2(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant3(Box::new(r))), None => () }
+            match super::UNQUAL::override_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant3(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant4(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant5(Box::new(r))), None => () }
+            match super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant4(Box::new(r))), None => () }
 
 
 
@@ -7357,40 +7326,26 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct occurs<'input>(PhantomData<&'input ()>);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
+    pub struct nestedParticle__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
 
 
-    impl<'input> ParseXml<'input> for allModel__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option allModel__seqfield0";
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0__element_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom nestedParticle__choicevariant0__element_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(allModel__seqfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0__element_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_item__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0__element_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom allModel__seqfield1_item__choicevariant0__element_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant0__element_e_inner)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_item__choicevariant0__element_e<'input> {
-        child: allModel__seqfield1_item__choicevariant0__element_e_inner<'input>,
+    pub struct nestedParticle__choicevariant0__element_e<'input> {
+        child: nestedParticle__choicevariant0__element_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0__element_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) allModel__seqfield1_item__choicevariant0__element_e";
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0__element_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) nestedParticle__choicevariant0__element_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -7415,12 +7370,14 @@ pub mod UNQUAL {
                                 Token::Comment(_) => (),
                                 Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(allModel__seqfield1_item__choicevariant0__element_e {
-                                        child: try_rollback!(stream, tx, allModel__seqfield1_item__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                    return Some(nestedParticle__choicevariant0__element_e {
+                                        child: try_rollback!(stream, tx, nestedParticle__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7436,37 +7393,37 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_item__choicevariant0<'input>(allModel__seqfield1_item__choicevariant0__element_e<'input>);
+    pub struct nestedParticle__choicevariant0<'input>(nestedParticle__choicevariant0__element_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element allModel__seqfield1_item__choicevariant0";
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            allModel__seqfield1_item__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant0)
+            nestedParticle__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_item__choicevariant2__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
+    pub struct nestedParticle__choicevariant1__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
 
 
-    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2__group_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom allModel__seqfield1_item__choicevariant2__group_e_inner";
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1__group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom nestedParticle__choicevariant1__group_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant2__group_e_inner)
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1__group_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_item__choicevariant2__group_e<'input> {
-        child: allModel__seqfield1_item__choicevariant2__group_e_inner<'input>,
+    pub struct nestedParticle__choicevariant1__group_e<'input> {
+        child: nestedParticle__choicevariant1__group_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2__group_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) allModel__seqfield1_item__choicevariant2__group_e";
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1__group_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) nestedParticle__choicevariant1__group_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -7491,12 +7448,14 @@ pub mod UNQUAL {
                                 Token::Comment(_) => (),
                                 Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(allModel__seqfield1_item__choicevariant2__group_e {
-                                        child: try_rollback!(stream, tx, allModel__seqfield1_item__choicevariant2__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                    return Some(nestedParticle__choicevariant1__group_e {
+                                        child: try_rollback!(stream, tx, nestedParticle__choicevariant1__group_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7512,43 +7471,53 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1_item__choicevariant2<'input>(allModel__seqfield1_item__choicevariant2__group_e<'input>);
+    pub struct nestedParticle__choicevariant1<'input>(nestedParticle__choicevariant1__group_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2<'input> {
-        const NODE_NAME: &'static str = "elementtype element allModel__seqfield1_item__choicevariant2";
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            allModel__seqfield1_item__choicevariant2__group_e::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant2)
+            nestedParticle__choicevariant1__group_e::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1)
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum allModel__seqfield1_item<'input> {
-        choicevariant0(Box<allModel__seqfield1_item__choicevariant0<'input>>),
-        choicevariant1(Box<super::UNQUAL::any_e<'input>>),
-        choicevariant2(Box<allModel__seqfield1_item__choicevariant2<'input>>),
+    pub enum nestedParticle<'input> {
+        choicevariant0(Box<nestedParticle__choicevariant0<'input>>),
+        choicevariant1(Box<nestedParticle__choicevariant1<'input>>),
+        choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::any_e<'input>>),
     }
 
-    impl<'input> Default for allModel__seqfield1_item<'input> { fn default() -> allModel__seqfield1_item<'input> { allModel__seqfield1_item::choicevariant2(Default::default()) } }
+    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::choicevariant4(Default::default()) } }
 
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "any"))), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }))])
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
 
 
-    impl<'input> ParseXml<'input> for allModel__seqfield1_item<'input> {
-        const NODE_NAME: &'static str = "choice allModel__seqfield1_item";
+    impl<'input> ParseXml<'input> for nestedParticle<'input> {
+        const NODE_NAME: &'static str = "choice nestedParticle";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match allModel__seqfield1_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant0(Box::new(r))), None => () }
+            match nestedParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant1(Box::new(r))), None => () }
+            match nestedParticle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant1(Box::new(r))), None => () }
 
 
 
-            match allModel__seqfield1_item__choicevariant2::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant2(Box::new(r))), None => () }
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant3(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant4(Box::new(r))), None => () }
 
 
 
@@ -7556,47 +7525,37 @@ pub mod UNQUAL {
         }
     }
 
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel__seqfield1<'input>(Vec<allModel__seqfield1_item<'input>>);
-
-
-    impl<'input> ParseXml<'input> for allModel__seqfield1<'input> {
-        const NODE_NAME: &'static str = "vec allModel__seqfield1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let mut items = Vec::new();
-            while let Some(new_item) = allModel__seqfield1_item::parse_xml(stream, parse_context, parent_context) {
-                items.push(new_item);
-            }
-            Some(allModel__seqfield1(items))
-        }
+    #[derive(Debug, PartialEq)]
+    pub enum simpleDerivation<'input> {
+        choicevariant0(Box<super::UNQUAL::restriction_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::list_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::union_e<'input>>),
     }
 
-    #[derive(Debug, PartialEq, Default)]
-    pub struct allModel<'input> {
-        seqfield0: allModel__seqfield0<'input>,
-        seqfield1: allModel__seqfield1<'input>,
-    }
+    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::choicevariant2(Default::default()) } }
 
-    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "any"))), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }))]))])
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "restriction"))), (None, None, Ref(QName(Some("xs"), "list"))), (None, None, Ref(QName(Some("xs"), "union")))])
 
 
-    impl<'input> ParseXml<'input> for allModel<'input> {
-        const NODE_NAME: &'static str = "sequence allModel";
+    impl<'input> ParseXml<'input> for simpleDerivation<'input> {
+        const NODE_NAME: &'static str = "choice simpleDerivation";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(allModel {
 
 
 
-                seqfield0: try_rollback!(stream, tx, allModel__seqfield0::parse_xml(stream, parse_context, parent_context)),
+            match super::UNQUAL::restriction_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant0(Box::new(r))), None => () }
 
 
 
-                seqfield1: try_rollback!(stream, tx, allModel__seqfield1::parse_xml(stream, parse_context, parent_context)),
+            match super::UNQUAL::list_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant1(Box::new(r))), None => () }
 
 
 
-            })
+            match super::UNQUAL::union_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
         }
     }
 
@@ -7651,6 +7610,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7716,113 +7677,93 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct typeDefParticle__choicevariant0__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
+    pub struct complexTypeModel__choicevariant2__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0__group_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom typeDefParticle__choicevariant0__group_e_inner";
+    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option complexTypeModel__choicevariant2__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(typeDefParticle__choicevariant0__group_e_inner)
+            Some(complexTypeModel__choicevariant2__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct typeDefParticle__choicevariant0__group_e<'input> {
-        child: typeDefParticle__choicevariant0__group_e_inner<'input>,
+    pub struct complexTypeModel__choicevariant2__seqfield1<'input>(Option<super::UNQUAL::typeDefParticle<'input>>);
+
+
+    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__seqfield1<'input> {
+        const NODE_NAME: &'static str = "option complexTypeModel__choicevariant2__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(complexTypeModel__choicevariant2__seqfield1(super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)))
+        }
     }
 
-    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
+    #[derive(Debug, PartialEq, Default)]
+    pub struct complexTypeModel__choicevariant2<'input> {
+        seqfield0: complexTypeModel__choicevariant2__seqfield0<'input>,
+        seqfield1: complexTypeModel__choicevariant2__seqfield1<'input>,
+        seqfield2: super::UNQUAL::attrDecls<'input>,
+        seqfield3: super::UNQUAL::assertions<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))])
 
 
-    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0__group_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) typeDefParticle__choicevariant0__group_e";
+    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2<'input> {
+        const NODE_NAME: &'static str = "sequence complexTypeModel__choicevariant2";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
-            let mut tok = stream.next().unwrap();
-            loop {
-                match tok {
-                    Token::Whitespaces(_) => (),
-                    Token::Comment(_) => (),
-                    _ => break,
-                }
-                tok = stream.next().unwrap();
-            }
-            match tok {
-                Token::ElementStart(prefix, name) => {
-                    if name.to_str() == "group" {
+            Some(complexTypeModel__choicevariant2 {
 
 
 
-                        loop {
-                            let tok = stream.next().unwrap();
-                            match tok {
-                                Token::Whitespaces(_) => (),
-                                Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(typeDefParticle__choicevariant0__group_e {
-                                        child: try_rollback!(stream, tx, typeDefParticle__choicevariant0__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+                seqfield0: try_rollback!(stream, tx, complexTypeModel__choicevariant2__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                                    }),
-                                _ => panic!(format!("Did not expect token {:?}", tok)),
-                            }
-                        }
-                    }
-                    else {
-                        tx.rollback(stream);
-                        None
-                    }
-                },
-                _ => panic!(format!("Did not expect token {:?}", tok)),
-            }
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct typeDefParticle__choicevariant0<'input>(typeDefParticle__choicevariant0__group_e<'input>);
+                seqfield1: try_rollback!(stream, tx, complexTypeModel__choicevariant2__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
-    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element typeDefParticle__choicevariant0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            typeDefParticle__choicevariant0__group_e::parse_xml(stream, parse_context, parent_context).map(typeDefParticle__choicevariant0)
+
+                seqfield2: try_rollback!(stream, tx, super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                seqfield3: try_rollback!(stream, tx, super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)),
+
+
+
+            })
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum typeDefParticle<'input> {
-        choicevariant0(Box<typeDefParticle__choicevariant0<'input>>),
-        choicevariant1(Box<super::UNQUAL::all_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
+    pub enum complexTypeModel<'input> {
+        choicevariant0(Box<super::UNQUAL::simpleContent_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::complexContent_e<'input>>),
+        choicevariant2(Box<complexTypeModel__choicevariant2<'input>>),
     }
 
-    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::choicevariant3(Default::default()) } }
+    impl<'input> Default for complexTypeModel<'input> { fn default() -> complexTypeModel<'input> { complexTypeModel::choicevariant2(Default::default()) } }
 
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence")))])
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "simpleContent"))), (None, None, Ref(QName(Some("xs"), "complexContent"))), (None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
 
 
-    impl<'input> ParseXml<'input> for typeDefParticle<'input> {
-        const NODE_NAME: &'static str = "choice typeDefParticle";
+    impl<'input> ParseXml<'input> for complexTypeModel<'input> {
+        const NODE_NAME: &'static str = "choice complexTypeModel";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match typeDefParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant0(Box::new(r))), None => () }
+            match super::UNQUAL::simpleContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant1(Box::new(r))), None => () }
+            match super::UNQUAL::complexContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant1(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant2(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant3(Box::new(r))), None => () }
+            match complexTypeModel__choicevariant2::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant2(Box::new(r))), None => () }
 
 
 
@@ -7881,6 +7822,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7957,6 +7900,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -8067,102 +8012,26 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
+    pub struct typeDefParticle__choicevariant0__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
 
 
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0__element_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom nestedParticle__choicevariant0__element_e_inner";
+    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0__group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom typeDefParticle__choicevariant0__group_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0__element_e_inner)
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(typeDefParticle__choicevariant0__group_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant0__element_e<'input> {
-        child: nestedParticle__choicevariant0__element_e_inner<'input>,
-    }
-
-    // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0__element_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) nestedParticle__choicevariant0__element_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            let mut tok = stream.next().unwrap();
-            loop {
-                match tok {
-                    Token::Whitespaces(_) => (),
-                    Token::Comment(_) => (),
-                    _ => break,
-                }
-                tok = stream.next().unwrap();
-            }
-            match tok {
-                Token::ElementStart(prefix, name) => {
-                    if name.to_str() == "element" {
-
-
-
-                        loop {
-                            let tok = stream.next().unwrap();
-                            match tok {
-                                Token::Whitespaces(_) => (),
-                                Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(nestedParticle__choicevariant0__element_e {
-                                        child: try_rollback!(stream, tx, nestedParticle__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                                    }),
-                                _ => panic!(format!("Did not expect token {:?}", tok)),
-                            }
-                        }
-                    }
-                    else {
-                        tx.rollback(stream);
-                        None
-                    }
-                },
-                _ => panic!(format!("Did not expect token {:?}", tok)),
-            }
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant0<'input>(nestedParticle__choicevariant0__element_e<'input>);
-
-
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            nestedParticle__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant1__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
-
-
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1__group_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom nestedParticle__choicevariant1__group_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1__group_e_inner)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant1__group_e<'input> {
-        child: nestedParticle__choicevariant1__group_e_inner<'input>,
+    pub struct typeDefParticle__choicevariant0__group_e<'input> {
+        child: typeDefParticle__choicevariant0__group_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1__group_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) nestedParticle__choicevariant1__group_e";
+    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0__group_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) typeDefParticle__choicevariant0__group_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -8187,12 +8056,14 @@ pub mod UNQUAL {
                                 Token::Comment(_) => (),
                                 Token::Attribute(_, _) => (),
                                 Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(nestedParticle__choicevariant1__group_e {
-                                        child: try_rollback!(stream, tx, nestedParticle__choicevariant1__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                    return Some(typeDefParticle__choicevariant0__group_e {
+                                        child: try_rollback!(stream, tx, typeDefParticle__choicevariant0__group_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -8208,59 +8079,341 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant1<'input>(nestedParticle__choicevariant1__group_e<'input>);
+    pub struct typeDefParticle__choicevariant0<'input>(typeDefParticle__choicevariant0__group_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant1";
+    impl<'input> ParseXml<'input> for typeDefParticle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element typeDefParticle__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            nestedParticle__choicevariant1__group_e::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1)
+            typeDefParticle__choicevariant0__group_e::parse_xml(stream, parse_context, parent_context).map(typeDefParticle__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum nestedParticle<'input> {
-        choicevariant0(Box<nestedParticle__choicevariant0<'input>>),
-        choicevariant1(Box<nestedParticle__choicevariant1<'input>>),
+    pub enum typeDefParticle<'input> {
+        choicevariant0(Box<typeDefParticle__choicevariant0<'input>>),
+        choicevariant1(Box<super::UNQUAL::all_e<'input>>),
         choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
         choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
-        choicevariant4(Box<super::UNQUAL::any_e<'input>>),
     }
 
-    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::choicevariant4(Default::default()) } }
+    impl<'input> Default for typeDefParticle<'input> { fn default() -> typeDefParticle<'input> { typeDefParticle::choicevariant3(Default::default()) } }
 
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence")))])
 
 
-    impl<'input> ParseXml<'input> for nestedParticle<'input> {
-        const NODE_NAME: &'static str = "choice nestedParticle";
+    impl<'input> ParseXml<'input> for typeDefParticle<'input> {
+        const NODE_NAME: &'static str = "choice typeDefParticle";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match nestedParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant0(Box::new(r))), None => () }
+            match typeDefParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match nestedParticle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant1(Box::new(r))), None => () }
+            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant1(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant2(Box::new(r))), None => () }
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant2(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant3(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant4(Box::new(r))), None => () }
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(typeDefParticle::choicevariant3(Box::new(r))), None => () }
 
 
 
             None
         }
     }
+
+    #[derive(Debug, PartialEq)]
+    pub enum schemaTop<'input> {
+        choicevariant0(Box<super::UNQUAL::redefinable<'input>>),
+        choicevariant1(Box<super::UNQUAL::element_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::attribute_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::notation_e<'input>>),
+    }
+
+    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::choicevariant3(Default::default()) } }
+
+    // ^-- from Choice([(None, None, GroupRef(QName(Some("xs"), "redefinable"))), (None, None, Ref(QName(Some("xs"), "element"))), (None, None, Ref(QName(Some("xs"), "attribute"))), (None, None, Ref(QName(Some("xs"), "notation")))])
+
+
+    impl<'input> ParseXml<'input> for schemaTop<'input> {
+        const NODE_NAME: &'static str = "choice schemaTop";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::element_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::attribute_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::notation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant3(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option allModel__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(allModel__seqfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0__element_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom allModel__seqfield1_item__choicevariant0__element_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant0__element_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant0__element_e<'input> {
+        child: allModel__seqfield1_item__choicevariant0__element_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0__element_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) allModel__seqfield1_item__choicevariant0__element_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "element" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(allModel__seqfield1_item__choicevariant0__element_e {
+                                        child: try_rollback!(stream, tx, allModel__seqfield1_item__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant0<'input>(allModel__seqfield1_item__choicevariant0__element_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element allModel__seqfield1_item__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            allModel__seqfield1_item__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant2__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2__group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom allModel__seqfield1_item__choicevariant2__group_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant2__group_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant2__group_e<'input> {
+        child: allModel__seqfield1_item__choicevariant2__group_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2__group_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) allModel__seqfield1_item__choicevariant2__group_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "group" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(allModel__seqfield1_item__choicevariant2__group_e {
+                                        child: try_rollback!(stream, tx, allModel__seqfield1_item__choicevariant2__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1_item__choicevariant2<'input>(allModel__seqfield1_item__choicevariant2__group_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item__choicevariant2<'input> {
+        const NODE_NAME: &'static str = "elementtype element allModel__seqfield1_item__choicevariant2";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            allModel__seqfield1_item__choicevariant2__group_e::parse_xml(stream, parse_context, parent_context).map(allModel__seqfield1_item__choicevariant2)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum allModel__seqfield1_item<'input> {
+        choicevariant0(Box<allModel__seqfield1_item__choicevariant0<'input>>),
+        choicevariant1(Box<super::UNQUAL::any_e<'input>>),
+        choicevariant2(Box<allModel__seqfield1_item__choicevariant2<'input>>),
+    }
+
+    impl<'input> Default for allModel__seqfield1_item<'input> { fn default() -> allModel__seqfield1_item<'input> { allModel__seqfield1_item::choicevariant2(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "any"))), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }))])
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1_item<'input> {
+        const NODE_NAME: &'static str = "choice allModel__seqfield1_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match allModel__seqfield1_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match allModel__seqfield1_item__choicevariant2::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(allModel__seqfield1_item::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel__seqfield1<'input>(Vec<allModel__seqfield1_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for allModel__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec allModel__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = allModel__seqfield1_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(allModel__seqfield1(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct allModel<'input> {
+        seqfield0: allModel__seqfield0<'input>,
+        seqfield1: allModel__seqfield1<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "any"))), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }))]))])
+
+
+    impl<'input> ParseXml<'input> for allModel<'input> {
+        const NODE_NAME: &'static str = "sequence allModel";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            Some(allModel {
+
+
+
+                seqfield0: try_rollback!(stream, tx, allModel__seqfield0::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                seqfield1: try_rollback!(stream, tx, allModel__seqfield1::parse_xml(stream, parse_context, parent_context)),
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct occurs<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq, Default)]
     pub struct simpleRestrictionModel__seqfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
@@ -8313,6 +8466,8 @@ pub mod UNQUAL {
 
 
                                     }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -8422,43 +8577,204 @@ pub mod UNQUAL {
         }
     }
 
-    #[derive(Debug, PartialEq)]
-    pub enum composition<'input> {
-        choicevariant0(Box<super::UNQUAL::include_e<'input>>),
-        choicevariant1(Box<super::UNQUAL::import_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::redefine_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::override_e<'input>>),
-        choicevariant4(Box<super::UNQUAL::annotation_e<'input>>),
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant0__element_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom particle__choicevariant0__element_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0__element_e_inner)
+        }
     }
 
-    impl<'input> Default for composition<'input> { fn default() -> composition<'input> { composition::choicevariant4(Default::default()) } }
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant0__element_e<'input> {
+        child: particle__choicevariant0__element_e_inner<'input>,
+    }
 
-    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "include"))), (None, None, Ref(QName(Some("xs"), "import"))), (None, None, Ref(QName(Some("xs"), "redefine"))), (None, None, Ref(QName(Some("xs"), "override"))), (None, None, Ref(QName(Some("xs"), "annotation")))])
+    // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for composition<'input> {
-        const NODE_NAME: &'static str = "choice composition";
+    impl<'input> ParseXml<'input> for particle__choicevariant0__element_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) particle__choicevariant0__element_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "element" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(particle__choicevariant0__element_e {
+                                        child: try_rollback!(stream, tx, particle__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant0<'input>(particle__choicevariant0__element_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element particle__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            particle__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant1__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant1__group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom particle__choicevariant1__group_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1__group_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant1__group_e<'input> {
+        child: particle__choicevariant1__group_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant1__group_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) particle__choicevariant1__group_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "group" {
+
+
+
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute(_, _) => (),
+                                Token::ElementEnd(ElementEnd::Open) =>
+                                    return Some(particle__choicevariant1__group_e {
+                                        child: try_rollback!(stream, tx, particle__choicevariant1__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    }),
+                                Token::ElementEnd(_) =>
+                                    return Default::default(), // TODO
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct particle__choicevariant1<'input>(particle__choicevariant1__group_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for particle__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element particle__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            particle__choicevariant1__group_e::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum particle<'input> {
+        choicevariant0(Box<particle__choicevariant0<'input>>),
+        choicevariant1(Box<particle__choicevariant1<'input>>),
+        choicevariant2(Box<super::UNQUAL::all_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::choice_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::sequence_e<'input>>),
+        choicevariant5(Box<super::UNQUAL::any_e<'input>>),
+    }
+
+    impl<'input> Default for particle<'input> { fn default() -> particle<'input> { particle::choicevariant5(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
+
+
+    impl<'input> ParseXml<'input> for particle<'input> {
+        const NODE_NAME: &'static str = "choice particle";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::include_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant0(Box::new(r))), None => () }
+            match particle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::import_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant1(Box::new(r))), None => () }
+            match particle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant1(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::redefine_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant2(Box::new(r))), None => () }
+            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant2(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::override_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant3(Box::new(r))), None => () }
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant3(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant4(Box::new(r))), None => () }
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant4(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant5(Box::new(r))), None => () }
 
 
 
@@ -8499,178 +8815,4 @@ pub mod UNQUAL {
             None
         }
     }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct complexTypeModel__choicevariant2__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
-
-
-    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option complexTypeModel__choicevariant2__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(complexTypeModel__choicevariant2__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct complexTypeModel__choicevariant2__seqfield1<'input>(Option<super::UNQUAL::typeDefParticle<'input>>);
-
-
-    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2__seqfield1<'input> {
-        const NODE_NAME: &'static str = "option complexTypeModel__choicevariant2__seqfield1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(complexTypeModel__choicevariant2__seqfield1(super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct complexTypeModel__choicevariant2<'input> {
-        seqfield0: complexTypeModel__choicevariant2__seqfield0<'input>,
-        seqfield1: complexTypeModel__choicevariant2__seqfield1<'input>,
-        seqfield2: super::UNQUAL::attrDecls<'input>,
-        seqfield3: super::UNQUAL::assertions<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))])
-
-
-    impl<'input> ParseXml<'input> for complexTypeModel__choicevariant2<'input> {
-        const NODE_NAME: &'static str = "sequence complexTypeModel__choicevariant2";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(complexTypeModel__choicevariant2 {
-
-
-
-                seqfield0: try_rollback!(stream, tx, complexTypeModel__choicevariant2__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                seqfield1: try_rollback!(stream, tx, complexTypeModel__choicevariant2__seqfield1::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                seqfield2: try_rollback!(stream, tx, super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                seqfield3: try_rollback!(stream, tx, super::UNQUAL::assertions::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum complexTypeModel<'input> {
-        choicevariant0(Box<super::UNQUAL::simpleContent_e<'input>>),
-        choicevariant1(Box<super::UNQUAL::complexContent_e<'input>>),
-        choicevariant2(Box<complexTypeModel__choicevariant2<'input>>),
-    }
-
-    impl<'input> Default for complexTypeModel<'input> { fn default() -> complexTypeModel<'input> { complexTypeModel::choicevariant2(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "simpleContent"))), (None, None, Ref(QName(Some("xs"), "complexContent"))), (None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
-
-
-    impl<'input> ParseXml<'input> for complexTypeModel<'input> {
-        const NODE_NAME: &'static str = "choice complexTypeModel";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::simpleContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::complexContent_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match complexTypeModel__choicevariant2::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexTypeModel::choicevariant2(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
-
-    #[derive(Debug, PartialEq)]
-    pub enum simpleDerivation<'input> {
-        choicevariant0(Box<super::UNQUAL::restriction_e<'input>>),
-        choicevariant1(Box<super::UNQUAL::list_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::union_e<'input>>),
-    }
-
-    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::choicevariant2(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "restriction"))), (None, None, Ref(QName(Some("xs"), "list"))), (None, None, Ref(QName(Some("xs"), "union")))])
-
-
-    impl<'input> ParseXml<'input> for simpleDerivation<'input> {
-        const NODE_NAME: &'static str = "choice simpleDerivation";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::restriction_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::list_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::union_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant2(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum schemaTop<'input> {
-        choicevariant0(Box<super::UNQUAL::redefinable<'input>>),
-        choicevariant1(Box<super::UNQUAL::element_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::attribute_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::notation_e<'input>>),
-    }
-
-    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::choicevariant3(Default::default()) } }
-
-    // ^-- from Choice([(None, None, GroupRef(QName(Some("xs"), "redefinable"))), (None, None, Ref(QName(Some("xs"), "element"))), (None, None, Ref(QName(Some("xs"), "attribute"))), (None, None, Ref(QName(Some("xs"), "notation")))])
-
-
-    impl<'input> ParseXml<'input> for schemaTop<'input> {
-        const NODE_NAME: &'static str = "choice schemaTop";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::element_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::attribute_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant2(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::notation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant3(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct defRef<'input>(PhantomData<&'input ()>);
 }
