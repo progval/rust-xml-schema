@@ -24,7 +24,7 @@ pub struct Schema<'a> {
     pub groups: HashMap<String, (Option<usize>, Option<usize>, Vec<Attribute<'a>>, Option<ElementType<'a>>)>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Element<'a> {
     pub name: QName<'a>,
     pub attrs: Vec<Attribute<'a>>,
@@ -33,7 +33,7 @@ pub struct Element<'a> {
     pub min_occurs: Option<usize>,
     pub max_occurs: Option<usize>,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub enum ElementType<'a> {
     String,
     Date,
@@ -47,12 +47,12 @@ pub enum ElementType<'a> {
     List(List<'a>),
     Element(Box<Element<'a>>),
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub enum List<'a> {
     ComplexList(bool, Box<ElementType<'a>>), // (mixed, inner_type)
     SimpleList(QName<'a>),
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub enum Attribute<'a> {
     Def {
         name: &'a str,
@@ -744,9 +744,15 @@ fn parse_choice(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (
     });
     assert_eq!(element_end, Ok(ElementEnd::Open), "{:?}", closing_tag);
 
-    let (attrs, items) = Self::parse_elements(stream, context, closing_tag);
+    let (attrs, mut items) = Self::parse_elements(stream, context, closing_tag);
 
-    (min_occurs, max_occurs, attrs, ElementType::Choice(items))
+    match (min_occurs, max_occurs, items.len()) {
+        (None, None, 1) => {
+            let (min_occurs, max_occurs, item) = items.remove(0);
+            (min_occurs, max_occurs, attrs, item)
+        },
+        _ => (min_occurs, max_occurs, attrs, ElementType::Choice(items)),
+    }
 }
 
 fn parse_extension(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Vec<Attribute<'a>>, ElementType<'a>) {

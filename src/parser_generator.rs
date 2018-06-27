@@ -241,6 +241,25 @@ impl<'input> ParseXml<'input> for {}<'input> {{
         type_name
     }
 
+/*
+    fn give_name(&mut self, type_: &ElementType, parent_name: &str, fallback_name: String) -> String {
+        match type_ {
+            ElementType::Sequence(items) |
+            ElementType::Choice(items) |
+            ElementType::Extension(_, items) if items.len() == 1 => {
+                let (min_occurs, max_occurs, t) = items.get(0).unwrap();
+                let min_occurs = min_occurs.unwrap_or(1);
+                let max_occurs = max_occurs.unwrap_or(1);
+                match (min_occurs, max_occurs, t) {
+                    (_, 1, _)  => self.give_name(t, parent_name, fallback_name),
+                    _ => format!("{}s", self.give_name(t, parent_name, fallback_name)),
+                }
+            },
+            _ => format!("{}__{}", parent_name, fallback_name),
+        }
+    }
+    */
+
     fn unbloat_element(&mut self, element: &Element, parent_name: &str, fallback_name: String) -> (String, String) {
         let Element { name: element_name, type_: element_type, min_occurs, max_occurs, .. } = element;
         let can_unbloat = match (min_occurs, max_occurs) {
