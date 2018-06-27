@@ -5,7 +5,6 @@ use std::num::ParseIntError;
 use codegen;
 use xmlparser::{Token, Tokenizer, Error, StrSpan, ElementEnd};
 
-use generated::UNQUAL::*;
 use support::QName;
 
 #[derive(Debug, PartialEq)]
