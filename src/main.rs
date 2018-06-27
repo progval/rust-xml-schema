@@ -19,4 +19,5 @@ fn main() {
     }*/
     scope.push_module(gen.nsuri_to_module.remove(doc.schema.as_ref().unwrap().target_namespace).unwrap().1);
     println!("#[allow(bad_style)]\n{}", scope.to_string());
+    println!("// substs: {:?}", doc.schema.as_ref().unwrap().substitution_groups);
 }

@@ -19,9 +19,10 @@ pub struct Document<'a> {
 pub struct Schema<'a> {
     pub target_namespace: &'a str,
     pub namespaces: HashMap<String, &'a str>,
-    pub elements: Vec<Element<'a>>,
-    pub types: HashMap<String, (Option<usize>, Option<usize>, Vec<Attribute<'a>>, bool, ElementType<'a>)>, // (min_occurs, max_occurs, attrs, mixed, type_)
+    pub elements: HashMap<QName<'a>, Element<'a>>,
+    pub types: HashMap<String, (Option<usize>, Option<usize>, Vec<Attribute<'a>>, bool, bool, ElementType<'a>)>, // (min_occurs, max_occurs, attrs, mixed, type_)
     pub groups: HashMap<String, (Option<usize>, Option<usize>, Vec<Attribute<'a>>, Option<ElementType<'a>>)>,
+    pub substitution_groups: HashMap<String, Vec<String>>,
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
@@ -32,6 +33,7 @@ pub struct Element<'a> {
     pub type_: Option<ElementType<'a>>, // XXX is sometimes None, something about abstract elements facets blah blah blah?
     pub min_occurs: Option<usize>,
     pub max_occurs: Option<usize>,
+    pub abstract_: bool,
 }
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub enum ElementType<'a> {
@@ -49,7 +51,7 @@ pub enum ElementType<'a> {
 }
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub enum List<'a> {
-    ComplexList(bool, Box<ElementType<'a>>), // (mixed, inner_type)
+    ComplexList(Option<usize>, Option<usize>, bool, Box<ElementType<'a>>), // (mixed, inner_type)
     SimpleList(QName<'a>),
 }
 #[derive(Debug, PartialEq, Eq, Hash)]
@@ -74,7 +76,8 @@ fn parse_max_occurs(s: &str) -> Result<usize, ParseIntError> {
 }
 
 struct SchemaParseContext<'input> {
-    main_namespace: &'input str
+    main_namespace: &'input str,
+    substitution_groups: HashMap<String, Vec<String>>,
 }
 
 pub(crate) struct Parser<S>(PhantomData<S>);
@@ -118,8 +121,11 @@ pub(crate) fn parse_document(stream: &mut S) -> Document<'a> {
                     Ok(Token::ElementStart(prefix, local)) => {
                         assert_eq!(local.to_str(), "schema");
                         let main_namespace = prefix.to_str();
-                        let mut context = SchemaParseContext { main_namespace };
-                        root.schema = Some(Self::parse_schema(stream, &mut context, (prefix.to_str(), local.to_str())));
+                        let substitution_groups = HashMap::new();
+                        let mut context = SchemaParseContext { main_namespace, substitution_groups };
+                        let mut schema = Self::parse_schema(stream, &mut context, (prefix.to_str(), local.to_str()));
+                        schema.substitution_groups = context.substitution_groups;
+                        root.schema = Some(schema);
                     },
                     Ok(Token::DtdStart(_, _)) => (),
                     Ok(Token::DtdEnd) => (),
@@ -179,9 +185,10 @@ fn parse_schema(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (
 
     let mut schema = Schema {
         namespaces: namespaces,
-        elements: Vec::new(),
+        elements: HashMap::new(),
         types: HashMap::new(),
         groups: HashMap::new(),
+        substitution_groups: HashMap::new(),
         target_namespace: target_namespace.expect("Missing targetNamespace"),
     };
 
@@ -191,7 +198,9 @@ fn parse_schema(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (
     Self::parse_children(stream, context, closing_tag, |stream2, context, prefix, local| {
         match local {
             "element" if prefix == context.main_namespace => {
-                schema.elements.push(Self::parse_root_element(stream2, context, (prefix, local)));
+                let element = Self::parse_root_element(stream2, context, (prefix, local));
+                assert_eq!(None, schema.elements.get(&element.name));
+                schema.elements.insert(element.name, element);
                 Ok(())
             },
             "annotation" if prefix == context.main_namespace => {
@@ -199,17 +208,17 @@ fn parse_schema(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (
                 Ok(())
             }
             "complexType" if prefix == context.main_namespace => {
-                let (min_occurs, max_occurs, name, attrs, mixed, def) = Self::parse_complex_type(stream2, context, (prefix, local));
+                let (min_occurs, max_occurs, name, attrs, mixed, abstract_, def) = Self::parse_complex_type(stream2, context, (prefix, local));
                 let name = name.unwrap();
                 assert_eq!(schema.types.get(name), None);
-                schema.types.insert(name.to_string(), (min_occurs, max_occurs, attrs, mixed, def));
+                schema.types.insert(name.to_string(), (min_occurs, max_occurs, attrs, mixed, abstract_, def));
                 Ok(())
             },
             "simpleType" if prefix == context.main_namespace => {
                 let (min_occurs, max_occurs, name, attrs, def) = Self::parse_simple_type(stream2, context, (prefix, local));
                 let name = name.unwrap();
                 assert_eq!(schema.types.get(name), None);
-                schema.types.insert(name.to_string(), (min_occurs, max_occurs, attrs, false, def));
+                schema.types.insert(name.to_string(), (min_occurs, max_occurs, attrs, false, false, def));
                 Ok(())
             },
             "group" if prefix == context.main_namespace => {
@@ -259,6 +268,8 @@ fn parse_root_element(stream: &mut S, context: &mut SchemaParseContext, closing_
     let mut attrs = None;
     let mut min_occurs = None;
     let mut max_occurs = None;
+    let mut substitution_group_head = None;
+    let mut abstract_ = false;
 
     let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value: &str|
         match (prefix, local) {
@@ -290,17 +301,21 @@ fn parse_root_element(stream: &mut S, context: &mut SchemaParseContext, closing_
             }
             ("", "id") => Ok(()), // TODO
             ("", "abstract") => Ok(()), // TODO
-            ("", "substitutionGroup") => Ok(()), // TODO
+            ("", "substitutionGroup") => {
+                assert_eq!(substitution_group_head, None);
+                substitution_group_head = Some(QName::from(value));
+                Ok(())
+            },
             _ => Err(format!("Unexpected attribute while parsing element: <{}:{}: {}:{}={:?}", closing_tag.0, closing_tag.1, prefix, local, value))
         }
     ).unwrap();
 
-    let (type_, mixed, attrs) = if let ElementEnd::Open = element_end {
-        let (newtype, mixed, newattrs) = Self::parse_subelement(stream, context, closing_tag);
-        let type_ = match (type_, newtype) {
-            (Some(t), None) => Some(t),
-            (None, Some(t)) => Some(t),
-            (None, None) => None,
+    let (min_occurs, max_occurs, type_, mixed, attrs) = if let ElementEnd::Open = element_end {
+        let (new_min_occurs, new_max_occurs, newtype, mixed, newattrs) = Self::parse_subelement(stream, context, closing_tag);
+        let (min_occurs, max_occurs, type_) = match (type_, newtype) {
+            (Some(t), None) => (min_occurs, max_occurs, Some(t)),
+            (None, Some(t)) => (new_min_occurs, new_max_occurs, Some(t)),
+            (None, None) => (min_occurs, max_occurs, None),
             (t1, t2) => panic!(format!("Conflict {:?} {:?} {:?}", name, t1, t2)),
         };
         let attrs = match (attrs, newattrs) {
@@ -309,14 +324,22 @@ fn parse_root_element(stream: &mut S, context: &mut SchemaParseContext, closing_
             (None, None) => Vec::new(),
             _ => panic!("Conflict"),
         };
-        (type_, mixed, attrs)
+        (min_occurs, max_occurs, type_, mixed, attrs)
     }
     else {
         let type_ = type_.expect(&format!("Element {:?} has no type", name));
-        (Some(type_), false, Vec::new())
+        (min_occurs, max_occurs, Some(type_), false, Vec::new())
     };
 
-    Element { name: name.expect(&format!("{:?}", type_)), attrs, mixed, type_, min_occurs, max_occurs }
+    let name = name.expect(&format!("{:?}", type_));
+    if let Some(head) = substitution_group_head {
+        if None == context.substitution_groups.get(head.1) {
+            context.substitution_groups.insert(head.1.to_string(), Vec::new()); // TODO: namespace
+        }
+        context.substitution_groups.get_mut(head.1).unwrap().push(name.1.to_string()); // TODO: namespace
+    }
+
+    Element { name, attrs, mixed, type_, min_occurs, max_occurs, abstract_ }
 }
 
 fn parse_element(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, ElementType<'a>) {
@@ -325,6 +348,7 @@ fn parse_element(stream: &mut S, context: &mut SchemaParseContext, closing_tag: 
     let mut attrs = None;
     let mut min_occurs = None;
     let mut max_occurs = None;
+    let mut abstract_ = false;
 
     let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value: &str|
         match (prefix, local) {
@@ -361,18 +385,21 @@ fn parse_element(stream: &mut S, context: &mut SchemaParseContext, closing_tag: 
                 Ok(())
             }
             ("", "id") => Ok(()), // TODO
-            ("", "abstract") => Ok(()), // TODO
+            ("", "abstract") => {
+                abstract_ = true;
+                Ok(())
+            },
             ("", "substitutionGroup") => Ok(()), // TODO
             _ => Err(format!("Unexpected attribute while parsing element: <{}:{}: {:?}", closing_tag.0, closing_tag.1, local))
         }
     ).unwrap();
 
-    let (type_, mixed, attrs) = if let ElementEnd::Open = element_end {
-        let (newtype, mixed, newattrs) = Self::parse_subelement(stream, context, closing_tag);
-        let type_ = match (type_, newtype) {
-            (Some(t), None) => Some(t),
-            (None, Some(t)) => Some(t),
-            (None, None) => None,
+    let (min_occurs, max_occurs, type_, mixed, attrs) = if let ElementEnd::Open = element_end {
+        let (new_min_occurs, new_max_occurs, newtype, mixed, newattrs) = Self::parse_subelement(stream, context, closing_tag);
+        let (min_occurs, max_occurs, type_) = match (type_, newtype) {
+            (Some(t), None) => (min_occurs, max_occurs, Some(t)),
+            (None, Some(t)) => (new_min_occurs, new_max_occurs, Some(t)),
+            (None, None) => (min_occurs, max_occurs, None),
             (t1, t2) => panic!(format!("Conflict {:?} {:?} {:?}", name, t1, t2)),
         };
         let attrs = match (attrs, newattrs) {
@@ -381,25 +408,26 @@ fn parse_element(stream: &mut S, context: &mut SchemaParseContext, closing_tag: 
             (None, None) => Vec::new(),
             _ => panic!("Conflict"),
         };
-        (type_, mixed, attrs)
+        (min_occurs, max_occurs, type_, mixed, attrs)
     }
     else {
         let type_ = type_.expect(&format!("Element {:?} has no type", name));
-        (Some(type_), false, Vec::new())
+        (min_occurs, max_occurs, Some(type_), false, Vec::new())
     };
 
     match name {
-        Some(name) => (min_occurs, max_occurs, ElementType::Element(Box::new(Element { name, attrs, mixed, type_, min_occurs, max_occurs }))),
+        Some(name) => (min_occurs, max_occurs, ElementType::Element(Box::new(Element { name, attrs, mixed, type_, min_occurs, max_occurs, abstract_ }))),
         None => (min_occurs, max_occurs, type_.unwrap()),
     }
 }
 
-fn parse_subelement(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<ElementType<'a>>, bool, Option<Vec<Attribute<'a>>>) {
+fn parse_subelement(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Option<ElementType<'a>>, bool, Option<Vec<Attribute<'a>>>) {
     let mut type_ = None;
     let mut attrs = None;
     let mut mixed = None;
     let mut min_occurs = None;
     let mut max_occurs = None;
+    let mut abstract_ = false;
     Self::parse_children(stream, context, closing_tag, |stream2, context, prefix, local| {
         assert_eq!(prefix, context.main_namespace);
         match local {
@@ -409,13 +437,14 @@ fn parse_subelement(stream: &mut S, context: &mut SchemaParseContext, closing_ta
                 assert_eq!(mixed, None);
                 assert_eq!(min_occurs, None);
                 assert_eq!(max_occurs, None);
-                let (min, max, name, attrs_def, newmixed, def) = Self::parse_complex_type(stream2, context, (prefix, local));
+                let (min, max, name, attrs_def, newmixed, abs, def) = Self::parse_complex_type(stream2, context, (prefix, local));
                 assert_eq!(name, None);
                 type_ = Some(def);
                 attrs = Some(attrs_def);
                 mixed = Some(newmixed);
                 min_occurs = Some(min);
                 max_occurs = Some(max);
+                abstract_ = abs;
                 Ok(())
             },
             "simpleType" => {
@@ -443,13 +472,14 @@ fn parse_subelement(stream: &mut S, context: &mut SchemaParseContext, closing_ta
         }
     }).unwrap();
 
-    (type_, mixed.unwrap_or(false), attrs)
+    (min_occurs.unwrap_or(None), max_occurs.unwrap_or(None), type_, mixed.unwrap_or(false), attrs)
 }
 
 
-fn parse_complex_type(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Option<&'a str>, Vec<Attribute<'a>>, bool, ElementType<'a>) {
+fn parse_complex_type(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Option<&'a str>, Vec<Attribute<'a>>, bool, bool, ElementType<'a>) {
     let mut name = None;
     let mut mixed = None;
+    let mut abstract_ = false;
 
     let element_end = Self::parse_attributes(stream, context, closing_tag, |prefix, local, value| {
         match (prefix, local) {
@@ -463,14 +493,17 @@ fn parse_complex_type(stream: &mut S, context: &mut SchemaParseContext, closing_
                 mixed = Some(value);
                 Ok(())
             }
-            ("", "abstract") => Ok(()), // TODO
+            ("", "abstract") => {
+                abstract_ = true;
+                Ok(())
+            },
             _ => Err(format!("Unknown attribute for complexType: {:?}", (prefix, local, name))),
         }
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
     let (min_occurs, max_occurs, attributes, type_) = Self::parse_subtype(stream, context, closing_tag).unwrap();
     let mixed = match mixed { None | Some("false") => false, Some("true") => true, _ => panic!(format!("{:?}", mixed)) };
-    (min_occurs, max_occurs, name, attributes, mixed, type_.expect("complexType has no subtype."))
+    (min_occurs, max_occurs, name, attributes, mixed, abstract_, type_.expect("complexType has no subtype."))
 }
 
 fn parse_attribute_group_def(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, &'a str, Vec<Attribute<'a>>) {
@@ -645,8 +678,9 @@ fn parse_elements(stream: &mut S, context: &mut SchemaParseContext, closing_tag:
             },
             "simpleType" => {
                 let (min_occurs, max_occurs, name, attrs, type_) = Self::parse_simple_type(stream2, context, (prefix, local));
+                let abstract_ = false; // TODO
                 match name {
-                    Some(name) => items.push((None, None, ElementType::Element(Box::new(Element { name: QName::from(name), attrs, mixed: false, type_: Some(type_), min_occurs, max_occurs })))),
+                    Some(name) => items.push((None, None, ElementType::Element(Box::new(Element { name: QName::from(name), attrs, mixed: false, type_: Some(type_), min_occurs, max_occurs, abstract_ })))),
                     None => items.push((min_occurs, max_occurs, type_)),
                 }
                 Ok(())
@@ -713,15 +747,9 @@ fn parse_sequence(stream: &mut S, context: &mut SchemaParseContext, closing_tag:
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
     
-    let (attrs, mut items) = Self::parse_elements(stream, context, closing_tag);
+    let (attrs, items) = Self::parse_elements(stream, context, closing_tag);
 
-    match (min_occurs, max_occurs, items.len()) {
-        (None, None, 1) => {
-            let (min_occurs, max_occurs, item) = items.remove(0);
-            (min_occurs, max_occurs, attrs, item)
-        },
-        _ => (min_occurs, max_occurs, attrs, ElementType::Sequence(items)),
-    }
+    (min_occurs, max_occurs, attrs, ElementType::Sequence(items))
 }
 
 fn parse_choice(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Vec<Attribute<'a>>, ElementType<'a>) {
@@ -746,13 +774,7 @@ fn parse_choice(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (
 
     let (attrs, mut items) = Self::parse_elements(stream, context, closing_tag);
 
-    match (min_occurs, max_occurs, items.len()) {
-        (None, None, 1) => {
-            let (min_occurs, max_occurs, item) = items.remove(0);
-            (min_occurs, max_occurs, attrs, item)
-        },
-        _ => (min_occurs, max_occurs, attrs, ElementType::Choice(items)),
-    }
+    (min_occurs, max_occurs, attrs, ElementType::Choice(items))
 }
 
 fn parse_extension(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Vec<Attribute<'a>>, ElementType<'a>) {
@@ -887,8 +909,10 @@ fn parse_attribute(stream: &mut S, context: &mut SchemaParseContext, closing_tag
         },
         (&Ok(ElementEnd::Open), None) => {
             let name = name.expect("Attribute has no name.");
-            let (newtype, mixed, attrs) = Self::parse_subelement(stream, context, closing_tag);
+            let (min_occurs, max_occurs, newtype, mixed, attrs) = Self::parse_subelement(stream, context, closing_tag);
             assert_eq!(mixed, false);
+            assert_eq!(min_occurs, None);
+            assert_eq!(max_occurs, None);
             let (attrs, type_) = match (type_, newtype) {
                 (Some(t), None) => {
                     assert_eq!(attrs, None);
@@ -1050,10 +1074,10 @@ fn parse_list(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&s
     });
     if let Ok(ElementEnd::Open) = element_end {
         assert_eq!(item_type, None);
-        let (newtype, mixed, newattrs) = Self::parse_subelement(stream, context, closing_tag);
+        let (min_occurs, max_occurs, newtype, mixed, newattrs) = Self::parse_subelement(stream, context, closing_tag);
         assert!(newattrs == None || newattrs == Some(Vec::new()));
         if let Some(type_) = newtype {
-            return (None, None, ElementType::List(List::ComplexList(mixed, Box::new(type_))))
+            return (None, None, ElementType::List(List::ComplexList(min_occurs, max_occurs, mixed, Box::new(type_))))
         }
     }
     else {

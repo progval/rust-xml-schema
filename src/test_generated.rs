@@ -25,6 +25,4 @@ fn generated_parses_person_xsd() {
     let mut stream = Box::new(InnerStream::new(tokenizer));
     let doc = UNQUAL::schema_e::parse_xml(&mut stream, &mut (), &());
     assert_ne!(doc, None);
-    println!("{:#?}", doc);
-    assert!(false);
 }

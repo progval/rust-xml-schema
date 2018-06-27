@@ -78,8 +78,17 @@ impl<'input> fmt::Display for QName<'input> {
 #[derive(Debug, PartialEq, Default)]
 pub struct anyURI<'input>(&'input str);
 
-#[derive(Debug, PartialEq, Default)]
-pub struct anyURI_e<'input>(&'input str);
+#[derive(Debug, PartialEq)]
+pub struct anyURI_e<'input>(StrSpan<'input>);
+impl<'input> ParseXml<'input> for anyURI_e<'input> {
+    const NODE_NAME: &'static str = "anyURI_e";
+    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<anyURI_e<'input>> {
+        match stream.next() {
+            Some(Token::Text(strspan)) => Some(anyURI_e(strspan)),
+            _ => None,
+        }
+    }
+}
 
 #[derive(Debug, PartialEq, Default)]
 pub struct nonNegativeInteger<'input>(&'input str);

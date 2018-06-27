@@ -22,6 +22,7 @@ pub struct ParserGenerator<'a> {
     target_uri: &'a str,
     ns_to_uri: HashMap<String, &'a str>,
     pub nsuri_to_module: HashMap<&'a str, (String, cg::Module)>,
+    generated_elements: HashMap<QName<'a>, String>,
 }
 
 impl<'a> ParserGenerator<'a> {
@@ -31,6 +32,7 @@ impl<'a> ParserGenerator<'a> {
             target_uri: document.schema.as_ref().unwrap().target_namespace,
             ns_to_uri: document.schema.as_ref().unwrap().namespaces.clone(),
             nsuri_to_module: HashMap::new(),
+            generated_elements: HashMap::new(),
         }
     }
 
@@ -60,18 +62,18 @@ impl<'a> ParserGenerator<'a> {
         }
         let mut types: Vec<_> = self.schema.types.iter().collect();
         types.sort_by_key(|&(n,_)| n);
-        for (name, (min_occurs, max_occurs, attrs, mixed, type_tree)) in types {
+        for (name, (min_occurs, max_occurs, attrs, mixed, abstract_, type_tree)) in types {
             self.type_occurs(*min_occurs, *max_occurs, &name, &type_tree);
         }
         self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// elements\n");
         let mut elements: Vec<_> = self.schema.elements.iter().collect();
-        elements.sort_by_key(|&n| n.name);
-        for (i, element) in elements.iter().enumerate() {
+        elements.sort_by_key(|&(n,_)| n);
+        for (i, (_name, element)) in elements.iter().enumerate() {
             self.element(&element, None);
         }
         self.nsuri_to_module.get_mut(self.target_uri).unwrap().1.scope().raw("\n/////////// groups\n");
         let mut groups: Vec<_> = self.schema.groups.iter().collect();
-        elements.sort_by_key(|&n| n.name);
+        groups.sort_by_key(|&(n,_)| n);
         for (name, (min_occurs, max_occurs, attrs, type_tree)) in groups.iter() {
             match type_tree {
                 Some(tt) => self.type_occurs(*min_occurs, *max_occurs, &name, &tt),
@@ -98,17 +100,87 @@ impl<'a> ParserGenerator<'a> {
         name.to_string()
     }
 
-    fn element(&mut self, element: &Element, name_override: Option<&str>) -> String {
-        let Element { name, attrs, mixed, type_, min_occurs, max_occurs } = element;
+    fn element(&mut self, element: &Element<'a>, name_override: Option<&str>) -> String {
+        if let Some(name) = self.generated_elements.get(&element.name) {
+            return name.to_string();
+        }
+        let Element { name, attrs, mixed, type_, min_occurs, max_occurs, abstract_ } = element;
         let type_name = name_override.unwrap_or(name.1);
         let type_name = format!("{}_e", type_name);
         let uri = match name.0 {
             Some(prefix) => self.ns_to_uri.get(prefix).unwrap(),
             None => self.target_uri.clone(),
         };
+
+        let (real_name, type_name) = if let Some(substitutes) = self.schema.substitution_groups.get(name.1) {
+            if substitutes.len() > 0 {
+                let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
+                let (real_name, type_name, default_impl) = {
+                    let mut e = module.new_enum(&type_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+                    let mut last_item_name = None;
+                    for substitute in substitutes.iter() {
+                        e.new_variant(substitute).tuple(&format!("{}_e<'input>", substitute));
+                        last_item_name = Some(substitute.clone())
+                    }
+                    let last_item_name = last_item_name.unwrap();
+                    let real_name = type_name.clone();
+                    let type_name = format!("{}_self", type_name);
+                    let default_impl = format!("impl<'input> Default for {}<'input> {{ fn default() -> {}<'input> {{ {}::{}(Default::default()) }} }}", real_name, real_name, real_name, last_item_name ); // TODO: remove this, that's a temporary hack
+                    (real_name, type_name, default_impl)
+                };
+                module.scope().raw(&format!(r#"
+impl<'input> ParseXml<'input> for {}<'input> {{
+    const NODE_NAME: &'static str = "element (substitution group) {}";
+    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
+        let tx = stream.transaction();
+        let mut tok = stream.next().unwrap();
+        loop {{
+            match tok {{
+                Token::Whitespaces(_) => (),
+                Token::Comment(_) => (),
+                Token::Text(_) => (),
+                _ => break,
+            }}
+            tok = stream.next().unwrap();
+        }}
+        match tok {{
+            Token::ElementStart(prefix, name) => {{
+                tx.rollback(stream);
+"#,             real_name, real_name));
+                for substitute in substitutes.iter() {
+                    module.scope().raw(&format!(r#"
+                match {}_e::parse_xml(stream, parse_context, parent_context) {{
+                    Some(s) => return Some({}::{}(s)),
+                    None => (),
+                }}
+"#,                 substitute, real_name, substitute));
+                }
+                module.scope().raw(&format!(r#"
+                None
+            }}
+            Token::ElementEnd(ElementEnd::Close(_, _)) => {{
+                tx.rollback(stream);
+                return None
+            }},
+            _ => panic!(format!("Did not expect token {{:?}}", tok)),
+        }}
+    }}
+}}"#,           ));
+                module.scope().raw(&default_impl);
+                (real_name, type_name)
+            }
+            else {
+                (type_name.clone(), type_name)
+            }
+        }
+        else {
+            (type_name.clone(), type_name)
+        };
+
+
         match type_ {
             Some(type_) => {
-                let inner_type_name = self.type_(&format!("{}_inner", type_name), type_);
+                let inner_type_name = self.type_occurs(*min_occurs, *max_occurs, &format!("{}_inner", type_name), type_);
 
                 let mut attrs_types = Vec::new();
                 for (i, attr) in attrs.iter().enumerate() {
@@ -124,6 +196,7 @@ impl<'a> ParserGenerator<'a> {
                         Attribute::GroupRef { .. } => {} // TODO
                     }
                 }
+
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
                 {
                     let mut s = module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").field("attrs", &format!("HashMap<QName<'input>, &'input str>")).field("child", &format!("{}<'input>", inner_type_name));
@@ -142,6 +215,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
             match tok {{
                 Token::Whitespaces(_) => (),
                 Token::Comment(_) => (),
+                Token::Text(_) => (),
                 _ => break,
             }}
             tok = stream.next().unwrap();
@@ -162,6 +236,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                         match tok {{
                             Token::Whitespaces(_) => (),
                             Token::Comment(_) => (),
+                            Token::Text(_) => (),
                             Token::Attribute((key_prefix, key_local), value) => {{
                                 let key = QName(match key_prefix.to_str() {{ "" => None, s => Some(s) }}, key_local.to_str());
                                 let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
@@ -184,6 +259,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                                     match next_tok {{
                                         Some(Token::Whitespaces(_)) => (),
                                         Some(Token::Comment(_)) => (),
+                                        Some(Token::Text(_)) => (),
                                         Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {{
                                             assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
                                             return ret;
@@ -229,6 +305,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
             None => {
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
                 module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field("PhantomData<&'input ()>");
+                module.scope().raw(&format!("// ^-- from {:?}", element));
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
     const NODE_NAME: &'static str = "element (empty) {}";
@@ -238,55 +315,11 @@ impl<'input> ParseXml<'input> for {}<'input> {{
 }}"#,           type_name, type_name, type_name));
             }
         }
-        type_name
+        self.generated_elements.insert(element.name, real_name.clone());
+        real_name
     }
 
-/*
-    fn give_name(&mut self, type_: &ElementType, parent_name: &str, fallback_name: String) -> String {
-        match type_ {
-            ElementType::Sequence(items) |
-            ElementType::Choice(items) |
-            ElementType::Extension(_, items) if items.len() == 1 => {
-                let (min_occurs, max_occurs, t) = items.get(0).unwrap();
-                let min_occurs = min_occurs.unwrap_or(1);
-                let max_occurs = max_occurs.unwrap_or(1);
-                match (min_occurs, max_occurs, t) {
-                    (_, 1, _)  => self.give_name(t, parent_name, fallback_name),
-                    _ => format!("{}s", self.give_name(t, parent_name, fallback_name)),
-                }
-            },
-            _ => format!("{}__{}", parent_name, fallback_name),
-        }
-    }
-    */
-
-    fn unbloat_element(&mut self, element: &Element, parent_name: &str, fallback_name: String) -> (String, String) {
-        let Element { name: element_name, type_: element_type, min_occurs, max_occurs, .. } = element;
-        let can_unbloat = match (min_occurs, max_occurs) {
-            (None, None) | (None, Some(1)) | (Some(1), None) | (Some(1), Some(1)) => true,
-            _ => false,
-        };
-        match element_type {
-            /*Some(ElementType::Ref(id)) if can_unbloat => {
-                let n = format!("{}_e", id.1);
-                let field_typename: String = self.id_to_type_name(QName(id.0, &n));
-                (element_name.to_string(), field_typename)
-            },
-            Some(ElementType::Custom(id)) |
-            Some(ElementType::GroupRef(id)) if can_unbloat => {
-                let field_typename = self.id_to_type_name(*id);
-                (element_name.to_string(), field_typename)
-            },
-            */
-            _ => { // Normal case, no unbloat
-                let element_name = element_name.1.to_string(); // TODO: deduplication
-                let field_typename = self.element(element, Some(&format!("{}__{}", parent_name, element_name)));
-                (element_name, field_typename)
-            },
-        }
-    }
-
-    fn type_occurs(&mut self, min_occurs: Option<usize>, max_occurs: Option<usize>, name: &str, type_tree: &ElementType) -> String {
+    fn type_occurs(&mut self, min_occurs: Option<usize>, max_occurs: Option<usize>, name: &str, type_tree: &ElementType<'a>) -> String {
         match (min_occurs, max_occurs) {
             (None, None) | (None, Some(1)) | (Some(1), None) | (Some(1), Some(1)) =>
                 self.type_(name, type_tree),
@@ -328,7 +361,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
             }
         }
     }
-    fn type_(&mut self, name: &str, type_tree: &ElementType) -> String {
+    fn type_(&mut self, name: &str, type_tree: &ElementType<'a>) -> String {
         match type_tree {
             ElementType::String | ElementType::Date => {
                 "XmlString".to_string()
@@ -486,7 +519,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
 }}"#,           ));
                 enum_name
             },
-            ElementType::List(List::ComplexList(mixed, item_type)) => {
+            ElementType::List(List::ComplexList(min_occurs, max_occurs, mixed, item_type)) => {
                 let struct_name = escape_keyword(name);
                 let item_type_name = format!("{}__valuetype", name);
                 let type_ = self.type_(&item_type_name, item_type);
@@ -503,16 +536,16 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 struct_name
             },
             ElementType::Element(e) => {
-                let (element_name, field_typename) = self.unbloat_element(e, name, format!("{}__element", name));
+                let element_type_name = self.element(e, None);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("{}<'input>", field_typename));
+                module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("{}<'input>", element_type_name));
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
     const NODE_NAME: &'static str = "elementtype element {}";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
         {}::parse_xml(stream, parse_context, parent_context).map({})
     }}
-}}"#,           name, name, field_typename, name));
+}}"#,           name, name, element_type_name, name));
                 name.to_string()
             }
             _ => unimplemented!("{:?}", type_tree),
