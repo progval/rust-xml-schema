@@ -50,6 +50,7 @@ impl<'a> ParserGenerator<'a> {
         {
             let mut module = cg::Module::new("UNQUAL");
             module.vis("pub");
+            module.scope().raw("use std::collections::HashMap;");
             module.scope().raw("use std::marker::PhantomData;");
             module.scope().raw("use support::*;");
             module.scope().raw("use xmlparser::{Token, ElementEnd};");
@@ -125,7 +126,7 @@ impl<'a> ParserGenerator<'a> {
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
                 {
-                    let mut s = module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").field("child", &format!("{}<'input>", inner_type_name));
+                    let mut s = module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").field("attrs", &format!("HashMap<QName<'input>, &'input str>")).field("child", &format!("{}<'input>", inner_type_name));
                     for (name, type_) in attrs_types.iter() {
                         s.field(name, &format!("Option<{}<'input>>", type_));
                     }
@@ -155,14 +156,19 @@ impl<'input> ParseXml<'input> for {}<'input> {{
 "#,                 name, type_));
                 }
                 module.scope().raw(&format!(r#"
+                    let mut attrs = HashMap::new();
                     loop {{
                         let tok = stream.next().unwrap();
                         match tok {{
                             Token::Whitespaces(_) => (),
                             Token::Comment(_) => (),
-                            Token::Attribute(_, _) => (),
-                            Token::ElementEnd(ElementEnd::Open) =>
-                                return Some({} {{
+                            Token::Attribute((key_prefix, key_local), value) => {{
+                                let key = QName(match key_prefix.to_str() {{ "" => None, s => Some(s) }}, key_local.to_str());
+                                let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                            }},
+                            Token::ElementEnd(ElementEnd::Open) => {{
+                                let ret = Some({} {{
+                                    attrs,
                                     child: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
 "#,             type_name, inner_type_name));
                 for (name, type_) in attrs_types.iter() {
@@ -171,9 +177,37 @@ impl<'input> ParseXml<'input> for {}<'input> {{
 "#,                 name));
                 }
                 module.scope().raw(&format!(r#"
+                                }});
+                                let mut next_tok;
+                                loop {{
+                                    next_tok = stream.next();
+                                    match next_tok {{
+                                        Some(Token::Whitespaces(_)) => (),
+                                        Some(Token::Comment(_)) => (),
+                                        Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {{
+                                            assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                            return ret;
+                                        }}
+                                        _ => panic!(format!("Did not expect token {{:?}}", next_tok)),
+                                    }}
+                                }}
+                            }},
+                            Token::ElementEnd(ElementEnd::Empty) =>
+                                return Some({} {{
+                                    attrs,
+                                    child: {}::default(),
+"#,             type_name, inner_type_name)); 
+                for (name, type_) in attrs_types.iter() {
+                    module.scope().raw(&format!(r#"
+                                    {},
+"#,                 name));
+                }
+                module.scope().raw(&format!(r#"
                                 }}),
-                            Token::ElementEnd(_) =>
-                                return Default::default(), // TODO
+                            Token::ElementEnd(ElementEnd::Close(_, _)) => {{
+                                tx.rollback(stream);
+                                return None
+                            }},
                             _ => panic!(format!("Did not expect token {{:?}}", tok)),
                         }}
                     }}
@@ -182,6 +216,10 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                     tx.rollback(stream);
                     None
                 }}
+            }},
+            Token::ElementEnd(ElementEnd::Close(_, _)) => {{
+                tx.rollback(stream);
+                return None
             }},
             _ => panic!(format!("Did not expect token {{:?}}", tok)),
         }}
@@ -336,15 +374,19 @@ impl<'input> ParseXml<'input> for {}<'input> {{
 }}"#,           name, name, type_name, name));
                 name.to_string()
             }
-            ElementType::Extension(base, inner) => {
+            ElementType::Extension(base, items) => {
                 let struct_name = escape_keyword(name);
                 let mut s = cg::Struct::new(&struct_name);
                 s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
                 let base_typename = self.id_to_type_name(*base);
                 s.field("BASE", format!("{}<'input>", base_typename));
-                let extension_type_name = format!("{}__extension", name);
-                let extension_type_name = self.type_(&extension_type_name, inner);
-                s.field("EXTENSION", format!("{}<'input>", extension_type_name));
+                let mut fields = Vec::new();
+                for (i, (min_occurs, max_occurs, item)) in items.iter().enumerate() {
+                    let element_name = format!("extfield{}", i);
+                    let field_typename = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
+                    s.field(&element_name, &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
+                    fields.push((element_name, field_typename));
+                }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
@@ -356,9 +398,11 @@ impl<'input> ParseXml<'input> for {}<'input> {{
         Some({} {{
             BASE: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
 "#,             name, name, name, base_typename));
-                module.scope().raw(&format!(r#"
-            EXTENSION: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
-"#,             extension_type_name));
+                for (item_name, item_typename) in fields {
+                    module.scope().raw(&format!(r#"
+            {}: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
+"#,                 item_name, item_typename));
+                }
                 module.scope().raw(&format!(r#"
         }})
     }}

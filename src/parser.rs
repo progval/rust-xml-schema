@@ -41,7 +41,7 @@ pub enum ElementType<'a> {
     Sequence(Vec<(Option<usize>, Option<usize>, ElementType<'a>)>),
     Ref(QName<'a>),
     Custom(QName<'a>),
-    Extension(QName<'a>, Box<ElementType<'a>>),
+    Extension(QName<'a>, Vec<(Option<usize>, Option<usize>, ElementType<'a>)>),
     GroupRef(QName<'a>),
     Choice(Vec<(Option<usize>, Option<usize>, ElementType<'a>)>),
     Union(Option<Vec<QName<'a>>>, Option<Vec<(Option<usize>, Option<usize>, ElementType<'a>)>>),
@@ -714,9 +714,15 @@ fn parse_sequence(stream: &mut S, context: &mut SchemaParseContext, closing_tag:
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
     
-    let (attrs, items) = Self::parse_elements(stream, context, closing_tag);
+    let (attrs, mut items) = Self::parse_elements(stream, context, closing_tag);
 
-    (min_occurs, max_occurs, attrs, ElementType::Sequence(items))
+    match (min_occurs, max_occurs, items.len()) {
+        (None, None, 1) => {
+            let (min_occurs, max_occurs, item) = items.remove(0);
+            (min_occurs, max_occurs, attrs, item)
+        },
+        _ => (min_occurs, max_occurs, attrs, ElementType::Sequence(items)),
+    }
 }
 
 fn parse_choice(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Vec<Attribute<'a>>, ElementType<'a>) {
@@ -771,7 +777,7 @@ fn parse_extension(stream: &mut S, context: &mut SchemaParseContext, closing_tag
     });
     assert_eq!(element_end, Ok(ElementEnd::Open));
     let (attrs, items) = Self::parse_elements(stream, context, closing_tag);
-    (min_occurs, max_occurs, attrs, ElementType::Extension(QName::from(base.expect("Extension has no base.")), Box::new(ElementType::Sequence(items))))
+    (min_occurs, max_occurs, attrs, ElementType::Extension(QName::from(base.expect("Extension has no base.")), items))
 }
 
 fn parse_any(stream: &mut S, context: &mut SchemaParseContext, closing_tag: (&str, &str)) -> (Option<usize>, Option<usize>, Vec<Attribute<'a>>, ElementType<'a>) {
