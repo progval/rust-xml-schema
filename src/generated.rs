@@ -1,5 +1,7 @@
 #[allow(bad_style)]
 pub mod UNQUAL {
+    use std::collections::HashMap;
+
     use std::marker::PhantomData;
 
     use support::*;
@@ -43,26 +45,27 @@ pub mod UNQUAL {
     // ^-- from Union(Some([QName(Some("xs"), "nonNegativeInteger")]), Some([(None, None, Custom(QName(Some("xs"), "NMTOKEN")))]))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
+    pub struct altType__extfield0_item__choicevariant0__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
 
 
-    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner";
+    impl<'input> ParseXml<'input> for altType__extfield0_item__choicevariant0__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom altType__extfield0_item__choicevariant0__simpleType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner)
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(altType__extfield0_item__choicevariant0__simpleType_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType__extension__seqfield0_item__choicevariant0__simpleType_e<'input> {
-        child: altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner<'input>,
+    pub struct altType__extfield0_item__choicevariant0__simpleType_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: altType__extfield0_item__choicevariant0__simpleType_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant0__simpleType_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) altType__extension__seqfield0_item__choicevariant0__simpleType_e";
+    impl<'input> ParseXml<'input> for altType__extfield0_item__choicevariant0__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) altType__extfield0_item__choicevariant0__simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -80,21 +83,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(altType__extension__seqfield0_item__choicevariant0__simpleType_e {
-                                        child: try_rollback!(stream, tx, altType__extension__seqfield0_item__choicevariant0__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(altType__extfield0_item__choicevariant0__simpleType_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, altType__extfield0_item__choicevariant0__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(altType__extfield0_item__choicevariant0__simpleType_e {
+                                        attrs,
+                                        child: altType__extfield0_item__choicevariant0__simpleType_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -104,43 +136,48 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType__extension__seqfield0_item__choicevariant0<'input>(altType__extension__seqfield0_item__choicevariant0__simpleType_e<'input>);
+    pub struct altType__extfield0_item__choicevariant0<'input>(altType__extfield0_item__choicevariant0__simpleType_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element altType__extension__seqfield0_item__choicevariant0";
+    impl<'input> ParseXml<'input> for altType__extfield0_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element altType__extfield0_item__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            altType__extension__seqfield0_item__choicevariant0__simpleType_e::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant0)
+            altType__extfield0_item__choicevariant0__simpleType_e::parse_xml(stream, parse_context, parent_context).map(altType__extfield0_item__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType__extension__seqfield0_item__choicevariant1__complexType_e_inner<'input>(super::UNQUAL::localComplexType<'input>);
+    pub struct altType__extfield0_item__choicevariant1__complexType_e_inner<'input>(super::UNQUAL::localComplexType<'input>);
 
 
-    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant1__complexType_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom altType__extension__seqfield0_item__choicevariant1__complexType_e_inner";
+    impl<'input> ParseXml<'input> for altType__extfield0_item__choicevariant1__complexType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom altType__extfield0_item__choicevariant1__complexType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant1__complexType_e_inner)
+            super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context).map(altType__extfield0_item__choicevariant1__complexType_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType__extension__seqfield0_item__choicevariant1__complexType_e<'input> {
-        child: altType__extension__seqfield0_item__choicevariant1__complexType_e_inner<'input>,
+    pub struct altType__extfield0_item__choicevariant1__complexType_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: altType__extfield0_item__choicevariant1__complexType_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant1__complexType_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) altType__extension__seqfield0_item__choicevariant1__complexType_e";
+    impl<'input> ParseXml<'input> for altType__extfield0_item__choicevariant1__complexType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) altType__extfield0_item__choicevariant1__complexType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -158,21 +195,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(altType__extension__seqfield0_item__choicevariant1__complexType_e {
-                                        child: try_rollback!(stream, tx, altType__extension__seqfield0_item__choicevariant1__complexType_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(altType__extfield0_item__choicevariant1__complexType_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, altType__extfield0_item__choicevariant1__complexType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(altType__extfield0_item__choicevariant1__complexType_e {
+                                        attrs,
+                                        child: altType__extfield0_item__choicevariant1__complexType_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -182,44 +248,48 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType__extension__seqfield0_item__choicevariant1<'input>(altType__extension__seqfield0_item__choicevariant1__complexType_e<'input>);
+    pub struct altType__extfield0_item__choicevariant1<'input>(altType__extfield0_item__choicevariant1__complexType_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element altType__extension__seqfield0_item__choicevariant1";
+    impl<'input> ParseXml<'input> for altType__extfield0_item__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element altType__extfield0_item__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            altType__extension__seqfield0_item__choicevariant1__complexType_e::parse_xml(stream, parse_context, parent_context).map(altType__extension__seqfield0_item__choicevariant1)
+            altType__extfield0_item__choicevariant1__complexType_e::parse_xml(stream, parse_context, parent_context).map(altType__extfield0_item__choicevariant1)
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum altType__extension__seqfield0_item<'input> {
-        choicevariant0(Box<altType__extension__seqfield0_item__choicevariant0<'input>>),
-        choicevariant1(Box<altType__extension__seqfield0_item__choicevariant1<'input>>),
+    pub enum altType__extfield0_item<'input> {
+        choicevariant0(Box<altType__extfield0_item__choicevariant0<'input>>),
+        choicevariant1(Box<altType__extfield0_item__choicevariant1<'input>>),
     }
 
-    impl<'input> Default for altType__extension__seqfield0_item<'input> { fn default() -> altType__extension__seqfield0_item<'input> { altType__extension__seqfield0_item::choicevariant1(Default::default()) } }
+    impl<'input> Default for altType__extfield0_item<'input> { fn default() -> altType__extfield0_item<'input> { altType__extfield0_item::choicevariant1(Default::default()) } }
 
     // ^-- from Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])
 
 
-    impl<'input> ParseXml<'input> for altType__extension__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "choice altType__extension__seqfield0_item";
+    impl<'input> ParseXml<'input> for altType__extfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice altType__extfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match altType__extension__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(altType__extension__seqfield0_item::choicevariant0(Box::new(r))), None => () }
+            match altType__extfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(altType__extfield0_item::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match altType__extension__seqfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(altType__extension__seqfield0_item::choicevariant1(Box::new(r))), None => () }
+            match altType__extfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(altType__extfield0_item::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -228,47 +298,23 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct altType__extension__seqfield0<'input>(Option<altType__extension__seqfield0_item<'input>>);
+    pub struct altType__extfield0<'input>(Option<altType__extfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for altType__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option altType__extension__seqfield0";
+    impl<'input> ParseXml<'input> for altType__extfield0<'input> {
+        const NODE_NAME: &'static str = "option altType__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(altType__extension__seqfield0(altType__extension__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct altType__extension<'input> {
-        seqfield0: altType__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))]))])
-
-
-    impl<'input> ParseXml<'input> for altType__extension<'input> {
-        const NODE_NAME: &'static str = "sequence altType__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(altType__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, altType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            Some(altType__extfield0(altType__extfield0_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct altType<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: altType__extension<'input>,
+        extfield0: altType__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))]))])
 
 
     impl<'input> ParseXml<'input> for altType<'input> {
@@ -280,7 +326,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, altType__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, altType__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -290,71 +336,23 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct annotated__extension__seqfield0__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
+    pub struct annotated__extfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for annotated__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option annotated__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for annotated__extfield0<'input> {
+        const NODE_NAME: &'static str = "option annotated__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(annotated__extension__seqfield0__seqfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct annotated__extension__seqfield0<'input> {
-        seqfield0: annotated__extension__seqfield0__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation")))])
-
-
-    impl<'input> ParseXml<'input> for annotated__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence annotated__extension__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(annotated__extension__seqfield0 {
-
-
-
-                seqfield0: try_rollback!(stream, tx, annotated__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct annotated__extension<'input> {
-        seqfield0: annotated__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation")))]))])
-
-
-    impl<'input> ParseXml<'input> for annotated__extension<'input> {
-        const NODE_NAME: &'static str = "sequence annotated__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(annotated__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, annotated__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            Some(annotated__extfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct annotated<'input> {
         BASE: super::UNQUAL::openAttrs<'input>,
-        EXTENSION: annotated__extension<'input>,
+        extfield0: annotated__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "openAttrs"), Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation")))]))]))
+    // ^-- from Extension(QName(Some("xs"), "openAttrs"), [(Some(0), None, Ref(QName(Some("xs"), "annotation")))])
 
 
     impl<'input> ParseXml<'input> for annotated<'input> {
@@ -366,7 +364,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, annotated__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, annotated__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -376,73 +374,26 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct anyType__seqfield0<'input>(Vec<any_e<'input>>);
+    pub struct anyType<'input>(Vec<any_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for anyType__seqfield0<'input> {
-        const NODE_NAME: &'static str = "vec anyType__seqfield0";
+    impl<'input> ParseXml<'input> for anyType<'input> {
+        const NODE_NAME: &'static str = "vec anyType";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
             while let Some(new_item) = any_e::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(anyType__seqfield0(items))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct anyType<'input> {
-        seqfield0: anyType__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Ref(QName(None, "any")))])
-
-
-    impl<'input> ParseXml<'input> for anyType<'input> {
-        const NODE_NAME: &'static str = "sequence anyType";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(anyType {
-
-
-
-                seqfield0: try_rollback!(stream, tx, anyType__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertion__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for assertion__extension<'input> {
-        const NODE_NAME: &'static str = "sequence assertion__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(assertion__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
+            Some(anyType(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct assertion<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: assertion__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [])
 
 
     impl<'input> ParseXml<'input> for assertion<'input> {
@@ -454,36 +405,33 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, assertion__extension::parse_xml(stream, parse_context, parent_context)),
-
-
-
             })
         }
     }
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
+    pub struct attribute__extfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
 
 
-    impl<'input> ParseXml<'input> for attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner";
+    impl<'input> ParseXml<'input> for attribute__extfield0_item__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom attribute__extfield0_item__simpleType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner)
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(attribute__extfield0_item__simpleType_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attribute__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
-        child: attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>,
+    pub struct attribute__extfield0_item__simpleType_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: attribute__extfield0_item__simpleType_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for attribute__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) attribute__extension__seqfield0__seqfield0_item__simpleType_e";
+    impl<'input> ParseXml<'input> for attribute__extfield0_item__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) attribute__extfield0_item__simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -501,21 +449,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(attribute__extension__seqfield0__seqfield0_item__simpleType_e {
-                                        child: try_rollback!(stream, tx, attribute__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(attribute__extfield0_item__simpleType_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, attribute__extfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(attribute__extfield0_item__simpleType_e {
+                                        attrs,
+                                        child: attribute__extfield0_item__simpleType_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -525,88 +502,44 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attribute__extension__seqfield0__seqfield0_item<'input>(attribute__extension__seqfield0__seqfield0_item__simpleType_e<'input>);
+    pub struct attribute__extfield0_item<'input>(attribute__extfield0_item__simpleType_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for attribute__extension__seqfield0__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "elementtype element attribute__extension__seqfield0__seqfield0_item";
+    impl<'input> ParseXml<'input> for attribute__extfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element attribute__extfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            attribute__extension__seqfield0__seqfield0_item__simpleType_e::parse_xml(stream, parse_context, parent_context).map(attribute__extension__seqfield0__seqfield0_item)
+            attribute__extfield0_item__simpleType_e::parse_xml(stream, parse_context, parent_context).map(attribute__extfield0_item)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attribute__extension__seqfield0__seqfield0<'input>(Option<attribute__extension__seqfield0__seqfield0_item<'input>>);
+    pub struct attribute__extfield0<'input>(Option<attribute__extfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for attribute__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option attribute__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for attribute__extfield0<'input> {
+        const NODE_NAME: &'static str = "option attribute__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(attribute__extension__seqfield0__seqfield0(attribute__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attribute__extension__seqfield0<'input> {
-        seqfield0: attribute__extension__seqfield0__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))])
-
-
-    impl<'input> ParseXml<'input> for attribute__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence attribute__extension__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(attribute__extension__seqfield0 {
-
-
-
-                seqfield0: try_rollback!(stream, tx, attribute__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attribute__extension<'input> {
-        seqfield0: attribute__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))]))])
-
-
-    impl<'input> ParseXml<'input> for attribute__extension<'input> {
-        const NODE_NAME: &'static str = "sequence attribute__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(attribute__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, attribute__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            Some(attribute__extfield0(attribute__extfield0_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct attribute<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: attribute__extension<'input>,
+        extfield0: attribute__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))])
 
 
     impl<'input> ParseXml<'input> for attribute<'input> {
@@ -618,7 +551,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, attribute__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, attribute__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -626,38 +559,14 @@ pub mod UNQUAL {
         }
     }
 
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attributeGroup__extension<'input> {
-        seqfield0: super::UNQUAL::attrDecls<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, GroupRef(QName(Some("xs"), "attrDecls")))])
-
-
-    impl<'input> ParseXml<'input> for attributeGroup__extension<'input> {
-        const NODE_NAME: &'static str = "sequence attributeGroup__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(attributeGroup__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct attributeGroup<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: attributeGroup__extension<'input>,
+        extfield0: super::UNQUAL::attrDecls<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, GroupRef(QName(Some("xs"), "attrDecls")))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(None, None, GroupRef(QName(Some("xs"), "attrDecls")))])
 
 
     impl<'input> ParseXml<'input> for attributeGroup<'input> {
@@ -669,7 +578,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, attributeGroup__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, super::UNQUAL::attrDecls::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -760,36 +669,12 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexType__extension<'input> {
-        seqfield0: super::UNQUAL::complexTypeModel<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, GroupRef(QName(Some("xs"), "complexTypeModel")))])
-
-
-    impl<'input> ParseXml<'input> for complexType__extension<'input> {
-        const NODE_NAME: &'static str = "sequence complexType__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(complexType__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, super::UNQUAL::complexTypeModel::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct complexType<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: complexType__extension<'input>,
+        extfield0: super::UNQUAL::complexTypeModel<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, GroupRef(QName(Some("xs"), "complexTypeModel")))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(None, None, GroupRef(QName(Some("xs"), "complexTypeModel")))])
 
 
     impl<'input> ParseXml<'input> for complexType<'input> {
@@ -801,7 +686,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, complexType__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, super::UNQUAL::complexTypeModel::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -844,26 +729,27 @@ pub mod UNQUAL {
     // ^-- from Union(None, Some([(None, None, Custom(QName(Some("xs"), "token"))), (None, None, List(SimpleList(QName(Some("xs"), "reducedDerivationControl"))))]))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
+    pub struct element__extfield0__seqfield0_item__choicevariant0__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield0_item__choicevariant0__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom element__extfield0__seqfield0_item__choicevariant0__simpleType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner)
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(element__extfield0__seqfield0_item__choicevariant0__simpleType_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e<'input> {
-        child: element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner<'input>,
+    pub struct element__extfield0__seqfield0_item__choicevariant0__simpleType_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: element__extfield0__seqfield0_item__choicevariant0__simpleType_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield0_item__choicevariant0__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) element__extfield0__seqfield0_item__choicevariant0__simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -881,21 +767,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e {
-                                        child: try_rollback!(stream, tx, element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(element__extfield0__seqfield0_item__choicevariant0__simpleType_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, element__extfield0__seqfield0_item__choicevariant0__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(element__extfield0__seqfield0_item__choicevariant0__simpleType_e {
+                                        attrs,
+                                        child: element__extfield0__seqfield0_item__choicevariant0__simpleType_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -905,43 +820,48 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield0_item__choicevariant0<'input>(element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e<'input>);
+    pub struct element__extfield0__seqfield0_item__choicevariant0<'input>(element__extfield0__seqfield0_item__choicevariant0__simpleType_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element element__extension__seqfield0__seqfield0_item__choicevariant0";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield0_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element element__extfield0__seqfield0_item__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            element__extension__seqfield0__seqfield0_item__choicevariant0__simpleType_e::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant0)
+            element__extfield0__seqfield0_item__choicevariant0__simpleType_e::parse_xml(stream, parse_context, parent_context).map(element__extfield0__seqfield0_item__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner<'input>(super::UNQUAL::localComplexType<'input>);
+    pub struct element__extfield0__seqfield0_item__choicevariant1__complexType_e_inner<'input>(super::UNQUAL::localComplexType<'input>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield0_item__choicevariant1__complexType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom element__extfield0__seqfield0_item__choicevariant1__complexType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner)
+            super::UNQUAL::localComplexType::parse_xml(stream, parse_context, parent_context).map(element__extfield0__seqfield0_item__choicevariant1__complexType_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e<'input> {
-        child: element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner<'input>,
+    pub struct element__extfield0__seqfield0_item__choicevariant1__complexType_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: element__extfield0__seqfield0_item__choicevariant1__complexType_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield0_item__choicevariant1__complexType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) element__extfield0__seqfield0_item__choicevariant1__complexType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -959,21 +879,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e {
-                                        child: try_rollback!(stream, tx, element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(element__extfield0__seqfield0_item__choicevariant1__complexType_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, element__extfield0__seqfield0_item__choicevariant1__complexType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(element__extfield0__seqfield0_item__choicevariant1__complexType_e {
+                                        attrs,
+                                        child: element__extfield0__seqfield0_item__choicevariant1__complexType_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -983,44 +932,48 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield0_item__choicevariant1<'input>(element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e<'input>);
+    pub struct element__extfield0__seqfield0_item__choicevariant1<'input>(element__extfield0__seqfield0_item__choicevariant1__complexType_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element element__extension__seqfield0__seqfield0_item__choicevariant1";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield0_item__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element element__extfield0__seqfield0_item__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            element__extension__seqfield0__seqfield0_item__choicevariant1__complexType_e::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield0_item__choicevariant1)
+            element__extfield0__seqfield0_item__choicevariant1__complexType_e::parse_xml(stream, parse_context, parent_context).map(element__extfield0__seqfield0_item__choicevariant1)
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum element__extension__seqfield0__seqfield0_item<'input> {
-        choicevariant0(Box<element__extension__seqfield0__seqfield0_item__choicevariant0<'input>>),
-        choicevariant1(Box<element__extension__seqfield0__seqfield0_item__choicevariant1<'input>>),
+    pub enum element__extfield0__seqfield0_item<'input> {
+        choicevariant0(Box<element__extfield0__seqfield0_item__choicevariant0<'input>>),
+        choicevariant1(Box<element__extfield0__seqfield0_item__choicevariant1<'input>>),
     }
 
-    impl<'input> Default for element__extension__seqfield0__seqfield0_item<'input> { fn default() -> element__extension__seqfield0__seqfield0_item<'input> { element__extension__seqfield0__seqfield0_item::choicevariant1(Default::default()) } }
+    impl<'input> Default for element__extfield0__seqfield0_item<'input> { fn default() -> element__extfield0__seqfield0_item<'input> { element__extfield0__seqfield0_item::choicevariant1(Default::default()) } }
 
     // ^-- from Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "choice element__extension__seqfield0__seqfield0_item";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice element__extfield0__seqfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match element__extension__seqfield0__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(element__extension__seqfield0__seqfield0_item::choicevariant0(Box::new(r))), None => () }
+            match element__extfield0__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(element__extfield0__seqfield0_item::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match element__extension__seqfield0__seqfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(element__extension__seqfield0__seqfield0_item::choicevariant1(Box::new(r))), None => () }
+            match element__extfield0__seqfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(element__extfield0__seqfield0_item::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -1029,37 +982,38 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield0<'input>(Option<element__extension__seqfield0__seqfield0_item<'input>>);
+    pub struct element__extfield0__seqfield0<'input>(Option<element__extfield0__seqfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option element__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option element__extfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(element__extension__seqfield0__seqfield0(element__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
+            Some(element__extfield0__seqfield0(element__extfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield1_item__alternative_e_inner<'input>(super::UNQUAL::altType<'input>);
+    pub struct element__extfield0__seqfield1_item__alternative_e_inner<'input>(super::UNQUAL::altType<'input>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield1_item__alternative_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom element__extension__seqfield0__seqfield1_item__alternative_e_inner";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield1_item__alternative_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom element__extfield0__seqfield1_item__alternative_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::altType::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield1_item__alternative_e_inner)
+            super::UNQUAL::altType::parse_xml(stream, parse_context, parent_context).map(element__extfield0__seqfield1_item__alternative_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield1_item__alternative_e<'input> {
-        child: element__extension__seqfield0__seqfield1_item__alternative_e_inner<'input>,
+    pub struct element__extfield0__seqfield1_item__alternative_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: element__extfield0__seqfield1_item__alternative_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "alternative"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield1_item__alternative_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) element__extension__seqfield0__seqfield1_item__alternative_e";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield1_item__alternative_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) element__extfield0__seqfield1_item__alternative_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -1077,21 +1031,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(element__extension__seqfield0__seqfield1_item__alternative_e {
-                                        child: try_rollback!(stream, tx, element__extension__seqfield0__seqfield1_item__alternative_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(element__extfield0__seqfield1_item__alternative_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, element__extfield0__seqfield1_item__alternative_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(element__extfield0__seqfield1_item__alternative_e {
+                                        attrs,
+                                        child: element__extfield0__seqfield1_item__alternative_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -1101,103 +1084,83 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield1_item<'input>(element__extension__seqfield0__seqfield1_item__alternative_e<'input>);
+    pub struct element__extfield0__seqfield1_item<'input>(element__extfield0__seqfield1_item__alternative_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield1_item<'input> {
-        const NODE_NAME: &'static str = "elementtype element element__extension__seqfield0__seqfield1_item";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield1_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element element__extfield0__seqfield1_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            element__extension__seqfield0__seqfield1_item__alternative_e::parse_xml(stream, parse_context, parent_context).map(element__extension__seqfield0__seqfield1_item)
+            element__extfield0__seqfield1_item__alternative_e::parse_xml(stream, parse_context, parent_context).map(element__extfield0__seqfield1_item)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield1<'input>(Vec<element__extension__seqfield0__seqfield1_item<'input>>);
+    pub struct element__extfield0__seqfield1<'input>(Vec<element__extfield0__seqfield1_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield1<'input> {
-        const NODE_NAME: &'static str = "vec element__extension__seqfield0__seqfield1";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec element__extfield0__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
-            while let Some(new_item) = element__extension__seqfield0__seqfield1_item::parse_xml(stream, parse_context, parent_context) {
+            while let Some(new_item) = element__extfield0__seqfield1_item::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(element__extension__seqfield0__seqfield1(items))
+            Some(element__extfield0__seqfield1(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0__seqfield2<'input>(Vec<super::UNQUAL::identityConstraint<'input>>);
+    pub struct element__extfield0__seqfield2<'input>(Vec<super::UNQUAL::identityConstraint<'input>>);
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0__seqfield2<'input> {
-        const NODE_NAME: &'static str = "vec element__extension__seqfield0__seqfield2";
+    impl<'input> ParseXml<'input> for element__extfield0__seqfield2<'input> {
+        const NODE_NAME: &'static str = "vec element__extfield0__seqfield2";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
             while let Some(new_item) = super::UNQUAL::identityConstraint::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(element__extension__seqfield0__seqfield2(items))
+            Some(element__extfield0__seqfield2(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension__seqfield0<'input> {
-        seqfield0: element__extension__seqfield0__seqfield0<'input>,
-        seqfield1: element__extension__seqfield0__seqfield1<'input>,
-        seqfield2: element__extension__seqfield0__seqfield2<'input>,
+    pub struct element__extfield0<'input> {
+        seqfield0: element__extfield0__seqfield0<'input>,
+        seqfield1: element__extfield0__seqfield1<'input>,
+        seqfield2: element__extfield0__seqfield2<'input>,
     }
 
     // ^-- from Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])), (Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "alternative"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) })), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "identityConstraint")))])
 
 
-    impl<'input> ParseXml<'input> for element__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence element__extension__seqfield0";
+    impl<'input> ParseXml<'input> for element__extfield0<'input> {
+        const NODE_NAME: &'static str = "sequence element__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
-            Some(element__extension__seqfield0 {
+            Some(element__extfield0 {
 
 
 
-                seqfield0: try_rollback!(stream, tx, element__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
+                seqfield0: try_rollback!(stream, tx, element__extfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: try_rollback!(stream, tx, element__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
+                seqfield1: try_rollback!(stream, tx, element__extfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield2: try_rollback!(stream, tx, element__extension__seqfield0__seqfield2::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct element__extension<'input> {
-        seqfield0: element__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])), (Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "alternative"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) })), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "identityConstraint")))]))])
-
-
-    impl<'input> ParseXml<'input> for element__extension<'input> {
-        const NODE_NAME: &'static str = "sequence element__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(element__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, element__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
+                seqfield2: try_rollback!(stream, tx, element__extfield0__seqfield2::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1208,10 +1171,10 @@ pub mod UNQUAL {
     #[derive(Debug, PartialEq, Default)]
     pub struct element<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: element__extension<'input>,
+        extfield0: element__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])), (Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "alternative"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) })), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "identityConstraint")))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(None, None, Sequence([(Some(0), None, Choice([(None, None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "complexType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localComplexType"))), min_occurs: None, max_occurs: None }))])), (Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "alternative"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "altType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) })), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "identityConstraint")))]))])
 
 
     impl<'input> ParseXml<'input> for element<'input> {
@@ -1223,7 +1186,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, element__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, element__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1244,31 +1207,31 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct extensionType__extension__seqfield0__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
+    pub struct extensionType__extfield0__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for extensionType__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option extensionType__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for extensionType__extfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option extensionType__extfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(extensionType__extension__seqfield0__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
+            Some(extensionType__extfield0__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct extensionType__extension__seqfield0__seqfield1<'input>(Option<super::UNQUAL::typeDefParticle<'input>>);
+    pub struct extensionType__extfield0__seqfield1<'input>(Option<super::UNQUAL::typeDefParticle<'input>>);
 
 
-    impl<'input> ParseXml<'input> for extensionType__extension__seqfield0__seqfield1<'input> {
-        const NODE_NAME: &'static str = "option extensionType__extension__seqfield0__seqfield1";
+    impl<'input> ParseXml<'input> for extensionType__extfield0__seqfield1<'input> {
+        const NODE_NAME: &'static str = "option extensionType__extfield0__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(extensionType__extension__seqfield0__seqfield1(super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)))
+            Some(extensionType__extfield0__seqfield1(super::UNQUAL::typeDefParticle::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct extensionType__extension__seqfield0<'input> {
-        seqfield0: extensionType__extension__seqfield0__seqfield0<'input>,
-        seqfield1: extensionType__extension__seqfield0__seqfield1<'input>,
+    pub struct extensionType__extfield0<'input> {
+        seqfield0: extensionType__extfield0__seqfield0<'input>,
+        seqfield1: extensionType__extfield0__seqfield1<'input>,
         seqfield2: super::UNQUAL::attrDecls<'input>,
         seqfield3: super::UNQUAL::assertions<'input>,
     }
@@ -1276,19 +1239,19 @@ pub mod UNQUAL {
     // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))])
 
 
-    impl<'input> ParseXml<'input> for extensionType__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence extensionType__extension__seqfield0";
+    impl<'input> ParseXml<'input> for extensionType__extfield0<'input> {
+        const NODE_NAME: &'static str = "sequence extensionType__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
-            Some(extensionType__extension__seqfield0 {
+            Some(extensionType__extfield0 {
 
 
 
-                seqfield0: try_rollback!(stream, tx, extensionType__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
+                seqfield0: try_rollback!(stream, tx, extensionType__extfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: try_rollback!(stream, tx, extensionType__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
+                seqfield1: try_rollback!(stream, tx, extensionType__extfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1305,36 +1268,12 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct extensionType__extension<'input> {
-        seqfield0: extensionType__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
-
-
-    impl<'input> ParseXml<'input> for extensionType__extension<'input> {
-        const NODE_NAME: &'static str = "sequence extensionType__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(extensionType__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, extensionType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct extensionType<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: extensionType__extension<'input>,
+        extfield0: extensionType__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (Some(0), None, GroupRef(QName(Some("xs"), "typeDefParticle"))), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
 
 
     impl<'input> ParseXml<'input> for extensionType<'input> {
@@ -1346,7 +1285,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, extensionType__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, extensionType__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1354,36 +1293,13 @@ pub mod UNQUAL {
         }
     }
 
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct facet__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for facet__extension<'input> {
-        const NODE_NAME: &'static str = "sequence facet__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(facet__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
-        }
-    }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct facet<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: facet__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [])
 
 
     impl<'input> ParseXml<'input> for facet<'input> {
@@ -1392,10 +1308,6 @@ pub mod UNQUAL {
             let tx = stream.transaction();
             Some(facet {
                 BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                EXTENSION: try_rollback!(stream, tx, facet__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1438,51 +1350,27 @@ pub mod UNQUAL {
     // ^-- from Union(None, Some([(None, None, Custom(QName(Some("xs"), "token"))), (None, None, List(SimpleList(QName(Some("xs"), "typeDerivationControl"))))]))
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct group__extension__seqfield0<'input>(Vec<super::UNQUAL::particle<'input>>);
+    pub struct group__extfield0<'input>(Vec<super::UNQUAL::particle<'input>>);
 
 
-    impl<'input> ParseXml<'input> for group__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "vec group__extension__seqfield0";
+    impl<'input> ParseXml<'input> for group__extfield0<'input> {
+        const NODE_NAME: &'static str = "vec group__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
             while let Some(new_item) = super::UNQUAL::particle::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(group__extension__seqfield0(items))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct group__extension<'input> {
-        seqfield0: group__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "particle")))])
-
-
-    impl<'input> ParseXml<'input> for group__extension<'input> {
-        const NODE_NAME: &'static str = "sequence group__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(group__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, group__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            Some(group__extfield0(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct group<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: group__extension<'input>,
+        extfield0: group__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "particle")))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "particle")))])
 
 
     impl<'input> ParseXml<'input> for group<'input> {
@@ -1494,7 +1382,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, group__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, group__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1526,34 +1414,34 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keybase__extension__seqfield0_item__seqfield1<'input>(Vec<super::UNQUAL::field_e<'input>>);
+    pub struct keybase__extfield0_item__seqfield1<'input>(Vec<super::UNQUAL::field_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for keybase__extension__seqfield0_item__seqfield1<'input> {
-        const NODE_NAME: &'static str = "vec keybase__extension__seqfield0_item__seqfield1";
+    impl<'input> ParseXml<'input> for keybase__extfield0_item__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec keybase__extfield0_item__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
             while let Some(new_item) = super::UNQUAL::field_e::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(keybase__extension__seqfield0_item__seqfield1(items))
+            Some(keybase__extfield0_item__seqfield1(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keybase__extension__seqfield0_item<'input> {
+    pub struct keybase__extfield0_item<'input> {
         seqfield0: super::UNQUAL::selector_e<'input>,
-        seqfield1: keybase__extension__seqfield0_item__seqfield1<'input>,
+        seqfield1: keybase__extfield0_item__seqfield1<'input>,
     }
 
     // ^-- from Sequence([(None, None, Ref(QName(Some("xs"), "selector"))), (Some(1), Some(18446744073709551615), Ref(QName(Some("xs"), "field")))])
 
 
-    impl<'input> ParseXml<'input> for keybase__extension__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "sequence keybase__extension__seqfield0_item";
+    impl<'input> ParseXml<'input> for keybase__extfield0_item<'input> {
+        const NODE_NAME: &'static str = "sequence keybase__extfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
-            Some(keybase__extension__seqfield0_item {
+            Some(keybase__extfield0_item {
 
 
 
@@ -1561,7 +1449,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield1: try_rollback!(stream, tx, keybase__extension__seqfield0_item__seqfield1::parse_xml(stream, parse_context, parent_context)),
+                seqfield1: try_rollback!(stream, tx, keybase__extfield0_item__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1570,47 +1458,23 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keybase__extension__seqfield0<'input>(Option<keybase__extension__seqfield0_item<'input>>);
+    pub struct keybase__extfield0<'input>(Option<keybase__extfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for keybase__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option keybase__extension__seqfield0";
+    impl<'input> ParseXml<'input> for keybase__extfield0<'input> {
+        const NODE_NAME: &'static str = "option keybase__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(keybase__extension__seqfield0(keybase__extension__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct keybase__extension<'input> {
-        seqfield0: keybase__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "selector"))), (Some(1), Some(18446744073709551615), Ref(QName(Some("xs"), "field")))]))])
-
-
-    impl<'input> ParseXml<'input> for keybase__extension<'input> {
-        const NODE_NAME: &'static str = "sequence keybase__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(keybase__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, keybase__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            Some(keybase__extfield0(keybase__extfield0_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct keybase<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: keybase__extension<'input>,
+        extfield0: keybase__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "selector"))), (Some(1), Some(18446744073709551615), Ref(QName(Some("xs"), "field")))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "selector"))), (Some(1), Some(18446744073709551615), Ref(QName(Some("xs"), "field")))]))])
 
 
     impl<'input> ParseXml<'input> for keybase<'input> {
@@ -1622,7 +1486,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, keybase__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, keybase__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1809,34 +1673,34 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
+    pub struct restrictionType__extfield0__seqfield0_item__choicevariant0__seqfield0<'input>(Option<super::UNQUAL::openContent_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0";
+    impl<'input> ParseXml<'input> for restrictionType__extfield0__seqfield0_item__choicevariant0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option restrictionType__extfield0__seqfield0_item__choicevariant0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
+            Some(restrictionType__extfield0__seqfield0_item__choicevariant0__seqfield0(super::UNQUAL::openContent_e::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType__extension__seqfield0__seqfield0_item__choicevariant0<'input> {
-        seqfield0: restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0<'input>,
+    pub struct restrictionType__extfield0__seqfield0_item__choicevariant0<'input> {
+        seqfield0: restrictionType__extfield0__seqfield0_item__choicevariant0__seqfield0<'input>,
         seqfield1: super::UNQUAL::typeDefParticle<'input>,
     }
 
     // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])
 
 
-    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0__seqfield0_item__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "sequence restrictionType__extension__seqfield0__seqfield0_item__choicevariant0";
+    impl<'input> ParseXml<'input> for restrictionType__extfield0__seqfield0_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "sequence restrictionType__extfield0__seqfield0_item__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
-            Some(restrictionType__extension__seqfield0__seqfield0_item__choicevariant0 {
+            Some(restrictionType__extfield0__seqfield0_item__choicevariant0 {
 
 
 
-                seqfield0: try_rollback!(stream, tx, restrictionType__extension__seqfield0__seqfield0_item__choicevariant0__seqfield0::parse_xml(stream, parse_context, parent_context)),
+                seqfield0: try_rollback!(stream, tx, restrictionType__extfield0__seqfield0_item__choicevariant0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1849,27 +1713,27 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum restrictionType__extension__seqfield0__seqfield0_item<'input> {
-        choicevariant0(Box<restrictionType__extension__seqfield0__seqfield0_item__choicevariant0<'input>>),
+    pub enum restrictionType__extfield0__seqfield0_item<'input> {
+        choicevariant0(Box<restrictionType__extfield0__seqfield0_item__choicevariant0<'input>>),
         choicevariant1(Box<super::UNQUAL::simpleRestrictionModel<'input>>),
     }
 
-    impl<'input> Default for restrictionType__extension__seqfield0__seqfield0_item<'input> { fn default() -> restrictionType__extension__seqfield0__seqfield0_item<'input> { restrictionType__extension__seqfield0__seqfield0_item::choicevariant1(Default::default()) } }
+    impl<'input> Default for restrictionType__extfield0__seqfield0_item<'input> { fn default() -> restrictionType__extfield0__seqfield0_item<'input> { restrictionType__extfield0__seqfield0_item::choicevariant1(Default::default()) } }
 
     // ^-- from Choice([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])), (None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])
 
 
-    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "choice restrictionType__extension__seqfield0__seqfield0_item";
+    impl<'input> ParseXml<'input> for restrictionType__extfield0__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice restrictionType__extfield0__seqfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match restrictionType__extension__seqfield0__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(restrictionType__extension__seqfield0__seqfield0_item::choicevariant0(Box::new(r))), None => () }
+            match restrictionType__extfield0__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(restrictionType__extfield0__seqfield0_item::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::simpleRestrictionModel::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(restrictionType__extension__seqfield0__seqfield0_item::choicevariant1(Box::new(r))), None => () }
+            match super::UNQUAL::simpleRestrictionModel::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(restrictionType__extfield0__seqfield0_item::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -1878,19 +1742,19 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType__extension__seqfield0__seqfield0<'input>(Option<restrictionType__extension__seqfield0__seqfield0_item<'input>>);
+    pub struct restrictionType__extfield0__seqfield0<'input>(Option<restrictionType__extfield0__seqfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option restrictionType__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for restrictionType__extfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option restrictionType__extfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(restrictionType__extension__seqfield0__seqfield0(restrictionType__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
+            Some(restrictionType__extfield0__seqfield0(restrictionType__extfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType__extension__seqfield0<'input> {
-        seqfield0: restrictionType__extension__seqfield0__seqfield0<'input>,
+    pub struct restrictionType__extfield0<'input> {
+        seqfield0: restrictionType__extfield0__seqfield0<'input>,
         seqfield1: super::UNQUAL::attrDecls<'input>,
         seqfield2: super::UNQUAL::assertions<'input>,
     }
@@ -1898,15 +1762,15 @@ pub mod UNQUAL {
     // ^-- from Sequence([(Some(0), None, Choice([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])), (None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))])
 
 
-    impl<'input> ParseXml<'input> for restrictionType__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence restrictionType__extension__seqfield0";
+    impl<'input> ParseXml<'input> for restrictionType__extfield0<'input> {
+        const NODE_NAME: &'static str = "sequence restrictionType__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
-            Some(restrictionType__extension__seqfield0 {
+            Some(restrictionType__extfield0 {
 
 
 
-                seqfield0: try_rollback!(stream, tx, restrictionType__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
+                seqfield0: try_rollback!(stream, tx, restrictionType__extfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -1923,36 +1787,12 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restrictionType__extension<'input> {
-        seqfield0: restrictionType__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Choice([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])), (None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
-
-
-    impl<'input> ParseXml<'input> for restrictionType__extension<'input> {
-        const NODE_NAME: &'static str = "sequence restrictionType__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(restrictionType__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, restrictionType__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct restrictionType<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: restrictionType__extension<'input>,
+        extfield0: restrictionType__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Choice([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])), (None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(None, None, Sequence([(Some(0), None, Choice([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "openContent"))), (None, None, GroupRef(QName(Some("xs"), "typeDefParticle")))])), (None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])), (None, None, GroupRef(QName(Some("xs"), "attrDecls"))), (None, None, GroupRef(QName(Some("xs"), "assertions")))]))])
 
 
     impl<'input> ParseXml<'input> for restrictionType<'input> {
@@ -1964,7 +1804,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, restrictionType__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, restrictionType__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2042,36 +1882,12 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleType__extension<'input> {
-        seqfield0: super::UNQUAL::simpleDerivation<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, GroupRef(QName(Some("xs"), "simpleDerivation")))])
-
-
-    impl<'input> ParseXml<'input> for simpleType__extension<'input> {
-        const NODE_NAME: &'static str = "sequence simpleType__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(simpleType__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, super::UNQUAL::simpleDerivation::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct simpleType<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: simpleType__extension<'input>,
+        extfield0: super::UNQUAL::simpleDerivation<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, GroupRef(QName(Some("xs"), "simpleDerivation")))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(None, None, GroupRef(QName(Some("xs"), "simpleDerivation")))])
 
 
     impl<'input> ParseXml<'input> for simpleType<'input> {
@@ -2083,7 +1899,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, simpleType__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, super::UNQUAL::simpleDerivation::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2159,34 +1975,11 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct wildcard__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for wildcard__extension<'input> {
-        const NODE_NAME: &'static str = "sequence wildcard__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(wildcard__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct wildcard<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: wildcard__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [])
 
 
     impl<'input> ParseXml<'input> for wildcard<'input> {
@@ -2195,10 +1988,6 @@ pub mod UNQUAL {
             let tx = stream.transaction();
             Some(wildcard {
                 BASE: try_rollback!(stream, tx, super::UNQUAL::annotated::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                EXTENSION: try_rollback!(stream, tx, wildcard__extension::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2243,6 +2032,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct all_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: all_e_inner<'input>,
     }
 
@@ -2268,21 +2058,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(all_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(all_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, all_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(all_e {
+                                        attrs,
+                                        child: all_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2292,33 +2111,37 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum annotation_e_inner__extension__seqfield0_item<'input> {
+    pub enum annotation_e_inner__extfield0_item<'input> {
         choicevariant0(Box<super::UNQUAL::appinfo_e<'input>>),
         choicevariant1(Box<super::UNQUAL::documentation_e<'input>>),
     }
 
-    impl<'input> Default for annotation_e_inner__extension__seqfield0_item<'input> { fn default() -> annotation_e_inner__extension__seqfield0_item<'input> { annotation_e_inner__extension__seqfield0_item::choicevariant1(Default::default()) } }
+    impl<'input> Default for annotation_e_inner__extfield0_item<'input> { fn default() -> annotation_e_inner__extfield0_item<'input> { annotation_e_inner__extfield0_item::choicevariant1(Default::default()) } }
 
     // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "appinfo"))), (None, None, Ref(QName(Some("xs"), "documentation")))])
 
 
-    impl<'input> ParseXml<'input> for annotation_e_inner__extension__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "choice annotation_e_inner__extension__seqfield0_item";
+    impl<'input> ParseXml<'input> for annotation_e_inner__extfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice annotation_e_inner__extfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::appinfo_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(annotation_e_inner__extension__seqfield0_item::choicevariant0(Box::new(r))), None => () }
+            match super::UNQUAL::appinfo_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(annotation_e_inner__extfield0_item::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::documentation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(annotation_e_inner__extension__seqfield0_item::choicevariant1(Box::new(r))), None => () }
+            match super::UNQUAL::documentation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(annotation_e_inner__extfield0_item::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -2327,51 +2150,27 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct annotation_e_inner__extension__seqfield0<'input>(Vec<annotation_e_inner__extension__seqfield0_item<'input>>);
+    pub struct annotation_e_inner__extfield0<'input>(Vec<annotation_e_inner__extfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for annotation_e_inner__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "vec annotation_e_inner__extension__seqfield0";
+    impl<'input> ParseXml<'input> for annotation_e_inner__extfield0<'input> {
+        const NODE_NAME: &'static str = "vec annotation_e_inner__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
-            while let Some(new_item) = annotation_e_inner__extension__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+            while let Some(new_item) = annotation_e_inner__extfield0_item::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(annotation_e_inner__extension__seqfield0(items))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct annotation_e_inner__extension<'input> {
-        seqfield0: annotation_e_inner__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "appinfo"))), (None, None, Ref(QName(Some("xs"), "documentation")))]))])
-
-
-    impl<'input> ParseXml<'input> for annotation_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence annotation_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(annotation_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, annotation_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            Some(annotation_e_inner__extfield0(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct annotation_e_inner<'input> {
         BASE: super::UNQUAL::openAttrs<'input>,
-        EXTENSION: annotation_e_inner__extension<'input>,
+        extfield0: annotation_e_inner__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "openAttrs"), Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "appinfo"))), (None, None, Ref(QName(Some("xs"), "documentation")))]))]))
+    // ^-- from Extension(QName(Some("xs"), "openAttrs"), [(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "appinfo"))), (None, None, Ref(QName(Some("xs"), "documentation")))]))])
 
 
     impl<'input> ParseXml<'input> for annotation_e_inner<'input> {
@@ -2383,7 +2182,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, annotation_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, annotation_e_inner__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -2394,10 +2193,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct annotation_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: annotation_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "annotation"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "appinfo"))), (None, None, Ref(QName(Some("xs"), "documentation")))]))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "annotation"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), [(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "appinfo"))), (None, None, Ref(QName(Some("xs"), "documentation")))]))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for annotation_e<'input> {
@@ -2419,21 +2219,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(annotation_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(annotation_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, annotation_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(annotation_e {
+                                        attrs,
+                                        child: annotation_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2443,40 +2272,21 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct any_e_inner__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for any_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence any_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(any_e_inner__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct any_e_inner<'input> {
         BASE: super::UNQUAL::wildcard<'input>,
-        EXTENSION: any_e_inner__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "wildcard"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "wildcard"), [])
 
 
     impl<'input> ParseXml<'input> for any_e_inner<'input> {
@@ -2488,10 +2298,6 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, any_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
-
-
-
             })
         }
     }
@@ -2499,10 +2305,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct any_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: any_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "wildcard"), Sequence([]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "wildcard"), [])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for any_e<'input> {
@@ -2524,21 +2331,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(any_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(any_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, any_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(any_e {
+                                        attrs,
+                                        child: any_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2548,40 +2384,21 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct anyAttribute_e_inner__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for anyAttribute_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence anyAttribute_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(anyAttribute_e_inner__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct anyAttribute_e_inner<'input> {
         BASE: super::UNQUAL::wildcard<'input>,
-        EXTENSION: anyAttribute_e_inner__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "wildcard"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "wildcard"), [])
 
 
     impl<'input> ParseXml<'input> for anyAttribute_e_inner<'input> {
@@ -2593,10 +2410,6 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, anyAttribute_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
-
-
-
             })
         }
     }
@@ -2604,10 +2417,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct anyAttribute_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: anyAttribute_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "anyAttribute"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "wildcard"), Sequence([]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "anyAttribute"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "wildcard"), [])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for anyAttribute_e<'input> {
@@ -2629,21 +2443,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(anyAttribute_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(anyAttribute_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, anyAttribute_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(anyAttribute_e {
+                                        attrs,
+                                        child: anyAttribute_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2652,6 +2495,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -2684,6 +2531,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct appinfo_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: appinfo_e_inner<'input>,
         source: Option<super::UNQUAL::anyURI_e<'input>>,
     }
@@ -2714,14 +2562,19 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(appinfo_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(appinfo_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, appinfo_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
@@ -2730,9 +2583,37 @@ pub mod UNQUAL {
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(appinfo_e {
+                                        attrs,
+                                        child: appinfo_e_inner::default(),
+
+
+
+                                        source,
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2741,6 +2622,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -2760,6 +2645,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct assertion_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: assertion_e_inner<'input>,
     }
 
@@ -2785,21 +2671,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(assertion_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(assertion_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, assertion_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(assertion_e {
+                                        attrs,
+                                        child: assertion_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2808,6 +2723,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -2827,6 +2746,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct attribute_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: attribute_e_inner<'input>,
     }
 
@@ -2852,21 +2772,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(attribute_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(attribute_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, attribute_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(attribute_e {
+                                        attrs,
+                                        child: attribute_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2875,6 +2824,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -2894,6 +2847,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct attributeGroup_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: attributeGroup_e_inner<'input>,
     }
 
@@ -2919,21 +2873,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(attributeGroup_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(attributeGroup_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, attributeGroup_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(attributeGroup_e {
+                                        attrs,
+                                        child: attributeGroup_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -2942,6 +2925,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -2961,6 +2948,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct choice_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: choice_e_inner<'input>,
     }
 
@@ -2986,21 +2974,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(choice_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(choice_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, choice_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(choice_e {
+                                        attrs,
+                                        child: choice_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3010,32 +3027,37 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input>(super::UNQUAL::complexRestrictionType<'input>);
+    pub struct complexContent_e_inner__extfield0__choicevariant0__restriction_e_inner<'input>(super::UNQUAL::complexRestrictionType<'input>);
 
 
-    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner";
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extfield0__choicevariant0__restriction_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom complexContent_e_inner__extfield0__choicevariant0__restriction_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::complexRestrictionType::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner)
+            super::UNQUAL::complexRestrictionType::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extfield0__choicevariant0__restriction_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input> {
-        child: complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input>,
+    pub struct complexContent_e_inner__extfield0__choicevariant0__restriction_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: complexContent_e_inner__extfield0__choicevariant0__restriction_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e";
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extfield0__choicevariant0__restriction_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) complexContent_e_inner__extfield0__choicevariant0__restriction_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -3053,21 +3075,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e {
-                                        child: try_rollback!(stream, tx, complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(complexContent_e_inner__extfield0__choicevariant0__restriction_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, complexContent_e_inner__extfield0__choicevariant0__restriction_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(complexContent_e_inner__extfield0__choicevariant0__restriction_e {
+                                        attrs,
+                                        child: complexContent_e_inner__extfield0__choicevariant0__restriction_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3077,43 +3128,48 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e_inner__extension__seqfield0__choicevariant0<'input>(complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input>);
+    pub struct complexContent_e_inner__extfield0__choicevariant0<'input>(complexContent_e_inner__extfield0__choicevariant0__restriction_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element complexContent_e_inner__extension__seqfield0__choicevariant0";
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extfield0__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element complexContent_e_inner__extfield0__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            complexContent_e_inner__extension__seqfield0__choicevariant0__restriction_e::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant0)
+            complexContent_e_inner__extfield0__choicevariant0__restriction_e::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extfield0__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input>(super::UNQUAL::extensionType<'input>);
+    pub struct complexContent_e_inner__extfield0__choicevariant1__extension_e_inner<'input>(super::UNQUAL::extensionType<'input>);
 
 
-    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner";
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extfield0__choicevariant1__extension_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom complexContent_e_inner__extfield0__choicevariant1__extension_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::extensionType::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner)
+            super::UNQUAL::extensionType::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extfield0__choicevariant1__extension_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input> {
-        child: complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input>,
+    pub struct complexContent_e_inner__extfield0__choicevariant1__extension_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: complexContent_e_inner__extfield0__choicevariant1__extension_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e";
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extfield0__choicevariant1__extension_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) complexContent_e_inner__extfield0__choicevariant1__extension_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -3131,21 +3187,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e {
-                                        child: try_rollback!(stream, tx, complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(complexContent_e_inner__extfield0__choicevariant1__extension_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, complexContent_e_inner__extfield0__choicevariant1__extension_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(complexContent_e_inner__extfield0__choicevariant1__extension_e {
+                                        attrs,
+                                        child: complexContent_e_inner__extfield0__choicevariant1__extension_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3155,44 +3240,48 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e_inner__extension__seqfield0__choicevariant1<'input>(complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input>);
+    pub struct complexContent_e_inner__extfield0__choicevariant1<'input>(complexContent_e_inner__extfield0__choicevariant1__extension_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element complexContent_e_inner__extension__seqfield0__choicevariant1";
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extfield0__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element complexContent_e_inner__extfield0__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            complexContent_e_inner__extension__seqfield0__choicevariant1__extension_e::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extension__seqfield0__choicevariant1)
+            complexContent_e_inner__extfield0__choicevariant1__extension_e::parse_xml(stream, parse_context, parent_context).map(complexContent_e_inner__extfield0__choicevariant1)
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum complexContent_e_inner__extension__seqfield0<'input> {
-        choicevariant0(Box<complexContent_e_inner__extension__seqfield0__choicevariant0<'input>>),
-        choicevariant1(Box<complexContent_e_inner__extension__seqfield0__choicevariant1<'input>>),
+    pub enum complexContent_e_inner__extfield0<'input> {
+        choicevariant0(Box<complexContent_e_inner__extfield0__choicevariant0<'input>>),
+        choicevariant1(Box<complexContent_e_inner__extfield0__choicevariant1<'input>>),
     }
 
-    impl<'input> Default for complexContent_e_inner__extension__seqfield0<'input> { fn default() -> complexContent_e_inner__extension__seqfield0<'input> { complexContent_e_inner__extension__seqfield0::choicevariant1(Default::default()) } }
+    impl<'input> Default for complexContent_e_inner__extfield0<'input> { fn default() -> complexContent_e_inner__extfield0<'input> { complexContent_e_inner__extfield0::choicevariant1(Default::default()) } }
 
     // ^-- from Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }))])
 
 
-    impl<'input> ParseXml<'input> for complexContent_e_inner__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "choice complexContent_e_inner__extension__seqfield0";
+    impl<'input> ParseXml<'input> for complexContent_e_inner__extfield0<'input> {
+        const NODE_NAME: &'static str = "choice complexContent_e_inner__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match complexContent_e_inner__extension__seqfield0__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexContent_e_inner__extension__seqfield0::choicevariant0(Box::new(r))), None => () }
+            match complexContent_e_inner__extfield0__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexContent_e_inner__extfield0::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match complexContent_e_inner__extension__seqfield0__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexContent_e_inner__extension__seqfield0::choicevariant1(Box::new(r))), None => () }
+            match complexContent_e_inner__extfield0__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(complexContent_e_inner__extfield0::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -3201,36 +3290,12 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct complexContent_e_inner__extension<'input> {
-        seqfield0: complexContent_e_inner__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }))]))])
-
-
-    impl<'input> ParseXml<'input> for complexContent_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence complexContent_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(complexContent_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, complexContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct complexContent_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: complexContent_e_inner__extension<'input>,
+        extfield0: complexContent_e_inner__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }))]))])
 
 
     impl<'input> ParseXml<'input> for complexContent_e_inner<'input> {
@@ -3242,7 +3307,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, complexContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, complexContent_e_inner__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3253,10 +3318,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct complexContent_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: complexContent_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "complexContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }))]))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "complexContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "complexRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "extensionType"))), min_occurs: None, max_occurs: None }))]))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for complexContent_e<'input> {
@@ -3278,21 +3344,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(complexContent_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(complexContent_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, complexContent_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(complexContent_e {
+                                        attrs,
+                                        child: complexContent_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3301,6 +3396,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -3320,6 +3419,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct complexType_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: complexType_e_inner<'input>,
     }
 
@@ -3345,21 +3445,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(complexType_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(complexType_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, complexType_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(complexType_e {
+                                        attrs,
+                                        child: complexType_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3369,32 +3498,37 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner<'input>(super::UNQUAL::wildcard<'input>);
+    pub struct defaultOpenContent_e_inner__extfield0__any_e_inner<'input>(super::UNQUAL::wildcard<'input>);
 
 
-    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner";
+    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extfield0__any_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom defaultOpenContent_e_inner__extfield0__any_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context).map(defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner)
+            super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context).map(defaultOpenContent_e_inner__extfield0__any_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e<'input> {
-        child: defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner<'input>,
+    pub struct defaultOpenContent_e_inner__extfield0__any_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: defaultOpenContent_e_inner__extfield0__any_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e";
+    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extfield0__any_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) defaultOpenContent_e_inner__extfield0__any_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -3412,21 +3546,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e {
-                                        child: try_rollback!(stream, tx, defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(defaultOpenContent_e_inner__extfield0__any_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, defaultOpenContent_e_inner__extfield0__any_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(defaultOpenContent_e_inner__extfield0__any_e {
+                                        attrs,
+                                        child: defaultOpenContent_e_inner__extfield0__any_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3436,77 +3599,33 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct defaultOpenContent_e_inner__extension__seqfield0__seqfield0<'input>(defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e<'input>);
+    pub struct defaultOpenContent_e_inner__extfield0<'input>(defaultOpenContent_e_inner__extfield0__any_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "elementtype element defaultOpenContent_e_inner__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extfield0<'input> {
+        const NODE_NAME: &'static str = "elementtype element defaultOpenContent_e_inner__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            defaultOpenContent_e_inner__extension__seqfield0__seqfield0__any_e::parse_xml(stream, parse_context, parent_context).map(defaultOpenContent_e_inner__extension__seqfield0__seqfield0)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct defaultOpenContent_e_inner__extension__seqfield0<'input> {
-        seqfield0: defaultOpenContent_e_inner__extension__seqfield0__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }))])
-
-
-    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence defaultOpenContent_e_inner__extension__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(defaultOpenContent_e_inner__extension__seqfield0 {
-
-
-
-                seqfield0: try_rollback!(stream, tx, defaultOpenContent_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct defaultOpenContent_e_inner__extension<'input> {
-        seqfield0: defaultOpenContent_e_inner__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(None, None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }))]))])
-
-
-    impl<'input> ParseXml<'input> for defaultOpenContent_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence defaultOpenContent_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(defaultOpenContent_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, defaultOpenContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            defaultOpenContent_e_inner__extfield0__any_e::parse_xml(stream, parse_context, parent_context).map(defaultOpenContent_e_inner__extfield0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct defaultOpenContent_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: defaultOpenContent_e_inner__extension<'input>,
+        extfield0: defaultOpenContent_e_inner__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(None, None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(None, None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }))])
 
 
     impl<'input> ParseXml<'input> for defaultOpenContent_e_inner<'input> {
@@ -3518,7 +3637,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, defaultOpenContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, defaultOpenContent_e_inner__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -3529,10 +3648,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct defaultOpenContent_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: defaultOpenContent_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "defaultOpenContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(None, None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }))]))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "defaultOpenContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [(None, None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: None, max_occurs: None }))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for defaultOpenContent_e<'input> {
@@ -3554,21 +3674,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(defaultOpenContent_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(defaultOpenContent_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, defaultOpenContent_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(defaultOpenContent_e {
+                                        attrs,
+                                        child: defaultOpenContent_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3577,6 +3726,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -3609,6 +3762,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct documentation_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: documentation_e_inner<'input>,
         source: Option<super::UNQUAL::anyURI_e<'input>>,
     }
@@ -3639,14 +3793,19 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(documentation_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(documentation_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, documentation_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
@@ -3655,9 +3814,37 @@ pub mod UNQUAL {
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(documentation_e {
+                                        attrs,
+                                        child: documentation_e_inner::default(),
+
+
+
+                                        source,
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3666,6 +3853,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -3685,6 +3876,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct element_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: element_e_inner<'input>,
     }
 
@@ -3710,21 +3902,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(element_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(element_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, element_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(element_e {
+                                        attrs,
+                                        child: element_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3733,6 +3954,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -3752,6 +3977,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct enumeration_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: enumeration_e_inner<'input>,
     }
 
@@ -3777,21 +4003,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(enumeration_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(enumeration_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, enumeration_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(enumeration_e {
+                                        attrs,
+                                        child: enumeration_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3800,6 +4055,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -3819,6 +4078,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct explicitTimezone_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: explicitTimezone_e_inner<'input>,
     }
 
@@ -3844,21 +4104,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(explicitTimezone_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(explicitTimezone_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, explicitTimezone_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(explicitTimezone_e {
+                                        attrs,
+                                        child: explicitTimezone_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3867,6 +4156,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -3885,34 +4178,11 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct field_e_inner__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for field_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence field_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(field_e_inner__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct field_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: field_e_inner__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [])
 
 
     impl<'input> ParseXml<'input> for field_e_inner<'input> {
@@ -3924,10 +4194,6 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, field_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
-
-
-
             })
         }
     }
@@ -3935,10 +4201,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct field_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: field_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "field"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "field"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for field_e<'input> {
@@ -3960,21 +4227,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(field_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(field_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, field_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(field_e {
+                                        attrs,
+                                        child: field_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -3983,6 +4279,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -4002,6 +4302,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct fractionDigits_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: fractionDigits_e_inner<'input>,
     }
 
@@ -4027,21 +4328,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(fractionDigits_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(fractionDigits_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, fractionDigits_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(fractionDigits_e {
+                                        attrs,
+                                        child: fractionDigits_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4050,6 +4380,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -4069,6 +4403,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct group_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: group_e_inner<'input>,
     }
 
@@ -4094,21 +4429,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(group_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(group_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, group_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(group_e {
+                                        attrs,
+                                        child: group_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4118,40 +4482,21 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct import_e_inner__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for import_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence import_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(import_e_inner__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct import_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: import_e_inner__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [])
 
 
     impl<'input> ParseXml<'input> for import_e_inner<'input> {
@@ -4163,10 +4508,6 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, import_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
-
-
-
             })
         }
     }
@@ -4174,10 +4515,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct import_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: import_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "import"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "import"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for import_e<'input> {
@@ -4199,21 +4541,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(import_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(import_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, import_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(import_e {
+                                        attrs,
+                                        child: import_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4223,40 +4594,21 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct include_e_inner__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for include_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence include_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(include_e_inner__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct include_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: include_e_inner__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [])
 
 
     impl<'input> ParseXml<'input> for include_e_inner<'input> {
@@ -4268,10 +4620,6 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, include_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
-
-
-
             })
         }
     }
@@ -4279,10 +4627,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct include_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: include_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "include"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "include"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for include_e<'input> {
@@ -4304,21 +4653,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(include_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(include_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, include_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(include_e {
+                                        attrs,
+                                        child: include_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4327,6 +4705,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -4346,6 +4728,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct key_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: key_e_inner<'input>,
     }
 
@@ -4371,21 +4754,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(key_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(key_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, key_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(key_e {
+                                        attrs,
+                                        child: key_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4395,40 +4807,21 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct keyref_e_inner__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for keyref_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence keyref_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(keyref_e_inner__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct keyref_e_inner<'input> {
         BASE: super::UNQUAL::keybase<'input>,
-        EXTENSION: keyref_e_inner__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "keybase"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "keybase"), [])
 
 
     impl<'input> ParseXml<'input> for keyref_e_inner<'input> {
@@ -4440,10 +4833,6 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, keyref_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
-
-
-
             })
         }
     }
@@ -4451,10 +4840,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct keyref_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: keyref_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "keyref"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "keybase"), Sequence([]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "keyref"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "keybase"), [])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for keyref_e<'input> {
@@ -4476,21 +4866,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(keyref_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(keyref_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, keyref_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(keyref_e {
+                                        attrs,
+                                        child: keyref_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4499,6 +4918,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -4518,6 +4941,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct length_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: length_e_inner<'input>,
     }
 
@@ -4543,21 +4967,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(length_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(length_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, length_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(length_e {
+                                        attrs,
+                                        child: length_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4567,32 +5020,37 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
+    pub struct list_e_inner__extfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
 
 
-    impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner";
+    impl<'input> ParseXml<'input> for list_e_inner__extfield0_item__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom list_e_inner__extfield0_item__simpleType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner)
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(list_e_inner__extfield0_item__simpleType_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
-        child: list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>,
+    pub struct list_e_inner__extfield0_item__simpleType_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: list_e_inner__extfield0_item__simpleType_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e";
+    impl<'input> ParseXml<'input> for list_e_inner__extfield0_item__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) list_e_inner__extfield0_item__simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -4610,21 +5068,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e {
-                                        child: try_rollback!(stream, tx, list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(list_e_inner__extfield0_item__simpleType_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, list_e_inner__extfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(list_e_inner__extfield0_item__simpleType_e {
+                                        attrs,
+                                        child: list_e_inner__extfield0_item__simpleType_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4634,88 +5121,44 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct list_e_inner__extension__seqfield0__seqfield0_item<'input>(list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input>);
+    pub struct list_e_inner__extfield0_item<'input>(list_e_inner__extfield0_item__simpleType_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "elementtype element list_e_inner__extension__seqfield0__seqfield0_item";
+    impl<'input> ParseXml<'input> for list_e_inner__extfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element list_e_inner__extfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            list_e_inner__extension__seqfield0__seqfield0_item__simpleType_e::parse_xml(stream, parse_context, parent_context).map(list_e_inner__extension__seqfield0__seqfield0_item)
+            list_e_inner__extfield0_item__simpleType_e::parse_xml(stream, parse_context, parent_context).map(list_e_inner__extfield0_item)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct list_e_inner__extension__seqfield0__seqfield0<'input>(Option<list_e_inner__extension__seqfield0__seqfield0_item<'input>>);
+    pub struct list_e_inner__extfield0<'input>(Option<list_e_inner__extfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option list_e_inner__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for list_e_inner__extfield0<'input> {
+        const NODE_NAME: &'static str = "option list_e_inner__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(list_e_inner__extension__seqfield0__seqfield0(list_e_inner__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct list_e_inner__extension__seqfield0<'input> {
-        seqfield0: list_e_inner__extension__seqfield0__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))])
-
-
-    impl<'input> ParseXml<'input> for list_e_inner__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence list_e_inner__extension__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(list_e_inner__extension__seqfield0 {
-
-
-
-                seqfield0: try_rollback!(stream, tx, list_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct list_e_inner__extension<'input> {
-        seqfield0: list_e_inner__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))]))])
-
-
-    impl<'input> ParseXml<'input> for list_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence list_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(list_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, list_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            Some(list_e_inner__extfield0(list_e_inner__extfield0_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct list_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: list_e_inner__extension<'input>,
+        extfield0: list_e_inner__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))])
 
 
     impl<'input> ParseXml<'input> for list_e_inner<'input> {
@@ -4727,7 +5170,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, list_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, list_e_inner__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -4738,10 +5181,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct list_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: list_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "list"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))]))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "list"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [(Some(0), None, Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: None }))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for list_e<'input> {
@@ -4763,21 +5207,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(list_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(list_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, list_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(list_e {
+                                        attrs,
+                                        child: list_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4786,6 +5259,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -4805,6 +5282,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct maxExclusive_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: maxExclusive_e_inner<'input>,
     }
 
@@ -4830,21 +5308,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(maxExclusive_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(maxExclusive_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, maxExclusive_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(maxExclusive_e {
+                                        attrs,
+                                        child: maxExclusive_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4853,6 +5360,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -4872,6 +5383,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct maxInclusive_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: maxInclusive_e_inner<'input>,
     }
 
@@ -4897,21 +5409,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(maxInclusive_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(maxInclusive_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, maxInclusive_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(maxInclusive_e {
+                                        attrs,
+                                        child: maxInclusive_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4920,6 +5461,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -4939,6 +5484,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct maxLength_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: maxLength_e_inner<'input>,
     }
 
@@ -4964,21 +5510,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(maxLength_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(maxLength_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, maxLength_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(maxLength_e {
+                                        attrs,
+                                        child: maxLength_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -4987,6 +5562,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -5006,6 +5585,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct minExclusive_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: minExclusive_e_inner<'input>,
     }
 
@@ -5031,21 +5611,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(minExclusive_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(minExclusive_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, minExclusive_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(minExclusive_e {
+                                        attrs,
+                                        child: minExclusive_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5054,6 +5663,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -5073,6 +5686,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct minInclusive_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: minInclusive_e_inner<'input>,
     }
 
@@ -5098,21 +5712,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(minInclusive_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(minInclusive_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, minInclusive_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(minInclusive_e {
+                                        attrs,
+                                        child: minInclusive_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5121,6 +5764,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -5140,6 +5787,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct minLength_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: minLength_e_inner<'input>,
     }
 
@@ -5165,21 +5813,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(minLength_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(minLength_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, minLength_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(minLength_e {
+                                        attrs,
+                                        child: minLength_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5189,40 +5866,21 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct notation_e_inner__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for notation_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence notation_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(notation_e_inner__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct notation_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: notation_e_inner__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [])
 
 
     impl<'input> ParseXml<'input> for notation_e_inner<'input> {
@@ -5234,10 +5892,6 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, notation_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
-
-
-
             })
         }
     }
@@ -5245,10 +5899,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct notation_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: notation_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "notation"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "notation"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for notation_e<'input> {
@@ -5270,21 +5925,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(notation_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(notation_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, notation_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(notation_e {
+                                        attrs,
+                                        child: notation_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5294,32 +5978,37 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner<'input>(super::UNQUAL::wildcard<'input>);
+    pub struct openContent_e_inner__extfield0_item__any_e_inner<'input>(super::UNQUAL::wildcard<'input>);
 
 
-    impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner";
+    impl<'input> ParseXml<'input> for openContent_e_inner__extfield0_item__any_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom openContent_e_inner__extfield0_item__any_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context).map(openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner)
+            super::UNQUAL::wildcard::parse_xml(stream, parse_context, parent_context).map(openContent_e_inner__extfield0_item__any_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e_inner__extension__seqfield0__seqfield0_item__any_e<'input> {
-        child: openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner<'input>,
+    pub struct openContent_e_inner__extfield0_item__any_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: openContent_e_inner__extfield0_item__any_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0__seqfield0_item__any_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) openContent_e_inner__extension__seqfield0__seqfield0_item__any_e";
+    impl<'input> ParseXml<'input> for openContent_e_inner__extfield0_item__any_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) openContent_e_inner__extfield0_item__any_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -5337,21 +6026,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(openContent_e_inner__extension__seqfield0__seqfield0_item__any_e {
-                                        child: try_rollback!(stream, tx, openContent_e_inner__extension__seqfield0__seqfield0_item__any_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(openContent_e_inner__extfield0_item__any_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, openContent_e_inner__extfield0_item__any_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(openContent_e_inner__extfield0_item__any_e {
+                                        attrs,
+                                        child: openContent_e_inner__extfield0_item__any_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5361,88 +6079,44 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e_inner__extension__seqfield0__seqfield0_item<'input>(openContent_e_inner__extension__seqfield0__seqfield0_item__any_e<'input>);
+    pub struct openContent_e_inner__extfield0_item<'input>(openContent_e_inner__extfield0_item__any_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "elementtype element openContent_e_inner__extension__seqfield0__seqfield0_item";
+    impl<'input> ParseXml<'input> for openContent_e_inner__extfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element openContent_e_inner__extfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            openContent_e_inner__extension__seqfield0__seqfield0_item__any_e::parse_xml(stream, parse_context, parent_context).map(openContent_e_inner__extension__seqfield0__seqfield0_item)
+            openContent_e_inner__extfield0_item__any_e::parse_xml(stream, parse_context, parent_context).map(openContent_e_inner__extfield0_item)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e_inner__extension__seqfield0__seqfield0<'input>(Option<openContent_e_inner__extension__seqfield0__seqfield0_item<'input>>);
+    pub struct openContent_e_inner__extfield0<'input>(Option<openContent_e_inner__extfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option openContent_e_inner__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for openContent_e_inner__extfield0<'input> {
+        const NODE_NAME: &'static str = "option openContent_e_inner__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(openContent_e_inner__extension__seqfield0__seqfield0(openContent_e_inner__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e_inner__extension__seqfield0<'input> {
-        seqfield0: openContent_e_inner__extension__seqfield0__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }))])
-
-
-    impl<'input> ParseXml<'input> for openContent_e_inner__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence openContent_e_inner__extension__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(openContent_e_inner__extension__seqfield0 {
-
-
-
-                seqfield0: try_rollback!(stream, tx, openContent_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct openContent_e_inner__extension<'input> {
-        seqfield0: openContent_e_inner__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }))]))])
-
-
-    impl<'input> ParseXml<'input> for openContent_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence openContent_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(openContent_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, openContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            Some(openContent_e_inner__extfield0(openContent_e_inner__extfield0_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct openContent_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: openContent_e_inner__extension<'input>,
+        extfield0: openContent_e_inner__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(Some(0), None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }))])
 
 
     impl<'input> ParseXml<'input> for openContent_e_inner<'input> {
@@ -5454,7 +6128,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, openContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, openContent_e_inner__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5465,10 +6139,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct openContent_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: openContent_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "openContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }))]))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "openContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [(Some(0), None, Element(Element { name: QName(None, "any"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "wildcard"))), min_occurs: Some(0), max_occurs: None }))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for openContent_e<'input> {
@@ -5490,21 +6165,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(openContent_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(openContent_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, openContent_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(openContent_e {
+                                        attrs,
+                                        child: openContent_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5514,83 +6218,63 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct override_e_inner__extension__seqfield0__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
+    pub struct override_e_inner__extfield0__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for override_e_inner__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "option override_e_inner__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for override_e_inner__extfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "option override_e_inner__extfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(override_e_inner__extension__seqfield0__seqfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
+            Some(override_e_inner__extfield0__seqfield0(super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct override_e_inner__extension__seqfield0__seqfield1<'input>(Vec<super::UNQUAL::schemaTop<'input>>);
+    pub struct override_e_inner__extfield0__seqfield1<'input>(Vec<super::UNQUAL::schemaTop<'input>>);
 
 
-    impl<'input> ParseXml<'input> for override_e_inner__extension__seqfield0__seqfield1<'input> {
-        const NODE_NAME: &'static str = "vec override_e_inner__extension__seqfield0__seqfield1";
+    impl<'input> ParseXml<'input> for override_e_inner__extfield0__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec override_e_inner__extfield0__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
             while let Some(new_item) = super::UNQUAL::schemaTop::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(override_e_inner__extension__seqfield0__seqfield1(items))
+            Some(override_e_inner__extfield0__seqfield1(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct override_e_inner__extension__seqfield0<'input> {
-        seqfield0: override_e_inner__extension__seqfield0__seqfield0<'input>,
-        seqfield1: override_e_inner__extension__seqfield0__seqfield1<'input>,
+    pub struct override_e_inner__extfield0<'input> {
+        seqfield0: override_e_inner__extfield0__seqfield0<'input>,
+        seqfield1: override_e_inner__extfield0__seqfield1<'input>,
     }
 
     // ^-- from Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "schemaTop")))])
 
 
-    impl<'input> ParseXml<'input> for override_e_inner__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence override_e_inner__extension__seqfield0";
+    impl<'input> ParseXml<'input> for override_e_inner__extfield0<'input> {
+        const NODE_NAME: &'static str = "sequence override_e_inner__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
-            Some(override_e_inner__extension__seqfield0 {
+            Some(override_e_inner__extfield0 {
 
 
 
-                seqfield0: try_rollback!(stream, tx, override_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
+                seqfield0: try_rollback!(stream, tx, override_e_inner__extfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: try_rollback!(stream, tx, override_e_inner__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct override_e_inner__extension<'input> {
-        seqfield0: override_e_inner__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "schemaTop")))]))])
-
-
-    impl<'input> ParseXml<'input> for override_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence override_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(override_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, override_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
+                seqfield1: try_rollback!(stream, tx, override_e_inner__extfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5601,10 +6285,10 @@ pub mod UNQUAL {
     #[derive(Debug, PartialEq, Default)]
     pub struct override_e_inner<'input> {
         BASE: super::UNQUAL::openAttrs<'input>,
-        EXTENSION: override_e_inner__extension<'input>,
+        extfield0: override_e_inner__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "openAttrs"), Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "schemaTop")))]))]))
+    // ^-- from Extension(QName(Some("xs"), "openAttrs"), [(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "schemaTop")))]))])
 
 
     impl<'input> ParseXml<'input> for override_e_inner<'input> {
@@ -5616,7 +6300,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, override_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, override_e_inner__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5627,10 +6311,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct override_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: override_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "override"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), Sequence([(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "schemaTop")))]))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "override"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), [(None, None, Sequence([(Some(0), None, Ref(QName(Some("xs"), "annotation"))), (Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "schemaTop")))]))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for override_e<'input> {
@@ -5652,21 +6337,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(override_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(override_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, override_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(override_e {
+                                        attrs,
+                                        child: override_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5675,6 +6389,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -5694,6 +6412,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct pattern_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: pattern_e_inner<'input>,
     }
 
@@ -5719,21 +6438,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(pattern_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(pattern_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, pattern_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(pattern_e {
+                                        attrs,
+                                        child: pattern_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5743,33 +6491,37 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum redefine_e_inner__extension__seqfield0_item<'input> {
+    pub enum redefine_e_inner__extfield0_item<'input> {
         choicevariant0(Box<super::UNQUAL::annotation_e<'input>>),
         choicevariant1(Box<super::UNQUAL::redefinable<'input>>),
     }
 
-    impl<'input> Default for redefine_e_inner__extension__seqfield0_item<'input> { fn default() -> redefine_e_inner__extension__seqfield0_item<'input> { redefine_e_inner__extension__seqfield0_item::choicevariant1(Default::default()) } }
+    impl<'input> Default for redefine_e_inner__extfield0_item<'input> { fn default() -> redefine_e_inner__extfield0_item<'input> { redefine_e_inner__extfield0_item::choicevariant1(Default::default()) } }
 
     // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "annotation"))), (None, None, GroupRef(QName(Some("xs"), "redefinable")))])
 
 
-    impl<'input> ParseXml<'input> for redefine_e_inner__extension__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "choice redefine_e_inner__extension__seqfield0_item";
+    impl<'input> ParseXml<'input> for redefine_e_inner__extfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice redefine_e_inner__extfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefine_e_inner__extension__seqfield0_item::choicevariant0(Box::new(r))), None => () }
+            match super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefine_e_inner__extfield0_item::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefine_e_inner__extension__seqfield0_item::choicevariant1(Box::new(r))), None => () }
+            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefine_e_inner__extfield0_item::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -5778,51 +6530,27 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct redefine_e_inner__extension__seqfield0<'input>(Vec<redefine_e_inner__extension__seqfield0_item<'input>>);
+    pub struct redefine_e_inner__extfield0<'input>(Vec<redefine_e_inner__extfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for redefine_e_inner__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "vec redefine_e_inner__extension__seqfield0";
+    impl<'input> ParseXml<'input> for redefine_e_inner__extfield0<'input> {
+        const NODE_NAME: &'static str = "vec redefine_e_inner__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
-            while let Some(new_item) = redefine_e_inner__extension__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+            while let Some(new_item) = redefine_e_inner__extfield0_item::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(redefine_e_inner__extension__seqfield0(items))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct redefine_e_inner__extension<'input> {
-        seqfield0: redefine_e_inner__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "annotation"))), (None, None, GroupRef(QName(Some("xs"), "redefinable")))]))])
-
-
-    impl<'input> ParseXml<'input> for redefine_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence redefine_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(redefine_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, redefine_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            Some(redefine_e_inner__extfield0(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct redefine_e_inner<'input> {
         BASE: super::UNQUAL::openAttrs<'input>,
-        EXTENSION: redefine_e_inner__extension<'input>,
+        extfield0: redefine_e_inner__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "openAttrs"), Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "annotation"))), (None, None, GroupRef(QName(Some("xs"), "redefinable")))]))]))
+    // ^-- from Extension(QName(Some("xs"), "openAttrs"), [(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "annotation"))), (None, None, GroupRef(QName(Some("xs"), "redefinable")))]))])
 
 
     impl<'input> ParseXml<'input> for redefine_e_inner<'input> {
@@ -5834,7 +6562,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, redefine_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, redefine_e_inner__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5845,10 +6573,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct redefine_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: redefine_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "redefine"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "annotation"))), (None, None, GroupRef(QName(Some("xs"), "redefinable")))]))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "redefine"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), [(Some(0), Some(18446744073709551615), Choice([(None, None, Ref(QName(Some("xs"), "annotation"))), (None, None, GroupRef(QName(Some("xs"), "redefinable")))]))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for redefine_e<'input> {
@@ -5870,21 +6599,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(redefine_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(redefine_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, redefine_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(redefine_e {
+                                        attrs,
+                                        child: redefine_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -5894,42 +6652,22 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct restriction_e_inner__extension<'input> {
-        seqfield0: super::UNQUAL::simpleRestrictionModel<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])
-
-
-    impl<'input> ParseXml<'input> for restriction_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence restriction_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(restriction_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, super::UNQUAL::simpleRestrictionModel::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct restriction_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: restriction_e_inner__extension<'input>,
+        extfield0: super::UNQUAL::simpleRestrictionModel<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])
 
 
     impl<'input> ParseXml<'input> for restriction_e_inner<'input> {
@@ -5941,7 +6679,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, restriction_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, super::UNQUAL::simpleRestrictionModel::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -5952,10 +6690,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct restriction_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: restriction_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [(None, None, GroupRef(QName(Some("xs"), "simpleRestrictionModel")))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for restriction_e<'input> {
@@ -5977,21 +6716,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(restriction_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(restriction_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, restriction_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(restriction_e {
+                                        attrs,
+                                        child: restriction_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6001,55 +6769,59 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield0__seqfield0<'input>(Vec<super::UNQUAL::composition<'input>>);
+    pub struct schema_e_inner__extfield0__seqfield0<'input>(Vec<super::UNQUAL::composition<'input>>);
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "vec schema_e_inner__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for schema_e_inner__extfield0__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec schema_e_inner__extfield0__seqfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
             while let Some(new_item) = super::UNQUAL::composition::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(schema_e_inner__extension__seqfield0__seqfield0(items))
+            Some(schema_e_inner__extfield0__seqfield0(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1<'input>(Vec<super::UNQUAL::annotation_e<'input>>);
+    pub struct schema_e_inner__extfield0__seqfield1_item__seqfield1<'input>(Vec<super::UNQUAL::annotation_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1<'input> {
-        const NODE_NAME: &'static str = "vec schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1";
+    impl<'input> ParseXml<'input> for schema_e_inner__extfield0__seqfield1_item__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec schema_e_inner__extfield0__seqfield1_item__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
             while let Some(new_item) = super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1(items))
+            Some(schema_e_inner__extfield0__seqfield1_item__seqfield1(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield0__seqfield1_item<'input> {
+    pub struct schema_e_inner__extfield0__seqfield1_item<'input> {
         seqfield0: super::UNQUAL::defaultOpenContent_e<'input>,
-        seqfield1: schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1<'input>,
+        seqfield1: schema_e_inner__extfield0__seqfield1_item__seqfield1<'input>,
     }
 
     // ^-- from Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield1_item<'input> {
-        const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield0__seqfield1_item";
+    impl<'input> ParseXml<'input> for schema_e_inner__extfield0__seqfield1_item<'input> {
+        const NODE_NAME: &'static str = "sequence schema_e_inner__extfield0__seqfield1_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
-            Some(schema_e_inner__extension__seqfield0__seqfield1_item {
+            Some(schema_e_inner__extfield0__seqfield1_item {
 
 
 
@@ -6057,7 +6829,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield1: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0__seqfield1_item__seqfield1::parse_xml(stream, parse_context, parent_context)),
+                seqfield1: try_rollback!(stream, tx, schema_e_inner__extfield0__seqfield1_item__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -6066,45 +6838,45 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield0__seqfield1<'input>(Option<schema_e_inner__extension__seqfield0__seqfield1_item<'input>>);
+    pub struct schema_e_inner__extfield0__seqfield1<'input>(Option<schema_e_inner__extfield0__seqfield1_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield1<'input> {
-        const NODE_NAME: &'static str = "option schema_e_inner__extension__seqfield0__seqfield1";
+    impl<'input> ParseXml<'input> for schema_e_inner__extfield0__seqfield1<'input> {
+        const NODE_NAME: &'static str = "option schema_e_inner__extfield0__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(schema_e_inner__extension__seqfield0__seqfield1(schema_e_inner__extension__seqfield0__seqfield1_item::parse_xml(stream, parse_context, parent_context)))
+            Some(schema_e_inner__extfield0__seqfield1(schema_e_inner__extfield0__seqfield1_item::parse_xml(stream, parse_context, parent_context)))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1<'input>(Vec<super::UNQUAL::annotation_e<'input>>);
+    pub struct schema_e_inner__extfield0__seqfield2_item__seqfield1<'input>(Vec<super::UNQUAL::annotation_e<'input>>);
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1<'input> {
-        const NODE_NAME: &'static str = "vec schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1";
+    impl<'input> ParseXml<'input> for schema_e_inner__extfield0__seqfield2_item__seqfield1<'input> {
+        const NODE_NAME: &'static str = "vec schema_e_inner__extfield0__seqfield2_item__seqfield1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
             while let Some(new_item) = super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1(items))
+            Some(schema_e_inner__extfield0__seqfield2_item__seqfield1(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield0__seqfield2_item<'input> {
+    pub struct schema_e_inner__extfield0__seqfield2_item<'input> {
         seqfield0: super::UNQUAL::schemaTop<'input>,
-        seqfield1: schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1<'input>,
+        seqfield1: schema_e_inner__extfield0__seqfield2_item__seqfield1<'input>,
     }
 
     // ^-- from Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield2_item<'input> {
-        const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield0__seqfield2_item";
+    impl<'input> ParseXml<'input> for schema_e_inner__extfield0__seqfield2_item<'input> {
+        const NODE_NAME: &'static str = "sequence schema_e_inner__extfield0__seqfield2_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
-            Some(schema_e_inner__extension__seqfield0__seqfield2_item {
+            Some(schema_e_inner__extfield0__seqfield2_item {
 
 
 
@@ -6112,7 +6884,7 @@ pub mod UNQUAL {
 
 
 
-                seqfield1: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0__seqfield2_item__seqfield1::parse_xml(stream, parse_context, parent_context)),
+                seqfield1: try_rollback!(stream, tx, schema_e_inner__extfield0__seqfield2_item__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -6121,71 +6893,47 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield0__seqfield2<'input>(Vec<schema_e_inner__extension__seqfield0__seqfield2_item<'input>>);
+    pub struct schema_e_inner__extfield0__seqfield2<'input>(Vec<schema_e_inner__extfield0__seqfield2_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0__seqfield2<'input> {
-        const NODE_NAME: &'static str = "vec schema_e_inner__extension__seqfield0__seqfield2";
+    impl<'input> ParseXml<'input> for schema_e_inner__extfield0__seqfield2<'input> {
+        const NODE_NAME: &'static str = "vec schema_e_inner__extfield0__seqfield2";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
-            while let Some(new_item) = schema_e_inner__extension__seqfield0__seqfield2_item::parse_xml(stream, parse_context, parent_context) {
+            while let Some(new_item) = schema_e_inner__extfield0__seqfield2_item::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(schema_e_inner__extension__seqfield0__seqfield2(items))
+            Some(schema_e_inner__extfield0__seqfield2(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension__seqfield0<'input> {
-        seqfield0: schema_e_inner__extension__seqfield0__seqfield0<'input>,
-        seqfield1: schema_e_inner__extension__seqfield0__seqfield1<'input>,
-        seqfield2: schema_e_inner__extension__seqfield0__seqfield2<'input>,
+    pub struct schema_e_inner__extfield0<'input> {
+        seqfield0: schema_e_inner__extfield0__seqfield0<'input>,
+        seqfield1: schema_e_inner__extfield0__seqfield1<'input>,
+        seqfield2: schema_e_inner__extfield0__seqfield2<'input>,
     }
 
     // ^-- from Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "composition"))), (Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])), (Some(0), Some(18446744073709551615), Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))]))])
 
 
-    impl<'input> ParseXml<'input> for schema_e_inner__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence schema_e_inner__extension__seqfield0";
+    impl<'input> ParseXml<'input> for schema_e_inner__extfield0<'input> {
+        const NODE_NAME: &'static str = "sequence schema_e_inner__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
-            Some(schema_e_inner__extension__seqfield0 {
+            Some(schema_e_inner__extfield0 {
 
 
 
-                seqfield0: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
+                seqfield0: try_rollback!(stream, tx, schema_e_inner__extfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield1: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
+                seqfield1: try_rollback!(stream, tx, schema_e_inner__extfield0__seqfield1::parse_xml(stream, parse_context, parent_context)),
 
 
 
-                seqfield2: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0__seqfield2::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct schema_e_inner__extension<'input> {
-        seqfield0: schema_e_inner__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "composition"))), (Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])), (Some(0), Some(18446744073709551615), Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))]))]))])
-
-
-    impl<'input> ParseXml<'input> for schema_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence schema_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(schema_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, schema_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
+                seqfield2: try_rollback!(stream, tx, schema_e_inner__extfield0__seqfield2::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -6196,10 +6944,10 @@ pub mod UNQUAL {
     #[derive(Debug, PartialEq, Default)]
     pub struct schema_e_inner<'input> {
         BASE: super::UNQUAL::openAttrs<'input>,
-        EXTENSION: schema_e_inner__extension<'input>,
+        extfield0: schema_e_inner__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "openAttrs"), Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "composition"))), (Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])), (Some(0), Some(18446744073709551615), Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))]))]))]))
+    // ^-- from Extension(QName(Some("xs"), "openAttrs"), [(None, None, Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "composition"))), (Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])), (Some(0), Some(18446744073709551615), Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))]))]))])
 
 
     impl<'input> ParseXml<'input> for schema_e_inner<'input> {
@@ -6211,7 +6959,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, schema_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, schema_e_inner__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -6222,10 +6970,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct schema_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: schema_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "schema"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "composition"))), (Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])), (Some(0), Some(18446744073709551615), Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))]))]))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "schema"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "openAttrs"), [(None, None, Sequence([(Some(0), Some(18446744073709551615), GroupRef(QName(Some("xs"), "composition"))), (Some(0), None, Sequence([(None, None, Ref(QName(Some("xs"), "defaultOpenContent"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))])), (Some(0), Some(18446744073709551615), Sequence([(None, None, GroupRef(QName(Some("xs"), "schemaTop"))), (Some(0), Some(18446744073709551615), Ref(QName(Some("xs"), "annotation")))]))]))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for schema_e<'input> {
@@ -6247,21 +6996,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(schema_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(schema_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, schema_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(schema_e {
+                                        attrs,
+                                        child: schema_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6271,40 +7049,21 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct selector_e_inner__extension<'input>(PhantomData<&'input ()>);
-
-    // ^-- from Sequence([])
-
-
-    impl<'input> ParseXml<'input> for selector_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence selector_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(selector_e_inner__extension {
-
-
-
-                0: Default::default()
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct selector_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: selector_e_inner__extension<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [])
 
 
     impl<'input> ParseXml<'input> for selector_e_inner<'input> {
@@ -6316,10 +7075,6 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, selector_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
-
-
-
             })
         }
     }
@@ -6327,10 +7082,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct selector_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: selector_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "selector"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "selector"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for selector_e<'input> {
@@ -6352,21 +7108,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(selector_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(selector_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, selector_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(selector_e {
+                                        attrs,
+                                        child: selector_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6375,6 +7160,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -6394,6 +7183,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct sequence_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: sequence_e_inner<'input>,
     }
 
@@ -6419,21 +7209,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(sequence_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(sequence_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, sequence_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(sequence_e {
+                                        attrs,
+                                        child: sequence_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6443,32 +7262,37 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input>(super::UNQUAL::simpleRestrictionType<'input>);
+    pub struct simpleContent_e_inner__extfield0__choicevariant0__restriction_e_inner<'input>(super::UNQUAL::simpleRestrictionType<'input>);
 
 
-    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner";
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extfield0__choicevariant0__restriction_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom simpleContent_e_inner__extfield0__choicevariant0__restriction_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::simpleRestrictionType::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner)
+            super::UNQUAL::simpleRestrictionType::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extfield0__choicevariant0__restriction_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input> {
-        child: simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner<'input>,
+    pub struct simpleContent_e_inner__extfield0__choicevariant0__restriction_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: simpleContent_e_inner__extfield0__choicevariant0__restriction_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e";
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extfield0__choicevariant0__restriction_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) simpleContent_e_inner__extfield0__choicevariant0__restriction_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -6486,21 +7310,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e {
-                                        child: try_rollback!(stream, tx, simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(simpleContent_e_inner__extfield0__choicevariant0__restriction_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, simpleContent_e_inner__extfield0__choicevariant0__restriction_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(simpleContent_e_inner__extfield0__choicevariant0__restriction_e {
+                                        attrs,
+                                        child: simpleContent_e_inner__extfield0__choicevariant0__restriction_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6510,43 +7363,48 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant0<'input>(simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e<'input>);
+    pub struct simpleContent_e_inner__extfield0__choicevariant0<'input>(simpleContent_e_inner__extfield0__choicevariant0__restriction_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element simpleContent_e_inner__extension__seqfield0__choicevariant0";
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extfield0__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element simpleContent_e_inner__extfield0__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            simpleContent_e_inner__extension__seqfield0__choicevariant0__restriction_e::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant0)
+            simpleContent_e_inner__extfield0__choicevariant0__restriction_e::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extfield0__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input>(super::UNQUAL::simpleExtensionType<'input>);
+    pub struct simpleContent_e_inner__extfield0__choicevariant1__extension_e_inner<'input>(super::UNQUAL::simpleExtensionType<'input>);
 
 
-    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner";
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extfield0__choicevariant1__extension_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom simpleContent_e_inner__extfield0__choicevariant1__extension_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::simpleExtensionType::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner)
+            super::UNQUAL::simpleExtensionType::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extfield0__choicevariant1__extension_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input> {
-        child: simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner<'input>,
+    pub struct simpleContent_e_inner__extfield0__choicevariant1__extension_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: simpleContent_e_inner__extfield0__choicevariant1__extension_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e";
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extfield0__choicevariant1__extension_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) simpleContent_e_inner__extfield0__choicevariant1__extension_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -6564,21 +7422,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e {
-                                        child: try_rollback!(stream, tx, simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(simpleContent_e_inner__extfield0__choicevariant1__extension_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, simpleContent_e_inner__extfield0__choicevariant1__extension_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(simpleContent_e_inner__extfield0__choicevariant1__extension_e {
+                                        attrs,
+                                        child: simpleContent_e_inner__extfield0__choicevariant1__extension_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6588,44 +7475,48 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e_inner__extension__seqfield0__choicevariant1<'input>(simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e<'input>);
+    pub struct simpleContent_e_inner__extfield0__choicevariant1<'input>(simpleContent_e_inner__extfield0__choicevariant1__extension_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element simpleContent_e_inner__extension__seqfield0__choicevariant1";
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extfield0__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element simpleContent_e_inner__extfield0__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            simpleContent_e_inner__extension__seqfield0__choicevariant1__extension_e::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extension__seqfield0__choicevariant1)
+            simpleContent_e_inner__extfield0__choicevariant1__extension_e::parse_xml(stream, parse_context, parent_context).map(simpleContent_e_inner__extfield0__choicevariant1)
         }
     }
 
     #[derive(Debug, PartialEq)]
-    pub enum simpleContent_e_inner__extension__seqfield0<'input> {
-        choicevariant0(Box<simpleContent_e_inner__extension__seqfield0__choicevariant0<'input>>),
-        choicevariant1(Box<simpleContent_e_inner__extension__seqfield0__choicevariant1<'input>>),
+    pub enum simpleContent_e_inner__extfield0<'input> {
+        choicevariant0(Box<simpleContent_e_inner__extfield0__choicevariant0<'input>>),
+        choicevariant1(Box<simpleContent_e_inner__extfield0__choicevariant1<'input>>),
     }
 
-    impl<'input> Default for simpleContent_e_inner__extension__seqfield0<'input> { fn default() -> simpleContent_e_inner__extension__seqfield0<'input> { simpleContent_e_inner__extension__seqfield0::choicevariant1(Default::default()) } }
+    impl<'input> Default for simpleContent_e_inner__extfield0<'input> { fn default() -> simpleContent_e_inner__extfield0<'input> { simpleContent_e_inner__extfield0::choicevariant1(Default::default()) } }
 
     // ^-- from Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }))])
 
 
-    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "choice simpleContent_e_inner__extension__seqfield0";
+    impl<'input> ParseXml<'input> for simpleContent_e_inner__extfield0<'input> {
+        const NODE_NAME: &'static str = "choice simpleContent_e_inner__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match simpleContent_e_inner__extension__seqfield0__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleContent_e_inner__extension__seqfield0::choicevariant0(Box::new(r))), None => () }
+            match simpleContent_e_inner__extfield0__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleContent_e_inner__extfield0::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match simpleContent_e_inner__extension__seqfield0__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleContent_e_inner__extension__seqfield0::choicevariant1(Box::new(r))), None => () }
+            match simpleContent_e_inner__extfield0__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleContent_e_inner__extfield0::choicevariant1(Box::new(r))), None => () }
 
 
 
@@ -6634,36 +7525,12 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct simpleContent_e_inner__extension<'input> {
-        seqfield0: simpleContent_e_inner__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }))]))])
-
-
-    impl<'input> ParseXml<'input> for simpleContent_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence simpleContent_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(simpleContent_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, simpleContent_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct simpleContent_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: simpleContent_e_inner__extension<'input>,
+        extfield0: simpleContent_e_inner__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }))]))])
 
 
     impl<'input> ParseXml<'input> for simpleContent_e_inner<'input> {
@@ -6675,7 +7542,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, simpleContent_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, simpleContent_e_inner__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -6686,10 +7553,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct simpleContent_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: simpleContent_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "simpleContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }))]))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "simpleContent"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [(None, None, Choice([(None, None, Element(Element { name: QName(None, "restriction"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleRestrictionType"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "extension"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "simpleExtensionType"))), min_occurs: None, max_occurs: None }))]))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for simpleContent_e<'input> {
@@ -6711,21 +7579,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(simpleContent_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(simpleContent_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, simpleContent_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(simpleContent_e {
+                                        attrs,
+                                        child: simpleContent_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6734,6 +7631,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -6753,6 +7654,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct simpleType_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: simpleType_e_inner<'input>,
     }
 
@@ -6778,21 +7680,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(simpleType_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(simpleType_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(simpleType_e {
+                                        attrs,
+                                        child: simpleType_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6801,6 +7732,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -6820,6 +7755,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct totalDigits_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: totalDigits_e_inner<'input>,
     }
 
@@ -6845,21 +7781,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(totalDigits_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(totalDigits_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, totalDigits_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(totalDigits_e {
+                                        attrs,
+                                        child: totalDigits_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6869,32 +7834,37 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
+    pub struct union_e_inner__extfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
 
 
-    impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner";
+    impl<'input> ParseXml<'input> for union_e_inner__extfield0_item__simpleType_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom union_e_inner__extfield0_item__simpleType_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner)
+            super::UNQUAL::localSimpleType::parse_xml(stream, parse_context, parent_context).map(union_e_inner__extfield0_item__simpleType_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
-        child: union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner<'input>,
+    pub struct union_e_inner__extfield0_item__simpleType_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: union_e_inner__extfield0_item__simpleType_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
 
 
-    impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e";
+    impl<'input> ParseXml<'input> for union_e_inner__extfield0_item__simpleType_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) union_e_inner__extfield0_item__simpleType_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -6912,21 +7882,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e {
-                                        child: try_rollback!(stream, tx, union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(union_e_inner__extfield0_item__simpleType_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, union_e_inner__extfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(union_e_inner__extfield0_item__simpleType_e {
+                                        attrs,
+                                        child: union_e_inner__extfield0_item__simpleType_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -6936,92 +7935,48 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct union_e_inner__extension__seqfield0__seqfield0_item<'input>(union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e<'input>);
+    pub struct union_e_inner__extfield0_item<'input>(union_e_inner__extfield0_item__simpleType_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "elementtype element union_e_inner__extension__seqfield0__seqfield0_item";
+    impl<'input> ParseXml<'input> for union_e_inner__extfield0_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element union_e_inner__extfield0_item";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            union_e_inner__extension__seqfield0__seqfield0_item__simpleType_e::parse_xml(stream, parse_context, parent_context).map(union_e_inner__extension__seqfield0__seqfield0_item)
+            union_e_inner__extfield0_item__simpleType_e::parse_xml(stream, parse_context, parent_context).map(union_e_inner__extfield0_item)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct union_e_inner__extension__seqfield0__seqfield0<'input>(Vec<union_e_inner__extension__seqfield0__seqfield0_item<'input>>);
+    pub struct union_e_inner__extfield0<'input>(Vec<union_e_inner__extfield0_item<'input>>);
 
 
-    impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0__seqfield0<'input> {
-        const NODE_NAME: &'static str = "vec union_e_inner__extension__seqfield0__seqfield0";
+    impl<'input> ParseXml<'input> for union_e_inner__extfield0<'input> {
+        const NODE_NAME: &'static str = "vec union_e_inner__extfield0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let mut items = Vec::new();
-            while let Some(new_item) = union_e_inner__extension__seqfield0__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+            while let Some(new_item) = union_e_inner__extfield0_item::parse_xml(stream, parse_context, parent_context) {
                 items.push(new_item);
             }
-            Some(union_e_inner__extension__seqfield0__seqfield0(items))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct union_e_inner__extension__seqfield0<'input> {
-        seqfield0: union_e_inner__extension__seqfield0__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))])
-
-
-    impl<'input> ParseXml<'input> for union_e_inner__extension__seqfield0<'input> {
-        const NODE_NAME: &'static str = "sequence union_e_inner__extension__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(union_e_inner__extension__seqfield0 {
-
-
-
-                seqfield0: try_rollback!(stream, tx, union_e_inner__extension__seqfield0__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct union_e_inner__extension<'input> {
-        seqfield0: union_e_inner__extension__seqfield0<'input>,
-    }
-
-    // ^-- from Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))]))])
-
-
-    impl<'input> ParseXml<'input> for union_e_inner__extension<'input> {
-        const NODE_NAME: &'static str = "sequence union_e_inner__extension";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(union_e_inner__extension {
-
-
-
-                seqfield0: try_rollback!(stream, tx, union_e_inner__extension__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
+            Some(union_e_inner__extfield0(items))
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct union_e_inner<'input> {
         BASE: super::UNQUAL::annotated<'input>,
-        EXTENSION: union_e_inner__extension<'input>,
+        extfield0: union_e_inner__extfield0<'input>,
     }
 
-    // ^-- from Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))]))]))
+    // ^-- from Extension(QName(Some("xs"), "annotated"), [(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))])
 
 
     impl<'input> ParseXml<'input> for union_e_inner<'input> {
@@ -7033,7 +7988,7 @@ pub mod UNQUAL {
 
 
 
-                EXTENSION: try_rollback!(stream, tx, union_e_inner__extension::parse_xml(stream, parse_context, parent_context)),
+                extfield0: try_rollback!(stream, tx, union_e_inner__extfield0::parse_xml(stream, parse_context, parent_context)),
 
 
 
@@ -7044,10 +7999,11 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct union_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: union_e_inner<'input>,
     }
 
-    // ^-- from Element { name: QName(None, "union"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), Sequence([(None, None, Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))]))]))), min_occurs: None, max_occurs: None }
+    // ^-- from Element { name: QName(None, "union"), attrs: [], mixed: false, type_: Some(Extension(QName(Some("xs"), "annotated"), [(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "simpleType"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localSimpleType"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))])), min_occurs: None, max_occurs: None }
 
 
     impl<'input> ParseXml<'input> for union_e<'input> {
@@ -7069,21 +8025,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(union_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(union_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, union_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(union_e {
+                                        attrs,
+                                        child: union_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7092,6 +8077,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -7111,6 +8100,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct unique_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: unique_e_inner<'input>,
     }
 
@@ -7136,21 +8126,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(unique_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(unique_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, unique_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(unique_e {
+                                        attrs,
+                                        child: unique_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7159,6 +8178,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -7178,6 +8201,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct whiteSpace_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: whiteSpace_e_inner<'input>,
     }
 
@@ -7203,21 +8227,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(whiteSpace_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(whiteSpace_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, whiteSpace_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(whiteSpace_e {
+                                        attrs,
+                                        child: whiteSpace_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7226,6 +8279,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -7237,115 +8294,27 @@ pub mod UNQUAL {
 
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct defRef<'input>(PhantomData<&'input ()>);
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
-
-    #[derive(Debug, PartialEq)]
-    pub enum composition<'input> {
-        choicevariant0(Box<super::UNQUAL::include_e<'input>>),
-        choicevariant1(Box<super::UNQUAL::import_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::redefine_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::override_e<'input>>),
-        choicevariant4(Box<super::UNQUAL::annotation_e<'input>>),
-    }
-
-    impl<'input> Default for composition<'input> { fn default() -> composition<'input> { composition::choicevariant4(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "include"))), (None, None, Ref(QName(Some("xs"), "import"))), (None, None, Ref(QName(Some("xs"), "redefine"))), (None, None, Ref(QName(Some("xs"), "override"))), (None, None, Ref(QName(Some("xs"), "annotation")))])
+    pub struct particle__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
 
 
-    impl<'input> ParseXml<'input> for composition<'input> {
-        const NODE_NAME: &'static str = "choice composition";
+    impl<'input> ParseXml<'input> for particle__choicevariant0__element_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom particle__choicevariant0__element_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::include_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::import_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::redefine_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant2(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::override_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant3(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant4(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum redefinable<'input> {
-        choicevariant0(Box<super::UNQUAL::simpleType_e<'input>>),
-        choicevariant1(Box<super::UNQUAL::complexType_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::group_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::attributeGroup_e<'input>>),
-    }
-
-    impl<'input> Default for redefinable<'input> { fn default() -> redefinable<'input> { redefinable::choicevariant3(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "simpleType"))), (None, None, Ref(QName(Some("xs"), "complexType"))), (None, None, Ref(QName(Some("xs"), "group"))), (None, None, Ref(QName(Some("xs"), "attributeGroup")))])
-
-
-    impl<'input> ParseXml<'input> for redefinable<'input> {
-        const NODE_NAME: &'static str = "choice redefinable";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::simpleType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::complexType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::group_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant2(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::attributeGroup_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant3(Box::new(r))), None => () }
-
-
-
-            None
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0__element_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
-
-
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0__element_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom nestedParticle__choicevariant0__element_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0__element_e_inner)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant0__element_e<'input> {
-        child: nestedParticle__choicevariant0__element_e_inner<'input>,
+    pub struct particle__choicevariant0__element_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: particle__choicevariant0__element_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0__element_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) nestedParticle__choicevariant0__element_e";
+    impl<'input> ParseXml<'input> for particle__choicevariant0__element_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) particle__choicevariant0__element_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -7363,21 +8332,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(nestedParticle__choicevariant0__element_e {
-                                        child: try_rollback!(stream, tx, nestedParticle__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(particle__choicevariant0__element_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, particle__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(particle__choicevariant0__element_e {
+                                        attrs,
+                                        child: particle__choicevariant0__element_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7387,43 +8385,48 @@ pub mod UNQUAL {
                         None
                     }
                 },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant0<'input>(nestedParticle__choicevariant0__element_e<'input>);
+    pub struct particle__choicevariant0<'input>(particle__choicevariant0__element_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant0";
+    impl<'input> ParseXml<'input> for particle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element particle__choicevariant0";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            nestedParticle__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0)
+            particle__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant1__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
+    pub struct particle__choicevariant1__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
 
 
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1__group_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom nestedParticle__choicevariant1__group_e_inner";
+    impl<'input> ParseXml<'input> for particle__choicevariant1__group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom particle__choicevariant1__group_e_inner";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1__group_e_inner)
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1__group_e_inner)
         }
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant1__group_e<'input> {
-        child: nestedParticle__choicevariant1__group_e_inner<'input>,
+    pub struct particle__choicevariant1__group_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: particle__choicevariant1__group_e_inner<'input>,
     }
 
     // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
 
 
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1__group_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) nestedParticle__choicevariant1__group_e";
+    impl<'input> ParseXml<'input> for particle__choicevariant1__group_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) particle__choicevariant1__group_e";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
             let tx = stream.transaction();
             let mut tok = stream.next().unwrap();
@@ -7441,21 +8444,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(nestedParticle__choicevariant1__group_e {
-                                        child: try_rollback!(stream, tx, nestedParticle__choicevariant1__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(particle__choicevariant1__group_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, particle__choicevariant1__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(particle__choicevariant1__group_e {
+                                        attrs,
+                                        child: particle__choicevariant1__group_e_inner::default(),
 
 
 
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -7465,161 +8497,9 @@ pub mod UNQUAL {
                         None
                     }
                 },
-                _ => panic!(format!("Did not expect token {:?}", tok)),
-            }
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct nestedParticle__choicevariant1<'input>(nestedParticle__choicevariant1__group_e<'input>);
-
-
-    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            nestedParticle__choicevariant1__group_e::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum nestedParticle<'input> {
-        choicevariant0(Box<nestedParticle__choicevariant0<'input>>),
-        choicevariant1(Box<nestedParticle__choicevariant1<'input>>),
-        choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
-        choicevariant4(Box<super::UNQUAL::any_e<'input>>),
-    }
-
-    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::choicevariant4(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
-
-
-    impl<'input> ParseXml<'input> for nestedParticle<'input> {
-        const NODE_NAME: &'static str = "choice nestedParticle";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match nestedParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match nestedParticle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant2(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant3(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant4(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum simpleDerivation<'input> {
-        choicevariant0(Box<super::UNQUAL::restriction_e<'input>>),
-        choicevariant1(Box<super::UNQUAL::list_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::union_e<'input>>),
-    }
-
-    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::choicevariant2(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "restriction"))), (None, None, Ref(QName(Some("xs"), "list"))), (None, None, Ref(QName(Some("xs"), "union")))])
-
-
-    impl<'input> ParseXml<'input> for simpleDerivation<'input> {
-        const NODE_NAME: &'static str = "choice simpleDerivation";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::restriction_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::list_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::union_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant2(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions__seqfield0_item__assert_e_inner<'input>(super::UNQUAL::assertion<'input>);
-
-
-    impl<'input> ParseXml<'input> for assertions__seqfield0_item__assert_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom assertions__seqfield0_item__assert_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::assertion::parse_xml(stream, parse_context, parent_context).map(assertions__seqfield0_item__assert_e_inner)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions__seqfield0_item__assert_e<'input> {
-        child: assertions__seqfield0_item__assert_e_inner<'input>,
-    }
-
-    // ^-- from Element { name: QName(None, "assert"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
-
-
-    impl<'input> ParseXml<'input> for assertions__seqfield0_item__assert_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) assertions__seqfield0_item__assert_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            let mut tok = stream.next().unwrap();
-            loop {
-                match tok {
-                    Token::Whitespaces(_) => (),
-                    Token::Comment(_) => (),
-                    _ => break,
-                }
-                tok = stream.next().unwrap();
-            }
-            match tok {
-                Token::ElementStart(prefix, name) => {
-                    if name.to_str() == "assert" {
-
-
-
-                        loop {
-                            let tok = stream.next().unwrap();
-                            match tok {
-                                Token::Whitespaces(_) => (),
-                                Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(assertions__seqfield0_item__assert_e {
-                                        child: try_rollback!(stream, tx, assertions__seqfield0_item__assert_e_inner::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                                    }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
-                                _ => panic!(format!("Did not expect token {:?}", tok)),
-                            }
-                        }
-                    }
-                    else {
-                        tx.rollback(stream);
-                        None
-                    }
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -7627,52 +8507,62 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct assertions__seqfield0_item<'input>(assertions__seqfield0_item__assert_e<'input>);
+    pub struct particle__choicevariant1<'input>(particle__choicevariant1__group_e<'input>);
 
 
-    impl<'input> ParseXml<'input> for assertions__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "elementtype element assertions__seqfield0_item";
+    impl<'input> ParseXml<'input> for particle__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element particle__choicevariant1";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            assertions__seqfield0_item__assert_e::parse_xml(stream, parse_context, parent_context).map(assertions__seqfield0_item)
+            particle__choicevariant1__group_e::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1)
         }
     }
 
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions__seqfield0<'input>(Vec<assertions__seqfield0_item<'input>>);
-
-
-    impl<'input> ParseXml<'input> for assertions__seqfield0<'input> {
-        const NODE_NAME: &'static str = "vec assertions__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let mut items = Vec::new();
-            while let Some(new_item) = assertions__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
-                items.push(new_item);
-            }
-            Some(assertions__seqfield0(items))
-        }
+    #[derive(Debug, PartialEq)]
+    pub enum particle<'input> {
+        choicevariant0(Box<particle__choicevariant0<'input>>),
+        choicevariant1(Box<particle__choicevariant1<'input>>),
+        choicevariant2(Box<super::UNQUAL::all_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::choice_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::sequence_e<'input>>),
+        choicevariant5(Box<super::UNQUAL::any_e<'input>>),
     }
 
-    #[derive(Debug, PartialEq, Default)]
-    pub struct assertions<'input> {
-        seqfield0: assertions__seqfield0<'input>,
-    }
+    impl<'input> Default for particle<'input> { fn default() -> particle<'input> { particle::choicevariant5(Default::default()) } }
 
-    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Element(Element { name: QName(None, "assert"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }))])
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
 
 
-    impl<'input> ParseXml<'input> for assertions<'input> {
-        const NODE_NAME: &'static str = "sequence assertions";
+    impl<'input> ParseXml<'input> for particle<'input> {
+        const NODE_NAME: &'static str = "choice particle";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(assertions {
 
 
 
-                seqfield0: try_rollback!(stream, tx, assertions__seqfield0::parse_xml(stream, parse_context, parent_context)),
+            match particle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant0(Box::new(r))), None => () }
 
 
 
-            })
+            match particle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant3(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant4(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant5(Box::new(r))), None => () }
+
+
+
+            None
         }
     }
 
@@ -7772,246 +8662,6 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0_item__choicevariant0__attribute_e_inner<'input>(super::UNQUAL::attribute<'input>);
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0__attribute_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom attrDecls__seqfield0_item__choicevariant0__attribute_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::attribute::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant0__attribute_e_inner)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0_item__choicevariant0__attribute_e<'input> {
-        child: attrDecls__seqfield0_item__choicevariant0__attribute_e_inner<'input>,
-    }
-
-    // ^-- from Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0__attribute_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) attrDecls__seqfield0_item__choicevariant0__attribute_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            let mut tok = stream.next().unwrap();
-            loop {
-                match tok {
-                    Token::Whitespaces(_) => (),
-                    Token::Comment(_) => (),
-                    _ => break,
-                }
-                tok = stream.next().unwrap();
-            }
-            match tok {
-                Token::ElementStart(prefix, name) => {
-                    if name.to_str() == "attribute" {
-
-
-
-                        loop {
-                            let tok = stream.next().unwrap();
-                            match tok {
-                                Token::Whitespaces(_) => (),
-                                Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(attrDecls__seqfield0_item__choicevariant0__attribute_e {
-                                        child: try_rollback!(stream, tx, attrDecls__seqfield0_item__choicevariant0__attribute_e_inner::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                                    }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
-                                _ => panic!(format!("Did not expect token {:?}", tok)),
-                            }
-                        }
-                    }
-                    else {
-                        tx.rollback(stream);
-                        None
-                    }
-                },
-                _ => panic!(format!("Did not expect token {:?}", tok)),
-            }
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0_item__choicevariant0<'input>(attrDecls__seqfield0_item__choicevariant0__attribute_e<'input>);
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element attrDecls__seqfield0_item__choicevariant0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            attrDecls__seqfield0_item__choicevariant0__attribute_e::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant0)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner<'input>(super::UNQUAL::attributeGroupRef<'input>);
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::attributeGroupRef::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0_item__choicevariant1__attributeGroup_e<'input> {
-        child: attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner<'input>,
-    }
-
-    // ^-- from Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1__attributeGroup_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) attrDecls__seqfield0_item__choicevariant1__attributeGroup_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            let mut tok = stream.next().unwrap();
-            loop {
-                match tok {
-                    Token::Whitespaces(_) => (),
-                    Token::Comment(_) => (),
-                    _ => break,
-                }
-                tok = stream.next().unwrap();
-            }
-            match tok {
-                Token::ElementStart(prefix, name) => {
-                    if name.to_str() == "attributeGroup" {
-
-
-
-                        loop {
-                            let tok = stream.next().unwrap();
-                            match tok {
-                                Token::Whitespaces(_) => (),
-                                Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(attrDecls__seqfield0_item__choicevariant1__attributeGroup_e {
-                                        child: try_rollback!(stream, tx, attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                                    }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
-                                _ => panic!(format!("Did not expect token {:?}", tok)),
-                            }
-                        }
-                    }
-                    else {
-                        tx.rollback(stream);
-                        None
-                    }
-                },
-                _ => panic!(format!("Did not expect token {:?}", tok)),
-            }
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0_item__choicevariant1<'input>(attrDecls__seqfield0_item__choicevariant1__attributeGroup_e<'input>);
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element attrDecls__seqfield0_item__choicevariant1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            attrDecls__seqfield0_item__choicevariant1__attributeGroup_e::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant1)
-        }
-    }
-
-    #[derive(Debug, PartialEq)]
-    pub enum attrDecls__seqfield0_item<'input> {
-        choicevariant0(Box<attrDecls__seqfield0_item__choicevariant0<'input>>),
-        choicevariant1(Box<attrDecls__seqfield0_item__choicevariant1<'input>>),
-    }
-
-    impl<'input> Default for attrDecls__seqfield0_item<'input> { fn default() -> attrDecls__seqfield0_item<'input> { attrDecls__seqfield0_item::choicevariant1(Default::default()) } }
-
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }))])
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item<'input> {
-        const NODE_NAME: &'static str = "choice attrDecls__seqfield0_item";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match attrDecls__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_item::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match attrDecls__seqfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_item::choicevariant1(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield0<'input>(Vec<attrDecls__seqfield0_item<'input>>);
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield0<'input> {
-        const NODE_NAME: &'static str = "vec attrDecls__seqfield0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let mut items = Vec::new();
-            while let Some(new_item) = attrDecls__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
-                items.push(new_item);
-            }
-            Some(attrDecls__seqfield0(items))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls__seqfield1<'input>(Option<super::UNQUAL::anyAttribute_e<'input>>);
-
-
-    impl<'input> ParseXml<'input> for attrDecls__seqfield1<'input> {
-        const NODE_NAME: &'static str = "option attrDecls__seqfield1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            Some(attrDecls__seqfield1(super::UNQUAL::anyAttribute_e::parse_xml(stream, parse_context, parent_context)))
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct attrDecls<'input> {
-        seqfield0: attrDecls__seqfield0<'input>,
-        seqfield1: attrDecls__seqfield1<'input>,
-    }
-
-    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Element(Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }))])), (Some(0), None, Ref(QName(Some("xs"), "anyAttribute")))])
-
-
-    impl<'input> ParseXml<'input> for attrDecls<'input> {
-        const NODE_NAME: &'static str = "sequence attrDecls";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            Some(attrDecls {
-
-
-
-                seqfield0: try_rollback!(stream, tx, attrDecls__seqfield0::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                seqfield1: try_rollback!(stream, tx, attrDecls__seqfield1::parse_xml(stream, parse_context, parent_context)),
-
-
-
-            })
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
     pub struct typeDefParticle__choicevariant0__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
 
 
@@ -8024,6 +8674,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct typeDefParticle__choicevariant0__group_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: typeDefParticle__choicevariant0__group_e_inner<'input>,
     }
 
@@ -8049,21 +8700,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(typeDefParticle__choicevariant0__group_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(typeDefParticle__choicevariant0__group_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, typeDefParticle__choicevariant0__group_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(typeDefParticle__choicevariant0__group_e {
+                                        attrs,
+                                        child: typeDefParticle__choicevariant0__group_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -8072,6 +8752,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -8128,45 +8812,6 @@ pub mod UNQUAL {
         }
     }
 
-    #[derive(Debug, PartialEq)]
-    pub enum schemaTop<'input> {
-        choicevariant0(Box<super::UNQUAL::redefinable<'input>>),
-        choicevariant1(Box<super::UNQUAL::element_e<'input>>),
-        choicevariant2(Box<super::UNQUAL::attribute_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::notation_e<'input>>),
-    }
-
-    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::choicevariant3(Default::default()) } }
-
-    // ^-- from Choice([(None, None, GroupRef(QName(Some("xs"), "redefinable"))), (None, None, Ref(QName(Some("xs"), "element"))), (None, None, Ref(QName(Some("xs"), "attribute"))), (None, None, Ref(QName(Some("xs"), "notation")))])
-
-
-    impl<'input> ParseXml<'input> for schemaTop<'input> {
-        const NODE_NAME: &'static str = "choice schemaTop";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-
-
-
-            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant0(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::element_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant1(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::attribute_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant2(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::notation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant3(Box::new(r))), None => () }
-
-
-
-            None
-        }
-    }
-
     #[derive(Debug, PartialEq, Default)]
     pub struct allModel__seqfield0<'input>(Option<super::UNQUAL::annotation_e<'input>>);
 
@@ -8191,6 +8836,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct allModel__seqfield1_item__choicevariant0__element_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: allModel__seqfield1_item__choicevariant0__element_e_inner<'input>,
     }
 
@@ -8216,21 +8862,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(allModel__seqfield1_item__choicevariant0__element_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(allModel__seqfield1_item__choicevariant0__element_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, allModel__seqfield1_item__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(allModel__seqfield1_item__choicevariant0__element_e {
+                                        attrs,
+                                        child: allModel__seqfield1_item__choicevariant0__element_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -8239,6 +8914,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -8269,6 +8948,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct allModel__seqfield1_item__choicevariant2__group_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: allModel__seqfield1_item__choicevariant2__group_e_inner<'input>,
     }
 
@@ -8294,21 +8974,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(allModel__seqfield1_item__choicevariant2__group_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(allModel__seqfield1_item__choicevariant2__group_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, allModel__seqfield1_item__choicevariant2__group_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(allModel__seqfield1_item__choicevariant2__group_e {
+                                        attrs,
+                                        child: allModel__seqfield1_item__choicevariant2__group_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -8317,6 +9026,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -8413,7 +9126,137 @@ pub mod UNQUAL {
     }
 
     #[derive(Debug, PartialEq, Default)]
-    pub struct occurs<'input>(PhantomData<&'input ()>);
+    pub struct anyAttrGroup<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct defRef<'input>(PhantomData<&'input ()>);
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions_item__assert_e_inner<'input>(super::UNQUAL::assertion<'input>);
+
+
+    impl<'input> ParseXml<'input> for assertions_item__assert_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom assertions_item__assert_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::assertion::parse_xml(stream, parse_context, parent_context).map(assertions_item__assert_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions_item__assert_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: assertions_item__assert_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "assert"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "assertion"))), min_occurs: Some(0), max_occurs: Some(18446744073709551615) }
+
+
+    impl<'input> ParseXml<'input> for assertions_item__assert_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) assertions_item__assert_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "assert" {
+
+
+
+                        let mut attrs = HashMap::new();
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(assertions_item__assert_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, assertions_item__assert_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(assertions_item__assert_e {
+                                        attrs,
+                                        child: assertions_item__assert_e_inner::default(),
+
+
+
+                                    }),
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions_item<'input>(assertions_item__assert_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for assertions_item<'input> {
+        const NODE_NAME: &'static str = "elementtype element assertions_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            assertions_item__assert_e::parse_xml(stream, parse_context, parent_context).map(assertions_item)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct assertions<'input>(Vec<assertions_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for assertions<'input> {
+        const NODE_NAME: &'static str = "vec assertions";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = assertions_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(assertions(items))
+        }
+    }
 
     #[derive(Debug, PartialEq, Default)]
     pub struct simpleRestrictionModel__seqfield0_item__simpleType_e_inner<'input>(super::UNQUAL::localSimpleType<'input>);
@@ -8428,6 +9271,7 @@ pub mod UNQUAL {
 
     #[derive(Debug, PartialEq, Default)]
     pub struct simpleRestrictionModel__seqfield0_item__simpleType_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
         child: simpleRestrictionModel__seqfield0_item__simpleType_e_inner<'input>,
     }
 
@@ -8453,21 +9297,50 @@ pub mod UNQUAL {
 
 
 
+                        let mut attrs = HashMap::new();
                         loop {
                             let tok = stream.next().unwrap();
                             match tok {
                                 Token::Whitespaces(_) => (),
                                 Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(simpleRestrictionModel__seqfield0_item__simpleType_e {
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(simpleRestrictionModel__seqfield0_item__simpleType_e {
+                                        attrs,
                                         child: try_rollback!(stream, tx, simpleRestrictionModel__seqfield0_item__simpleType_e_inner::parse_xml(stream, parse_context, parent_context)),
 
 
 
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(simpleRestrictionModel__seqfield0_item__simpleType_e {
+                                        attrs,
+                                        child: simpleRestrictionModel__seqfield0_item__simpleType_e_inner::default(),
+
+
+
                                     }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
                                 _ => panic!(format!("Did not expect token {:?}", tok)),
                             }
                         }
@@ -8476,6 +9349,10 @@ pub mod UNQUAL {
                         tx.rollback(stream);
                         None
                     }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
                 },
                 _ => panic!(format!("Did not expect token {:?}", tok)),
             }
@@ -8577,210 +9454,52 @@ pub mod UNQUAL {
         }
     }
 
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant0__element_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom particle__choicevariant0__element_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0__element_e_inner)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant0__element_e<'input> {
-        child: particle__choicevariant0__element_e_inner<'input>,
-    }
-
-    // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant0__element_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) particle__choicevariant0__element_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            let mut tok = stream.next().unwrap();
-            loop {
-                match tok {
-                    Token::Whitespaces(_) => (),
-                    Token::Comment(_) => (),
-                    _ => break,
-                }
-                tok = stream.next().unwrap();
-            }
-            match tok {
-                Token::ElementStart(prefix, name) => {
-                    if name.to_str() == "element" {
-
-
-
-                        loop {
-                            let tok = stream.next().unwrap();
-                            match tok {
-                                Token::Whitespaces(_) => (),
-                                Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(particle__choicevariant0__element_e {
-                                        child: try_rollback!(stream, tx, particle__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                                    }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
-                                _ => panic!(format!("Did not expect token {:?}", tok)),
-                            }
-                        }
-                    }
-                    else {
-                        tx.rollback(stream);
-                        None
-                    }
-                },
-                _ => panic!(format!("Did not expect token {:?}", tok)),
-            }
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant0<'input>(particle__choicevariant0__element_e<'input>);
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant0<'input> {
-        const NODE_NAME: &'static str = "elementtype element particle__choicevariant0";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            particle__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant0)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant1__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant1__group_e_inner<'input> {
-        const NODE_NAME: &'static str = "custom particle__choicevariant1__group_e_inner";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1__group_e_inner)
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant1__group_e<'input> {
-        child: particle__choicevariant1__group_e_inner<'input>,
-    }
-
-    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant1__group_e<'input> {
-        const NODE_NAME: &'static str = "element (normal) particle__choicevariant1__group_e";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            let tx = stream.transaction();
-            let mut tok = stream.next().unwrap();
-            loop {
-                match tok {
-                    Token::Whitespaces(_) => (),
-                    Token::Comment(_) => (),
-                    _ => break,
-                }
-                tok = stream.next().unwrap();
-            }
-            match tok {
-                Token::ElementStart(prefix, name) => {
-                    if name.to_str() == "group" {
-
-
-
-                        loop {
-                            let tok = stream.next().unwrap();
-                            match tok {
-                                Token::Whitespaces(_) => (),
-                                Token::Comment(_) => (),
-                                Token::Attribute(_, _) => (),
-                                Token::ElementEnd(ElementEnd::Open) =>
-                                    return Some(particle__choicevariant1__group_e {
-                                        child: try_rollback!(stream, tx, particle__choicevariant1__group_e_inner::parse_xml(stream, parse_context, parent_context)),
-
-
-
-                                    }),
-                                Token::ElementEnd(_) =>
-                                    return Default::default(), // TODO
-                                _ => panic!(format!("Did not expect token {:?}", tok)),
-                            }
-                        }
-                    }
-                    else {
-                        tx.rollback(stream);
-                        None
-                    }
-                },
-                _ => panic!(format!("Did not expect token {:?}", tok)),
-            }
-        }
-    }
-
-    #[derive(Debug, PartialEq, Default)]
-    pub struct particle__choicevariant1<'input>(particle__choicevariant1__group_e<'input>);
-
-
-    impl<'input> ParseXml<'input> for particle__choicevariant1<'input> {
-        const NODE_NAME: &'static str = "elementtype element particle__choicevariant1";
-        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-            particle__choicevariant1__group_e::parse_xml(stream, parse_context, parent_context).map(particle__choicevariant1)
-        }
-    }
-
     #[derive(Debug, PartialEq)]
-    pub enum particle<'input> {
-        choicevariant0(Box<particle__choicevariant0<'input>>),
-        choicevariant1(Box<particle__choicevariant1<'input>>),
-        choicevariant2(Box<super::UNQUAL::all_e<'input>>),
-        choicevariant3(Box<super::UNQUAL::choice_e<'input>>),
-        choicevariant4(Box<super::UNQUAL::sequence_e<'input>>),
-        choicevariant5(Box<super::UNQUAL::any_e<'input>>),
+    pub enum composition<'input> {
+        choicevariant0(Box<super::UNQUAL::include_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::import_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::redefine_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::override_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::annotation_e<'input>>),
     }
 
-    impl<'input> Default for particle<'input> { fn default() -> particle<'input> { particle::choicevariant5(Default::default()) } }
+    impl<'input> Default for composition<'input> { fn default() -> composition<'input> { composition::choicevariant4(Default::default()) } }
 
-    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "all"))), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "include"))), (None, None, Ref(QName(Some("xs"), "import"))), (None, None, Ref(QName(Some("xs"), "redefine"))), (None, None, Ref(QName(Some("xs"), "override"))), (None, None, Ref(QName(Some("xs"), "annotation")))])
 
 
-    impl<'input> ParseXml<'input> for particle<'input> {
-        const NODE_NAME: &'static str = "choice particle";
+    impl<'input> ParseXml<'input> for composition<'input> {
+        const NODE_NAME: &'static str = "choice composition";
         fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
 
 
 
-            match particle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant0(Box::new(r))), None => () }
+            match super::UNQUAL::include_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant0(Box::new(r))), None => () }
 
 
 
-            match particle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant1(Box::new(r))), None => () }
+            match super::UNQUAL::import_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant1(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::all_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant2(Box::new(r))), None => () }
+            match super::UNQUAL::redefine_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant2(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant3(Box::new(r))), None => () }
+            match super::UNQUAL::override_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant3(Box::new(r))), None => () }
 
 
 
-            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant4(Box::new(r))), None => () }
-
-
-
-            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(particle::choicevariant5(Box::new(r))), None => () }
+            match super::UNQUAL::annotation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(composition::choicevariant4(Box::new(r))), None => () }
 
 
 
             None
         }
     }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct occurs<'input>(PhantomData<&'input ()>);
 
     #[derive(Debug, PartialEq)]
     pub enum identityConstraint<'input> {
@@ -8809,6 +9528,694 @@ pub mod UNQUAL {
 
 
             match super::UNQUAL::keyref_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(identityConstraint::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum redefinable<'input> {
+        choicevariant0(Box<super::UNQUAL::simpleType_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::complexType_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::group_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::attributeGroup_e<'input>>),
+    }
+
+    impl<'input> Default for redefinable<'input> { fn default() -> redefinable<'input> { redefinable::choicevariant3(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "simpleType"))), (None, None, Ref(QName(Some("xs"), "complexType"))), (None, None, Ref(QName(Some("xs"), "group"))), (None, None, Ref(QName(Some("xs"), "attributeGroup")))])
+
+
+    impl<'input> ParseXml<'input> for redefinable<'input> {
+        const NODE_NAME: &'static str = "choice redefinable";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::simpleType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::complexType_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::group_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::attributeGroup_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(redefinable::choicevariant3(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant0__attribute_e_inner<'input>(super::UNQUAL::attribute<'input>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0__attribute_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom attrDecls__seqfield0_item__choicevariant0__attribute_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::attribute::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant0__attribute_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant0__attribute_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: attrDecls__seqfield0_item__choicevariant0__attribute_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0__attribute_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) attrDecls__seqfield0_item__choicevariant0__attribute_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "attribute" {
+
+
+
+                        let mut attrs = HashMap::new();
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(attrDecls__seqfield0_item__choicevariant0__attribute_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, attrDecls__seqfield0_item__choicevariant0__attribute_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(attrDecls__seqfield0_item__choicevariant0__attribute_e {
+                                        attrs,
+                                        child: attrDecls__seqfield0_item__choicevariant0__attribute_e_inner::default(),
+
+
+
+                                    }),
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant0<'input>(attrDecls__seqfield0_item__choicevariant0__attribute_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element attrDecls__seqfield0_item__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            attrDecls__seqfield0_item__choicevariant0__attribute_e::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner<'input>(super::UNQUAL::attributeGroupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::attributeGroupRef::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant1__attributeGroup_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1__attributeGroup_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) attrDecls__seqfield0_item__choicevariant1__attributeGroup_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "attributeGroup" {
+
+
+
+                        let mut attrs = HashMap::new();
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(attrDecls__seqfield0_item__choicevariant1__attributeGroup_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(attrDecls__seqfield0_item__choicevariant1__attributeGroup_e {
+                                        attrs,
+                                        child: attrDecls__seqfield0_item__choicevariant1__attributeGroup_e_inner::default(),
+
+
+
+                                    }),
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0_item__choicevariant1<'input>(attrDecls__seqfield0_item__choicevariant1__attributeGroup_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element attrDecls__seqfield0_item__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            attrDecls__seqfield0_item__choicevariant1__attributeGroup_e::parse_xml(stream, parse_context, parent_context).map(attrDecls__seqfield0_item__choicevariant1)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum attrDecls__seqfield0_item<'input> {
+        choicevariant0(Box<attrDecls__seqfield0_item__choicevariant0<'input>>),
+        choicevariant1(Box<attrDecls__seqfield0_item__choicevariant1<'input>>),
+    }
+
+    impl<'input> Default for attrDecls__seqfield0_item<'input> { fn default() -> attrDecls__seqfield0_item<'input> { attrDecls__seqfield0_item::choicevariant1(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }))])
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0_item<'input> {
+        const NODE_NAME: &'static str = "choice attrDecls__seqfield0_item";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match attrDecls__seqfield0_item__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_item::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match attrDecls__seqfield0_item__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(attrDecls__seqfield0_item::choicevariant1(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield0<'input>(Vec<attrDecls__seqfield0_item<'input>>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield0<'input> {
+        const NODE_NAME: &'static str = "vec attrDecls__seqfield0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let mut items = Vec::new();
+            while let Some(new_item) = attrDecls__seqfield0_item::parse_xml(stream, parse_context, parent_context) {
+                items.push(new_item);
+            }
+            Some(attrDecls__seqfield0(items))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls__seqfield1<'input>(Option<super::UNQUAL::anyAttribute_e<'input>>);
+
+
+    impl<'input> ParseXml<'input> for attrDecls__seqfield1<'input> {
+        const NODE_NAME: &'static str = "option attrDecls__seqfield1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            Some(attrDecls__seqfield1(super::UNQUAL::anyAttribute_e::parse_xml(stream, parse_context, parent_context)))
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct attrDecls<'input> {
+        seqfield0: attrDecls__seqfield0<'input>,
+        seqfield1: attrDecls__seqfield1<'input>,
+    }
+
+    // ^-- from Sequence([(Some(0), Some(18446744073709551615), Choice([(None, None, Element(Element { name: QName(None, "attribute"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attribute"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "attributeGroup"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "attributeGroupRef"))), min_occurs: None, max_occurs: None }))])), (Some(0), None, Ref(QName(Some("xs"), "anyAttribute")))])
+
+
+    impl<'input> ParseXml<'input> for attrDecls<'input> {
+        const NODE_NAME: &'static str = "sequence attrDecls";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            Some(attrDecls {
+
+
+
+                seqfield0: try_rollback!(stream, tx, attrDecls__seqfield0::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                seqfield1: try_rollback!(stream, tx, attrDecls__seqfield1::parse_xml(stream, parse_context, parent_context)),
+
+
+
+            })
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum simpleDerivation<'input> {
+        choicevariant0(Box<super::UNQUAL::restriction_e<'input>>),
+        choicevariant1(Box<super::UNQUAL::list_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::union_e<'input>>),
+    }
+
+    impl<'input> Default for simpleDerivation<'input> { fn default() -> simpleDerivation<'input> { simpleDerivation::choicevariant2(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Ref(QName(Some("xs"), "restriction"))), (None, None, Ref(QName(Some("xs"), "list"))), (None, None, Ref(QName(Some("xs"), "union")))])
+
+
+    impl<'input> ParseXml<'input> for simpleDerivation<'input> {
+        const NODE_NAME: &'static str = "choice simpleDerivation";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::restriction_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::list_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::union_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(simpleDerivation::choicevariant2(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum schemaTop<'input> {
+        choicevariant0(Box<super::UNQUAL::redefinable<'input>>),
+        choicevariant1(Box<super::UNQUAL::element_e<'input>>),
+        choicevariant2(Box<super::UNQUAL::attribute_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::notation_e<'input>>),
+    }
+
+    impl<'input> Default for schemaTop<'input> { fn default() -> schemaTop<'input> { schemaTop::choicevariant3(Default::default()) } }
+
+    // ^-- from Choice([(None, None, GroupRef(QName(Some("xs"), "redefinable"))), (None, None, Ref(QName(Some("xs"), "element"))), (None, None, Ref(QName(Some("xs"), "attribute"))), (None, None, Ref(QName(Some("xs"), "notation")))])
+
+
+    impl<'input> ParseXml<'input> for schemaTop<'input> {
+        const NODE_NAME: &'static str = "choice schemaTop";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match super::UNQUAL::redefinable::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::element_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::attribute_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::notation_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(schemaTop::choicevariant3(Box::new(r))), None => () }
+
+
+
+            None
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant0__element_e_inner<'input>(super::UNQUAL::localElement<'input>);
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0__element_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom nestedParticle__choicevariant0__element_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::localElement::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0__element_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant0__element_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: nestedParticle__choicevariant0__element_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0__element_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) nestedParticle__choicevariant0__element_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "element" {
+
+
+
+                        let mut attrs = HashMap::new();
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(nestedParticle__choicevariant0__element_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, nestedParticle__choicevariant0__element_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(nestedParticle__choicevariant0__element_e {
+                                        attrs,
+                                        child: nestedParticle__choicevariant0__element_e_inner::default(),
+
+
+
+                                    }),
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant0<'input>(nestedParticle__choicevariant0__element_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant0<'input> {
+        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant0";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            nestedParticle__choicevariant0__element_e::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant0)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant1__group_e_inner<'input>(super::UNQUAL::groupRef<'input>);
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1__group_e_inner<'input> {
+        const NODE_NAME: &'static str = "custom nestedParticle__choicevariant1__group_e_inner";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            super::UNQUAL::groupRef::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1__group_e_inner)
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant1__group_e<'input> {
+        attrs: HashMap<QName<'input>, &'input str>,
+        child: nestedParticle__choicevariant1__group_e_inner<'input>,
+    }
+
+    // ^-- from Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None }
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1__group_e<'input> {
+        const NODE_NAME: &'static str = "element (normal) nestedParticle__choicevariant1__group_e";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            let tx = stream.transaction();
+            let mut tok = stream.next().unwrap();
+            loop {
+                match tok {
+                    Token::Whitespaces(_) => (),
+                    Token::Comment(_) => (),
+                    _ => break,
+                }
+                tok = stream.next().unwrap();
+            }
+            match tok {
+                Token::ElementStart(prefix, name) => {
+                    if name.to_str() == "group" {
+
+
+
+                        let mut attrs = HashMap::new();
+                        loop {
+                            let tok = stream.next().unwrap();
+                            match tok {
+                                Token::Whitespaces(_) => (),
+                                Token::Comment(_) => (),
+                                Token::Attribute((key_prefix, key_local), value) => {
+                                    let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                    let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                },
+                                Token::ElementEnd(ElementEnd::Open) => {
+                                    let ret = Some(nestedParticle__choicevariant1__group_e {
+                                        attrs,
+                                        child: try_rollback!(stream, tx, nestedParticle__choicevariant1__group_e_inner::parse_xml(stream, parse_context, parent_context)),
+
+
+
+                                    });
+                                    let mut next_tok;
+                                    loop {
+                                        next_tok = stream.next();
+                                        match next_tok {
+                                            Some(Token::Whitespaces(_)) => (),
+                                            Some(Token::Comment(_)) => (),
+                                            Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                return ret;
+                                            }
+                                            _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                        }
+                                    }
+                                },
+                                Token::ElementEnd(ElementEnd::Empty) =>
+                                    return Some(nestedParticle__choicevariant1__group_e {
+                                        attrs,
+                                        child: nestedParticle__choicevariant1__group_e_inner::default(),
+
+
+
+                                    }),
+                                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    tx.rollback(stream);
+                                    return None
+                                },
+                                _ => panic!(format!("Did not expect token {:?}", tok)),
+                            }
+                        }
+                    }
+                    else {
+                        tx.rollback(stream);
+                        None
+                    }
+                },
+                Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    tx.rollback(stream);
+                    return None
+                },
+                _ => panic!(format!("Did not expect token {:?}", tok)),
+            }
+        }
+    }
+
+    #[derive(Debug, PartialEq, Default)]
+    pub struct nestedParticle__choicevariant1<'input>(nestedParticle__choicevariant1__group_e<'input>);
+
+
+    impl<'input> ParseXml<'input> for nestedParticle__choicevariant1<'input> {
+        const NODE_NAME: &'static str = "elementtype element nestedParticle__choicevariant1";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            nestedParticle__choicevariant1__group_e::parse_xml(stream, parse_context, parent_context).map(nestedParticle__choicevariant1)
+        }
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum nestedParticle<'input> {
+        choicevariant0(Box<nestedParticle__choicevariant0<'input>>),
+        choicevariant1(Box<nestedParticle__choicevariant1<'input>>),
+        choicevariant2(Box<super::UNQUAL::choice_e<'input>>),
+        choicevariant3(Box<super::UNQUAL::sequence_e<'input>>),
+        choicevariant4(Box<super::UNQUAL::any_e<'input>>),
+    }
+
+    impl<'input> Default for nestedParticle<'input> { fn default() -> nestedParticle<'input> { nestedParticle::choicevariant4(Default::default()) } }
+
+    // ^-- from Choice([(None, None, Element(Element { name: QName(None, "element"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "localElement"))), min_occurs: None, max_occurs: None })), (None, None, Element(Element { name: QName(None, "group"), attrs: [], mixed: false, type_: Some(Custom(QName(Some("xs"), "groupRef"))), min_occurs: None, max_occurs: None })), (None, None, Ref(QName(Some("xs"), "choice"))), (None, None, Ref(QName(Some("xs"), "sequence"))), (None, None, Ref(QName(Some("xs"), "any")))])
+
+
+    impl<'input> ParseXml<'input> for nestedParticle<'input> {
+        const NODE_NAME: &'static str = "choice nestedParticle";
+        fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+
+
+
+            match nestedParticle__choicevariant0::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant0(Box::new(r))), None => () }
+
+
+
+            match nestedParticle__choicevariant1::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant1(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::choice_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant2(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::sequence_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant3(Box::new(r))), None => () }
+
+
+
+            match super::UNQUAL::any_e::parse_xml(stream, parse_context, parent_context) { Some(r) => return Some(nestedParticle::choicevariant4(Box::new(r))), None => () }
 
 
 
