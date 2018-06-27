@@ -9,7 +9,10 @@ pub mod parser;
 pub mod support;
 pub mod parser_generator;
 
-//mod generated;
+#[cfg(test)]
+pub mod generated;
+#[cfg(test)]
+mod test_generated;
 
 pub fn parse_xsd(xsd: &str) -> parser::Document {
     let mut stream = xmlparser::Tokenizer::from(xsd);

@@ -1,10 +1,10 @@
 
-extern crate xmlparser;
-extern crate xml_schema;
-use xml_schema::parse_xsd;
-use xml_schema::parser::*;
-use xml_schema::generated::UNQUAL;
-use xml_schema::support::*;
+use xmlparser;
+
+use parse_xsd;
+use parser::*;
+use generated::UNQUAL;
+use support::*;
 
 const PERSON_XSD: &'static str = r#"
   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="foo">
