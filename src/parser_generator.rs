@@ -469,11 +469,22 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 let mut last_item_name = None;
                 let mut variants = Vec::new();
                 for (i, (min_occurs, max_occurs, item)) in items.iter().enumerate() {
-                    let element_name = format!("choicevariant{}", i);
-                    let field_typename = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
-                    e.new_variant(&element_name).tuple(&format!("Box<{}<'input>>", field_typename));
-                    last_item_name = Some(element_name.clone());
-                    variants.push((element_name, field_typename));
+                    match (min_occurs.unwrap_or(1), max_occurs.unwrap_or(1), item) {
+                        (1, 1, ElementType::Element(elem)) => {
+                            let variant_name = elem.name.1;
+                            let variant_type_name = self.element(elem, None);
+                            e.new_variant(&variant_name).tuple(&format!("Box<{}<'input>>", variant_type_name));
+                            variants.push((variant_name.to_string(), variant_type_name.to_string())); // TODO: namespace
+                            last_item_name = Some(variant_name.to_string());
+                        },
+                        _ => {
+                            let element_name = format!("choicevariant{}", i);
+                            let field_typename = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
+                            e.new_variant(&element_name).tuple(&format!("Box<{}<'input>>", field_typename));
+                            last_item_name = Some(element_name.clone());
+                            variants.push((element_name, field_typename));
+                        }
+                    }
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_enum(e);
