@@ -14,6 +14,8 @@ pub mod round0_parser_generator;
 #[cfg(test)]
 pub mod generated;
 #[cfg(test)]
+pub mod parser_generator;
+#[cfg(test)]
 mod test_generated;
 #[cfg(test)]
 mod test_generated_schema;

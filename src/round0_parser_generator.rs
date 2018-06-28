@@ -275,7 +275,7 @@ impl<'a> ParserGenerator<'a> {
 
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
                 {
-                    let mut s = module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").field("attrs", &format!("HashMap<QName<'input>, &'input str>")).field("child", &format!("{}<'input>", inner_type_name));
+                    let mut s = module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").field("pub attrs", &format!("HashMap<QName<'input>, &'input str>")).field("pub child", &format!("{}<'input>", inner_type_name));
                 }
                 module.scope().raw(&format!("// ^-- from {:?}", element));
                 module.scope().raw(&format!(r#"impl_parsexml_for_element!({}, {:?}, {});"#,
@@ -310,7 +310,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 }
                 self.generated_types.insert(name.clone(), name.clone());
                 let mut s = cg::Struct::new(&name);
-                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("Option<{}<'input>>", child_typename));
+                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("pub Option<{}<'input>>", child_typename));
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
                 module.scope().raw(&format!(r#"
@@ -330,7 +330,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 }
                 self.generated_types.insert(name.clone(), name.clone());
                 let mut s = cg::Struct::new(&name);
-                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("Vec<{}<'input>>", child_typename));
+                s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("pub Vec<{}<'input>>", child_typename));
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
                 module.scope().raw(&format!(r#"
@@ -365,25 +365,25 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                         (1, 1, ElementType::Element(elem)) => {
                             let field_name = elem.name.1;
                             let field_type_name = self.element(elem, None);
-                            s.field(&field_name, &format!("{}<'input>", field_type_name));
+                            s.field(&format!("pub {}", field_name), &format!("{}<'input>", field_type_name));
                             fields.push((field_name.to_string(), field_type_name.to_string())); // TODO: namespace
                         },
                         (1, 1, ElementType::GroupRef(ref_name)) => {
                             let field_name = escape_keyword(ref_name.1);
                             let field_type_name = escape_keyword(ref_name.1);
-                            s.field(&field_name, &format!("{}<'input>", field_type_name));
+                            s.field(&format!("pub {}", field_name), &format!("{}<'input>", field_type_name));
                             fields.push((field_name.to_string(), field_type_name.to_string())); // TODO: namespace
                         },
                         (1, 1, ElementType::Ref(ref_name)) => {
                             let field_name = escape_keyword(ref_name.1);
                             let field_type_name = escape_keyword(&format!("{}_e", ref_name.1));
-                            s.field(&field_name, &format!("{}<'input>", field_type_name));
+                            s.field(&format!("pub {}", field_name), &format!("{}<'input>", field_type_name));
                             fields.push((field_name.to_string(), field_type_name.to_string())); // TODO: namespace
                         },
                         _ => {
                             let element_name = format!("seqfield{}", i);
                             let (element_name, field_typename) = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
-                            s.field(&element_name, &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
+                            s.field(&format!("pub {}", element_name), &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
                             fields.push((element_name, field_typename));
                         }
                     }
@@ -432,7 +432,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
             ElementType::Custom(id_) => {
                 let type_name = self.id_to_type_name(*id_);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("{}<'input>", type_name));
+                module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("pub {}<'input>", type_name));
                 module.scope().raw(&format!(r#"
 impl<'input> ParseXml<'input> for {}<'input> {{
     const NODE_NAME: &'static str = "custom {}";
@@ -447,12 +447,12 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 let mut s = cg::Struct::new(&struct_name);
                 s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
                 let base_typename = self.id_to_type_name(*base);
-                s.field("BASE", format!("{}<'input>", base_typename));
+                s.field("pub BASE", format!("{}<'input>", base_typename));
                 let mut fields = Vec::new();
                 for (i, (min_occurs, max_occurs, item)) in items.iter().enumerate() {
                     let element_name = format!("extfield{}", i);
                     let (element_name, field_typename) = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
-                    s.field(&element_name, &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
+                    s.field(&format!("pub {}", element_name), &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
                     fields.push((element_name, field_typename));
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
@@ -568,7 +568,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 }
                 self.generated_types.insert(name.to_string(), name.to_string());
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(&name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(&format!("Vec<{}<'input>>", type_));
+                module.new_struct(&name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(&format!("pub Vec<{}<'input>>", type_));
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
                 (name.to_string(), name.to_string())
             },
@@ -576,7 +576,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 let type_name = self.id_to_type_name(*item_type);
                 let name = format!("{}_list", name);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(&name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(&format!("Vec<{}<'input>>", type_name));
+                module.new_struct(&name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(&format!("pub Vec<{}<'input>>", type_name));
                 (name.clone(), name)
             },
             ElementType::Element(e) => {
