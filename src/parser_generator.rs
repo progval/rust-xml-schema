@@ -406,7 +406,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
             0: Default::default()
 "#,                 ));
                 }
-                for (item_name, item_typename) in fields {
+                for (item_name, item_typename) in fields.iter() {
                     module.scope().raw(&format!(r#"
             {}: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
 "#,                 item_name, item_typename));
@@ -415,6 +415,10 @@ impl<'input> ParseXml<'input> for {}<'input> {{
         }})
     }}
 }}"#,           ));
+                if fields.len() == 1 {
+                    let (element_name, field_typename) = fields.remove(0);
+                    return (element_name, field_typename);
+                }
                 (name.to_string(), name.to_string())
             },
             ElementType::Ref(id) => {
