@@ -144,6 +144,7 @@ pub struct ParserGenerator<'a> {
     ns_to_uri: HashMap<String, &'a str>,
     pub nsuri_to_module: HashMap<&'a str, (String, cg::Module)>,
     generated_elements: HashMap<QName<'a>, String>,
+    generated_types: HashMap<String, String>,
 }
 
 impl<'a> ParserGenerator<'a> {
@@ -154,6 +155,7 @@ impl<'a> ParserGenerator<'a> {
             ns_to_uri: document.schema.as_ref().unwrap().namespaces.clone(),
             nsuri_to_module: HashMap::new(),
             generated_elements: HashMap::new(),
+            generated_types: HashMap::new(),
         }
     }
 
@@ -197,8 +199,8 @@ impl<'a> ParserGenerator<'a> {
         groups.sort_by_key(|&(n,_)| n);
         for (name, (min_occurs, max_occurs, attrs, type_tree)) in groups.iter() {
             match type_tree {
-                Some(tt) => self.type_occurs(*min_occurs, *max_occurs, &name, &tt),
-                None => self.empty_type(&name),
+                Some(tt) => { self.type_occurs(*min_occurs, *max_occurs, &name, &tt); },
+                None => { self.empty_type(&name); },
             };
         }
         self.nsuri_to_module.get_mut(self.target_uri).unwrap() // Won't panic because we inserted it before.
@@ -268,7 +270,7 @@ impl<'a> ParserGenerator<'a> {
 
         match type_ {
             Some(type_) => {
-                let inner_type_name = self.type_occurs(*min_occurs, *max_occurs, &format!("{}_inner", type_name), type_);
+                let (_, inner_type_name) = self.type_occurs(*min_occurs, *max_occurs, &format!("{}_inner", type_name), type_);
 
 
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
@@ -296,14 +298,18 @@ impl<'input> ParseXml<'input> for {}<'input> {{
         real_name
     }
 
-    fn type_occurs(&mut self, min_occurs: Option<usize>, max_occurs: Option<usize>, name: &str, type_tree: &ElementType<'a>) -> String {
+    fn type_occurs(&mut self, min_occurs: Option<usize>, max_occurs: Option<usize>, name: &str, type_tree: &ElementType<'a>) -> (String, String) {
         match (min_occurs, max_occurs) {
             (None, None) | (None, Some(1)) | (Some(1), None) | (Some(1), Some(1)) =>
                 self.type_(name, type_tree),
             (Some(0), None) | (Some(0), Some(1)) => {
-                let item_name = format!("{}_item", name);
-                let mut s = cg::Struct::new(name);
-                let child_typename = self.type_(&item_name, type_tree);
+                let (field_name, child_typename) = self.type_(name, type_tree);
+                let name = format!("opt_{}", field_name);
+                if let Some(type_name) = self.generated_types.get(&name) {
+                    return (field_name, type_name.clone());
+                }
+                self.generated_types.insert(name.clone(), name.clone());
+                let mut s = cg::Struct::new(&name);
                 s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("Option<{}<'input>>", child_typename));
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
@@ -314,12 +320,16 @@ impl<'input> ParseXml<'input> for {}<'input> {{
         Some({}({}::parse_xml(stream, parse_context, parent_context)))
     }}
 }}"#,           name, name, name, child_typename));
-                name.to_string()
+                (field_name, name.to_string())
             }
             (_, _) => {
-                let item_name = format!("{}_item", name);
-                let mut s = cg::Struct::new(name);
-                let child_typename = self.type_(&item_name, type_tree);
+                let (field_name, child_typename) = self.type_(&name, type_tree);
+                let name = format!("many_{}", field_name);
+                if let Some(type_name) = self.generated_types.get(&name) {
+                    return (field_name, type_name.clone());
+                }
+                self.generated_types.insert(name.clone(), name.clone());
+                let mut s = cg::Struct::new(&name);
                 s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("Vec<{}<'input>>", child_typename));
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
@@ -334,14 +344,17 @@ impl<'input> ParseXml<'input> for {}<'input> {{
         Some({}(items))
     }}
 }}"#,           name, name, child_typename, name)); // TODO: validate the size
-                name.to_string()
+                (field_name, name.to_string())
             }
         }
     }
-    fn type_(&mut self, name: &str, type_tree: &ElementType<'a>) -> String {
+    fn type_(&mut self, name: &str, type_tree: &ElementType<'a>) -> (String, String) {
         match type_tree {
-            ElementType::String | ElementType::Date => {
-                "XmlString".to_string()
+            ElementType::String => {
+                ("string".to_string(), "XmlString".to_string())
+            }
+            ElementType::Date => {
+                ("date".to_string(), "XmlString".to_string())
             }
             ElementType::Sequence(items) => {
                 let mut s = cg::Struct::new(name);
@@ -369,7 +382,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                         },
                         _ => {
                             let element_name = format!("seqfield{}", i);
-                            let field_typename = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
+                            let (element_name, field_typename) = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
                             s.field(&element_name, &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
                             fields.push((element_name, field_typename));
                         }
@@ -402,15 +415,15 @@ impl<'input> ParseXml<'input> for {}<'input> {{
         }})
     }}
 }}"#,           ));
-                name.to_string()
+                (name.to_string(), name.to_string())
             },
             ElementType::Ref(id) => {
                 let escaped_name = escape_keyword(&format!("{}_e", id.1));
-                let mut id = QName(id.0, &escaped_name);
-                self.id_to_type_name(id)
+                let mut newid = QName(id.0, &escaped_name);
+                (id.1.to_string(), self.id_to_type_name(newid))
             },
             ElementType::GroupRef(id) => {
-                self.id_to_type_name(*id)
+                (id.1.to_string(), self.id_to_type_name(*id))
             },
             ElementType::Custom(id_) => {
                 let type_name = self.id_to_type_name(*id_);
@@ -423,7 +436,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
         {}::parse_xml(stream, parse_context, parent_context).map({})
     }}
 }}"#,           name, name, type_name, name));
-                name.to_string()
+                (id_.1.to_string(), name.to_string())
             }
             ElementType::Extension(base, items) => {
                 let struct_name = escape_keyword(name);
@@ -434,7 +447,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 let mut fields = Vec::new();
                 for (i, (min_occurs, max_occurs, item)) in items.iter().enumerate() {
                     let element_name = format!("extfield{}", i);
-                    let field_typename = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
+                    let (element_name, field_typename) = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
                     s.field(&element_name, &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
                     fields.push((element_name, field_typename));
                 }
@@ -459,7 +472,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
     }}
 }}
 "#,             ));
-                struct_name
+                (name.to_string(), struct_name)
             },
             ElementType::Union(member_types, items) => {
                 let struct_name = escape_keyword(name);
@@ -475,14 +488,14 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                     for (i, (min_occurs, max_occurs, item)) in items.iter().enumerate() {
                         let item_name = format!("item{}", i);
                         let item_type_name = format!("{}__item{}", name, i);
-                        let item_type = self.type_occurs(*min_occurs, *max_occurs, &item_type_name, item);
+                        let (item_name, item_type) = self.type_occurs(*min_occurs, *max_occurs, &item_type_name, item);
                         s.field(&item_name, &format!("{}<'input>", item_type));
                     }
                 }
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
                 module.push_struct(s);
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
-                struct_name
+                (name.to_string(), struct_name)
             },
             ElementType::Choice(items) => {
                 let enum_name = escape_keyword(name);
@@ -515,7 +528,7 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                         },
                         _ => {
                             let element_name = format!("choicevariant{}", i);
-                            let field_typename = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
+                            let (element_name, field_typename) = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
                             e.new_variant(&element_name).tuple(&format!("Box<{}<'input>>", field_typename));
                             last_item_name = Some(element_name.clone());
                             variants.push((element_name, field_typename));
@@ -541,36 +554,30 @@ impl<'input> ParseXml<'input> for {}<'input> {{
         None
     }}
 }}"#,           ));
-                enum_name
+                (name.to_string(), enum_name)
             },
             ElementType::List(List::ComplexList(min_occurs, max_occurs, mixed, item_type)) => {
                 let struct_name = escape_keyword(name);
-                let item_type_name = format!("{}__valuetype", name);
-                let type_ = self.type_(&item_type_name, item_type);
+                let (_, type_) = self.type_(&format!("{}__valuetype", name), item_type);
+                if let Some(type_name) = self.generated_types.get(name) {
+                    return (name.to_string(), type_name.clone());
+                }
+                self.generated_types.insert(name.to_string(), name.to_string());
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(&format!("Vec<{}<'input>>", type_));
+                module.new_struct(&name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(&format!("Vec<{}<'input>>", type_));
                 module.scope().raw(&format!("// ^-- from {:?}", type_tree));
-                struct_name
+                (name.to_string(), name.to_string())
             },
             ElementType::List(List::SimpleList(item_type)) => {
-                let struct_name = escape_keyword(name);
                 let type_name = self.id_to_type_name(*item_type);
+                let name = format!("{}_list", name);
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(&format!("Vec<{}<'input>>", type_name));
-                struct_name
+                module.new_struct(&name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(&format!("Vec<{}<'input>>", type_name));
+                (name.clone(), name)
             },
             ElementType::Element(e) => {
                 let element_type_name = self.element(e, None);
-                let (_, ref mut module) = self.nsuri_to_module.get_mut(self.target_uri).unwrap();
-                module.new_struct(name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").tuple_field(format!("{}<'input>", element_type_name));
-                module.scope().raw(&format!(r#"
-impl<'input> ParseXml<'input> for {}<'input> {{
-    const NODE_NAME: &'static str = "elementtype element {}";
-    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
-        {}::parse_xml(stream, parse_context, parent_context).map({})
-    }}
-}}"#,           name, name, element_type_name, name));
-                name.to_string()
+                (e.name.1.to_string(), element_type_name)
             }
             _ => unimplemented!("{:?}", type_tree),
         }
