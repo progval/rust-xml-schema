@@ -15,6 +15,127 @@ fn escape_keyword(name: &str) -> String {
     }
 }
 
+pub const MACROS: &'static str = r#"
+macro_rules! impl_parsexml_for_element {
+    ( $element_type:ident, $element_name:expr, $child_type:ident ) => {
+        impl<'input> ParseXml<'input> for $element_type<'input> {
+            const NODE_NAME: &'static str = "element (normal) $element_type";
+            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+                let tx = stream.transaction();
+                let mut tok = stream.next().unwrap();
+                loop {
+                    match tok {
+                        Token::Whitespaces(_) => (),
+                        Token::Comment(_) => (),
+                        Token::Text(_) => (),
+                        _ => break,
+                    }
+                    tok = stream.next().unwrap();
+                }
+                match tok {
+                    Token::ElementStart(prefix, name) => {
+                        if name.to_str() == $element_name {
+                            let mut attrs = HashMap::new();
+                            loop {
+                                let tok = stream.next().unwrap();
+                                match tok {
+                                    Token::Whitespaces(_) => (),
+                                    Token::Comment(_) => (),
+                                    Token::Text(_) => (),
+                                    Token::Attribute((key_prefix, key_local), value) => {
+                                        let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
+                                        let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                    },
+                                    Token::ElementEnd(ElementEnd::Open) => {
+                                        let ret = Some($element_type {
+                                            attrs,
+                                            child: try_rollback!(stream, tx, $child_type::parse_xml(stream, parse_context, parent_context)),
+                                        });
+                                        let mut next_tok;
+                                        loop {
+                                            next_tok = stream.next();
+                                            match next_tok {
+                                                Some(Token::Whitespaces(_)) => (),
+                                                Some(Token::Comment(_)) => (),
+                                                Some(Token::Text(_)) => (),
+                                                Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                    assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                    return ret;
+                                                }
+                                                _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                            }
+                                        }
+                                    },
+                                    Token::ElementEnd(ElementEnd::Empty) =>
+                                        return Some($element_type {
+                                            attrs,
+                                            child: $child_type::default(),
+                                        }),
+                                    Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                        tx.rollback(stream);
+                                        return None
+                                    },
+                                    _ => panic!(format!("Did not expect token {:?}", tok)),
+                                }
+                            }
+                        }
+                        else {
+                            tx.rollback(stream);
+                            None
+                        }
+                    },
+                    Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                        tx.rollback(stream);
+                        return None
+                    },
+                    _ => panic!(format!("Did not expect token {:?}", tok)),
+                }
+            }
+        }
+    }
+}
+
+macro_rules! impl_parsexml_for_substitution {
+    ( $element_type:ident, $($variant_name:ident => $variant_type:ident,)* ) => {
+        impl<'input> ParseXml<'input> for $element_type<'input> {
+            const NODE_NAME: &'static str = "element (substitution group) $element_type";
+            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+                let tx = stream.transaction();
+                let mut tok = stream.next().unwrap();
+                loop {
+                    match tok {
+                        Token::Whitespaces(_) => (),
+                        Token::Comment(_) => (),
+                        Token::Text(_) => (),
+                        _ => break,
+                    }
+                    tok = stream.next().unwrap();
+                }
+                match tok {
+                    Token::ElementStart(prefix, name) => {
+                        tx.rollback(stream);
+                        $(
+                            match $variant_type::parse_xml(stream, parse_context, parent_context) {
+                                Some(s) => return Some($element_type::$variant_name(s)),
+                                None => (),
+                            }
+                        )*
+                        None
+                    }
+                    Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                        tx.rollback(stream);
+                        return None
+                    },
+                    _ => panic!(format!("Did not expect token {:?}", tok)),
+                }
+            }
+        }
+    }
+}
+
+"#;
+
+
 #[derive(Debug)]
 pub struct ParserGenerator<'a> {
     //document: &'a Document<'a>
@@ -128,44 +249,11 @@ impl<'a> ParserGenerator<'a> {
                     let default_impl = format!("impl<'input> Default for {}<'input> {{ fn default() -> {}<'input> {{ {}::{}(Default::default()) }} }}", real_name, real_name, real_name, last_item_name ); // TODO: remove this, that's a temporary hack
                     (real_name, type_name, default_impl)
                 };
-                module.scope().raw(&format!(r#"
-impl<'input> ParseXml<'input> for {}<'input> {{
-    const NODE_NAME: &'static str = "element (substitution group) {}";
-    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
-        let tx = stream.transaction();
-        let mut tok = stream.next().unwrap();
-        loop {{
-            match tok {{
-                Token::Whitespaces(_) => (),
-                Token::Comment(_) => (),
-                Token::Text(_) => (),
-                _ => break,
-            }}
-            tok = stream.next().unwrap();
-        }}
-        match tok {{
-            Token::ElementStart(prefix, name) => {{
-                tx.rollback(stream);
-"#,             real_name, real_name));
+                module.scope().raw(&format!(r#"impl_parsexml_for_substitution!({}, "#, real_name));
                 for substitute in substitutes.iter() {
-                    module.scope().raw(&format!(r#"
-                match {}_e::parse_xml(stream, parse_context, parent_context) {{
-                    Some(s) => return Some({}::{}(s)),
-                    None => (),
-                }}
-"#,                 substitute, real_name, substitute));
+                    module.scope().raw(&format!(r#"{} => {}_e,"#, substitute, substitute));
                 }
-                module.scope().raw(&format!(r#"
-                None
-            }}
-            Token::ElementEnd(ElementEnd::Close(_, _)) => {{
-                tx.rollback(stream);
-                return None
-            }},
-            _ => panic!(format!("Did not expect token {{:?}}", tok)),
-        }}
-    }}
-}}"#,           ));
+                module.scope().raw(&format!(r#");"#));
                 module.scope().raw(&default_impl);
                 (real_name, type_name)
             }
@@ -182,125 +270,14 @@ impl<'input> ParseXml<'input> for {}<'input> {{
             Some(type_) => {
                 let inner_type_name = self.type_occurs(*min_occurs, *max_occurs, &format!("{}_inner", type_name), type_);
 
-                let mut attrs_types = Vec::new();
-                for (i, attr) in attrs.iter().enumerate() {
-                    match attr {
-                        Attribute::Def { name, type_: Some(type_), default } => {
-                            let type_ = self.type_(&format!("{}_attr{}", type_name, i), type_);
-                            attrs_types.push((name, type_));
-                        },
-                        Attribute::Def { name, type_: None, default } => {
-                        },
-                        Attribute::Any => {} // TODO
-                        Attribute::Ref { .. } => {} // TODO
-                        Attribute::GroupRef { .. } => {} // TODO
-                    }
-                }
 
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
                 {
                     let mut s = module.new_struct(&type_name).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input").field("attrs", &format!("HashMap<QName<'input>, &'input str>")).field("child", &format!("{}<'input>", inner_type_name));
-                    for (name, type_) in attrs_types.iter() {
-                        s.field(name, &format!("Option<{}<'input>>", type_));
-                    }
                 }
                 module.scope().raw(&format!("// ^-- from {:?}", element));
-                module.scope().raw(&format!(r#"
-impl<'input> ParseXml<'input> for {}<'input> {{
-    const NODE_NAME: &'static str = "element (normal) {}";
-    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {{
-        let tx = stream.transaction();
-        let mut tok = stream.next().unwrap();
-        loop {{
-            match tok {{
-                Token::Whitespaces(_) => (),
-                Token::Comment(_) => (),
-                Token::Text(_) => (),
-                _ => break,
-            }}
-            tok = stream.next().unwrap();
-        }}
-        match tok {{
-            Token::ElementStart(prefix, name) => {{
-                if name.to_str() == {:?} {{
-"#,             type_name, type_name, name.1));
-                for (name, type_) in attrs_types.iter() {
-                    module.scope().raw(&format!(r#"
-                        let {}: Option<{}> = None;
-"#,                 name, type_));
-                }
-                module.scope().raw(&format!(r#"
-                    let mut attrs = HashMap::new();
-                    loop {{
-                        let tok = stream.next().unwrap();
-                        match tok {{
-                            Token::Whitespaces(_) => (),
-                            Token::Comment(_) => (),
-                            Token::Text(_) => (),
-                            Token::Attribute((key_prefix, key_local), value) => {{
-                                let key = QName(match key_prefix.to_str() {{ "" => None, s => Some(s) }}, key_local.to_str());
-                                let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
-                            }},
-                            Token::ElementEnd(ElementEnd::Open) => {{
-                                let ret = Some({} {{
-                                    attrs,
-                                    child: try_rollback!(stream, tx, {}::parse_xml(stream, parse_context, parent_context)),
-"#,             type_name, inner_type_name));
-                for (name, type_) in attrs_types.iter() {
-                    module.scope().raw(&format!(r#"
-                                    {},
-"#,                 name));
-                }
-                module.scope().raw(&format!(r#"
-                                }});
-                                let mut next_tok;
-                                loop {{
-                                    next_tok = stream.next();
-                                    match next_tok {{
-                                        Some(Token::Whitespaces(_)) => (),
-                                        Some(Token::Comment(_)) => (),
-                                        Some(Token::Text(_)) => (),
-                                        Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {{
-                                            assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
-                                            return ret;
-                                        }}
-                                        _ => panic!(format!("Did not expect token {{:?}}", next_tok)),
-                                    }}
-                                }}
-                            }},
-                            Token::ElementEnd(ElementEnd::Empty) =>
-                                return Some({} {{
-                                    attrs,
-                                    child: {}::default(),
-"#,             type_name, inner_type_name)); 
-                for (name, type_) in attrs_types.iter() {
-                    module.scope().raw(&format!(r#"
-                                    {},
-"#,                 name));
-                }
-                module.scope().raw(&format!(r#"
-                                }}),
-                            Token::ElementEnd(ElementEnd::Close(_, _)) => {{
-                                tx.rollback(stream);
-                                return None
-                            }},
-                            _ => panic!(format!("Did not expect token {{:?}}", tok)),
-                        }}
-                    }}
-                }}
-                else {{
-                    tx.rollback(stream);
-                    None
-                }}
-            }},
-            Token::ElementEnd(ElementEnd::Close(_, _)) => {{
-                tx.rollback(stream);
-                return None
-            }},
-            _ => panic!(format!("Did not expect token {{:?}}", tok)),
-        }}
-    }}
-}}"#,           ));
+                module.scope().raw(&format!(r#"impl_parsexml_for_element!({}, {:?}, {});"#,
+                    type_name, name.1, inner_type_name));
             }
             None => {
                 let (_, ref mut module) = self.nsuri_to_module.get_mut(uri).unwrap();
