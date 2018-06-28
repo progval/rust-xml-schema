@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use codegen as cg;
 
-use parser::*;
+use round0_parser::*;
 use support::QName;
 
 const KEYWORDS: &[&'static str] = &["override"];

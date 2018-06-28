@@ -7,9 +7,9 @@ extern crate codegen;
 #[macro_use]
 extern crate pretty_assertions;
 
-pub mod parser;
+pub mod round0_parser;
 pub mod support;
-pub mod parser_generator;
+pub mod round0_parser_generator;
 
 #[cfg(test)]
 pub mod generated;
@@ -18,9 +18,9 @@ mod test_generated;
 #[cfg(test)]
 mod test_generated_schema;
 
-pub fn parse_xsd(xsd: &str) -> parser::Document {
+pub fn parse_xsd(xsd: &str) -> round0_parser::Document {
     let mut stream = xmlparser::Tokenizer::from(xsd);
-    parser::Parser::parse_document(&mut stream)
+    round0_parser::Parser::parse_document(&mut stream)
 }
 
 
@@ -28,7 +28,7 @@ pub fn parse_xsd(xsd: &str) -> parser::Document {
 mod tests {
     use std::collections::HashMap;
     use super::*;
-    use parser::*;
+    use round0_parser::*;
 
 	const PERSON_XSD: &'static str = r#"
 	  <?xml version="1.0" encoding="UTF-8"?>

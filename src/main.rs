@@ -4,8 +4,8 @@ use std::io::Read;
 extern crate xml_schema;
 extern crate codegen;
 use xml_schema::parse_xsd;
-use xml_schema::parser::*;
-use xml_schema::parser_generator::*;
+use xml_schema::round0_parser::*;
+use xml_schema::round0_parser_generator::*;
 
 fn main() {
     let mut s = String::new();

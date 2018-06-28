@@ -1,6 +1,6 @@
 extern crate xml_schema;
 use xml_schema::parse_xsd;
-use xml_schema::parser::*;
+use xml_schema::round0_parser::*;
 
 const PO_XSD: &'static str = r#"
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="foo">

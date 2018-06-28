@@ -2,7 +2,7 @@
 use xmlparser;
 
 use parse_xsd;
-use parser::*;
+use round0_parser::*;
 use generated::UNQUAL;
 use support::*;
 
