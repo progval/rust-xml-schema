@@ -348,10 +348,32 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                 s.vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
                 let mut fields = Vec::new();
                 for (i, (min_occurs, max_occurs, item)) in items.iter().enumerate() {
-                    let element_name = format!("seqfield{}", i);
-                    let field_typename = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
-                    s.field(&element_name, &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
-                    fields.push((element_name, field_typename));
+                    match (min_occurs.unwrap_or(1), max_occurs.unwrap_or(1), item) {
+                        (1, 1, ElementType::Element(elem)) => {
+                            let field_name = elem.name.1;
+                            let field_type_name = self.element(elem, None);
+                            s.field(&field_name, &format!("{}<'input>", field_type_name));
+                            fields.push((field_name.to_string(), field_type_name.to_string())); // TODO: namespace
+                        },
+                        (1, 1, ElementType::GroupRef(ref_name)) => {
+                            let field_name = escape_keyword(ref_name.1);
+                            let field_type_name = escape_keyword(ref_name.1);
+                            s.field(&field_name, &format!("{}<'input>", field_type_name));
+                            fields.push((field_name.to_string(), field_type_name.to_string())); // TODO: namespace
+                        },
+                        (1, 1, ElementType::Ref(ref_name)) => {
+                            let field_name = escape_keyword(ref_name.1);
+                            let field_type_name = escape_keyword(&format!("{}_e", ref_name.1));
+                            s.field(&field_name, &format!("{}<'input>", field_type_name));
+                            fields.push((field_name.to_string(), field_type_name.to_string())); // TODO: namespace
+                        },
+                        _ => {
+                            let element_name = format!("seqfield{}", i);
+                            let field_typename = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
+                            s.field(&element_name, &format!("{}<'input>", field_typename)); // TODO: make sure there is no name conflict
+                            fields.push((element_name, field_typename));
+                        }
+                    }
                 }
                 if items.len() == 0 {
                     s.tuple_field("PhantomData<&'input ()>");
