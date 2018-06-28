@@ -477,6 +477,20 @@ impl<'input> ParseXml<'input> for {}<'input> {{
                             variants.push((variant_name.to_string(), variant_type_name.to_string())); // TODO: namespace
                             last_item_name = Some(variant_name.to_string());
                         },
+                        (1, 1, ElementType::GroupRef(ref_name)) => {
+                            let variant_name = escape_keyword(ref_name.1);
+                            let variant_type_name = escape_keyword(ref_name.1);
+                            e.new_variant(&variant_name).tuple(&format!("Box<{}<'input>>", variant_type_name));
+                            variants.push((variant_name.to_string(), variant_type_name.to_string())); // TODO: namespace
+                            last_item_name = Some(variant_name.to_string());
+                        },
+                        (1, 1, ElementType::Ref(ref_name)) => {
+                            let variant_name = escape_keyword(ref_name.1);
+                            let variant_type_name = escape_keyword(&format!("{}_e", ref_name.1));
+                            e.new_variant(&variant_name).tuple(&format!("Box<{}<'input>>", variant_type_name));
+                            variants.push((variant_name.to_string(), variant_type_name.to_string())); // TODO: namespace
+                            last_item_name = Some(variant_name.to_string());
+                        },
                         _ => {
                             let element_name = format!("choicevariant{}", i);
                             let field_typename = self.type_occurs(*min_occurs, *max_occurs, &format!("{}__{}", name, element_name), item);
