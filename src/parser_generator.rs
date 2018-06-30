@@ -66,6 +66,15 @@ impl<'input> Namespaces<'input> {
     fn get_module_name(&self, qname: FullName<'input>) -> &'input str {
         self.module_names.get(qname.0).cloned().unwrap_or("UNQUAL")
     }
+
+    fn name_from_hint(&self, hint: &NameHint<'input>) -> Option<String> {
+        if hint.tokens.len() > 0 {
+            Some(hint.tokens.join("_"))
+        }
+        else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -106,9 +115,9 @@ enum Type<'input> {
     Union(Vec<RichType<'input>>),
     Extension(FullName<'input>, Box<RichType<'input>>),
     Sequence(Vec<RichType<'input>>),
-    Choice(Vec<RichType<'input>>),
     Element(FullName<'input>),
     Group(FullName<'input>),
+    Choice(String),
 }
 
 #[derive(Debug)]
@@ -118,6 +127,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     attribute_form_default_qualified: bool,
     elements: HashMap<FullName<'input>, RichType<'input>>,
     types: HashMap<FullName<'input>, RichType<'input>>,
+    choices: Vec<(String, Vec<RichType<'input>>)>,
     groups: HashMap<FullName<'input>, Vec<RichType<'input>>>,
     attribute_groups: HashMap<FullName<'input>, &'ast attributeGroup_e<'input>>,
 }
@@ -164,6 +174,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             elements: HashMap::new(),
             types: HashMap::new(),
             groups: HashMap::new(),
+            choices: Vec::new(),
             attribute_groups: HashMap::new(),
         }
     }
@@ -175,6 +186,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     fn gen_target_scope(&mut self, ast: &schema_e<'input>) -> cg::Scope {
         let mut scope = cg::Scope::new();
+        self.gen_choices(&mut scope);
         self.gen_elements(&mut scope);
         scope
     }
@@ -406,10 +418,15 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     fn process_choice(&mut self, choice: &'ast choice_e<'input>) -> RichType<'input> {
         let mut items = Vec::new();
+        let mut name_hint = NameHint::new("choice");
         for particle in (choice.child.0).0.particle.0.iter() {
-            items.push(self.process_particle(particle));
+            let ty = self.process_particle(particle);
+            name_hint.tokens.extend(&ty.name_hint.tokens);
+            items.push(ty);
         }
-        RichType::new(NameHint::new_empty(), None, None, Type::Choice(items))
+        let name = self.namespaces.name_from_hint(&name_hint).unwrap();
+        self.choices.push((name.clone(), items));
+        RichType::new(name_hint, None, None, Type::Choice(name))
     }
 
     fn process_extension(&mut self, extension: &'ast extension_e<'input>) -> RichType<'input> {
@@ -480,6 +497,31 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
+    fn gen_choices(&mut self, scope: &mut cg::Scope) {
+        let mut module = scope.new_module("ENUMS");
+        // TODO: sort the choices
+        for (name, items) in self.choices.iter() {
+            let mut enum_ = module.new_enum(&name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            for (i, item) in items.iter().enumerate() {
+                let mut fields: Vec<(&str, &str)> = Vec::new();
+                {
+                    let writer = &mut |variant_name, type_name| { fields.push((variant_name, type_name)); };
+                    self.write_type_in_struct_def(writer, &item);
+                }
+                let mut variant = enum_.new_variant(&self.namespaces.name_from_hint(&item.name_hint).unwrap_or(format!("{}{}", name, i)));
+                if fields.len() == 1 {
+                    let (_, type_name) = fields.remove(0);
+                    variant.tuple(type_name);
+                }
+                else {
+                    for (field_name, type_name) in fields {
+                        variant.named(field_name, type_name);
+                    }
+                }
+            }
+        }
+    }
+
     fn gen_elements(&mut self, scope: &mut cg::Scope) {
         let mut elements: Vec<_> = self.elements.iter().collect();
 
@@ -491,37 +533,41 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn gen_element(&self, module: &mut cg::Module, name: FullName<'input>, type_: &RichType<'input>) {
-        let mut struct_ = module.new_struct(name.1).vis("pub").derive("Debug").derive("PartialEq").derive("Default").generic("'input");
+        let mut struct_ = module.new_struct(name.1).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
         struct_.field("attrs", "HashMap<&'input str, &'input str>");
-        self.write_type_in_struct_def(struct_, type_);
+        self.write_type_in_struct_def(&mut |name, type_name| { struct_.field(name, &format!("{}<'input>", type_name)); }, type_);
     }
 
-    fn write_type_in_struct_def(&self, struct_: &mut cg::Struct, rich_type: &RichType<'input>) {
+    fn write_type_in_struct_def<'a, F>(&'a self, mut writer: &mut F, rich_type: &'a RichType<'input>)
+            where F: FnMut(&'a str, &'a str), 'ast: 'a {
         let RichType { name_hint, type_, min_occurs, max_occurs } = rich_type;
         // TODO: handle min_occurs and max_occurs
         match &type_ {
             Type::Alias(name) => {
                 let target_type = self.types.get(name).unwrap();
-                self.write_type_in_struct_def(struct_, target_type)
+                self.write_type_in_struct_def(writer, target_type)
             },
             Type::Group(name) => {
                 let group = self.groups.get(name).unwrap();
                 for field in group.iter() {
-                    self.write_type_in_struct_def(struct_, field);
+                    self.write_type_in_struct_def(writer, field);
                 }
             },
             Type::Sequence(fields) => {
                 for field in fields.iter() {
-                    self.write_type_in_struct_def(struct_, field);
+                    self.write_type_in_struct_def(writer, field);
                 }
             },
             Type::Element(name) => {
-                struct_.field(name.1, format!("{}<'input>", name.1));
+                writer(name.1, name.1);
+            },
+            Type::Choice(ref name) => {
+                writer(name, name);
             },
             Type::Extension(base, ext_type) => {
                 let base_type = &self.types.get(base).unwrap();
-                self.write_type_in_struct_def(struct_, base_type);
-                self.write_type_in_struct_def(struct_, ext_type);
+                self.write_type_in_struct_def(writer, base_type);
+                self.write_type_in_struct_def(writer, ext_type);
             },
             Type::Any => (),
             _ => unimplemented!("writing {:?}", type_),
