@@ -632,7 +632,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     }
                     else {
                         impl_code.push(format!("    impl_struct_variant!({},", variant_name));
-                        for (field_name, type_mod_name, type_name) in fields {
+                        let mut field_name_gen = NameGenerator::new();
+                        for (field_name, type_mod_name, type_name) in fields.iter() {
+                            let field_name = field_name_gen.gen_name(field_name);
                             impl_code.push(format!("        ({}, {}, {}),", field_name, type_mod_name, type_name));
                             variant.named(&field_name, &format!("Box<super::{}::{}<'input>>", type_mod_name, type_name));
                         }
@@ -664,11 +666,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         {
             let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             struct_.field("ATTRS", "HashMap<QName<'input>, &'input str>");
-            let mut nb_uses = HashMap::<&str, usize>::new(); // TODO: use a proper implementation for handling duplicate names.
+            let mut name_gen = NameGenerator::new();
             let writer = &mut |name, type_mod_name, type_name| {
-                let nb_use = nb_uses.get(name).cloned().unwrap_or(0);
-                nb_uses.insert(&name, nb_use+1);
-                let name = format!("{}{}", name, "_".repeat(nb_use));
+                let name = name_gen.gen_name(name);
                 struct_.field(&name, &format!("super::{}::{}<'input>", escape_keyword(type_mod_name), escape_keyword(type_name)));
                 impl_code.push(format!("    ({}, {}, {}),", escape_keyword(&name), escape_keyword(type_mod_name), escape_keyword(type_name)))
             };
@@ -705,7 +705,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 writer(field_name, mod_name, type_name);
             },
             Type::Choice(ref name) => {
-                writer(name, "ENUMS", name);
+                writer("choice", "ENUMS", name);
             },
             Type::Extension(base, ext_type) => {
                 let base_type = &self.types.get(base).unwrap();

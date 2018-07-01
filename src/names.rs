@@ -12,6 +12,20 @@ fn escape_keyword(name: &str) -> String {
     }
 }
 
+pub(crate) struct NameGenerator<'a>(HashMap<&'a str, usize>);
+
+impl<'a> NameGenerator<'a> {
+    pub fn new() -> NameGenerator<'a> {
+        NameGenerator(HashMap::new())
+    }
+
+    pub fn gen_name(&mut self, name: &'a str) -> String {
+        let nb_uses = self.0.get(name).cloned().unwrap_or(0);
+        self.0.insert(name, nb_uses+1);
+        format!("{}{}", name, "_".repeat(nb_uses))
+    }
+}
+
 macro_rules! str_alias {
     ($name:ident) => {
         #[derive(Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
