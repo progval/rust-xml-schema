@@ -17,7 +17,7 @@ pretty_assertions = "^0.4"
 [[bin]]
 name = "bootstrap"
 path = "src/bin/bootstrap.rs"
-required_features = "bootstrap"
+required-features = ["bootstrap"]
 
 [[bin]]
 name = "gen"
