@@ -39,6 +39,5 @@ fn round1_parser_person_xsd() {
     let doc = UNQUAL::schema_e::parse_xml(&mut stream, &mut (), &());
     assert_ne!(doc, None);
     let mut parser_generator = ParserGenerator::new(doc.as_ref().unwrap());
-    println!("{}", parser_generator.gen(doc.as_ref().unwrap()).to_string());
-    assert!(false);
+    parser_generator.gen(doc.as_ref().unwrap()).to_string();
 }

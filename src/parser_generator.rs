@@ -34,7 +34,7 @@ macro_rules! try_rollback {
 macro_rules! impl_enum {
     ( $name:ident, $($variant_macro:ident ! ( $($variant_args: tt )* ),  )* ) => {
         impl<'input> ParseXml<'input> for $name<'input> {
-            const NODE_NAME: &'static str = "enum $name";
+            const NODE_NAME: &'static str = concat!("enum ", stringify!($name));
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 $(
@@ -54,6 +54,9 @@ macro_rules! impl_enum {
 macro_rules! impl_singleton_variant {
     ( $enum_name:ident, $stream:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Box < $type_name:ident > ) => {
         super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new).map($enum_name::$variant_name)
+    };
+    ( $enum_name:ident, $stream:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Option < Box < $type_name:ident > > ) => {
+        Some(super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new).map($enum_name::$variant_name))
     };
     ( $enum_name:ident, $stream:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Vec < $type_name:ident > ) => {{
         let mut items = Vec::new();
@@ -89,6 +92,9 @@ macro_rules! impl_struct_variant_field {
     ( $stream: expr, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Box < $type_name:ident > ) => {
         super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new)
     };
+    ( $stream: expr, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Option < Box < $type_name:ident > > ) => {
+        Some(super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new))
+    };
     ( $stream: expr, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Vec < $type_name:ident > ) => {{
         let mut items = Vec::new();
         while let Some(item) = super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context) {
@@ -98,10 +104,10 @@ macro_rules! impl_struct_variant_field {
     }}
 }
 
-macro_rules! impl_group {
+macro_rules! impl_group_or_sequence {
     ( $name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {
         impl<'input> ParseXml<'input> for $name<'input> {
-            const NODE_NAME: &'static str = "group $name";
+            const NODE_NAME: &'static str = concat!("group or sequence ", stringify!($name));
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 Some($name {
@@ -115,9 +121,9 @@ macro_rules! impl_group {
 }
 
 macro_rules! impl_element {
-    ( $name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {
-        impl<'input> ParseXml<'input> for $name<'input> {
-            const NODE_NAME: &'static str = "element $name";
+    ( $struct_name:ident, $name:expr, { $( ( $field_name:ident, $( $field_args:tt )* ), )* }, can_be_empty=$can_be_empty:ident ) => {
+        impl<'input> ParseXml<'input> for $struct_name<'input> {
+            const NODE_NAME: &'static str = concat!("element ", stringify!($struct_name));
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 let mut tok = stream.next().unwrap();
@@ -132,7 +138,7 @@ macro_rules! impl_element {
                 }
                 match tok {
                     Token::ElementStart(prefix, name) => {
-                        if name.to_str() == "$name" {
+                        if name.to_str() == $name {
                             let mut attrs = HashMap::new();
                             loop {
                                 let tok = stream.next().unwrap();
@@ -145,7 +151,7 @@ macro_rules! impl_element {
                                         let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
                                     },
                                     Token::ElementEnd(ElementEnd::Open) => {
-                                        let ret = Some($name {
+                                        let ret = Some($struct_name {
                                             ATTRS: attrs,
                                             $(
                                                 $field_name: impl_element_field!(stream, tx, parse_context, parent_context, $($field_args)*),
@@ -167,7 +173,7 @@ macro_rules! impl_element {
                                         }
                                     },
                                     Token::ElementEnd(ElementEnd::Empty) => {
-                                        panic!("Empty element $name"); // TODO
+                                        return gen_empty_element!($can_be_empty, $struct_name, attrs, $($field_name,)*);
                                     },
                                     Token::ElementEnd(ElementEnd::Close(_, _)) => {
                                         tx.rollback(stream);
@@ -190,6 +196,20 @@ macro_rules! impl_element {
                 }
             }
         }
+    }
+}
+
+macro_rules! gen_empty_element {
+    ( false, $struct_name:ident, $attrs:expr, $($field_name:ident,)* ) => {
+        panic!(concat!("Empty element ", stringify!($struct_name)));
+    };
+    ( true, $struct_name:ident, $attrs:expr, $($field_name:ident,)* ) => {
+        Some($struct_name {
+            ATTRS: $attrs,
+            $(
+                $field_name: Default::default(), // This fails to compile if you told gen_element!() that it can gen_empty_element() whereas there is a field that does not implement Default (ie. not a Vec or an Option)
+            )*
+        })
     }
 }
 
@@ -239,10 +259,10 @@ enum Type<'input> {
     List(Box<RichType<'input>>),
     Union(Vec<RichType<'input>>),
     Extension(FullName<'input>, Box<RichType<'input>>),
-    Sequence(Vec<RichType<'input>>),
     Element(usize, usize, FullName<'input>),
     Group(usize, usize, FullName<'input>),
-    Choice(String),
+    Choice(usize, usize, String),
+    Sequence(usize, usize, String),
 }
 
 #[derive(Debug)]
@@ -253,6 +273,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     elements: HashMap<FullName<'input>, RichType<'input>>,
     types: HashMap<FullName<'input>, RichType<'input>>,
     choices: HashMap<String, Vec<RichType<'input>>>,
+    sequences: HashMap<String, Vec<RichType<'input>>>,
     groups: HashMap<FullName<'input>, RichType<'input>>,
     attribute_groups: HashMap<FullName<'input>, &'ast attributeGroup_e<'input>>,
 }
@@ -300,6 +321,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             types: HashMap::new(),
             groups: HashMap::new(),
             choices: HashMap::new(),
+            sequences: HashMap::new(),
             attribute_groups: HashMap::new(),
         }
     }
@@ -317,6 +339,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         scope.raw("pub use support::*;");
         scope.raw("pub use xmlparser::{Token, ElementEnd};");
         self.gen_choices(&mut scope);
+        self.gen_sequences(&mut scope);
         self.gen_elements(&mut scope);
         self.gen_groups(&mut scope);
         scope
@@ -558,14 +581,41 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn process_sequence(&mut self, sequence: &'ast sequence_e<'input>) -> RichType<'input> {
-        let mut items = Vec::new();
-        for particle in (sequence.child.0).0.particle.0.iter() {
-            items.push(self.process_particle(particle));
+        let mut min_occurs = 1;
+        let mut max_occurs = 1;
+        for (key, &value) in sequence.attrs.iter() {
+            match self.namespaces.expand_qname(*key).as_tuple() {
+                (SCHEMA_URI, "minOccurs") =>
+                    min_occurs = value.parse().unwrap(),
+                (SCHEMA_URI, "maxOccurs") =>
+                    max_occurs = parse_max_occurs(value).unwrap(),
+                _ => panic!("Unknown attribute {} in <sequence>", key),
+            }
         }
-        RichType::new(NameHint::new_empty(), Type::Sequence(items))
+        let mut items = Vec::new();
+        let mut name_hint = NameHint::new("sequence");
+        for particle in (sequence.child.0).0.particle.0.iter() {
+            let ty = self.process_particle(particle);
+            name_hint.extend(&ty.name_hint);
+            items.push(ty);
+        }
+        let name = self.namespaces.name_from_hint(&name_hint).unwrap();
+        self.sequences.insert(name.clone(), items);
+        RichType::new(name_hint, Type::Sequence(min_occurs, max_occurs, name))
     }
 
     fn process_choice(&mut self, choice: &'ast choice_e<'input>) -> RichType<'input> {
+        let mut min_occurs = 1;
+        let mut max_occurs = 1;
+        for (key, &value) in choice.attrs.iter() {
+            match self.namespaces.expand_qname(*key).as_tuple() {
+                (SCHEMA_URI, "minOccurs") =>
+                    min_occurs = value.parse().unwrap(),
+                (SCHEMA_URI, "maxOccurs") =>
+                    max_occurs = parse_max_occurs(value).unwrap(),
+                _ => panic!("Unknown attribute {} in <choice>", key),
+            }
+        }
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("choice");
         for particle in (choice.child.0).0.particle.0.iter() {
@@ -575,7 +625,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let name = self.namespaces.name_from_hint(&name_hint).unwrap();
         self.choices.insert(name.clone(), items);
-        RichType::new(name_hint, Type::Choice(name))
+        RichType::new(name_hint, Type::Choice(min_occurs, max_occurs, name))
     }
 
     fn process_extension(&mut self, extension: &'ast extension_e<'input>) -> RichType<'input> {
@@ -694,6 +744,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                                 variant.tuple(&format!("Box<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
                                 impl_code.push(format!("    impl_singleton_variant!({}, {}, Box<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
                             },
+                            (0, 1) => {
+                                variant.tuple(&format!("Option<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                                impl_code.push(format!("    impl_singleton_variant!({}, {}, Option<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                            },
                             (_, _) => {
                                 variant.tuple(&format!("Vec<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
                                 impl_code.push(format!("    impl_singleton_variant!({}, {}, Vec<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
@@ -707,6 +761,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                                 (1, 1) => {
                                     impl_code.push(format!("        ({}, {}, Box<{}>),", field_name, type_mod_name, type_name));
                                     variant.named(&field_name, &format!("Box<super::{}::{}<'input>>", type_mod_name, type_name));
+                                },
+                                (0, 1) => {
+                                    impl_code.push(format!("        ({}, {}, Option<Box<{}> >),", field_name, type_mod_name, type_name));
+                                    variant.named(&field_name, &format!("Option<Box<super::{}::{}<'input>> >", type_mod_name, type_name));
                                 },
                                 (_, _) => {
                                     impl_code.push(format!("        ({}, {}, Vec<{}>),", field_name, type_mod_name, type_name));
@@ -723,6 +781,20 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
+    fn gen_sequences(&mut self, scope: &mut cg::Scope) {
+        let mut module = scope.new_module("sequences");
+        module.vis("pub");
+        module.scope().raw("use super::*;");
+        let mut sequences: Vec<_> = self.sequences.iter().collect();
+
+        sequences.sort_by_key(|&(n,_)| n);
+        for (name, sequence) in sequences {
+            module.vis("pub");
+            module.scope().raw("use super::*;");
+            self.gen_group_or_sequence(module, name, &sequence.iter().collect());
+        }
+    }
+
     fn gen_groups(&mut self, scope: &mut cg::Scope) {
         let mut groups: Vec<_> = self.groups.iter().collect();
 
@@ -731,15 +803,15 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut module = &mut scope.get_or_new_module(self.namespaces.get_module_name(name));
             module.vis("pub");
             module.scope().raw("use super::*;");
-            self.gen_group(module, name, group);
+            let (mod_name, struct_name) = name.as_tuple();
+            self.gen_group_or_sequence(module, struct_name, &vec![group]);
         }
     }
 
-    fn gen_group(&self, module: &mut cg::Module, name: FullName<'input>, type_: &RichType<'input>) {
+    fn gen_group_or_sequence(&self, module: &mut cg::Module, struct_name: &'input str, items: &Vec<&RichType<'input>>) {
         let mut impl_code = Vec::new();
-        let (mod_name, struct_name) = name.as_tuple();
         let struct_name = escape_keyword(&struct_name.to_camel_case());
-        impl_code.push(format!("impl_group!({},", struct_name));
+        impl_code.push(format!("impl_group_or_sequence!({},", struct_name));
         {
             let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             let mut name_gen = NameGenerator::new();
@@ -752,13 +824,19 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                         struct_.field(&name, &format!("super::{}::{}<'input>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
                     },
+                    (0, 1) => {
+                        struct_.field(&name, &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
+                        impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
+                    },
                     (_, _) => {
                         struct_.field(&name, &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
                     },
                 }
             };
-            self.write_type_in_struct_def(writer, type_);
+            for item in items {
+                self.write_type_in_struct_def(writer, item);
+            }
         }
         impl_code.push(");".to_string());
         module.scope().raw(&impl_code.join("\n"));
@@ -778,9 +856,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     fn gen_element(&self, module: &mut cg::Module, name: FullName<'input>, type_: &RichType<'input>) {
         let mut impl_code = Vec::new();
-        let (mod_name, struct_name) = name.as_tuple();
-        let struct_name = escape_keyword(&struct_name.to_camel_case());
-        impl_code.push(format!("impl_element!({},", struct_name));
+        let (mod_name, tag_name) = name.as_tuple();
+        let struct_name = escape_keyword(&tag_name.to_camel_case());
+        let mut can_be_empty = true;
+        impl_code.push(format!("impl_element!({}, \"{}\", {{", struct_name, tag_name));
         {
             let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             struct_.field("ATTRS", "HashMap<QName<'input>, &'input str>");
@@ -791,10 +870,20 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let type_name = escape_keyword(&type_name.to_camel_case());
                 match (min_occurs, max_occurs) {
                     (1, 1) => {
+                        can_be_empty = false; // TODO: what if all subelements can be empty?
                         struct_.field(&name, &format!("super::{}::{}<'input>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
                     },
+                    (0, 1) => {
+                        struct_.field(&name, &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
+                        impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
+                    },
+                    (0, _) => {
+                        struct_.field(&name, &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                        impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
+                    },
                     (_, _) => {
+                        can_be_empty = false; // TODO: what if all subelements can be empty?
                         struct_.field(&name, &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
                     },
@@ -802,7 +891,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             };
             self.write_type_in_struct_def(writer, type_);
         }
-        impl_code.push(");".to_string());
+        impl_code.push(format!("}}, can_be_empty={:?});", can_be_empty));
         module.scope().raw(&impl_code.join("\n"));
     }
 
@@ -814,11 +903,15 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let target_type = self.types.get(name).unwrap();
                 self.write_type_in_struct_def(writer, target_type)
             },
-            Type::Sequence(fields) => {
-                for field in fields.iter() {
-                    self.write_type_in_struct_def(writer, field);
+            Type::Sequence(1, 1, name) => { // shortcut, and a lot more readable
+                let items = self.sequences.get(name).unwrap();
+                for item in items {
+                    self.write_type_in_struct_def(writer, item)
                 }
-            },
+            }
+            Type::Sequence(min_occurs, max_occurs, name) => {
+                writer("sequence", "sequences", *min_occurs, *max_occurs, name);
+            }
             Type::Group(min_occurs, max_occurs, name) |
             Type::Element(min_occurs, max_occurs, name) => {
                 let (mod_name, type_name) = name.as_tuple();
@@ -826,8 +919,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let mod_name = self.namespaces.module_names.get(mod_name).expect(mod_name);
                 writer(field_name, mod_name, *min_occurs, *max_occurs, type_name);
             },
-            Type::Choice(ref name) => {
-                writer("choice", "enums", 1, 1, name);
+            Type::Choice(min_occurs, max_occurs, ref name) => {
+                writer("choice", "enums", *min_occurs, *max_occurs, name);
             },
             Type::Extension(base, ext_type) => {
                 let base_type = &self.types.get(base).unwrap();
