@@ -19,6 +19,6 @@ name = "bootstrap"
 path = "src/bin/bootstrap.rs"
 required_features = "bootstrap"
 
-#[[bin]]
-#name = "gen"
-#path = "src/bin/gen.rs"
+[[bin]]
+name = "gen"
+path = "src/bin/gen.rs"
