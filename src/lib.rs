@@ -11,9 +11,9 @@ pub mod round0_parser;
 pub mod support;
 pub mod round0_parser_generator;
 
-#[cfg(test)]
+#[cfg(not(feature="bootstrap"))]
 pub mod generated;
-#[cfg(test)]
+#[cfg(not(feature="bootstrap"))]
 pub mod parser_generator;
 #[cfg(test)]
 mod test_generated;

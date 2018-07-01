@@ -10,3 +10,15 @@ codegen = { git = "https://github.com/carllerche/codegen" }
 
 [dev-dependencies]
 pretty_assertions = "^0.4"
+
+[features]
+"bootsrap" = []
+
+[[bin]]
+name = "bootstrap"
+path = "src/bin/bootstrap.rs"
+required_features = "bootstrap"
+
+#[[bin]]
+#name = "gen"
+#path = "src/bin/gen.rs"

@@ -6,6 +6,9 @@ use codegen as cg;
 use support::*;
 use generated::UNQUAL::*;
 
+pub const MACROS: &'static str = r#"
+"#;
+
 const SCHEMA_URI: &'static str = "http://www.w3.org/2001/XMLSchema";
 
 type FullName<'input> = (&'input str, &'input str);
@@ -127,7 +130,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     attribute_form_default_qualified: bool,
     elements: HashMap<FullName<'input>, RichType<'input>>,
     types: HashMap<FullName<'input>, RichType<'input>>,
-    choices: Vec<(String, Vec<RichType<'input>>)>,
+    choices: HashMap<String, Vec<RichType<'input>>>,
     groups: HashMap<FullName<'input>, Vec<RichType<'input>>>,
     attribute_groups: HashMap<FullName<'input>, &'ast attributeGroup_e<'input>>,
 }
@@ -174,7 +177,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             elements: HashMap::new(),
             types: HashMap::new(),
             groups: HashMap::new(),
-            choices: Vec::new(),
+            choices: HashMap::new(),
             attribute_groups: HashMap::new(),
         }
     }
@@ -425,7 +428,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             items.push(ty);
         }
         let name = self.namespaces.name_from_hint(&name_hint).unwrap();
-        self.choices.push((name.clone(), items));
+        self.choices.insert(name.clone(), items);
         RichType::new(name_hint, None, None, Type::Choice(name))
     }
 
@@ -501,24 +504,38 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let mut module = scope.new_module("ENUMS");
         // TODO: sort the choices
         for (name, items) in self.choices.iter() {
-            let mut enum_ = module.new_enum(&name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-            for (i, item) in items.iter().enumerate() {
-                let mut fields: Vec<(&str, &str)> = Vec::new();
-                {
-                    let writer = &mut |variant_name, type_name| { fields.push((variant_name, type_name)); };
-                    self.write_type_in_struct_def(writer, &item);
-                }
-                let mut variant = enum_.new_variant(&self.namespaces.name_from_hint(&item.name_hint).unwrap_or(format!("{}{}", name, i)));
-                if fields.len() == 1 {
-                    let (_, type_name) = fields.remove(0);
-                    variant.tuple(type_name);
-                }
-                else {
-                    for (field_name, type_name) in fields {
-                        variant.named(field_name, type_name);
+            let mut impl_code = Vec::new();
+            impl_code.push(format!("impl_enum!({},", name));
+            {
+                let mut enum_ = module.new_enum(&name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+                for (i, item) in items.iter().enumerate() {
+                    let mut fields: Vec<(&str, &str)> = Vec::new();
+                    {
+                        let writer = &mut |variant_name, type_name| {
+                            fields.push((variant_name, type_name));
+                        };
+                        self.write_type_in_struct_def(writer, &item);
+                    }
+                    let variant_name = self.namespaces.name_from_hint(&item.name_hint)
+                        .unwrap_or(format!("{}{}", name, i));
+                    let mut variant = enum_.new_variant(&variant_name);
+                    if fields.len() == 1 {
+                        let (_, type_name) = fields.remove(0);
+                        variant.tuple(&format!("{}<'input>", type_name));
+                        impl_code.push(format!("    {}({}),", variant_name, type_name));
+                    }
+                    else {
+                        impl_code.push(format!("    {} {{", variant_name));
+                        for (field_name, type_name) in fields {
+                            impl_code.push(format!("        {}: {},", field_name, type_name));
+                            variant.named(field_name, &format!("{}<'input>", type_name));
+                        }
+                        impl_code.push(format!("    }},"));
                     }
                 }
             }
+            impl_code.push(");".to_string());
+            module.scope().raw(&impl_code.join("\n"));
         }
     }
 
@@ -533,9 +550,19 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn gen_element(&self, module: &mut cg::Module, name: FullName<'input>, type_: &RichType<'input>) {
+        let mut impl_code = Vec::new();
+        impl_code.push(format!("impl_element!({},", name.1));
+        {
         let mut struct_ = module.new_struct(name.1).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-        struct_.field("attrs", "HashMap<&'input str, &'input str>");
-        self.write_type_in_struct_def(&mut |name, type_name| { struct_.field(name, &format!("{}<'input>", type_name)); }, type_);
+        struct_.field("ATTRS", "HashMap<&'input str, &'input str>");
+            let writer = &mut |name, type_name| {
+                struct_.field(name, &format!("{}<'input>", type_name));
+                impl_code.push(format!("    {}: {},", name, type_name))
+            };
+            self.write_type_in_struct_def(writer, type_);
+        }
+        impl_code.push(");".to_string());
+        module.scope().raw(&impl_code.join("\n"));
     }
 
     fn write_type_in_struct_def<'a, F>(&'a self, mut writer: &mut F, rich_type: &'a RichType<'input>)
