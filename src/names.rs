@@ -12,17 +12,18 @@ fn escape_keyword(name: &str) -> String {
     }
 }
 
-pub(crate) struct NameGenerator<'a>(HashMap<&'a str, usize>);
+pub(crate) struct NameGenerator(HashMap<String, usize>);
 
-impl<'a> NameGenerator<'a> {
-    pub fn new() -> NameGenerator<'a> {
+impl NameGenerator {
+    pub fn new() -> NameGenerator {
         NameGenerator(HashMap::new())
     }
 
-    pub fn gen_name(&mut self, name: &'a str) -> String {
-        let nb_uses = self.0.get(name).cloned().unwrap_or(0);
+    pub fn gen_name(&mut self, name: String) -> String {
+        let nb_uses = self.0.get(&name).cloned().unwrap_or(0);
+        let ret = format!("{}{}", name, "_".repeat(nb_uses));
         self.0.insert(name, nb_uses+1);
-        format!("{}{}", name, "_".repeat(nb_uses))
+        ret
     }
 }
 

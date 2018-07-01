@@ -2,6 +2,7 @@
 
 extern crate xmlparser;
 extern crate codegen;
+extern crate heck;
 
 #[cfg(test)]
 #[macro_use]

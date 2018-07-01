@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::num::ParseIntError;
 
 use codegen as cg;
+use heck::{SnakeCase, CamelCase};
 
 use support::*;
 use generated::UNQUAL::*;
@@ -606,35 +607,40 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn gen_choices(&mut self, scope: &mut cg::Scope) {
-        let mut module = scope.new_module("ENUMS");
+        let mut module = scope.new_module("enums");
+        module.vis("pub");
         module.scope().raw("use super::*;");
         // TODO: sort the choices
         for (name, items) in self.choices.iter() {
             let mut impl_code = Vec::new();
-            impl_code.push(format!("impl_enum!({},", name));
+            let enum_name = escape_keyword(&name.to_camel_case());
+            impl_code.push(format!("impl_enum!({},", enum_name));
             {
-                let mut enum_ = module.new_enum(&escape_keyword(&name)).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+                let mut enum_ = module.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
                 for (i, item) in items.iter().enumerate() {
                     let mut fields = Vec::new();
                     {
-                        let writer = &mut |variant_name, type_mod_name, type_name| {
-                            fields.push((escape_keyword(variant_name), escape_keyword(type_mod_name), escape_keyword(type_name)));
+                        let mut name_gen = NameGenerator::new();
+                        let writer = &mut |variant_name: &str, type_mod_name: &str, type_name: &str| {
+                            let variant_name = escape_keyword(&name_gen.gen_name(variant_name.to_snake_case()));
+                            let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
+                            let type_name = escape_keyword(&type_name.to_camel_case());
+                            fields.push((variant_name, type_mod_name, type_name));
                         };
                         self.write_type_in_struct_def(writer, &item);
                     }
                     let variant_name = self.namespaces.name_from_hint(&item.name_hint)
-                        .unwrap_or(format!("{}{}", name, i));
+                        .unwrap_or(format!("{}{}", name, i)).to_camel_case();
+                    let variant_name = escape_keyword(&variant_name.to_camel_case());
                     let mut variant = enum_.new_variant(&variant_name);
                     if fields.len() == 1 {
                         let (_, type_mod_name, type_name) = fields.remove(0);
                         variant.tuple(&format!("Box<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
-                        impl_code.push(format!("    impl_singleton_variant!({}, {}, {}),", escape_keyword(&variant_name), escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                        impl_code.push(format!("    impl_singleton_variant!({}, {}, {}),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
                     }
                     else {
                         impl_code.push(format!("    impl_struct_variant!({},", variant_name));
-                        let mut field_name_gen = NameGenerator::new();
-                        for (field_name, type_mod_name, type_name) in fields.iter() {
-                            let field_name = field_name_gen.gen_name(field_name);
+                        for (field_name, type_mod_name, type_name) in fields {
                             impl_code.push(format!("        ({}, {}, {}),", field_name, type_mod_name, type_name));
                             variant.named(&field_name, &format!("Box<super::{}::{}<'input>>", type_mod_name, type_name));
                         }
@@ -652,7 +658,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
         elements.sort_by_key(|&(n,_)| n);
         for (&name, element) in elements {
-            let module = &mut scope.get_or_new_module(self.namespaces.get_module_name(name));
+            let mut module = &mut scope.get_or_new_module(self.namespaces.get_module_name(name));
+            module.vis("pub");
             module.scope().raw("use super::*;");
             self.gen_element(module, name, element);
         }
@@ -661,16 +668,18 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn gen_element(&self, module: &mut cg::Module, name: FullName<'input>, type_: &RichType<'input>) {
         let mut impl_code = Vec::new();
         let (mod_name, struct_name) = name.as_tuple();
-        let struct_name = escape_keyword(struct_name);
+        let struct_name = escape_keyword(&struct_name.to_camel_case());
         impl_code.push(format!("impl_element!({},", struct_name));
         {
             let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             struct_.field("ATTRS", "HashMap<QName<'input>, &'input str>");
             let mut name_gen = NameGenerator::new();
-            let writer = &mut |name, type_mod_name, type_name| {
-                let name = name_gen.gen_name(name);
-                struct_.field(&name, &format!("super::{}::{}<'input>", escape_keyword(type_mod_name), escape_keyword(type_name)));
-                impl_code.push(format!("    ({}, {}, {}),", escape_keyword(&name), escape_keyword(type_mod_name), escape_keyword(type_name)))
+            let writer = &mut |name: &str, type_mod_name: &str, type_name: &str| {
+                let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
+                let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
+                let type_name = escape_keyword(&type_name.to_camel_case());
+                struct_.field(&name, &format!("super::{}::{}<'input>", type_mod_name, type_name));
+                impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
             };
             self.write_type_in_struct_def(writer, type_);
         }
@@ -705,7 +714,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 writer(field_name, mod_name, type_name);
             },
             Type::Choice(ref name) => {
-                writer("choice", "ENUMS", name);
+                writer("choice", "enums", name);
             },
             Type::Extension(base, ext_type) => {
                 let base_type = &self.types.get(base).unwrap();

@@ -3,25 +3,26 @@ use std::collections::VecDeque;
 use std::fmt;
 
 use xmlparser::Error as XmlParserError;
-use xmlparser::{Token, ElementEnd, StrSpan, Tokenizer};
+use xmlparser::{Token as XmlToken, ElementEnd, StrSpan, Tokenizer};
 
 #[derive(Debug, PartialEq)]
-pub struct token<'input>(StrSpan<'input>);
+pub struct Token<'input>(StrSpan<'input>);
 
-impl<'input> ParseXml<'input> for token<'input> {
+impl<'input> ParseXml<'input> for Token<'input> {
     const NODE_NAME: &'static str = "token";
-    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<token<'input>> {
+    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Token<'input>> {
         match stream.next() {
-            Some(Token::Text(strspan)) => Some(token(strspan)),
+            Some(XmlToken::Text(strspan)) => Some(Token(strspan)),
             _ => None,
         }
     }
 }
-impl<'input> Default for token<'input> {
+impl<'input> Default for Token<'input> {
     fn default() -> Self {
-        token(StrSpan::from_substr("", 0, 0))
+        Token(StrSpan::from_substr("", 0, 0))
     }
 }
+pub(crate) type token<'input> = Token<'input>;
 
 #[derive(Debug, PartialEq)]
 pub struct NMTOKEN<'input>(StrSpan<'input>);
@@ -30,7 +31,7 @@ impl<'input> ParseXml<'input> for NMTOKEN<'input> {
     const NODE_NAME: &'static str = "NMTOKEN";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<NMTOKEN<'input>> {
         match stream.next() {
-            Some(Token::Text(strspan)) => Some(NMTOKEN(strspan)),
+            Some(XmlToken::Text(strspan)) => Some(NMTOKEN(strspan)),
             _ => None,
         }
     }
@@ -84,7 +85,7 @@ impl<'input> ParseXml<'input> for anyURI_e<'input> {
     const NODE_NAME: &'static str = "anyURI_e";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<anyURI_e<'input>> {
         match stream.next() {
-            Some(Token::Text(strspan)) => Some(anyURI_e(strspan)),
+            Some(XmlToken::Text(strspan)) => Some(anyURI_e(strspan)),
             _ => None,
         }
     }
@@ -94,10 +95,10 @@ impl<'input> ParseXml<'input> for anyURI_e<'input> {
 pub struct nonNegativeInteger<'input>(&'input str);
 
 #[derive(Debug, PartialEq, Default)]
-pub struct SUPPORT_ANY<'input>(Vec<Token<'input>>); // TODO: remove, temporary
+pub struct SUPPORT_ANY<'input>(Vec<XmlToken<'input>>); // TODO: remove, temporary
 
 #[derive(Debug, PartialEq, Default)]
-pub struct any<'input>(Vec<Token<'input>>);
+pub struct any<'input>(Vec<XmlToken<'input>>);
 impl<'input> ParseXml<'input> for any<'input> {
     const NODE_NAME: &'static str = "any";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<any<'input>> {
@@ -106,15 +107,15 @@ impl<'input> ParseXml<'input> for any<'input> {
         let tok = stream.next()?;
         tokens.push(tok);
         match tok {
-            Token::ElementStart(prefix, name) => tag_stack.push(QName::from_strspans(prefix, name)),
+            XmlToken::ElementStart(prefix, name) => tag_stack.push(QName::from_strspans(prefix, name)),
             _ => return None, // TODO: put it back in the stream
         }
         while tag_stack.len() > 0 {
             let tok = stream.next().unwrap();
             tokens.push(tok);
             match tok {
-                Token::ElementStart(prefix, name) => tag_stack.push(QName::from_strspans(prefix, name)),
-                Token::ElementEnd(end) => {
+                XmlToken::ElementStart(prefix, name) => tag_stack.push(QName::from_strspans(prefix, name)),
+                XmlToken::ElementEnd(end) => {
                     match end {
                         ElementEnd::Open => (),
                         ElementEnd::Close(prefix, name) => assert_eq!(QName::from_strspans(prefix, name), tag_stack.pop().unwrap()),
@@ -135,7 +136,7 @@ impl<'input> ParseXml<'input> for XmlString<'input> {
     const NODE_NAME: &'static str = "string";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<XmlString<'input>> {
         match stream.next() {
-            Some(Token::Text(strspan)) => Some(XmlString(strspan)),
+            Some(XmlToken::Text(strspan)) => Some(XmlString(strspan)),
             _ => None, // TODO: put it back in the stream
         }
     }
@@ -150,7 +151,7 @@ impl<'input> Default for XmlString<'input> {
 pub type Stream<'input> = Box<InnerStream<'input>>;
 pub struct InnerStream<'input> {
     pub(crate) index: usize,
-    tokens: Vec<Token<'input>>,
+    tokens: Vec<XmlToken<'input>>,
 }
 
 impl<'input> InnerStream<'input> {
@@ -183,7 +184,7 @@ impl Transaction {
 }
 
 impl<'input> Iterator for InnerStream<'input> {
-    type Item = Token<'input>;
+    type Item = XmlToken<'input>;
     fn next(&mut self) -> Option<Self::Item> {
         let tok = self.tokens.get(self.index);
         println!("// Reading {:?}", tok);
