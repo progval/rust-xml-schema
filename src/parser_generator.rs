@@ -768,7 +768,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                                 },
                                 (_, _) => {
                                     impl_code.push(format!("        ({}, {}, Vec<{}>),", field_name, type_mod_name, type_name));
-                                    variant.named(&field_name, &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                                    variant.named(&field_name, &format!("Vec<super::{}::{}<'input> >", type_mod_name, type_name));
                                 },
                             }
                         }
