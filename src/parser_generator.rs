@@ -98,6 +98,22 @@ macro_rules! impl_struct_variant_field {
     }}
 }
 
+macro_rules! impl_group {
+    ( $name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {
+        impl<'input> ParseXml<'input> for $name<'input> {
+            const NODE_NAME: &'static str = "group $name";
+            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+                let tx = stream.transaction();
+                Some($name {
+                    $(
+                        $field_name: impl_element_field!(stream, tx, parse_context, parent_context, $($field_args)*),
+                    )*
+                })
+            }
+        }
+    }
+}
+
 macro_rules! impl_element {
     ( $name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {
         impl<'input> ParseXml<'input> for $name<'input> {
@@ -237,7 +253,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     elements: HashMap<FullName<'input>, RichType<'input>>,
     types: HashMap<FullName<'input>, RichType<'input>>,
     choices: HashMap<String, Vec<RichType<'input>>>,
-    groups: HashMap<FullName<'input>, Vec<RichType<'input>>>,
+    groups: HashMap<FullName<'input>, RichType<'input>>,
     attribute_groups: HashMap<FullName<'input>, &'ast attributeGroup_e<'input>>,
 }
 
@@ -302,6 +318,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         scope.raw("pub use xmlparser::{Token, ElementEnd};");
         self.gen_choices(&mut scope);
         self.gen_elements(&mut scope);
+        self.gen_groups(&mut scope);
         scope
     }
 
@@ -363,7 +380,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 items.push(self.process_particle(particle));
             }
 
-            self.groups.insert(name, items);
+            assert_eq!(items.len(), 1, "{:?}", items);
+            let type_ = items.remove(0);
+
+            self.groups.insert(name, type_);
             RichType::new(NameHint::from_fullname(&name), Type::Group(min_occurs, max_occurs, name))
         }
     }
@@ -703,6 +723,47 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
+    fn gen_groups(&mut self, scope: &mut cg::Scope) {
+        let mut groups: Vec<_> = self.groups.iter().collect();
+
+        groups.sort_by_key(|&(n,_)| n);
+        for (&name, group) in groups {
+            let mut module = &mut scope.get_or_new_module(self.namespaces.get_module_name(name));
+            module.vis("pub");
+            module.scope().raw("use super::*;");
+            self.gen_group(module, name, group);
+        }
+    }
+
+    fn gen_group(&self, module: &mut cg::Module, name: FullName<'input>, type_: &RichType<'input>) {
+        let mut impl_code = Vec::new();
+        let (mod_name, struct_name) = name.as_tuple();
+        let struct_name = escape_keyword(&struct_name.to_camel_case());
+        impl_code.push(format!("impl_group!({},", struct_name));
+        {
+            let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            let mut name_gen = NameGenerator::new();
+            let writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
+                let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
+                let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
+                let type_name = escape_keyword(&type_name.to_camel_case());
+                match (min_occurs, max_occurs) {
+                    (1, 1) => {
+                        struct_.field(&name, &format!("super::{}::{}<'input>", type_mod_name, type_name));
+                        impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
+                    },
+                    (_, _) => {
+                        struct_.field(&name, &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                        impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
+                    },
+                }
+            };
+            self.write_type_in_struct_def(writer, type_);
+        }
+        impl_code.push(");".to_string());
+        module.scope().raw(&impl_code.join("\n"));
+    }
+
     fn gen_elements(&mut self, scope: &mut cg::Scope) {
         let mut elements: Vec<_> = self.elements.iter().collect();
 
@@ -753,18 +814,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let target_type = self.types.get(name).unwrap();
                 self.write_type_in_struct_def(writer, target_type)
             },
-            Type::Group(min_occurs, max_occurs, name) => {
-                // TODO: handle min_occurs and max_occurs
-                let group = self.groups.get(name).unwrap();
-                for field in group.iter() {
-                    self.write_type_in_struct_def(writer, field);
-                }
-            },
             Type::Sequence(fields) => {
                 for field in fields.iter() {
                     self.write_type_in_struct_def(writer, field);
                 }
             },
+            Type::Group(min_occurs, max_occurs, name) |
             Type::Element(min_occurs, max_occurs, name) => {
                 let (mod_name, type_name) = name.as_tuple();
                 let field_name = type_name;
