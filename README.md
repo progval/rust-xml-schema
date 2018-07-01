@@ -5,7 +5,8 @@ XML Parser generator based on XML schemas.
 
 ```
 wget https://www.w3.org/2009/XMLSchema/XMLSchema.xsd
-cargo run --bin bootstrap < XMLSchema.xsd > foo.rs && cp foo.rs src/generated.rs
-cargo run --bin gen < XMLSchema.xsd > foo.rs && cp foo.rs src/generated2.rs
+cargo run --features=bootstrap --bin bootstrap < XMLSchema.xsd > src/generated.rs
+cargo run --bin gen < XMLSchema.xsd > src/generated2.rs
+cargo test
 ```
 
