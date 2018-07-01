@@ -52,18 +52,25 @@ macro_rules! impl_enum {
 }
 
 macro_rules! impl_singleton_variant {
-    ( $enum_name:ident, $stream:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, $type_name:ident ) => {
+    ( $enum_name:ident, $stream:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Box < $type_name:ident > ) => {
         super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new).map($enum_name::$variant_name)
-    }
+    };
+    ( $enum_name:ident, $stream:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Vec < $type_name:ident > ) => {{
+        let mut items = Vec::new();
+        while let Some(item) = super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context) {
+            items.push(item);
+        }
+        Some($enum_name::$variant_name(items))
+    }}
 }
 
 macro_rules! impl_struct_variant {
-    ( $enum_name:ident, $stream: expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $( ( $field_name:ident, $type_mod_name:ident, $type_name:ident ), )* ) => {{
+    ( $enum_name:ident, $stream: expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {{
         let mut res = None;
         loop { // single run, used for breaking
             $(
-                let $field_name = match super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context) {
-                    Some(e) => Box::new(e),
+                let $field_name = match impl_struct_variant_field!($stream, $parse_context, $parent_context, $( $field_args )* ) {
+                    Some(e) => e,
                     None => break,
                 };
             )*
@@ -78,8 +85,21 @@ macro_rules! impl_struct_variant {
     }}
 }
 
+macro_rules! impl_struct_variant_field {
+    ( $stream: expr, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Box < $type_name:ident > ) => {
+        super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new)
+    };
+    ( $stream: expr, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Vec < $type_name:ident > ) => {{
+        let mut items = Vec::new();
+        while let Some(item) = super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context) {
+            items.push(item);
+        }
+        Some(items)
+    }}
+}
+
 macro_rules! impl_element {
-    ( $name:ident, $( ( $field_name:ident, $type_mod_name:ident, $type_name:ident ),  )* ) => {
+    ( $name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = "element $name";
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
@@ -112,7 +132,7 @@ macro_rules! impl_element {
                                         let ret = Some($name {
                                             ATTRS: attrs,
                                             $(
-                                                $field_name: try_rollback!(stream, tx, super::$type_mod_name::$type_name::parse_xml(stream, parse_context, parent_context)),
+                                                $field_name: impl_element_field!(stream, tx, parse_context, parent_context, $($field_args)*),
                                             )*
                                         });
                                         let mut next_tok;
@@ -156,6 +176,22 @@ macro_rules! impl_element {
         }
     }
 }
+
+macro_rules! impl_element_field {
+    ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, $type_name:ident ) => {
+        try_rollback!($stream, $tx, super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context))
+    };
+    ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Option < $type_name:ident > ) => {
+        super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context)
+    };
+    ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Vec < $type_name:ident > ) => {{
+        let mut items = Vec::new();
+        while let Some(item) = super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context) {
+            items.push(item);
+        }
+        items
+    }}
+}
 "#;
 
 const SCHEMA_URI: &'static str = "http://www.w3.org/2001/XMLSchema";
@@ -172,13 +208,11 @@ fn parse_max_occurs(s: &str) -> Result<usize, ParseIntError> {
 #[derive(Debug)]
 struct RichType<'input> {
     name_hint: NameHint<'input>,
-    min_occurs: Option<usize>,
-    max_occurs: Option<usize>,
     type_: Type<'input>,
 }
 impl<'input> RichType<'input> {
-    fn new(name_hint: NameHint<'input>, min_occurs: Option<usize>, max_occurs: Option<usize>, type_: Type<'input>) -> RichType<'input> {
-        RichType { name_hint, min_occurs, max_occurs, type_ }
+    fn new(name_hint: NameHint<'input>, type_: Type<'input>) -> RichType<'input> {
+        RichType { name_hint, type_ }
     }
 }
 
@@ -190,8 +224,8 @@ enum Type<'input> {
     Union(Vec<RichType<'input>>),
     Extension(FullName<'input>, Box<RichType<'input>>),
     Sequence(Vec<RichType<'input>>),
-    Element(FullName<'input>),
-    Group(FullName<'input>),
+    Element(usize, usize, FullName<'input>),
+    Group(usize, usize, FullName<'input>),
     Choice(String),
 }
 
@@ -298,8 +332,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn process_group(&mut self, group: &'ast group_e<'input>) -> RichType<'input> {
         let mut name = None;
         let mut ref_ = None;
-        let mut max_occurs = None;
-        let mut min_occurs = None;
+        let mut max_occurs = 1;
+        let mut min_occurs = 1;
         for (key, &value) in group.attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "name") =>
@@ -307,9 +341,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 (SCHEMA_URI, "ref") =>
                     ref_ = Some(self.namespaces.parse_qname(value)),
                 (SCHEMA_URI, "minOccurs") =>
-                    min_occurs = Some(value.parse().unwrap()),
+                    min_occurs = value.parse().unwrap(),
                 (SCHEMA_URI, "maxOccurs") =>
-                    max_occurs = Some(parse_max_occurs(value).unwrap()),
+                    max_occurs = parse_max_occurs(value).unwrap(),
                 _ => panic!("Unknown attribute {} in <group>", key),
             }
         }
@@ -319,7 +353,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 panic!("<group> has both ref={:?} and name={:?}", ref_, name)
             }
             let (_, field_name) = ref_.as_tuple();
-            RichType::new(NameHint::new(field_name), min_occurs, max_occurs, Type::Group(ref_))
+            RichType::new(NameHint::new(field_name), Type::Group(min_occurs, max_occurs, ref_))
         }
         else {
             let name = name.expect("<group> has no name or ref.");
@@ -330,7 +364,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
 
             self.groups.insert(name, items);
-            RichType::new(NameHint::from_fullname(&name), min_occurs, max_occurs, Type::Group(name))
+            RichType::new(NameHint::from_fullname(&name), Type::Group(min_occurs, max_occurs, name))
         }
     }
 
@@ -365,7 +399,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
         if let Some(name) = name {
             self.types.insert(name, ty);
-            RichType::new(NameHint::from_fullname(&name), None, None, Type::Alias(name))
+            RichType::new(NameHint::from_fullname(&name), Type::Alias(name))
         }
         else {
             ty
@@ -383,14 +417,14 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         
         let item_type = match (item_type, &list.child.simpleType.0) {
             (None, Some(st)) => self.process_simple_type(st),
-            (Some(n), None) => RichType::new(NameHint::new_empty(), None, None, Type::Alias(n)),
-            (None, None) => RichType::new(NameHint::new_empty(), None, None, Type::Any), // TODO
+            (Some(n), None) => RichType::new(NameHint::new_empty(), Type::Alias(n)),
+            (None, None) => RichType::new(NameHint::new_empty(), Type::Any), // TODO
             (Some(ref t1), Some(ref t2)) => panic!("<list> has both an itemType attribute ({:?}) and a child type ({:?}).", t1, t2),
         };
 
         let mut name_hint = item_type.name_hint.clone();
         name_hint.push("list");
-        RichType::new(name_hint, None, None, Type::List(Box::new(item_type)))
+        RichType::new(name_hint, Type::List(Box::new(item_type)))
     }
 
     fn process_union(&mut self, union: &'ast union_e<'input>) -> RichType<'input> {
@@ -401,7 +435,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     member_types = value.split(" ").map(|s| {
                         let name = self.namespaces.parse_qname(s);
                         let (_, field_name) = name.as_tuple();
-                        RichType::new(NameHint::new(field_name), None, None, Type::Alias(name))
+                        RichType::new(NameHint::new(field_name), Type::Alias(name))
                     }).collect()
                 },
                 _ => panic!("Unknown attribute {} in <union>", key),
@@ -412,7 +446,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             member_types.push(self.process_simple_type(t))
         }
 
-        RichType::new(NameHint::new_empty(), None, None, Type::Union(member_types))
+        RichType::new(NameHint::new_empty(), Type::Union(member_types))
     }
 
     fn process_complex_type(&mut self, type_: &'ast complexType_e<'input>) -> RichType<'input> {
@@ -449,7 +483,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
         if let Some(name) = name {
             self.types.insert(name, ty);
-            RichType::new(NameHint::from_fullname(&name), None, None, Type::Alias(name))
+            RichType::new(NameHint::from_fullname(&name), Type::Alias(name))
         }
         else {
            ty 
@@ -457,7 +491,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn process_other_complex_type_model(&mut self, model: &'ast complexTypeModel__choicevariant2<'input>) -> RichType<'input> {
-        RichType::new(NameHint::new_empty(), None, None, Type::Any) // TODO
+        RichType::new(NameHint::new_empty(), Type::Any) // TODO
     }
 
     fn process_complex_content(&mut self, model: &'ast complexContent_e<'input>) -> RichType<'input> {
@@ -477,7 +511,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let base = base.expect("<restriction> has no base");
         //match (restriction_e.child.0).0.restrictionType__extfield0.
-        RichType::new(NameHint::new_empty(), None, None, Type::Alias(self.namespaces.parse_qname(base))) // TODO
+        RichType::new(NameHint::new_empty(), Type::Alias(self.namespaces.parse_qname(base))) // TODO
     }
 
     fn process_type_def_particle(&mut self, particle: &'ast typeDefParticle<'input>) -> RichType<'input> {
@@ -500,7 +534,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn process_any(&mut self, any: &'ast any_e<'input>) -> RichType<'input> {
-        RichType::new(NameHint::new_empty(), None, None, Type::Any)
+        RichType::new(NameHint::new_empty(), Type::Any)
     }
 
     fn process_sequence(&mut self, sequence: &'ast sequence_e<'input>) -> RichType<'input> {
@@ -508,7 +542,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         for particle in (sequence.child.0).0.particle.0.iter() {
             items.push(self.process_particle(particle));
         }
-        RichType::new(NameHint::new_empty(), None, None, Type::Sequence(items))
+        RichType::new(NameHint::new_empty(), Type::Sequence(items))
     }
 
     fn process_choice(&mut self, choice: &'ast choice_e<'input>) -> RichType<'input> {
@@ -521,7 +555,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let name = self.namespaces.name_from_hint(&name_hint).unwrap();
         self.choices.insert(name.clone(), items);
-        RichType::new(name_hint, None, None, Type::Choice(name))
+        RichType::new(name_hint, Type::Choice(name))
     }
 
     fn process_extension(&mut self, extension: &'ast extension_e<'input>) -> RichType<'input> {
@@ -535,10 +569,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let base = base.expect("<extension> has no base");
         let base = self.namespaces.parse_qname(base);
         if let Some(ref particle) = extension.child.0.extensionType__extfield0.typeDefParticle.0 {
-            RichType::new(NameHint::new_empty(), None, None, Type::Extension(base, Box::new(self.process_type_def_particle(particle))))
+            RichType::new(NameHint::new_empty(), Type::Extension(base, Box::new(self.process_type_def_particle(particle))))
         }
         else {
-            RichType::new(NameHint::new_empty(), None, None, Type::Alias(base))
+            RichType::new(NameHint::new_empty(), Type::Alias(base))
         }
     }
 
@@ -548,8 +582,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let mut type_attr = None;
         let mut abstract_ = false;
         let mut substitution_group = None;
-        let mut min_occurs = None;
-        let mut max_occurs = None;
+        let mut min_occurs = 1;
+        let mut max_occurs = 1;
         for (key, &value) in element.attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "name") =>
@@ -559,9 +593,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 (SCHEMA_URI, "type") =>
                     type_attr = Some(self.namespaces.parse_qname(value)),
                 (SCHEMA_URI, "minOccurs") =>
-                    min_occurs = Some(value.parse().unwrap()),
+                    min_occurs = value.parse().unwrap(),
                 (SCHEMA_URI, "maxOccurs") =>
-                    max_occurs = Some(parse_max_occurs(value).unwrap()),
+                    max_occurs = parse_max_occurs(value).unwrap(),
                 (SCHEMA_URI, "abstract") => {
                     match value {
                         "true" => abstract_ = true,
@@ -581,7 +615,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 panic!("<element> has both ref={:?} and name={:?}", ref_, name);
             }
             let (_, field_name) = ref_.as_tuple();
-            RichType::new(NameHint::new(field_name), min_occurs, max_occurs, Type::Element(ref_))
+            RichType::new(NameHint::new(field_name), Type::Element(min_occurs, max_occurs, ref_))
         }
         else {
             let name = name.expect("<element> has no name.");
@@ -594,15 +628,15 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 },
                 (Some(t), None) => {
                     let (_, field_name) = t.as_tuple();
-                    RichType::new(NameHint::new(field_name), None, None, Type::Alias(t))
+                    RichType::new(NameHint::new(field_name), Type::Alias(t))
                 },
-                (None, None) => RichType::new(NameHint::new_empty(), None, None, Type::Any), // TODO
+                (None, None) => RichType::new(NameHint::new_empty(), Type::Any), // TODO
                 (Some(ref t1), Some(ref t2)) => panic!("Element '{:?}' has both a type attribute ({:?}) and a child type ({:?}).", name, t1, t2),
             };
 
             self.elements.insert(name, type_);
             let (_, field_name) = name.as_tuple();
-            RichType::new(NameHint::new(field_name), min_occurs, max_occurs, Type::Element(name))
+            RichType::new(NameHint::new(field_name), Type::Element(min_occurs, max_occurs, name))
         }
     }
 
@@ -621,11 +655,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     let mut fields = Vec::new();
                     {
                         let mut name_gen = NameGenerator::new();
-                        let writer = &mut |variant_name: &str, type_mod_name: &str, type_name: &str| {
+                        let writer = &mut |variant_name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
                             let variant_name = escape_keyword(&name_gen.gen_name(variant_name.to_snake_case()));
                             let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
                             let type_name = escape_keyword(&type_name.to_camel_case());
-                            fields.push((variant_name, type_mod_name, type_name));
+                            fields.push((variant_name, type_mod_name, min_occurs, max_occurs, type_name));
                         };
                         self.write_type_in_struct_def(writer, &item);
                     }
@@ -634,15 +668,31 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     let variant_name = escape_keyword(&variant_name.to_camel_case());
                     let mut variant = enum_.new_variant(&variant_name);
                     if fields.len() == 1 {
-                        let (_, type_mod_name, type_name) = fields.remove(0);
-                        variant.tuple(&format!("Box<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
-                        impl_code.push(format!("    impl_singleton_variant!({}, {}, {}),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                        let (_, type_mod_name, min_occurs, max_occurs, type_name) = fields.remove(0);
+                        match (min_occurs, max_occurs) {
+                            (1, 1) => {
+                                variant.tuple(&format!("Box<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                                impl_code.push(format!("    impl_singleton_variant!({}, {}, Box<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                            },
+                            (_, _) => {
+                                variant.tuple(&format!("Vec<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                                impl_code.push(format!("    impl_singleton_variant!({}, {}, Vec<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                            },
+                        }
                     }
                     else {
                         impl_code.push(format!("    impl_struct_variant!({},", variant_name));
-                        for (field_name, type_mod_name, type_name) in fields {
-                            impl_code.push(format!("        ({}, {}, {}),", field_name, type_mod_name, type_name));
-                            variant.named(&field_name, &format!("Box<super::{}::{}<'input>>", type_mod_name, type_name));
+                        for (field_name, type_mod_name, min_occurs, max_occurs, type_name) in fields {
+                            match (min_occurs, max_occurs) {
+                                (1, 1) => {
+                                    impl_code.push(format!("        ({}, {}, Box<{}>),", field_name, type_mod_name, type_name));
+                                    variant.named(&field_name, &format!("Box<super::{}::{}<'input>>", type_mod_name, type_name));
+                                },
+                                (_, _) => {
+                                    impl_code.push(format!("        ({}, {}, Vec<{}>),", field_name, type_mod_name, type_name));
+                                    variant.named(&field_name, &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                                },
+                            }
                         }
                         impl_code.push(format!("    ),"));
                     }
@@ -674,12 +724,20 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             struct_.field("ATTRS", "HashMap<QName<'input>, &'input str>");
             let mut name_gen = NameGenerator::new();
-            let writer = &mut |name: &str, type_mod_name: &str, type_name: &str| {
+            let writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
                 let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
                 let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
                 let type_name = escape_keyword(&type_name.to_camel_case());
-                struct_.field(&name, &format!("super::{}::{}<'input>", type_mod_name, type_name));
-                impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
+                match (min_occurs, max_occurs) {
+                    (1, 1) => {
+                        struct_.field(&name, &format!("super::{}::{}<'input>", type_mod_name, type_name));
+                        impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
+                    },
+                    (_, _) => {
+                        struct_.field(&name, &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                        impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
+                    },
+                }
             };
             self.write_type_in_struct_def(writer, type_);
         }
@@ -688,15 +746,15 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn write_type_in_struct_def<'a, F>(&'a self, mut writer: &mut F, rich_type: &'a RichType<'input>)
-            where F: FnMut(&'a str, &'a str, &'a str), 'ast: 'a {
-        let RichType { name_hint, type_, min_occurs, max_occurs } = rich_type;
-        // TODO: handle min_occurs and max_occurs
+            where F: FnMut(&'a str, &'a str, usize, usize, &'a str), 'ast: 'a {
+        let RichType { name_hint, type_ } = rich_type;
         match &type_ {
             Type::Alias(name) => {
                 let target_type = self.types.get(name).unwrap();
                 self.write_type_in_struct_def(writer, target_type)
             },
-            Type::Group(name) => {
+            Type::Group(min_occurs, max_occurs, name) => {
+                // TODO: handle min_occurs and max_occurs
                 let group = self.groups.get(name).unwrap();
                 for field in group.iter() {
                     self.write_type_in_struct_def(writer, field);
@@ -707,14 +765,14 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     self.write_type_in_struct_def(writer, field);
                 }
             },
-            Type::Element(name) => {
+            Type::Element(min_occurs, max_occurs, name) => {
                 let (mod_name, type_name) = name.as_tuple();
                 let field_name = type_name;
                 let mod_name = self.namespaces.module_names.get(mod_name).expect(mod_name);
-                writer(field_name, mod_name, type_name);
+                writer(field_name, mod_name, *min_occurs, *max_occurs, type_name);
             },
             Type::Choice(ref name) => {
-                writer("choice", "enums", name);
+                writer("choice", "enums", 1, 1, name);
             },
             Type::Extension(base, ext_type) => {
                 let base_type = &self.types.get(base).unwrap();
