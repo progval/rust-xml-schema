@@ -8,6 +8,7 @@ extern crate codegen;
 extern crate pretty_assertions;
 
 pub mod round0_parser;
+pub mod names;
 pub mod support;
 pub mod round0_parser_generator;
 
