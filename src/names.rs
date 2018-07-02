@@ -99,6 +99,9 @@ impl<'input> Namespaces<'input> {
             None
         }
     }
+    pub fn modules(&self) -> impl Iterator<Item=(&&'input str, &&'input str)> {
+        self.namespaces.iter()
+    }
 }
 
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]

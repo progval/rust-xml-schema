@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::num::ParseIntError;
 
 use codegen as cg;
@@ -128,11 +128,20 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         scope.raw("pub use std::marker::PhantomData;");
         scope.raw("pub use support::*;");
         scope.raw("pub use xmlparser::{Token, ElementEnd};");
+        self.create_modules(&mut scope);
         self.gen_choices(&mut scope);
         self.gen_sequences(&mut scope);
         self.gen_elements(&mut scope);
         self.gen_groups(&mut scope);
         scope
+    }
+
+    fn create_modules(&mut self, scope: &mut cg::Scope) {
+        for (mod_name, _) in self.namespaces.modules() {
+            let mut module = scope.new_module(mod_name);
+            module.vis("pub");
+            module.scope().raw("use super::*;");
+        }
     }
 
     fn process_ast(&mut self, ast: &'ast schema_e<'input>) {
@@ -618,9 +627,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
         groups.sort_by_key(|&(n,_)| n);
         for (&name, group) in groups {
-            let mut module = &mut scope.get_or_new_module(self.namespaces.get_module_name(name));
-            module.vis("pub");
-            module.scope().raw("use super::*;");
+            let mod_name = self.namespaces.get_module_name(name);
+            let mut module = scope.get_module_mut(mod_name).unwrap();
             let (mod_name, struct_name) = name.as_tuple();
             if let Type::InlineChoice(ref items) = group.type_ {
                 self.gen_choice(module.scope(), struct_name, items);
@@ -673,9 +681,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
         elements.sort_by_key(|&(n,_)| n);
         for (&name, element) in elements {
-            let mut module = &mut scope.get_or_new_module(self.namespaces.get_module_name(name));
-            module.vis("pub");
-            module.scope().raw("use super::*;");
+            let mod_name = self.namespaces.get_module_name(name);
+            let mut module = scope.get_module_mut(mod_name).unwrap();
             self.gen_element(module, name, element);
         }
     }
