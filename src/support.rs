@@ -177,8 +177,7 @@ impl Transaction {
 
     #[inline]
     pub fn rollback(self, stream: &mut InnerStream) {
-        println!("// Rolling back {} tokens", stream.index - self.initial_index);
-        ::std::io::stdout().flush().ok().expect("Could not flush stdout");
+        //println!("// Rolling back {} tokens", stream.index - self.initial_index);
         stream.index = self.initial_index
     }
 }
@@ -187,8 +186,7 @@ impl<'input> Iterator for InnerStream<'input> {
     type Item = XmlToken<'input>;
     fn next(&mut self) -> Option<Self::Item> {
         let tok = self.tokens.get(self.index);
-        println!("// Reading {:?}", tok);
-        ::std::io::stdout().flush().ok().expect("Could not flush stdout");
+        //println!("// Reading {:?}", tok);
         match tok {
             Some(res) => {
                 self.index += 1;
@@ -206,11 +204,9 @@ pub trait ParseXml<'input>: Sized {
     const NODE_NAME: &'static str;
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self>;
     fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-        println!("// Entering: {:?}", Self::NODE_NAME);
-        ::std::io::stdout().flush().ok().expect("Could not flush stdout");
+        //println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml(stream, parse_context, parent_context);
-        println!("// Leaving: {:?}", Self::NODE_NAME);
-        ::std::io::stdout().flush().ok().expect("Could not flush stdout");
+        //println!("// Leaving: {:?}", Self::NODE_NAME);
         ret
     }
 }

@@ -18,218 +18,6 @@ fn escape_keyword(name: &str) -> String {
     }
 }
 
-pub const MACROS: &'static str = r#"
-macro_rules! try_rollback {
-    ($stream:expr, $tx:expr, $e:expr) => {
-        match $e {
-            Some(i) => i,
-            None => {
-                $tx.rollback($stream);
-                return None
-            }
-        }
-    }
-}
-
-macro_rules! impl_enum {
-    ( $name:ident, $($variant_macro:ident ! ( $($variant_args: tt )* ),  )* ) => {
-        impl<'input> ParseXml<'input> for $name<'input> {
-            const NODE_NAME: &'static str = concat!("enum ", stringify!($name));
-            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-                let tx = stream.transaction();
-                $(
-                    match $variant_macro!($name, stream, parse_context, parent_context, $($variant_args)*) {
-                        Some(x) => return Some(x),
-                        None => (), // TODO: should we rollback here?
-                    }
-                )*
-
-                tx.rollback(stream);
-                None
-            }
-        }
-    }
-}
-
-macro_rules! impl_singleton_variant {
-    ( $enum_name:ident, $stream:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Box < $type_name:ident > ) => {
-        super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new).map($enum_name::$variant_name)
-    };
-    ( $enum_name:ident, $stream:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Option < Box < $type_name:ident > > ) => {
-        Some(super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new).map($enum_name::$variant_name))
-    };
-    ( $enum_name:ident, $stream:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Vec < $type_name:ident > ) => {{
-        let mut items = Vec::new();
-        while let Some(item) = super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context) {
-            items.push(item);
-        }
-        Some($enum_name::$variant_name(items))
-    }}
-}
-
-macro_rules! impl_struct_variant {
-    ( $enum_name:ident, $stream: expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {{
-        let mut res = None;
-        loop { // single run, used for breaking
-            $(
-                let $field_name = match impl_struct_variant_field!($stream, $parse_context, $parent_context, $( $field_args )* ) {
-                    Some(e) => e,
-                    None => break,
-                };
-            )*
-            res = Some($enum_name::$variant_name {
-                $(
-                    $field_name,
-                )*
-            });
-            break;
-        }
-        res
-    }}
-}
-
-macro_rules! impl_struct_variant_field {
-    ( $stream: expr, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Box < $type_name:ident > ) => {
-        super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new)
-    };
-    ( $stream: expr, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Option < Box < $type_name:ident > > ) => {
-        Some(super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new))
-    };
-    ( $stream: expr, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Vec < $type_name:ident > ) => {{
-        let mut items = Vec::new();
-        while let Some(item) = super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context) {
-            items.push(item);
-        }
-        Some(items)
-    }}
-}
-
-macro_rules! impl_group_or_sequence {
-    ( $name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {
-        impl<'input> ParseXml<'input> for $name<'input> {
-            const NODE_NAME: &'static str = concat!("group or sequence ", stringify!($name));
-            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-                let tx = stream.transaction();
-                Some($name {
-                    $(
-                        $field_name: impl_element_field!(stream, tx, parse_context, parent_context, $($field_args)*),
-                    )*
-                })
-            }
-        }
-    }
-}
-
-macro_rules! impl_element {
-    ( $struct_name:ident, $name:expr, { $( ( $field_name:ident, $( $field_args:tt )* ), )* }, can_be_empty=$can_be_empty:ident ) => {
-        impl<'input> ParseXml<'input> for $struct_name<'input> {
-            const NODE_NAME: &'static str = concat!("element ", stringify!($struct_name));
-            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-                let tx = stream.transaction();
-                let mut tok = stream.next().unwrap();
-                loop {
-                    match tok {
-                        Token::Whitespaces(_) => (),
-                        Token::Comment(_) => (),
-                        Token::Text(_) => (),
-                        _ => break,
-                    }
-                    tok = stream.next().unwrap();
-                }
-                match tok {
-                    Token::ElementStart(prefix, name) => {
-                        if name.to_str() == $name {
-                            let mut attrs = HashMap::new();
-                            loop {
-                                let tok = stream.next().unwrap();
-                                match tok {
-                                    Token::Whitespaces(_) => (),
-                                    Token::Comment(_) => (),
-                                    Token::Text(_) => (),
-                                    Token::Attribute((key_prefix, key_local), value) => {
-                                        let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
-                                        let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
-                                    },
-                                    Token::ElementEnd(ElementEnd::Open) => {
-                                        let ret = Some($struct_name {
-                                            ATTRS: attrs,
-                                            $(
-                                                $field_name: impl_element_field!(stream, tx, parse_context, parent_context, $($field_args)*),
-                                            )*
-                                        });
-                                        let mut next_tok;
-                                        loop {
-                                            next_tok = stream.next();
-                                            match next_tok {
-                                                Some(Token::Whitespaces(_)) => (),
-                                                Some(Token::Comment(_)) => (),
-                                                Some(Token::Text(_)) => (),
-                                                Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
-                                                    assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
-                                                    return ret;
-                                                }
-                                                _ => panic!(format!("Did not expect token {:?}", next_tok)),
-                                            }
-                                        }
-                                    },
-                                    Token::ElementEnd(ElementEnd::Empty) => {
-                                        return gen_empty_element!($can_be_empty, $struct_name, attrs, $($field_name,)*);
-                                    },
-                                    Token::ElementEnd(ElementEnd::Close(_, _)) => {
-                                        tx.rollback(stream);
-                                        return None
-                                    },
-                                    _ => panic!(format!("Did not expect token {:?}", tok)),
-                                }
-                            }
-                        }
-                        else {
-                            tx.rollback(stream);
-                            None
-                        }
-                    },
-                    Token::ElementEnd(ElementEnd::Close(_, _)) => {
-                        tx.rollback(stream);
-                        return None
-                    },
-                    _ => panic!(format!("Did not expect token {:?}", tok)),
-                }
-            }
-        }
-    }
-}
-
-macro_rules! gen_empty_element {
-    ( false, $struct_name:ident, $attrs:expr, $($field_name:ident,)* ) => {
-        panic!(concat!("Empty element ", stringify!($struct_name)));
-    };
-    ( true, $struct_name:ident, $attrs:expr, $($field_name:ident,)* ) => {
-        Some($struct_name {
-            ATTRS: $attrs,
-            $(
-                $field_name: Default::default(), // This fails to compile if you told gen_element!() that it can gen_empty_element() whereas there is a field that does not implement Default (ie. not a Vec or an Option)
-            )*
-        })
-    }
-}
-
-macro_rules! impl_element_field {
-    ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, $type_name:ident ) => {
-        try_rollback!($stream, $tx, super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context))
-    };
-    ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Option < $type_name:ident > ) => {
-        super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context)
-    };
-    ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Vec < $type_name:ident > ) => {{
-        let mut items = Vec::new();
-        while let Some(item) = super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context) {
-            items.push(item);
-        }
-        items
-    }}
-}
-"#;
-
 const SCHEMA_URI: &'static str = "http://www.w3.org/2001/XMLSchema";
 
 fn parse_max_occurs(s: &str) -> Result<usize, ParseIntError> {
@@ -262,6 +50,7 @@ enum Type<'input> {
     Element(usize, usize, FullName<'input>),
     Group(usize, usize, FullName<'input>),
     Choice(usize, usize, String),
+    InlineChoice(Vec<RichType<'input>>),
     Sequence(usize, usize, String),
 }
 
@@ -399,15 +188,23 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let name = name.expect("<group> has no name or ref.");
 
             let mut items = Vec::new();
-            for particle in ((group.child.0).0).0.particle.0.iter() {
-                items.push(self.process_particle(particle));
+            let particles = &((group.child.0).0).0.particle.0;
+            if particles.len() == 1 {
+                let type_ = self.process_particle(particles.get(0).unwrap(), true);
+                self.groups.insert(name, type_);
+                RichType::new(NameHint::from_fullname(&name), Type::Group(min_occurs, max_occurs, name))
             }
+            else {
+                for particle in particles.iter() {
+                    items.push(self.process_particle(particle, false));
+                }
 
-            assert_eq!(items.len(), 1, "{:?}", items);
-            let type_ = items.remove(0);
+                assert_eq!(items.len(), 1, "{:?}", items);
+                let type_ = items.remove(0);
 
-            self.groups.insert(name, type_);
-            RichType::new(NameHint::from_fullname(&name), Type::Group(min_occurs, max_occurs, name))
+                self.groups.insert(name, type_);
+                RichType::new(NameHint::from_fullname(&name), Type::Group(min_occurs, max_occurs, name))
+            }
         }
     }
 
@@ -557,21 +354,21 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         RichType::new(NameHint::new_empty(), Type::Alias(self.namespaces.parse_qname(base))) // TODO
     }
 
-    fn process_type_def_particle(&mut self, particle: &'ast typeDefParticle<'input>) -> RichType<'input> {
+    fn process_type_def_particle(&mut self, particle: &'ast typeDefParticle<'input>, inlinable: bool) -> RichType<'input> {
         match particle {
             typeDefParticle::group(e) => self.process_group(e),
             typeDefParticle::all(_) => unimplemented!("all"),
-            typeDefParticle::choice(e) => self.process_choice(e),
-            typeDefParticle::sequence(e) => self.process_sequence(e),
+            typeDefParticle::choice(e) => self.process_choice(e, inlinable),
+            typeDefParticle::sequence(e) => self.process_sequence(e, inlinable),
         }
     }
-    fn process_particle(&mut self, particle: &'ast particle<'input>) -> RichType<'input> {
+    fn process_particle(&mut self, particle: &'ast particle<'input>, inlinable: bool) -> RichType<'input> {
         match particle {
             particle::element(e) => self.process_element(e),
             particle::group(e) => self.process_group(e),
             particle::all(_) => unimplemented!("all"),
-            particle::choice(e) => self.process_choice(e),
-            particle::sequence(sequence) => self.process_sequence(sequence),
+            particle::choice(e) => self.process_choice(e, inlinable),
+            particle::sequence(sequence) => self.process_sequence(sequence, inlinable),
             particle::any(e) => self.process_any(e),
         }
     }
@@ -580,7 +377,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         RichType::new(NameHint::new_empty(), Type::Any)
     }
 
-    fn process_sequence(&mut self, sequence: &'ast sequence_e<'input>) -> RichType<'input> {
+    fn process_sequence(&mut self, sequence: &'ast sequence_e<'input>, inlinable: bool) -> RichType<'input> {
         let mut min_occurs = 1;
         let mut max_occurs = 1;
         for (key, &value) in sequence.attrs.iter() {
@@ -594,17 +391,23 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("sequence");
-        for particle in (sequence.child.0).0.particle.0.iter() {
-            let ty = self.process_particle(particle);
-            name_hint.extend(&ty.name_hint);
-            items.push(ty);
+        let particles = &(sequence.child.0).0.particle.0;
+        if min_occurs == 1 && max_occurs == 1 && inlinable && particles.len() == 1 {
+            self.process_particle(particles.get(0).unwrap(), true)
         }
-        let name = self.namespaces.name_from_hint(&name_hint).unwrap();
-        self.sequences.insert(name.clone(), items);
-        RichType::new(name_hint, Type::Sequence(min_occurs, max_occurs, name))
+        else {
+            for particle in particles.iter() {
+                let ty = self.process_particle(particle, false);
+                name_hint.extend(&ty.name_hint);
+                items.push(ty);
+            }
+            let name = self.namespaces.name_from_hint(&name_hint).unwrap();
+            self.sequences.insert(name.clone(), items);
+            RichType::new(name_hint, Type::Sequence(min_occurs, max_occurs, name))
+        }
     }
 
-    fn process_choice(&mut self, choice: &'ast choice_e<'input>) -> RichType<'input> {
+    fn process_choice(&mut self, choice: &'ast choice_e<'input>, inlinable: bool) -> RichType<'input> {
         let mut min_occurs = 1;
         let mut max_occurs = 1;
         for (key, &value) in choice.attrs.iter() {
@@ -619,13 +422,20 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("choice");
         for particle in (choice.child.0).0.particle.0.iter() {
-            let ty = self.process_particle(particle);
+            let ty = self.process_particle(particle, false);
             name_hint.extend(&ty.name_hint);
             items.push(ty);
         }
-        let name = self.namespaces.name_from_hint(&name_hint).unwrap();
-        self.choices.insert(name.clone(), items);
-        RichType::new(name_hint, Type::Choice(min_occurs, max_occurs, name))
+        match (min_occurs, max_occurs, inlinable) {
+            (1, 1, true) => {
+                RichType::new(name_hint, Type::InlineChoice(items))
+            },
+            (_, _, _) => {
+                let name = self.namespaces.name_from_hint(&name_hint).unwrap();
+                self.choices.insert(name.clone(), items);
+                RichType::new(name_hint, Type::Choice(min_occurs, max_occurs, name))
+            }
+        }
     }
 
     fn process_extension(&mut self, extension: &'ast extension_e<'input>) -> RichType<'input> {
@@ -639,7 +449,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let base = base.expect("<extension> has no base");
         let base = self.namespaces.parse_qname(base);
         if let Some(ref particle) = extension.child.0.extensionType__extfield0.typeDefParticle.0 {
-            RichType::new(NameHint::new_empty(), Type::Extension(base, Box::new(self.process_type_def_particle(particle))))
+            RichType::new(NameHint::new_empty(), Type::Extension(base, Box::new(self.process_type_def_particle(particle, false))))
         }
         else {
             RichType::new(NameHint::new_empty(), Type::Alias(base))
@@ -710,75 +520,78 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn gen_choices(&mut self, scope: &mut cg::Scope) {
+    fn gen_choices(&self, scope: &mut cg::Scope) {
         let mut module = scope.new_module("enums");
         module.vis("pub");
         module.scope().raw("use super::*;");
         // TODO: sort the choices
-        for (name, items) in self.choices.iter() {
-            let mut impl_code = Vec::new();
-            let enum_name = escape_keyword(&name.to_camel_case());
-            impl_code.push(format!("impl_enum!({},", enum_name));
-            {
-                let mut enum_ = module.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-                for (i, item) in items.iter().enumerate() {
-                    let mut fields = Vec::new();
-                    {
-                        let mut name_gen = NameGenerator::new();
-                        let writer = &mut |variant_name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
-                            let variant_name = escape_keyword(&name_gen.gen_name(variant_name.to_snake_case()));
-                            let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                            let type_name = escape_keyword(&type_name.to_camel_case());
-                            fields.push((variant_name, type_mod_name, min_occurs, max_occurs, type_name));
-                        };
-                        self.write_type_in_struct_def(writer, &item);
-                    }
-                    let variant_name = self.namespaces.name_from_hint(&item.name_hint)
-                        .unwrap_or(format!("{}{}", name, i)).to_camel_case();
-                    let variant_name = escape_keyword(&variant_name.to_camel_case());
-                    let mut variant = enum_.new_variant(&variant_name);
-                    if fields.len() == 1 {
-                        let (_, type_mod_name, min_occurs, max_occurs, type_name) = fields.remove(0);
-                        match (min_occurs, max_occurs) {
-                            (1, 1) => {
-                                variant.tuple(&format!("Box<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
-                                impl_code.push(format!("    impl_singleton_variant!({}, {}, Box<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
-                            },
-                            (0, 1) => {
-                                variant.tuple(&format!("Option<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
-                                impl_code.push(format!("    impl_singleton_variant!({}, {}, Option<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
-                            },
-                            (_, _) => {
-                                variant.tuple(&format!("Vec<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
-                                impl_code.push(format!("    impl_singleton_variant!({}, {}, Vec<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
-                            },
-                        }
-                    }
-                    else {
-                        impl_code.push(format!("    impl_struct_variant!({},", variant_name));
-                        for (field_name, type_mod_name, min_occurs, max_occurs, type_name) in fields {
-                            match (min_occurs, max_occurs) {
-                                (1, 1) => {
-                                    impl_code.push(format!("        ({}, {}, Box<{}>),", field_name, type_mod_name, type_name));
-                                    variant.named(&field_name, &format!("Box<super::{}::{}<'input>>", type_mod_name, type_name));
-                                },
-                                (0, 1) => {
-                                    impl_code.push(format!("        ({}, {}, Option<Box<{}> >),", field_name, type_mod_name, type_name));
-                                    variant.named(&field_name, &format!("Option<Box<super::{}::{}<'input>> >", type_mod_name, type_name));
-                                },
-                                (_, _) => {
-                                    impl_code.push(format!("        ({}, {}, Vec<{}>),", field_name, type_mod_name, type_name));
-                                    variant.named(&field_name, &format!("Vec<super::{}::{}<'input> >", type_mod_name, type_name));
-                                },
-                            }
-                        }
-                        impl_code.push(format!("    ),"));
+        for (ref name, ref choice) in self.choices.iter() {
+            self.gen_choice(module.scope(), name, choice);
+        }
+    }
+    fn gen_choice(&self, scope: &mut cg::Scope, name: &str, items: &Vec<RichType<'input>>) {
+        let mut impl_code = Vec::new();
+        let enum_name = escape_keyword(&name.to_camel_case());
+        impl_code.push(format!("impl_enum!({},", enum_name));
+        {
+            let mut enum_ = scope.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            for (i, item) in items.iter().enumerate() {
+                let mut fields = Vec::new();
+                {
+                    let mut name_gen = NameGenerator::new();
+                    let writer = &mut |variant_name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
+                        let variant_name = escape_keyword(&name_gen.gen_name(variant_name.to_snake_case()));
+                        let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
+                        let type_name = escape_keyword(&type_name.to_camel_case());
+                        fields.push((variant_name, type_mod_name, min_occurs, max_occurs, type_name));
+                    };
+                    self.write_type_in_struct_def(writer, &item);
+                }
+                let variant_name = self.namespaces.name_from_hint(&item.name_hint)
+                    .unwrap_or(format!("{}{}", name, i)).to_camel_case();
+                let variant_name = escape_keyword(&variant_name.to_camel_case());
+                let mut variant = enum_.new_variant(&variant_name);
+                if fields.len() == 1 {
+                    let (_, type_mod_name, min_occurs, max_occurs, type_name) = fields.remove(0);
+                    match (min_occurs, max_occurs) {
+                        (1, 1) => {
+                            variant.tuple(&format!("Box<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                            impl_code.push(format!("    impl_singleton_variant!({}, {}, Box<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                        },
+                        (0, 1) => {
+                            variant.tuple(&format!("Option<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                            impl_code.push(format!("    impl_singleton_variant!({}, {}, Option<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                        },
+                        (_, _) => {
+                            variant.tuple(&format!("Vec<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                            impl_code.push(format!("    impl_singleton_variant!({}, {}, Vec<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                        },
                     }
                 }
+                else {
+                    impl_code.push(format!("    impl_struct_variant!({},", variant_name));
+                    for (field_name, type_mod_name, min_occurs, max_occurs, type_name) in fields {
+                        match (min_occurs, max_occurs) {
+                            (1, 1) => {
+                                impl_code.push(format!("        ({}, {}, Box<{}>),", field_name, type_mod_name, type_name));
+                                variant.named(&field_name, &format!("Box<super::{}::{}<'input>>", type_mod_name, type_name));
+                            },
+                            (0, 1) => {
+                                impl_code.push(format!("        ({}, {}, Option<Box<{}> >),", field_name, type_mod_name, type_name));
+                                variant.named(&field_name, &format!("Option<Box<super::{}::{}<'input>> >", type_mod_name, type_name));
+                            },
+                            (_, _) => {
+                                impl_code.push(format!("        ({}, {}, Vec<{}>),", field_name, type_mod_name, type_name));
+                                variant.named(&field_name, &format!("Vec<super::{}::{}<'input> >", type_mod_name, type_name));
+                            },
+                        }
+                    }
+                    impl_code.push(format!("    ),"));
+                }
             }
-            impl_code.push(");".to_string());
-            module.scope().raw(&impl_code.join("\n"));
         }
+        impl_code.push(");".to_string());
+        scope.raw(&impl_code.join("\n"));
     }
 
     fn gen_sequences(&mut self, scope: &mut cg::Scope) {
@@ -790,7 +603,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         sequences.sort_by_key(|&(n,_)| n);
         for (name, sequence) in sequences {
             module.vis("pub");
-            module.scope().raw("use super::*;");
             self.gen_group_or_sequence(module, name, &sequence.iter().collect());
         }
     }
@@ -804,7 +616,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             module.vis("pub");
             module.scope().raw("use super::*;");
             let (mod_name, struct_name) = name.as_tuple();
-            self.gen_group_or_sequence(module, struct_name, &vec![group]);
+            if let Type::InlineChoice(ref items) = group.type_ {
+                self.gen_choice(module.scope(), struct_name, items);
+            }
+            else {
+                self.gen_group_or_sequence(module, struct_name, &vec![group]);
+            }
         }
     }
 

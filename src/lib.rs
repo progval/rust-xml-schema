@@ -17,6 +17,7 @@ pub mod round0_parser_generator;
 pub mod generated;
 #[cfg(not(feature="bootstrap"))]
 pub mod parser_generator;
+#[macro_use] pub mod macros;
 #[cfg(test)]
 mod test_generated;
 #[cfg(test)]
