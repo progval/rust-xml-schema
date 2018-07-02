@@ -137,7 +137,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn create_modules(&mut self, scope: &mut cg::Scope) {
-        for (mod_name, _) in self.namespaces.modules() {
+        let mut mod_names: Vec<_> = self.namespaces.modules().map(|(n,_)| n).collect();
+        mod_names.sort();
+        for mod_name in mod_names {
             let mut module = scope.new_module(mod_name);
             module.vis("pub");
             module.scope().raw("use super::*;");
@@ -536,11 +538,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn gen_choices(&self, scope: &mut cg::Scope) {
-        let mut module = scope.new_module("enums");
+        let module = scope.new_module("enums");
         module.vis("pub");
         module.scope().raw("use super::*;");
-        // TODO: sort the choices
-        for (ref name, ref choice) in self.choices.iter() {
+        let mut choices: Vec<_> = self.choices.iter().collect();
+        choices.sort_by_key(|&(n,_)| n);
+        for (ref name, ref choice) in choices {
             self.gen_choice(module.scope(), name, choice);
         }
     }
