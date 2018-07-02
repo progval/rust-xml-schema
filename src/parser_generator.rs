@@ -52,6 +52,7 @@ enum Type<'input> {
     Choice(usize, usize, String),
     InlineChoice(Vec<RichType<'input>>),
     Sequence(usize, usize, String),
+    InlineSequence(Vec<RichType<'input>>),
 }
 
 #[derive(Debug)]
@@ -401,9 +402,14 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 name_hint.extend(&ty.name_hint);
                 items.push(ty);
             }
-            let name = self.namespaces.name_from_hint(&name_hint).unwrap();
-            self.sequences.insert(name.clone(), items);
-            RichType::new(name_hint, Type::Sequence(min_occurs, max_occurs, name))
+            if min_occurs == 1 && max_occurs == 1 {
+                RichType::new(name_hint, Type::InlineSequence(items))
+            }
+            else {
+                let name = self.namespaces.name_from_hint(&name_hint).unwrap();
+                self.sequences.insert(name.clone(), items);
+                RichType::new(name_hint, Type::Sequence(min_occurs, max_occurs, name))
+            }
         }
     }
 
@@ -619,6 +625,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             if let Type::InlineChoice(ref items) = group.type_ {
                 self.gen_choice(module.scope(), struct_name, items);
             }
+            else if let Type::InlineSequence(ref items) = group.type_ {
+                self.gen_group_or_sequence(module, struct_name, &items.iter().collect());
+            }
             else {
                 self.gen_group_or_sequence(module, struct_name, &vec![group]);
             }
@@ -720,6 +729,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let target_type = self.types.get(name).unwrap();
                 self.write_type_in_struct_def(writer, target_type)
             },
+            Type::InlineSequence(items) => {
+                for item in items {
+                    self.write_type_in_struct_def(writer, item)
+                }
+            }
             Type::Sequence(1, 1, name) => { // shortcut, and a lot more readable
                 let items = self.sequences.get(name).unwrap();
                 for item in items {
