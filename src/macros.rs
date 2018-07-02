@@ -134,7 +134,7 @@ macro_rules! impl_element {
                                     },
                                     Token::ElementEnd(ElementEnd::Open) => {
                                         let ret = Some($struct_name {
-                                            ATTRS: attrs,
+                                            attrs,
                                             $(
                                                 $field_name: impl_element_field!(stream, tx, parse_context, parent_context, $($field_args)*),
                                             )*
@@ -187,7 +187,7 @@ macro_rules! gen_empty_element {
     };
     ( true, $struct_name:ident, $attrs:expr, $($field_name:ident,)* ) => {
         Some($struct_name {
-            ATTRS: $attrs,
+            attrs: $attrs,
             $(
                 $field_name: Default::default(), // This fails to compile if you told gen_element!() that it can gen_empty_element() whereas there is a field that does not implement Default (ie. not a Vec or an Option)
             )*

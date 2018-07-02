@@ -47,7 +47,6 @@ pub(crate) struct Namespaces<'input> {
     pub target_namespace: &'input str,
     pub namespaces: HashMap<&'input str, &'input str>, // namespace -> URI
     pub module_names: HashMap<&'input str, &'input str>, // URI -> module name
-    pub default_namespace: &'input str,
 }
 
 impl<'input> Namespaces<'input> {
@@ -65,7 +64,6 @@ impl<'input> Namespaces<'input> {
         Namespaces {
             target_namespace,
             namespaces,
-            default_namespace: target_namespace,
             module_names,
         }
     }
@@ -73,7 +71,7 @@ impl<'input> Namespaces<'input> {
     pub fn expand_prefix(&self, prefix: Option<&'input str>) -> &'input str {
         match prefix {
             Some(prefix) => self.namespaces.get(prefix).expect(&format!("Unknown prefix: {:?}", prefix)),
-            None => self.default_namespace,
+            None => self.target_namespace,
         }
     }
     pub fn expand_qname(&self, qname: QName<'input>) -> FullName<'input> {

@@ -698,7 +698,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         impl_code.push(format!("impl_element!({}, \"{}\", {{", struct_name, tag_name));
         {
             let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-            struct_.field("ATTRS", "HashMap<QName<'input>, &'input str>");
+            struct_.field("attrs", "HashMap<QName<'input>, &'input str>");
             let mut name_gen = NameGenerator::new();
             let writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
                 let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
