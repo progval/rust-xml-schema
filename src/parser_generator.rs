@@ -425,7 +425,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 name_hint.extend(&ty.name_hint);
                 items.push(ty);
             }
-            items.push(RichType::new(NameHint::new("any"), Type::Any)); // TODO: remove this
+            if particles.len() == 0 {
+                items.push(RichType::new(NameHint::new("any"), Type::Any)); // TODO: remove this
+            }
             if min_occurs == 1 && max_occurs == 1 {
                 RichType::new(name_hint, Type::InlineSequence(items))
             }
