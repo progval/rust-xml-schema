@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use xmlparser;
 
 use parse_xsd;
-use generated2::*;
+use parser::xs;
 use parser_generator::ParserGenerator;
 use support::*;
 
@@ -39,6 +39,7 @@ fn round1_parser_person_xsd() {
     stream.next(); // Eat the DTD end
     let doc = xs::Schema::parse_xml(&mut stream, &mut (), &());
     assert_ne!(doc, None);
-    let mut parser_generator = ParserGenerator::new(doc.as_ref().unwrap(), HashMap::new());
-    parser_generator.gen(doc.as_ref().unwrap()).to_string();
+    //let mut parser_generator = ParserGenerator::new(doc.as_ref().unwrap(), HashMap::new());
+    //parser_generator.gen(doc.as_ref().unwrap()).to_string();
 }
+

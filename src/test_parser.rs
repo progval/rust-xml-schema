@@ -1,8 +1,7 @@
 use xmlparser;
 
 use parse_xsd;
-use round0_parser::*;
-use generated2::*;
+use parser::*;
 use support::*;
 
 const PERSON_XSD: &'static str = r#"

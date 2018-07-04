@@ -5,7 +5,7 @@ use codegen as cg;
 use heck::{SnakeCase, CamelCase};
 
 use support::*;
-use generated2::*;
+use parser::*;
 use names::*;
 
 const KEYWORDS: &[&'static str] = &["override"];

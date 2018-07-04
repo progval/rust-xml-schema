@@ -5,7 +5,7 @@ use std::collections::HashMap;
 extern crate xmlparser;
 extern crate xml_schema;
 extern crate codegen;
-use xml_schema::generated2::xs;
+use xml_schema::parser::xs;
 use xml_schema::parser_generator::*;
 use xml_schema::support::*;
 
