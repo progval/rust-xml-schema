@@ -43,6 +43,7 @@ impl<'input> RichType<'input> {
 #[derive(Debug)]
 enum Type<'input> {
     Any,
+    Empty,
     Alias(FullName<'input>),
     List(Box<RichType<'input>>),
     Union(Vec<RichType<'input>>),
@@ -532,7 +533,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     let (_, field_name) = t.as_tuple();
                     RichType::new(NameHint::new(field_name), Type::Alias(t))
                 },
-                (None, None) => RichType::new(NameHint::new_empty(), Type::Any), // TODO
+                (None, None) => {
+                    RichType::new(NameHint::new("empty"), Type::Empty)
+                },
                 (Some(ref t1), Some(ref t2)) => panic!("Element '{:?}' has both a type attribute ({:?}) and a child type ({:?}).", name, t1, t2),
             };
 
@@ -780,6 +783,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 self.write_type_in_struct_def(writer, base_type);
                 self.write_type_in_struct_def(writer, ext_type);
             },
+            Type::Empty => (), // TODO ?
             Type::Any => {
                 writer("any", "support", 0, 0, "Any")
             },
