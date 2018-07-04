@@ -421,7 +421,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             Some(enums::ChoiceSequenceOpenContentTypeDefParticleSimpleRestrictionModel::SimpleRestrictionModel(model)) => {
                 self.process_simple_restriction(attrs, model)
             }
-            None => RichType::new(NameHint::new(base.as_tuple().1), Type::Alias(base)),
+            None => RichType::new(NameHint::new(base.as_tuple().1), Type::Empty),
         }
     }
 
@@ -441,7 +441,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         match simple_type_local_simple_type {
             Some(inline_elements::SimpleTypeLocalSimpleType { ref attrs, ref annotation, ref simple_derivation }) =>
                 self.process_simple_type(attrs, simple_derivation),
-            None => RichType::new(NameHint::new(base.as_tuple().1), Type::Alias(base)),
+            None => RichType::new(NameHint::new(base.as_tuple().1), Type::Empty),
         }
     }
 
@@ -565,7 +565,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn process_toplevel_element(&mut self, element: &'ast xs::Element<'input>) {
-        //println!("/* {:#?} */", element);
         let mut name = None;
         let mut type_attr = None;
         let mut abstract_ = false;
