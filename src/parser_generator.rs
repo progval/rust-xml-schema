@@ -795,7 +795,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn gen_element(&self, module: &mut cg::Module, struct_name: &str, tag_name: &FullName<'input>, type_: &Type<'input>) {
         let mut impl_code = Vec::new();
         let (_, tag_name) = tag_name.as_tuple();
-        let mut can_be_empty = true;
         impl_code.push(format!("impl_element!({}, \"{}\", {{", struct_name, tag_name));
         {
             let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
@@ -809,7 +808,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
                 match (min_occurs, max_occurs) {
                     (1, 1) => {
-                        can_be_empty = false; // TODO: what if all subelements can be empty?
                         struct_.field(&format!("pub {}", name), &format!("super::{}::{}<'input>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
                     },
@@ -822,7 +820,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                         impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
                     },
                     (_, _) => {
-                        can_be_empty = false; // TODO: what if all subelements can be empty?
                         struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
                     },
@@ -830,7 +827,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             };
             self.write_type_in_struct_def(writer, type_);
         }
-        impl_code.push(format!("}}, can_be_empty={:?});", can_be_empty));
+        impl_code.push(format!("}});"));
         module.scope().raw(&impl_code.join("\n"));
     }
 

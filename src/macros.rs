@@ -15,6 +15,11 @@ macro_rules! impl_enum {
     ( $name:ident, $($variant_macro:ident ! ( $($variant_args: tt )* ),  )* ) => {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("enum ", stringify!($name));
+
+            fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+                None
+            }
+
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 $(
@@ -89,6 +94,11 @@ macro_rules! impl_group_or_sequence {
     ( $name:ident, ) => {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("empty group or sequence ", stringify!($name));
+
+            fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+                Some($name(Default::default()))
+            }
+
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
                 None
             }
@@ -97,6 +107,15 @@ macro_rules! impl_group_or_sequence {
     ( $name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("group or sequence ", stringify!($name));
+
+            fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+                Some($name {
+                    $(
+                        $field_name: impl_empty_element_field!(parse_context, parent_context, $($field_args)*),
+                    )*
+                })
+            }
+
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 Some($name {
@@ -111,9 +130,14 @@ macro_rules! impl_group_or_sequence {
 
 #[macro_export]
 macro_rules! impl_element {
-    ( $struct_name:ident, $name:expr, { $( ( $field_name:ident, $( $field_args:tt )* ), )* }, can_be_empty=$can_be_empty:ident ) => {
+    ( $struct_name:ident, $name:expr, { $( ( $field_name:ident, $( $field_args:tt )* ), )* } ) => {
         impl<'input> ParseXml<'input> for $struct_name<'input> {
             const NODE_NAME: &'static str = concat!("element ", stringify!($struct_name));
+
+            fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+                None
+            }
+
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 let mut tok = stream.next().unwrap();
@@ -163,7 +187,12 @@ macro_rules! impl_element {
                                         }
                                     },
                                     Token::ElementEnd(ElementEnd::Empty) => {
-                                        return gen_empty_element!($can_be_empty, $struct_name, attrs, $($field_name,)*);
+                                        return Some($struct_name {
+                                            attrs,
+                                            $(
+                                                $field_name: impl_empty_element_field!(parse_context, parent_context, $($field_args)*),
+                                            )*
+                                        });
                                     },
                                     Token::ElementEnd(ElementEnd::Close(_, _)) => {
                                         tx.rollback(stream);
@@ -191,7 +220,7 @@ macro_rules! impl_element {
 
 macro_rules! gen_empty_element {
     ( false, $struct_name:ident, $attrs:expr, $($field_name:ident,)* ) => {
-        panic!(concat!("Empty element ", stringify!($struct_name)));
+        None
     };
     ( true, $struct_name:ident, $attrs:expr, $($field_name:ident,)* ) => {
         Some($struct_name {
@@ -219,3 +248,18 @@ macro_rules! impl_element_field {
     }}
 }
 
+
+macro_rules! impl_empty_element_field {
+    ( $parse_context:expr, $parent_context:expr, $type_mod_name:ident, $type_name:ident ) => {
+        match super::$type_mod_name::$type_name::parse_empty($parse_context, $parent_context) {
+            Some(default) => default,
+            None => return None,
+        }
+    };
+    ( $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Option < $type_name:ident > ) => {
+        None
+    };
+    ( $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Vec < $type_name:ident > ) => {{
+        Vec::new()
+    }}
+}

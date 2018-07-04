@@ -215,7 +215,14 @@ pub trait ParseContext {
 } // TODO: remove this
 pub trait ParseXml<'input>: Sized {
     const NODE_NAME: &'static str;
+
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self>;
+
+
+    fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+        None
+    }
+
     fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
         //println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml(stream, parse_context, parent_context);
