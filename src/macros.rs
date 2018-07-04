@@ -53,6 +53,10 @@ macro_rules! impl_singleton_variant {
 }
 
 macro_rules! impl_struct_variant {
+    ( $enum_name:ident, $stream: expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, ) => {{
+        // empty variant
+        None
+    }};
     ( $enum_name:ident, $stream: expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {{
         let mut res = None;
         loop { // single run, used for breaking

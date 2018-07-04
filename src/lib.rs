@@ -22,8 +22,8 @@ pub mod parser_generator;
 mod test_generated;
 #[cfg(test)]
 mod test_generated_schema;
-#[cfg(test)]
-mod generated2;
+#[cfg(not(feature="bootstrap"))]
+pub mod generated2;
 #[cfg(test)]
 mod test_generated2;
 #[cfg(test)]

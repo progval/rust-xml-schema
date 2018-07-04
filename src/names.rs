@@ -114,7 +114,7 @@ impl<'input> FullName<'input> {
     }
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct NameHint<'input> {
     tokens: Vec<&'input str>,
 }

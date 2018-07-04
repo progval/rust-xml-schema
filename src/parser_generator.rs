@@ -5,7 +5,7 @@ use codegen as cg;
 use heck::{SnakeCase, CamelCase};
 
 use support::*;
-use generated::UNQUAL::*;
+use generated2::*;
 use names::*;
 
 const KEYWORDS: &[&'static str] = &["override"];
@@ -68,13 +68,13 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     choices: HashMap<String, Vec<RichType<'input>>>,
     sequences: HashMap<String, Vec<RichType<'input>>>,
     groups: HashMap<FullName<'input>, RichType<'input>>,
-    attribute_groups: HashMap<FullName<'input>, &'ast attributeGroup_e<'input>>,
+    attribute_groups: HashMap<FullName<'input>, &'ast xs::AttributeGroup<'input>>,
     renames: HashMap<String, String>,
     inline_elements: HashMap<(FullName<'input>, Type<'input>), HashSet<String>>,
 }
 
 impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
-    pub fn new(ast: &'ast schema_e<'input>, renames: HashMap<String, String>) -> ParserGenerator<'ast, 'input> {
+    pub fn new(ast: &'ast xs::Schema<'input>, renames: HashMap<String, String>) -> ParserGenerator<'ast, 'input> {
         let mut target_namespace = None;
         let mut namespaces = HashMap::new();
         let mut element_form_default_qualified = false;
@@ -123,12 +123,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    pub fn gen(&mut self, ast: &'ast schema_e<'input>) -> cg::Scope {
+    pub fn gen(&mut self, ast: &'ast xs::Schema<'input>) -> cg::Scope {
         self.process_ast(ast);
         self.gen_target_scope(ast)
     }
 
-    fn gen_target_scope(&mut self, ast: &schema_e<'input>) -> cg::Scope {
+    fn gen_target_scope(&mut self, ast: &xs::Schema<'input>) -> cg::Scope {
         let mut scope = cg::Scope::new();
         scope.raw("extern crate xmlparser;");
         scope.raw("pub use std::collections::HashMap;");
@@ -154,36 +154,48 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn process_ast(&mut self, ast: &'ast schema_e<'input>) {
-        for top_level_item in ast.child.schema_e_inner__extfield0.schema_e_inner__extfield0__seqfield2.0.iter() {
-            match top_level_item.schemaTop {
-                schemaTop::redefinable(ref r) => self.process_redefinable(r),
-                schemaTop::element(ref e) => { self.process_toplevel_element(e); },
-                schemaTop::attribute(_) => unimplemented!("top-level attribute"),
-                schemaTop::notation(ref e) => self.process_notation(e),
+    fn process_ast(&mut self, ast: &'ast xs::Schema<'input>) {
+        for top_level_item in ast.sequence_schema_top_annotation.iter() {
+            match top_level_item.schema_top {
+                xs::SchemaTop::Redefinable(ref r) => self.process_redefinable(r),
+                xs::SchemaTop::Element(ref e) => { self.process_toplevel_element(e); },
+                xs::SchemaTop::Attribute(_) => unimplemented!("top-level attribute"),
+                xs::SchemaTop::Notation(ref e) => self.process_notation(e),
             }
         }
     }
 
-    fn process_notation(&mut self, notation: &'ast notation_e<'input>) {
+    fn process_notation(&mut self, notation: &'ast xs::Notation<'input>) {
         // TODO
     }
 
-    fn process_redefinable(&mut self, r: &'ast redefinable<'input>) {
+    fn process_redefinable(&mut self, r: &'ast xs::Redefinable<'input>) {
         match r {
-            redefinable::simpleType(e) => { self.process_simple_type(e); },
-            redefinable::complexType(e) => { self.process_complex_type(e); },
-            redefinable::group(e) => { self.process_group(e); },
-            redefinable::attributeGroup(e) => self.process_attribute_group(e),
+            xs::Redefinable::SimpleType(ref e) => {
+                let xs::SimpleType { ref attrs, ref annotation, ref simple_derivation } = **e;
+                self.process_simple_type(attrs, simple_derivation);
+            },
+            xs::Redefinable::ComplexType(e) => {
+                    let xs::ComplexType { ref attrs, ref annotation, ref complex_type_model } = **e;
+                    self.process_complex_type(attrs, complex_type_model);
+                },
+            xs::Redefinable::Group(e) => {
+                let xs::Group { ref attrs, ref annotation, ref particle } = **e;
+                self.process_group(attrs, particle);
+            },
+            xs::Redefinable::AttributeGroup(e) => self.process_attribute_group(e),
         }
     }
 
-    fn process_group(&mut self, group: &'ast group_e<'input>) -> RichType<'input> {
+    fn process_group(&mut self, 
+            attrs: &'ast HashMap<QName<'input>, &'input str>,
+            particles: &'ast Vec<xs::Particle<'input>>,
+            ) -> RichType<'input> {
         let mut name = None;
         let mut ref_ = None;
         let mut max_occurs = 1;
         let mut min_occurs = 1;
-        for (key, &value) in group.attrs.iter() {
+        for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "name") =>
                     name = Some(self.namespaces.parse_qname(value)),
@@ -208,7 +220,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let name = name.expect("<group> has no name or ref.");
 
             let mut items = Vec::new();
-            let particles = &((group.child.0).0).0.particle.0;
             if particles.len() == 1 {
                 let type_ = self.process_particle(particles.get(0).unwrap(), true);
                 self.groups.insert(name, type_);
@@ -228,7 +239,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn process_attribute_group(&mut self, group: &'ast attributeGroup_e<'input>) {
+    fn process_attribute_group(&mut self, group: &'ast xs::AttributeGroup<'input>) {
         let mut name = None;
         for (key, &value) in group.attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
@@ -241,9 +252,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         self.attribute_groups.insert(self.namespaces.parse_qname(name), group);
     }
 
-    fn process_simple_type(&mut self, type_: &'ast simpleType_e<'input>) -> RichType<'input> {
+    fn process_simple_type(&mut self,
+            attrs: &'ast HashMap<QName<'input>, &'input str>,
+            simple_derivation: &'ast xs::SimpleDerivation<'input>,
+            ) -> RichType<'input> {
         let mut name = None;
-        for (key, &value) in type_.attrs.iter() {
+        for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "name") =>
                     name = Some(self.namespaces.parse_qname(value)),
@@ -251,10 +265,13 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
         }
         //let struct_name = self.namespaces.new_type(QName::from(name));
-        let ty = match (type_.child.0).0.simpleDerivation {
-            simpleDerivation::restriction(ref e) => self.process_restriction(e),
-            simpleDerivation::list(ref e) => self.process_list(e),
-            simpleDerivation::union(ref e) => self.process_union(e),
+        let ty = match simple_derivation {
+            xs::SimpleDerivation::Restriction(e) => {
+                let xs::Restriction { ref attrs, ref annotation, ref simple_restriction_model } = **e;
+                self.process_restriction(attrs)
+            },
+            xs::SimpleDerivation::List(ref e) => self.process_list(e),
+            xs::SimpleDerivation::Union(ref e) => self.process_union(e),
         };
 
         if let Some(name) = name {
@@ -266,7 +283,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn process_list(&mut self, list: &'ast list_e<'input>) -> RichType<'input> {
+    fn process_list(&mut self, list: &'ast xs::List<'input>) -> RichType<'input> {
         let mut item_type = None;
         for (key, &value) in list.attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
@@ -275,8 +292,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
         }
         
-        let item_type = match (item_type, &list.child.simpleType.0) {
-            (None, Some(st)) => self.process_simple_type(st),
+        let item_type = match (item_type, &list.simple_type_local_simple_type) {
+            (None, Some(st)) => {
+                let inline_elements::SimpleTypeLocalSimpleType { attrs, annotation, simple_derivation } = st;
+                self.process_simple_type(attrs, simple_derivation)
+            },
             (Some(n), None) => RichType::new(NameHint::new_empty(), Type::Alias(n)),
             (None, None) => panic!("<list> with no itemType or child type."),
             (Some(ref t1), Some(ref t2)) => panic!("<list> has both an itemType attribute ({:?}) and a child type ({:?}).", t1, t2),
@@ -287,7 +307,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         RichType::new(name_hint, Type::List(Box::new(item_type)))
     }
 
-    fn process_union(&mut self, union: &'ast union_e<'input>) -> RichType<'input> {
+    fn process_union(&mut self, union: &'ast xs::Union<'input>) -> RichType<'input> {
         let mut member_types = Vec::new();
         for (key, &value) in union.attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
@@ -303,8 +323,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
 
         let mut name_hint = NameHint::new("union");
-        for t in union.child.simpleType.0.iter() {
-            let ty = self.process_simple_type(t);
+        for t in union.simple_type_local_simple_type.iter() {
+            let ty = {
+                let inline_elements::SimpleTypeLocalSimpleType { attrs, annotation, simple_derivation } = t;
+                self.process_simple_type(attrs, simple_derivation)
+            };
             name_hint.extend(&ty.name_hint);
             member_types.push(ty)
         }
@@ -312,11 +335,14 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         RichType::new(name_hint, Type::Union(member_types))
     }
 
-    fn process_complex_type(&mut self, type_: &'ast complexType_e<'input>) -> RichType<'input> {
+    fn process_complex_type(&mut self,
+            attrs: &'ast HashMap<QName<'input>, &'input str>,
+            model: &'ast xs::ComplexTypeModel<'input>,
+            ) -> RichType<'input> {
         let mut name = None;
         let mut abstract_ = false;
         let mut mixed = false;
-        for (key, &value) in type_.attrs.iter() {
+        for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "name") =>
                     name = Some(self.namespaces.parse_qname(value)),
@@ -338,10 +364,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
         }
         //let struct_name = self.namespaces.new_type(QName::from(name));
-        let ty = match (type_.child.0).0.complexTypeModel {
-            complexTypeModel::simpleContent(_) => unimplemented!("simpleContent"),
-            complexTypeModel::complexContent(ref model) => self.process_complex_content(model),
-            complexTypeModel::complexTypeModel__choicevariant2(ref model) => self.process_other_complex_type_model(model),
+        let ty = match model {
+            xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
+            xs::ComplexTypeModel::ComplexContent(ref model) => self.process_complex_content(model),
+            xs::ComplexTypeModel::CompleteContentModel { ref open_content, ref type_def_particle, ref attr_decls, ref assertions } => self.process_complete_content_model(open_content, type_def_particle, attr_decls, assertions),
         };
 
         if let Some(name) = name {
@@ -353,21 +379,33 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn process_other_complex_type_model(&mut self, model: &'ast complexTypeModel__choicevariant2<'input>) -> RichType<'input> {
-        let complexTypeModel__choicevariant2 { openContent, typeDefParticle, attrDecls, assertions } = model;
-        self.process_type_def_particle(typeDefParticle.0.as_ref().unwrap(), true)
+    fn process_complete_content_model(&mut self,
+            open_content: &'ast Option<Box<xs::OpenContent<'input>>>,
+            type_def_particle: &'ast Option<Box<xs::TypeDefParticle<'input>>>,
+            attr_decls: &'ast xs::AttrDecls<'input>,
+            assertions: &'ast xs::Assertions<'input>,
+            ) -> RichType<'input> {
+        self.process_type_def_particle(type_def_particle.as_ref().unwrap(), true)
     }
 
-    fn process_complex_content(&mut self, model: &'ast complexContent_e<'input>) -> RichType<'input> {
-        match model.child.complexContent_e_inner__extfield0 {
-            complexContent_e_inner__extfield0::restriction(ref r) => self.process_restriction(r),
-            complexContent_e_inner__extfield0::extension(ref e) => self.process_extension(e),
+    fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>) -> RichType<'input> {
+        match model.content_def {
+            enums::ContentDef::Restriction(ref r) => {
+                let inline_elements::RestrictionSimpleRestrictionType { ref attrs, ref annotation, ref choice_sequence_open_content_type_def_particle_simple_restriction_model, ref attr_decls, ref assertions } = **r;
+                self.process_restriction(attrs)
+            },
+            enums::ContentDef::Extension(ref e) => {
+                let inline_elements::ExtensionSimpleExtensionType { ref attrs, ref annotation, ref open_content, ref type_def_particle, ref attr_decls, ref assertions } = **e;
+                self.process_extension(attrs, type_def_particle)
+            },
         }
     }
 
-    fn process_restriction(&mut self, restriction: &'ast restriction_e<'input>) -> RichType<'input> {
+    fn process_restriction(&mut self, 
+            attrs: &'ast HashMap<QName<'input>, &'input str>,
+            ) -> RichType<'input> {
         let mut base = None;
-        for (key, &value) in restriction.attrs.iter() {
+        for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "base") => base = Some(value),
                 _ => panic!("Unknown attribute {} in <restriction>", key),
@@ -378,30 +416,39 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         RichType::new(NameHint::new_empty(), Type::Alias(self.namespaces.parse_qname(base))) // TODO
     }
 
-    fn process_type_def_particle(&mut self, particle: &'ast typeDefParticle<'input>, inlinable: bool) -> RichType<'input> {
+    fn process_type_def_particle(&mut self, particle: &'ast xs::TypeDefParticle<'input>, inlinable: bool) -> RichType<'input> {
         match particle {
-            typeDefParticle::group(e) => self.process_group(e),
-            typeDefParticle::all(_) => unimplemented!("all"),
-            typeDefParticle::choice(e) => self.process_choice(e, inlinable),
-            typeDefParticle::sequence(e) => self.process_sequence(e, inlinable),
+            xs::TypeDefParticle::Group(e) => {
+                let inline_elements::Group { ref attrs, ref annotation, ref particle } = **e;
+                self.process_group(attrs, particle)
+            },
+            xs::TypeDefParticle::All(_) => unimplemented!("all"),
+            xs::TypeDefParticle::Choice(e) => self.process_choice(e, inlinable),
+            xs::TypeDefParticle::Sequence(e) => self.process_sequence(e, inlinable),
         }
     }
-    fn process_particle(&mut self, particle: &'ast particle<'input>, inlinable: bool) -> RichType<'input> {
+    fn process_particle(&mut self, particle: &'ast xs::Particle<'input>, inlinable: bool) -> RichType<'input> {
         match particle {
-            particle::element(e) => self.process_element(e),
-            particle::group(e) => self.process_group(e),
-            particle::all(_) => unimplemented!("all"),
-            particle::choice(e) => self.process_choice(e, inlinable),
-            particle::sequence(sequence) => self.process_sequence(sequence, inlinable),
-            particle::any(e) => self.process_any(e),
+            xs::Particle::Element(e) => {
+                let inline_elements::ElementLocalElement { ref attrs, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
+                self.process_element(attrs, type_)
+            },
+            xs::Particle::Group(e) => {
+                let inline_elements::Group { ref attrs, ref annotation, ref particle } = **e;
+                self.process_group(attrs, particle)
+            },
+            xs::Particle::All(_) => unimplemented!("all"),
+            xs::Particle::Choice(e) => self.process_choice(e, inlinable),
+            xs::Particle::Sequence(sequence) => self.process_sequence(sequence, inlinable),
+            xs::Particle::Any(e) => self.process_any(e),
         }
     }
 
-    fn process_any(&mut self, any: &'ast any_e<'input>) -> RichType<'input> {
+    fn process_any(&mut self, any: &'ast xs::Any<'input>) -> RichType<'input> {
         RichType::new(NameHint::new("any"), Type::Any)
     }
 
-    fn process_sequence(&mut self, sequence: &'ast sequence_e<'input>, inlinable: bool) -> RichType<'input> {
+    fn process_sequence(&mut self, sequence: &'ast xs::Sequence<'input>, inlinable: bool) -> RichType<'input> {
         let mut min_occurs = 1;
         let mut max_occurs = 1;
         for (key, &value) in sequence.attrs.iter() {
@@ -415,7 +462,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("sequence");
-        let particles = &(sequence.child.0).0.particle.0;
+        let particles = &sequence.particle;
         if min_occurs == 1 && max_occurs == 1 && inlinable && particles.len() == 1 {
             self.process_particle(particles.get(0).unwrap(), true)
         }
@@ -436,7 +483,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn process_choice(&mut self, choice: &'ast choice_e<'input>, inlinable: bool) -> RichType<'input> {
+    fn process_choice(&mut self, choice: &'ast xs::Choice<'input>, inlinable: bool) -> RichType<'input> {
         let mut min_occurs = 1;
         let mut max_occurs = 1;
         for (key, &value) in choice.attrs.iter() {
@@ -450,7 +497,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("choice");
-        for particle in (choice.child.0).0.particle.0.iter() {
+        for particle in choice.particle.iter() {
             let ty = self.process_particle(particle, false);
             name_hint.extend(&ty.name_hint);
             items.push(ty);
@@ -467,9 +514,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn process_extension(&mut self, extension: &'ast extension_e<'input>) -> RichType<'input> {
+    fn process_extension(&mut self,
+            attrs: &'ast HashMap<QName<'input>, &'input str>,
+            type_def_particle: &'ast Option<xs::TypeDefParticle<'input>>,
+            ) -> RichType<'input> {
         let mut base = None;
-        for (key, &value) in extension.attrs.iter() {
+        for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "base") => base = Some(value),
                 _ => panic!("Unknown attribute {} in <extension>", key),
@@ -477,7 +527,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let base = base.expect("<extension> has no base");
         let base = self.namespaces.parse_qname(base);
-        if let Some(ref particle) = extension.child.0.extensionType__extfield0.typeDefParticle.0 {
+        if let Some(ref particle) = type_def_particle {
             RichType::new(NameHint::new_empty(), Type::Extension(base, Box::new(self.process_type_def_particle(particle, false))))
         }
         else {
@@ -485,7 +535,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn process_toplevel_element(&mut self, element: &'ast element_e<'input>) {
+    fn process_toplevel_element(&mut self, element: &'ast xs::Element<'input>) {
         //println!("/* {:#?} */", element);
         let mut name = None;
         let mut type_attr = None;
@@ -518,12 +568,17 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
         }
         let name = name.expect("<element> has no name.");
-        let e = &(element.child.0).0.element__extfield0;
-        let element__extfield0 { element__extfield0__seqfield0: ref child_type, ref alternative, ref identityConstraint } = e;
-        let type_ = match (type_attr, &child_type.0) {
+        let xs::Element { ref attrs, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
+        let type_ = match (type_attr, &child_type) {
             (None, Some(ref c)) => match c {
-                element__extfield0__seqfield0::simpleType(ref e) => self.process_simple_type(e),
-                element__extfield0__seqfield0::complexType(ref e) => self.process_complex_type(e),
+                enums::Type::SimpleType(ref e) => {
+                    let inline_elements::SimpleTypeLocalSimpleType { ref attrs, ref annotation, ref simple_derivation } = **e;
+                    self.process_simple_type(attrs, simple_derivation)
+                },
+                enums::Type::ComplexType(ref e) => {
+                    let inline_elements::ComplexTypeLocalComplexType { ref attrs, ref annotation, ref complex_type_model } = **e;
+                    self.process_complex_type(attrs, complex_type_model)
+                },
             },
             (Some(t), None) => {
                 let (_, field_name) = t.as_tuple();
@@ -538,7 +593,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         self.elements.insert(name, type_);
     }
 
-    fn process_element(&mut self, element: &'ast element_e<'input>) -> RichType<'input> {
+    fn process_element(&mut self,
+            attrs: &'ast HashMap<QName<'input>, &'input str>,
+            child_type: &'ast Option<enums::Type<'input>>,
+            ) -> RichType<'input> {
         let mut name = None;
         let mut ref_ = None;
         let mut type_attr = None;
@@ -546,7 +604,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let mut substitution_group = None;
         let mut min_occurs = 1;
         let mut max_occurs = 1;
-        for (key, &value) in element.attrs.iter() {
+        for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "name") =>
                     name = Some(self.namespaces.parse_qname(value)),
@@ -581,13 +639,17 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         else {
             let name = name.expect("<element> has no name.");
-            let e = &(element.child.0).0.element__extfield0;
-            let element__extfield0 { element__extfield0__seqfield0: ref child_type, ref alternative, ref identityConstraint } = e;
-            match (type_attr, &child_type.0) {
+            match (type_attr, &child_type) {
                 (None, Some(ref c)) => {
                     let t = match c {
-                        element__extfield0__seqfield0::simpleType(ref e) => self.process_simple_type(e),
-                        element__extfield0__seqfield0::complexType(ref e) => self.process_complex_type(e),
+                        enums::Type::SimpleType(ref e) => {
+                            let inline_elements::SimpleTypeLocalSimpleType { ref attrs, ref annotation, ref simple_derivation } = **e;
+                            self.process_simple_type(attrs, simple_derivation)
+                        },
+                        enums::Type::ComplexType(ref e) => {
+                            let inline_elements::ComplexTypeLocalComplexType { ref attrs, ref annotation, ref complex_type_model } = **e;
+                            self.process_complex_type(attrs, complex_type_model)
+                        },
                     };
                     let (prefix, local) = name.as_tuple();
                     let mut name_hint = NameHint::new(local);

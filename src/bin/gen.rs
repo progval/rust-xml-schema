@@ -5,7 +5,7 @@ use std::collections::HashMap;
 extern crate xmlparser;
 extern crate xml_schema;
 extern crate codegen;
-use xml_schema::generated::UNQUAL;
+use xml_schema::generated2::xs;
 use xml_schema::parser_generator::*;
 use xml_schema::support::*;
 
@@ -35,7 +35,7 @@ fn main() {
     stream.next(); // Eat comment
     stream.next(); // Eat comment
     stream.next(); // Eat the DTD end
-    let doc = UNQUAL::schema_e::parse_xml(&mut stream, &mut (), &()).unwrap();
+    let doc = xs::Schema::parse_xml(&mut stream, &mut (), &()).unwrap();
 
     let mut renames = HashMap::new();
     for (from_, to_) in RENAMES {
