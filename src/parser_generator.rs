@@ -29,7 +29,7 @@ fn parse_max_occurs(s: &str) -> Result<usize, ParseIntError> {
     }
 }
 
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 struct RichType<'input> {
     name_hint: NameHint<'input>,
     type_: Type<'input>,
@@ -40,7 +40,7 @@ impl<'input> RichType<'input> {
     }
 }
 
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 enum Type<'input> {
     Any,
     Empty,
@@ -65,7 +65,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     attribute_form_default_qualified: bool,
     elements: HashMap<FullName<'input>, RichType<'input>>,
     types: HashMap<FullName<'input>, RichType<'input>>,
-    choices: HashMap<String, Vec<RichType<'input>>>,
+    choices: HashMap<Vec<RichType<'input>>, HashSet<String>>,
     sequences: HashMap<String, Vec<RichType<'input>>>,
     groups: HashMap<FullName<'input>, RichType<'input>>,
     attribute_groups: HashMap<FullName<'input>, &'ast xs::AttributeGroup<'input>>,
@@ -465,7 +465,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>) -> RichType<'input> {
-        match model.content_def {
+        let xs::ComplexContent { ref attrs, ref annotation, ref content_def } = model;
+        match content_def {
             enums::ComplexContentDef::Restriction(ref r) => {
                 let inline_elements::RestrictionComplexRestrictionType { ref attrs, ref annotation, ref choice_sequence_open_content_type_def_particle, ref attr_decls, ref assertions } = **r;
                 match choice_sequence_open_content_type_def_particle {
@@ -475,7 +476,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 }
             },
             enums::ComplexContentDef::Extension(ref e) => {
-                let inline_elements::ExtensionExtensionType { ref attrs, ref open_content, ref type_def_particle, ref annotation, ref attr_decls, ref assertions } = **e;
+                let inline_elements::ExtensionExtensionType { ref attrs, ref annotation, ref open_content, ref type_def_particle, ref attr_decls, ref assertions } = **e;
                 match type_def_particle {
                     Some(type_def_particle) => self.process_extension(attrs, type_def_particle),
                     None => self.process_simple_extension(attrs),
@@ -646,7 +647,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             //},
             (_, _, _) => {
                 let name = self.namespaces.name_from_hint(&name_hint).unwrap();
-                self.choices.insert(name.clone(), items);
+                self.choices.entry(items)
+                        .or_insert(HashSet::new())
+                        .insert(name.clone());
                 RichType::new(name_hint, Type::Choice(min_occurs, max_occurs, name))
             }
         }
@@ -830,15 +833,20 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         module.vis("pub");
         module.scope().raw("use super::*;");
         let mut choices: Vec<_> = self.choices.iter().collect();
-        choices.sort_by_key(|&(n,_)| n);
-        for (ref name, ref choice) in choices {
-            self.gen_choice(module.scope(), name, choice);
+        choices.sort_by_key(|&(t,_)| t);
+        let mut name_gen = NameGenerator::new();
+        for (ref choice, ref names) in choices {
+            // TODO: deduplicate
+            for name in names.iter() {
+                let enum_name = escape_keyword(&name.to_camel_case());
+                let enum_name = name_gen.gen_name(enum_name);
+                self.gen_choice(module.scope(), &enum_name, choice);
+            }
         }
     }
-    fn gen_choice(&self, scope: &mut cg::Scope, name: &str, items: &Vec<RichType<'input>>) {
+    fn gen_choice(&self, scope: &mut cg::Scope, enum_name: &String, items: &Vec<RichType<'input>>) {
         let mut impl_code = Vec::new();
-        let enum_name = escape_keyword(&name.to_camel_case());
-        let enum_name = self.renames.get(&enum_name).unwrap_or(&enum_name);
+        let enum_name = self.renames.get(enum_name).unwrap_or(enum_name);
         impl_code.push(format!("impl_enum!({},", enum_name));
         {
             let mut enum_ = scope.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
@@ -855,7 +863,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     self.write_type_in_struct_def(writer, &item.type_);
                 }
                 let variant_name = self.namespaces.name_from_hint(&item.name_hint)
-                    .unwrap_or(format!("{}{}", name, i)).to_camel_case();
+                    .unwrap_or(format!("{}{}", enum_name, i)).to_camel_case();
                 let variant_name = escape_keyword(&variant_name.to_camel_case());
                 let variant_name = self.renames.get(&variant_name).unwrap_or(&variant_name);
                 let mut variant = enum_.new_variant(&variant_name);
@@ -924,7 +932,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut module = scope.get_module_mut(mod_name).unwrap();
             let (mod_name, struct_name) = name.as_tuple();
             if let Type::InlineChoice(ref items) = group.type_ {
-                self.gen_choice(module.scope(), struct_name, items);
+                self.gen_choice(module.scope(), &struct_name.to_string().to_camel_case(), items);
             }
             else if let Type::InlineSequence(ref items) = group.type_ {
                 self.gen_group_or_sequence(module, struct_name, &items.iter().collect());

@@ -19,8 +19,8 @@ const RENAMES: &[(&'static str, &'static str)] = &[
     ("choice_attribute_attribute_group", "attribute"),
     ("SequenceSelectorField", "UniquenessSpec"),
     ("sequence_selector_field", "uniqueness_spec"),
-    ("ChoiceRestrictionExtension", "ContentDef"),
-    ("choice_restriction_extension", "content_def"),
+    //("ChoiceRestrictionExtension", "ContentDef"),
+    //("choice_restriction_extension", "content_def"),
     ("ChoiceAppinfoDocumentation", "AnnotationContent"),
     ("choice_appinfo_documentation", "annotation_content"),
     ];
