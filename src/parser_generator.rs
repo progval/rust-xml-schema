@@ -668,15 +668,15 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
                 match (min_occurs, max_occurs) {
                     (1, 1) => {
-                        struct_.field(&name, &format!("super::{}::{}<'input>", type_mod_name, type_name));
+                        struct_.field(&format!("pub {}", name), &format!("super::{}::{}<'input>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
                     },
                     (0, 1) => {
-                        struct_.field(&name, &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
+                        struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
                     },
                     (_, _) => {
-                        struct_.field(&name, &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                        struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
                     },
                 }
@@ -708,7 +708,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         impl_code.push(format!("impl_element!({}, \"{}\", {{", struct_name, tag_name));
         {
             let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-            struct_.field("attrs", "HashMap<QName<'input>, &'input str>");
+            struct_.field("pub attrs", "HashMap<QName<'input>, &'input str>");
             let mut name_gen = NameGenerator::new();
             let writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
                 let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
@@ -719,20 +719,20 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 match (min_occurs, max_occurs) {
                     (1, 1) => {
                         can_be_empty = false; // TODO: what if all subelements can be empty?
-                        struct_.field(&name, &format!("super::{}::{}<'input>", type_mod_name, type_name));
+                        struct_.field(&format!("pub {}", name), &format!("super::{}::{}<'input>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
                     },
                     (0, 1) => {
-                        struct_.field(&name, &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
+                        struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
                     },
                     (0, _) => {
-                        struct_.field(&name, &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                        struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
                     },
                     (_, _) => {
                         can_be_empty = false; // TODO: what if all subelements can be empty?
-                        struct_.field(&name, &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                        struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
                         impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
                     },
                 }
