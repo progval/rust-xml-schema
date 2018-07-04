@@ -268,7 +268,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let ty = match simple_derivation {
             xs::SimpleDerivation::Restriction(e) => {
                 let xs::Restriction { ref attrs, ref annotation, ref simple_restriction_model } = **e;
-                self.process_restriction(attrs)
+                self.process_simple_restriction(attrs, simple_restriction_model)
             },
             xs::SimpleDerivation::List(ref e) => self.process_list(e),
             xs::SimpleDerivation::Union(ref e) => self.process_union(e),
@@ -392,7 +392,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         match model.content_def {
             enums::ContentDef::Restriction(ref r) => {
                 let inline_elements::RestrictionSimpleRestrictionType { ref attrs, ref annotation, ref choice_sequence_open_content_type_def_particle_simple_restriction_model, ref attr_decls, ref assertions } = **r;
-                self.process_restriction(attrs)
+                self.process_restriction(attrs, choice_sequence_open_content_type_def_particle_simple_restriction_model)
             },
             enums::ContentDef::Extension(ref e) => {
                 let inline_elements::ExtensionSimpleExtensionType { ref attrs, ref annotation, ref open_content, ref type_def_particle, ref attr_decls, ref assertions } = **e;
@@ -403,17 +403,46 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     fn process_restriction(&mut self, 
             attrs: &'ast HashMap<QName<'input>, &'input str>,
+            model: &'ast Option<enums::ChoiceSequenceOpenContentTypeDefParticleSimpleRestrictionModel<'input>>,
             ) -> RichType<'input> {
         let mut base = None;
         for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
-                (SCHEMA_URI, "base") => base = Some(value),
+                (SCHEMA_URI, "base") => base = Some(self.namespaces.parse_qname(value)),
                 _ => panic!("Unknown attribute {} in <restriction>", key),
             }
         }
         let base = base.expect("<restriction> has no base");
-        //match (restriction_e.child.0).0.restrictionType__extfield0.
-        RichType::new(NameHint::new_empty(), Type::Alias(self.namespaces.parse_qname(base))) // TODO
+        match model {
+            Some(enums::ChoiceSequenceOpenContentTypeDefParticleSimpleRestrictionModel::SequenceOpenContentTypeDefParticle { ref open_content, ref type_def_particle }) => {
+                // TODO: use the base
+                self.process_type_def_particle(type_def_particle, false)
+            },
+            Some(enums::ChoiceSequenceOpenContentTypeDefParticleSimpleRestrictionModel::SimpleRestrictionModel(model)) => {
+                self.process_simple_restriction(attrs, model)
+            }
+            None => RichType::new(NameHint::new(base.as_tuple().1), Type::Alias(base)),
+        }
+    }
+
+    fn process_simple_restriction(&mut self, 
+            attrs: &'ast HashMap<QName<'input>, &'input str>,
+            model: &'ast xs::SimpleRestrictionModel<'input>,
+            ) -> RichType<'input> {
+        let mut base = None;
+        for (key, &value) in attrs.iter() {
+            match self.namespaces.expand_qname(*key).as_tuple() {
+                (SCHEMA_URI, "base") => base = Some(self.namespaces.parse_qname(value)),
+                _ => panic!("Unknown attribute {} in <restriction>", key),
+            }
+        }
+        let base = base.expect("<restriction> has no base");
+        let xs::SimpleRestrictionModel { ref simple_type_local_simple_type, ref choice_facet_any } = model;
+        match simple_type_local_simple_type {
+            Some(inline_elements::SimpleTypeLocalSimpleType { ref attrs, ref annotation, ref simple_derivation }) =>
+                self.process_simple_type(attrs, simple_derivation),
+            None => RichType::new(NameHint::new(base.as_tuple().1), Type::Alias(base)),
+        }
     }
 
     fn process_type_def_particle(&mut self, particle: &'ast xs::TypeDefParticle<'input>, inlinable: bool) -> RichType<'input> {
