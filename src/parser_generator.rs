@@ -477,8 +477,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             enums::ComplexContentDef::Extension(ref e) => {
                 let inline_elements::ExtensionExtensionType { ref attrs, ref open_content, ref type_def_particle, ref annotation, ref attr_decls, ref assertions } = **e;
                 match type_def_particle {
-                    Some(type_def_particle) => self.process_restriction(attrs, type_def_particle),
-                    None => RichType::new(NameHint::new("empty_extension"), Type::Empty),
+                    Some(type_def_particle) => self.process_extension(attrs, type_def_particle),
+                    None => self.process_simple_extension(attrs),
                 }
             },
         }
@@ -641,9 +641,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             items.push(ty);
         }
         match (min_occurs, max_occurs, inlinable) {
-            (1, 1, true) => {
-                RichType::new(name_hint, Type::InlineChoice(items))
-            },
+            //(1, 1, true) => {
+            //    RichType::new(name_hint, Type::InlineChoice(items))
+            //},
             (_, _, _) => {
                 let name = self.namespaces.name_from_hint(&name_hint).unwrap();
                 self.choices.insert(name.clone(), items);
@@ -669,7 +669,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     fn process_extension(&mut self,
             attrs: &'ast HashMap<QName<'input>, &'input str>,
-            type_def_particle: &'ast Option<xs::TypeDefParticle<'input>>,
+            type_def_particle: &'ast xs::TypeDefParticle<'input>,
             ) -> RichType<'input> {
         let mut base = None;
         for (key, &value) in attrs.iter() {
@@ -680,12 +680,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let base = base.expect("<extension> has no base");
         let base = self.namespaces.parse_qname(base);
-        if let Some(ref particle) = type_def_particle {
-            RichType::new(NameHint::new_empty(), Type::Extension(base, Box::new(self.process_type_def_particle(particle, true))))
-        }
-        else {
-            RichType::new(NameHint::new_empty(), Type::Alias(base))
-        }
+        RichType::new(NameHint::new_empty(), Type::Extension(base, Box::new(self.process_type_def_particle(type_def_particle, true))))
     }
 
     fn process_toplevel_element(&mut self, element: &'ast xs::Element<'input>) {
