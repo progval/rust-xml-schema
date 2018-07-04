@@ -234,11 +234,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let type_ = match content {
             enums::ChoiceAllChoiceSequence::All(_) => unimplemented!("all"),
             enums::ChoiceAllChoiceSequence::Choice(e) => {
-                let inline_elements::ChoiceSimpleExplicitGroup { ref attrs, ref annotation, ref nested_particle } = **e;
+                let xs::Choice { ref attrs, ref annotation, ref nested_particle } = **e;
                 self.process_choice(attrs, nested_particle, true)
             },
             enums::ChoiceAllChoiceSequence::Sequence(e) => {
-                let inline_elements::SequenceSimpleExplicitGroup { ref attrs, ref annotation, ref nested_particle } = **e;
+                let xs::Sequence { ref attrs, ref annotation, ref nested_particle } = **e;
                 self.process_sequence(attrs, nested_particle, true)
             },
         };
@@ -451,9 +451,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>, inlinable: bool) -> RichType<'input> {
-        let xs::ComplexContent { ref attrs, ref annotation, ref content_def } = model;
-        match content_def {
-            enums::ComplexContentDef::Restriction(ref r) => {
+        let xs::ComplexContent { ref attrs, ref annotation, ref choice_restriction_extension } = model;
+        match choice_restriction_extension {
+            enums::ChoiceRestrictionExtension::Restriction(ref r) => {
                 let inline_elements::RestrictionComplexRestrictionType { ref attrs, ref annotation, ref choice_sequence_open_content_type_def_particle, ref attr_decls, ref assertions } = **r;
                 match choice_sequence_open_content_type_def_particle {
                     Some(enums::ChoiceSequenceOpenContentTypeDefParticle::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
@@ -461,7 +461,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     None => RichType::new(NameHint::new("empty_extension"), Type::Empty),
                 }
             },
-            enums::ComplexContentDef::Extension(ref e) => {
+            enums::ChoiceRestrictionExtension::Extension(ref e) => {
                 let inline_elements::ExtensionExtensionType { ref attrs, ref annotation, ref open_content, ref type_def_particle, ref attr_decls, ref assertions } = **e;
                 match type_def_particle {
                     Some(type_def_particle) => self.process_extension(attrs, type_def_particle, inlinable),
@@ -823,7 +823,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         module.vis("pub");
         module.scope().raw("use super::*;");
         let mut choices: Vec<_> = self.choices.iter().collect();
-        choices.sort_by_key(|&(t,_)| t);
+        choices.sort_by_key(|&(t,names)| (t, names.iter().collect::<Vec<_>>()));
         let mut name_gen = NameGenerator::new();
         for (ref choice, ref names) in choices {
             // TODO: deduplicate
@@ -983,7 +983,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         module.scope().raw("use super::*;");
         let mut elements: Vec<_> = self.inline_elements.iter().collect();
 
-        elements.sort_by_key(|&((n, _),_)| n);
+        elements.sort_by_key(|&((n, _),n2)| (n, n2.iter().collect::<Vec<_>>()));
         for ((tag_name, element), struct_names) in elements {
             // struct_names is always non-empty.
 
