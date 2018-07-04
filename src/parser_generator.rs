@@ -466,24 +466,27 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>) -> RichType<'input> {
         match model.content_def {
-            enums::ContentDef::Restriction(ref r) => {
-                let inline_elements::RestrictionSimpleRestrictionType { ref attrs, ref annotation, ref choice_simple_restriction_model, ref attr_decls, ref assertions } = **r;
-                match choice_simple_restriction_model {
-                    Some(enums::ChoiceSimpleRestrictionModel::SimpleRestrictionModel(model)) =>
-                        self.process_simple_restriction(attrs, model),
-                    None => RichType::new(NameHint::new("very_empty_restriction"), Type::Empty),
+            enums::ComplexContentDef::Restriction(ref r) => {
+                let inline_elements::RestrictionComplexRestrictionType { ref attrs, ref annotation, ref choice_sequence_open_content_type_def_particle, ref attr_decls, ref assertions } = **r;
+                match choice_sequence_open_content_type_def_particle {
+                    Some(enums::ChoiceSequenceOpenContentTypeDefParticle::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
+                        self.process_restriction(attrs, type_def_particle),
+                    None => RichType::new(NameHint::new("empty_extension"), Type::Empty),
                 }
             },
-            enums::ContentDef::Extension(ref e) => {
-                let inline_elements::ExtensionSimpleExtensionType { ref attrs, ref annotation, ref attr_decls, ref assertions } = **e;
-                self.process_simple_extension(attrs)
+            enums::ComplexContentDef::Extension(ref e) => {
+                let inline_elements::ExtensionExtensionType { ref attrs, ref open_content, ref type_def_particle, ref annotation, ref attr_decls, ref assertions } = **e;
+                match type_def_particle {
+                    Some(type_def_particle) => self.process_restriction(attrs, type_def_particle),
+                    None => RichType::new(NameHint::new("empty_extension"), Type::Empty),
+                }
             },
         }
     }
 
     fn process_restriction(&mut self, 
             attrs: &'ast HashMap<QName<'input>, &'input str>,
-            model: &'ast Option<enums::ChoiceSequenceOpenContentTypeDefParticleSimpleRestrictionModel<'input>>,
+            type_def_particle: &'ast xs::TypeDefParticle<'input>,
             ) -> RichType<'input> {
         let mut base = None;
         for (key, &value) in attrs.iter() {
@@ -493,16 +496,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
         }
         let base = base.expect("<restriction> has no base");
-        match model {
-            Some(enums::ChoiceSequenceOpenContentTypeDefParticleSimpleRestrictionModel::SequenceOpenContentTypeDefParticle { ref open_content, ref type_def_particle }) => {
-                // TODO: use the base
-                self.process_type_def_particle(type_def_particle, false)
-            },
-            Some(enums::ChoiceSequenceOpenContentTypeDefParticleSimpleRestrictionModel::SimpleRestrictionModel(model)) => {
-                self.process_simple_restriction(attrs, model)
-            }
-            None => RichType::new(NameHint::new(base.as_tuple().1), Type::Alias(base)),
-        }
+        // TODO: use the base
+        self.process_type_def_particle(type_def_particle, false)
     }
 
     fn process_simple_restriction(&mut self, 

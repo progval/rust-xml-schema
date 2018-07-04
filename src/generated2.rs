@@ -121,12 +121,12 @@ pub mod xs {
     pub struct ComplexContent<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
-        pub content_def: super::enums::ContentDef<'input>,
+        pub content_def: super::enums::ComplexContentDef<'input>,
     }
 
     impl_element!(ComplexContent, "complexContent", {
         (annotation, xs, Option<Annotation>),
-        (content_def, enums, ContentDef),
+        (content_def, enums, ComplexContentDef),
     });
 
     #[derive(Debug, PartialEq)]
@@ -471,12 +471,12 @@ pub mod xs {
     pub struct SimpleContent<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
-        pub content_def: super::enums::ContentDef<'input>,
+        pub content_def: super::enums::SimpleContentDef<'input>,
     }
 
     impl_element!(SimpleContent, "simpleContent", {
         (annotation, xs, Option<Annotation>),
-        (content_def, enums, ContentDef),
+        (content_def, enums, SimpleContentDef),
     });
 
     #[derive(Debug, PartialEq)]
@@ -800,12 +800,23 @@ pub mod enums {
     );
 
     #[derive(Debug, PartialEq)]
-    pub enum ContentDef<'input> {
+    pub enum ComplexContentDef<'input> {
+        Restriction(Box<super::inline_elements::RestrictionComplexRestrictionType<'input>>),
+        Extension(Box<super::inline_elements::ExtensionExtensionType<'input>>),
+    }
+
+    impl_enum!(ComplexContentDef,
+        impl_singleton_variant!(Restriction, inline_elements, Box<RestrictionComplexRestrictionType>),
+        impl_singleton_variant!(Extension, inline_elements, Box<ExtensionExtensionType>),
+    );
+
+    #[derive(Debug, PartialEq)]
+    pub enum SimpleContentDef<'input> {
         Restriction(Box<super::inline_elements::RestrictionSimpleRestrictionType<'input>>),
         Extension(Box<super::inline_elements::ExtensionSimpleExtensionType<'input>>),
     }
 
-    impl_enum!(ContentDef,
+    impl_enum!(SimpleContentDef,
         impl_singleton_variant!(Restriction, inline_elements, Box<RestrictionSimpleRestrictionType>),
         impl_singleton_variant!(Extension, inline_elements, Box<ExtensionSimpleExtensionType>),
     );
