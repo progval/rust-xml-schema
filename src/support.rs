@@ -102,13 +102,24 @@ pub struct any<'input>(Vec<XmlToken<'input>>);
 impl<'input> ParseXml<'input> for any<'input> {
     const NODE_NAME: &'static str = "any";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<any<'input>> {
+        let tx = stream.transaction();
         let mut tag_stack = Vec::new();
         let mut tokens = Vec::new();
-        let tok = stream.next()?;
-        tokens.push(tok);
-        match tok {
-            XmlToken::ElementStart(prefix, name) => tag_stack.push(QName::from_strspans(prefix, name)),
-            _ => return None, // TODO: put it back in the stream
+        loop {
+            let tok = stream.next()?;
+            tokens.push(tok);
+            match tok {
+                XmlToken::Whitespaces(_) => (),
+                XmlToken::Comment(_) => (),
+                XmlToken::ElementStart(prefix, name) => {
+                    tag_stack.push(QName::from_strspans(prefix, name));
+                    break
+                },
+                _ => {
+                    tx.rollback(stream);
+                    return None;
+                }
+            }
         }
         while tag_stack.len() > 0 {
             let tok = stream.next().unwrap();
@@ -128,6 +139,8 @@ impl<'input> ParseXml<'input> for any<'input> {
         Some(any(tokens))
     }
 }
+
+pub type Any<'input> = any<'input>; // TODO: rename any to Any
 
 #[derive(Debug, PartialEq)]
 pub struct XmlString<'input>(StrSpan<'input>);

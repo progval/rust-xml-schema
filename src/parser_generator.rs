@@ -780,7 +780,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 self.write_type_in_struct_def(writer, base_type);
                 self.write_type_in_struct_def(writer, ext_type);
             },
-            Type::Any => (),
+            Type::Any => {
+                writer("any", "support", 0, 0, "Any")
+            },
             _ => unimplemented!("writing {:?}", type_),
         }
     }

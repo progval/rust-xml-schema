@@ -26,6 +26,8 @@ mod test_generated_schema;
 mod generated2;
 #[cfg(test)]
 mod test_generated2;
+#[cfg(test)]
+mod test_generated2_schema;
 
 pub fn parse_xsd(xsd: &str) -> round0_parser::Document {
     let mut stream = xmlparser::Tokenizer::from(xsd);
