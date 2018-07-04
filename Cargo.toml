@@ -12,14 +12,6 @@ heck = "0.3.0"
 [dev-dependencies]
 pretty_assertions = "^0.4"
 
-[features]
-"bootstrap" = []
-
-[[bin]]
-name = "bootstrap"
-path = "src/bin/bootstrap.rs"
-required-features = ["bootstrap"]
-
 [[bin]]
 name = "gen"
 path = "src/bin/gen.rs"
