@@ -29,7 +29,7 @@ fn parse_max_occurs(s: &str) -> Result<usize, ParseIntError> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Hash, PartialEq, Eq)]
 struct RichType<'input> {
     name_hint: NameHint<'input>,
     type_: Type<'input>,
@@ -40,7 +40,7 @@ impl<'input> RichType<'input> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Hash, PartialEq, Eq)]
 enum Type<'input> {
     Any,
     Empty,
@@ -70,7 +70,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     groups: HashMap<FullName<'input>, RichType<'input>>,
     attribute_groups: HashMap<FullName<'input>, &'ast attributeGroup_e<'input>>,
     renames: HashMap<String, String>,
-    inline_elements: HashMap<String, (FullName<'input>, Type<'input>)>,
+    inline_elements: HashMap<(FullName<'input>, Type<'input>), HashSet<String>>,
 }
 
 impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
@@ -593,7 +593,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     let mut name_hint = NameHint::new(local);
                     name_hint.extend(&t.name_hint);
                     let struct_name = self.namespaces.name_from_hint(&name_hint).unwrap();
-                    self.inline_elements.insert(struct_name.clone(), (name, t.type_));
+                    self.inline_elements.entry((name, t.type_))
+                            .or_insert(HashSet::new())
+                            .insert(struct_name.clone());
                     RichType::new(NameHint::new(local), Type::Element(min_occurs, max_occurs, struct_name))
                 },
                 (Some(t), None) => {
@@ -601,7 +603,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     let mut name_hint = NameHint::new(local);
                     name_hint.push(t.as_tuple().1);
                     let struct_name = self.namespaces.name_from_hint(&name_hint).unwrap();
-                    self.inline_elements.insert(struct_name.clone(), (name, Type::Alias(t)));
+                    self.inline_elements.entry((name, Type::Alias(t)))
+                            .or_insert(HashSet::new())
+                            .insert(struct_name.clone());
                     RichType::new(NameHint::new(local), Type::Element(min_occurs, max_occurs, struct_name))
                 },
                 (None, None) => {
@@ -772,10 +776,19 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         module.scope().raw("use super::*;");
         let mut elements: Vec<_> = self.inline_elements.iter().collect();
 
-        elements.sort_by_key(|&(n,_)| n);
-        for (struct_name, (tag_name, element)) in elements {
-            let struct_name = struct_name.to_camel_case();
-            self.gen_element(module, &struct_name, tag_name, element);
+        elements.sort_by_key(|&((n, _),_)| n);
+        for ((tag_name, element), struct_names) in elements {
+            // struct_names is always non-empty.
+
+            let mut struct_names: Vec<_> = struct_names.iter().map(|s| s.to_camel_case()).collect();
+
+            // Sort them to get the shortest one, and alias all the others to this one
+            struct_names.sort_by_key(|n| n.len()); // TODO: just use a min_by_key
+            for alias in &struct_names[1..] {
+                module.scope().raw(&format!("pub type {}<'input> = {}<'input>;", alias, struct_names[0]));
+            }
+
+            self.gen_element(module, &struct_names[0], tag_name, element);
         }
     }
 
