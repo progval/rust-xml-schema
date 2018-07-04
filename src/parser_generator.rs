@@ -235,11 +235,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             enums::ChoiceAllChoiceSequence::All(_) => unimplemented!("all"),
             enums::ChoiceAllChoiceSequence::Choice(e) => {
                 let inline_elements::ChoiceSimpleExplicitGroup { ref attrs, ref annotation, ref nested_particle } = **e;
-                self.process_choice(attrs, nested_particle, false)
+                self.process_choice(attrs, nested_particle, true)
             },
             enums::ChoiceAllChoiceSequence::Sequence(e) => {
                 let inline_elements::SequenceSimpleExplicitGroup { ref attrs, ref annotation, ref nested_particle } = **e;
-                self.process_sequence(attrs, nested_particle, false)
+                self.process_sequence(attrs, nested_particle, true)
             },
         };
         /*
@@ -606,7 +606,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         else {
             for particle in particles.iter() {
-                let ty = self.process_nested_particle(particle, false);
+                let ty = self.process_nested_particle(particle, inlinable);
                 name_hint.extend(&ty.name_hint);
                 items.push(ty);
             }
@@ -681,7 +681,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let base = base.expect("<extension> has no base");
         let base = self.namespaces.parse_qname(base);
         if let Some(ref particle) = type_def_particle {
-            RichType::new(NameHint::new_empty(), Type::Extension(base, Box::new(self.process_type_def_particle(particle, false))))
+            RichType::new(NameHint::new_empty(), Type::Extension(base, Box::new(self.process_type_def_particle(particle, true))))
         }
         else {
             RichType::new(NameHint::new_empty(), Type::Alias(base))
