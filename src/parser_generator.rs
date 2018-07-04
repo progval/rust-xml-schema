@@ -425,9 +425,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 name_hint.extend(&ty.name_hint);
                 items.push(ty);
             }
-            if particles.len() == 0 {
-                items.push(RichType::new(NameHint::new("any"), Type::Any)); // TODO: remove this
-            }
             if min_occurs == 1 && max_occurs == 1 {
                 RichType::new(name_hint, Type::InlineSequence(items))
             }
@@ -489,7 +486,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn process_toplevel_element(&mut self, element: &'ast element_e<'input>) {
-        println!("/* {:#?} */", element);
+        //println!("/* {:#?} */", element);
         let mut name = None;
         let mut type_attr = None;
         let mut abstract_ = false;
@@ -878,7 +875,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             },
             Type::Empty => (), // TODO ?
             Type::Any => {
-                writer("any", "support", 0, 0, "Any")
+                writer("any", "support", 1, 1, "Any")
             },
             _ => unimplemented!("writing {:?}", type_),
         }

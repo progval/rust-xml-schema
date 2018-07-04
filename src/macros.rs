@@ -90,7 +90,7 @@ macro_rules! impl_group_or_sequence {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("empty group or sequence ", stringify!($name));
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
-                Some($name(Default::default()))
+                None
             }
         }
     };
