@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::Read;
+use std::collections::HashMap;
 
 use xmlparser;
 
@@ -38,6 +39,6 @@ fn round1_parser_person_xsd() {
     stream.next(); // Eat the DTD end
     let doc = UNQUAL::schema_e::parse_xml(&mut stream, &mut (), &());
     assert_ne!(doc, None);
-    let mut parser_generator = ParserGenerator::new(doc.as_ref().unwrap());
+    let mut parser_generator = ParserGenerator::new(doc.as_ref().unwrap(), HashMap::new());
     parser_generator.gen(doc.as_ref().unwrap()).to_string();
 }

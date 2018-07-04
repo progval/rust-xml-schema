@@ -66,10 +66,11 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     sequences: HashMap<String, Vec<RichType<'input>>>,
     groups: HashMap<FullName<'input>, RichType<'input>>,
     attribute_groups: HashMap<FullName<'input>, &'ast attributeGroup_e<'input>>,
+    renames: HashMap<String, String>,
 }
 
 impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
-    pub fn new(ast: &'ast schema_e<'input>) -> ParserGenerator<'ast, 'input> {
+    pub fn new(ast: &'ast schema_e<'input>, renames: HashMap<String, String>) -> ParserGenerator<'ast, 'input> {
         let mut target_namespace = None;
         let mut namespaces = HashMap::new();
         let mut element_form_default_qualified = false;
@@ -113,6 +114,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             choices: HashMap::new(),
             sequences: HashMap::new(),
             attribute_groups: HashMap::new(),
+            renames,
         }
     }
 
@@ -270,7 +272,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let item_type = match (item_type, &list.child.simpleType.0) {
             (None, Some(st)) => self.process_simple_type(st),
             (Some(n), None) => RichType::new(NameHint::new_empty(), Type::Alias(n)),
-            (None, None) => RichType::new(NameHint::new_empty(), Type::Any), // TODO
+            (None, None) => panic!("<list> with no itemType or child type."),
             (Some(ref t1), Some(ref t2)) => panic!("<list> has both an itemType attribute ({:?}) and a child type ({:?}).", t1, t2),
         };
 
@@ -294,11 +296,14 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
         }
 
+        let mut name_hint = NameHint::new("union");
         for t in union.child.simpleType.0.iter() {
-            member_types.push(self.process_simple_type(t))
+            let ty = self.process_simple_type(t);
+            name_hint.extend(&ty.name_hint);
+            member_types.push(ty)
         }
 
-        RichType::new(NameHint::new_empty(), Type::Union(member_types))
+        RichType::new(name_hint, Type::Union(member_types))
     }
 
     fn process_complex_type(&mut self, type_: &'ast complexType_e<'input>) -> RichType<'input> {
@@ -550,6 +555,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn gen_choice(&self, scope: &mut cg::Scope, name: &str, items: &Vec<RichType<'input>>) {
         let mut impl_code = Vec::new();
         let enum_name = escape_keyword(&name.to_camel_case());
+        let enum_name = self.renames.get(&enum_name).unwrap_or(&enum_name);
         impl_code.push(format!("impl_enum!({},", enum_name));
         {
             let mut enum_ = scope.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
@@ -568,6 +574,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let variant_name = self.namespaces.name_from_hint(&item.name_hint)
                     .unwrap_or(format!("{}{}", name, i)).to_camel_case();
                 let variant_name = escape_keyword(&variant_name.to_camel_case());
+                let variant_name = self.renames.get(&variant_name).unwrap_or(&variant_name);
                 let mut variant = enum_.new_variant(&variant_name);
                 if fields.len() == 1 {
                     let (_, type_mod_name, min_occurs, max_occurs, type_name) = fields.remove(0);
@@ -648,14 +655,17 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn gen_group_or_sequence(&self, module: &mut cg::Module, struct_name: &'input str, items: &Vec<&RichType<'input>>) {
         let mut impl_code = Vec::new();
         let struct_name = escape_keyword(&struct_name.to_camel_case());
+        let struct_name = self.renames.get(&struct_name).unwrap_or(&struct_name);
         impl_code.push(format!("impl_group_or_sequence!({},", struct_name));
         {
             let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             let mut name_gen = NameGenerator::new();
             let writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
                 let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
+                let name = self.renames.get(&name).unwrap_or(&name);
                 let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
                 let type_name = escape_keyword(&type_name.to_camel_case());
+                let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
                 match (min_occurs, max_occurs) {
                     (1, 1) => {
                         struct_.field(&name, &format!("super::{}::{}<'input>", type_mod_name, type_name));
@@ -702,8 +712,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut name_gen = NameGenerator::new();
             let writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
                 let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
+                let name = self.renames.get(&name).unwrap_or(&name);
                 let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
                 let type_name = escape_keyword(&type_name.to_camel_case());
+                let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
                 match (min_occurs, max_occurs) {
                     (1, 1) => {
                         can_be_empty = false; // TODO: what if all subelements can be empty?
@@ -751,7 +763,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 }
             }
             Type::Sequence(min_occurs, max_occurs, name) => {
-                writer("sequence", "sequences", *min_occurs, *max_occurs, name);
+                writer(name, "sequences", *min_occurs, *max_occurs, name);
             }
             Type::Group(min_occurs, max_occurs, name) |
             Type::Element(min_occurs, max_occurs, name) => {
@@ -761,7 +773,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 writer(field_name, mod_name, *min_occurs, *max_occurs, type_name);
             },
             Type::Choice(min_occurs, max_occurs, ref name) => {
-                writer("choice", "enums", *min_occurs, *max_occurs, name);
+                writer(name, "enums", *min_occurs, *max_occurs, name);
             },
             Type::Extension(base, ext_type) => {
                 let base_type = &self.types.get(base).unwrap();
