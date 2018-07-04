@@ -226,11 +226,11 @@ pub trait ParseXml<'input>: Sized {
     fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
         println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml(stream, parse_context, parent_context);
-        /*
+        
         match ret {
             Some(_) => println!("// Leaving: {:?} (succeeded)", Self::NODE_NAME),
             None => println!("// Leaving: {:?} (aborted)", Self::NODE_NAME),
-        }*/
+        }
         ret
     }
 }

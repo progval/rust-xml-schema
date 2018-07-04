@@ -180,11 +180,87 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     self.process_complex_type(attrs, complex_type_model);
                 },
             xs::Redefinable::Group(e) => {
-                let xs::Group { ref attrs, ref annotation, ref particle } = **e;
-                self.process_group(attrs, particle);
+                let xs::Group { ref attrs, ref annotation, ref choice_all_choice_sequence } = **e;
+                self.process_named_group(attrs, choice_all_choice_sequence);
             },
             xs::Redefinable::AttributeGroup(e) => self.process_attribute_group(e),
         }
+    }
+
+    fn process_group_ref(&mut self, 
+            attrs: &'ast HashMap<QName<'input>, &'input str>,
+            ) -> RichType<'input> {
+        let mut ref_ = None;
+        let mut max_occurs = 1;
+        let mut min_occurs = 1;
+        for (key, &value) in attrs.iter() {
+            match self.namespaces.expand_qname(*key).as_tuple() {
+                (SCHEMA_URI, "ref") =>
+                    ref_ = Some(self.namespaces.parse_qname(value)),
+                (SCHEMA_URI, "minOccurs") =>
+                    min_occurs = value.parse().unwrap(),
+                (SCHEMA_URI, "maxOccurs") =>
+                    max_occurs = parse_max_occurs(value).unwrap(),
+                _ => panic!("Unknown attribute {} in <group>", key),
+            }
+        }
+
+        let ref_ = ref_.unwrap();
+        let (_, field_name) = ref_.as_tuple();
+        RichType::new(NameHint::new(field_name), Type::Group(min_occurs, max_occurs, ref_))
+    }
+
+    fn process_named_group(&mut self, 
+            attrs: &'ast HashMap<QName<'input>, &'input str>,
+            content: &'ast enums::ChoiceAllChoiceSequence<'input>,
+            ) -> RichType<'input> {
+        let mut name = None;
+        let mut max_occurs = 1;
+        let mut min_occurs = 1;
+        for (key, &value) in attrs.iter() {
+            match self.namespaces.expand_qname(*key).as_tuple() {
+                (SCHEMA_URI, "name") =>
+                    name = Some(self.namespaces.parse_qname(value)),
+                (SCHEMA_URI, "minOccurs") =>
+                    min_occurs = value.parse().unwrap(),
+                (SCHEMA_URI, "maxOccurs") =>
+                    max_occurs = parse_max_occurs(value).unwrap(),
+                _ => panic!("Unknown attribute {} in <group>", key),
+            }
+        }
+
+        let name = name.expect("<group> has no name or ref.");
+
+        let type_ = match content {
+            enums::ChoiceAllChoiceSequence::All(_) => unimplemented!("all"),
+            enums::ChoiceAllChoiceSequence::Choice(e) => {
+                let inline_elements::ChoiceSimpleExplicitGroup { ref attrs, ref annotation, ref nested_particle } = **e;
+                self.process_choice(attrs, nested_particle, false)
+            },
+            enums::ChoiceAllChoiceSequence::Sequence(e) => {
+                let inline_elements::SequenceSimpleExplicitGroup { ref attrs, ref annotation, ref nested_particle } = **e;
+                self.process_sequence(attrs, nested_particle, false)
+            },
+        };
+        /*
+                let particle = match choice_all_choice_sequence {
+                    enums::ChoiceAllChoiceSequence::All(e) => {
+                        let all_model = e.all_model;
+                        xs::Particle::All(Box::new(xs::All { attrs: HashMap::new(), all_model }))
+                    },
+                    enums::ChoiceAllChoiceSequence::Choice(e) => {
+                        let inline_elements::ChoiceSimpleExplicitGroup { attrs, annotation, nested_particle } = **e;
+                        xs::Particle::Choice(Box::new(xs::Choice { attrs, annotation, nested_particle }))
+                    },
+                    enums::ChoiceAllChoiceSequence::Sequence(e) => {
+                        let inline_elements::SequenceSimpleExplicitGroup { attrs, annotation, nested_particle } = **e;
+                        xs::Particle::Sequence(Box::new(xs::Sequence { attrs, annotation, nested_particle }))
+                    },
+                };
+                */
+
+        self.groups.insert(name, type_);
+        RichType::new(NameHint::from_fullname(&name), Type::Group(min_occurs, max_occurs, name))
     }
 
     fn process_group(&mut self, 
@@ -391,12 +467,16 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>) -> RichType<'input> {
         match model.content_def {
             enums::ContentDef::Restriction(ref r) => {
-                let inline_elements::RestrictionSimpleRestrictionType { ref attrs, ref annotation, ref choice_sequence_open_content_type_def_particle_simple_restriction_model, ref attr_decls, ref assertions } = **r;
-                self.process_restriction(attrs, choice_sequence_open_content_type_def_particle_simple_restriction_model)
+                let inline_elements::RestrictionSimpleRestrictionType { ref attrs, ref annotation, ref choice_simple_restriction_model, ref attr_decls, ref assertions } = **r;
+                match choice_simple_restriction_model {
+                    Some(enums::ChoiceSimpleRestrictionModel::SimpleRestrictionModel(model)) =>
+                        self.process_simple_restriction(attrs, model),
+                    None => RichType::new(NameHint::new("very_empty_restriction"), Type::Empty),
+                }
             },
             enums::ContentDef::Extension(ref e) => {
-                let inline_elements::ExtensionSimpleExtensionType { ref attrs, ref annotation, ref open_content, ref type_def_particle, ref attr_decls, ref assertions } = **e;
-                self.process_extension(attrs, type_def_particle)
+                let inline_elements::ExtensionSimpleExtensionType { ref attrs, ref annotation, ref attr_decls, ref assertions } = **e;
+                self.process_simple_extension(attrs)
             },
         }
     }
@@ -421,7 +501,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             Some(enums::ChoiceSequenceOpenContentTypeDefParticleSimpleRestrictionModel::SimpleRestrictionModel(model)) => {
                 self.process_simple_restriction(attrs, model)
             }
-            None => RichType::new(NameHint::new(base.as_tuple().1), Type::Empty),
+            None => RichType::new(NameHint::new(base.as_tuple().1), Type::Alias(base)),
         }
     }
 
@@ -448,14 +528,43 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn process_type_def_particle(&mut self, particle: &'ast xs::TypeDefParticle<'input>, inlinable: bool) -> RichType<'input> {
         match particle {
             xs::TypeDefParticle::Group(e) => {
-                let inline_elements::Group { ref attrs, ref annotation, ref particle } = **e;
-                self.process_group(attrs, particle)
+                let inline_elements::GroupGroupRef { ref attrs, ref annotation } = **e;
+                self.process_group_ref(attrs)
             },
             xs::TypeDefParticle::All(_) => unimplemented!("all"),
-            xs::TypeDefParticle::Choice(e) => self.process_choice(e, inlinable),
-            xs::TypeDefParticle::Sequence(e) => self.process_sequence(e, inlinable),
+            xs::TypeDefParticle::Choice(e) => {
+                let xs::Choice { ref attrs, ref annotation, ref nested_particle } = **e;
+                self.process_choice(attrs, nested_particle, inlinable)
+            },
+            xs::TypeDefParticle::Sequence(e) => {
+                let xs::Sequence { ref attrs, ref annotation, ref nested_particle } = **e;
+                self.process_sequence(attrs, nested_particle, inlinable)
+            },
         }
     }
+
+    fn process_nested_particle(&mut self, particle: &'ast xs::NestedParticle<'input>, inlinable: bool) -> RichType<'input> {
+        match particle {
+            xs::NestedParticle::Element(e) => {
+                let inline_elements::ElementLocalElement { ref attrs, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
+                self.process_element(attrs, type_)
+            },
+            xs::NestedParticle::Group(e) => {
+                let inline_elements::GroupGroupRef { ref attrs, ref annotation } = **e;
+                self.process_group_ref(attrs)
+            },
+            xs::NestedParticle::Choice(e) => {
+                let xs::Choice { ref attrs, ref annotation, ref nested_particle } = **e;
+                self.process_choice(attrs, nested_particle, inlinable)
+            },
+            xs::NestedParticle::Sequence(e) => {
+                let xs::Sequence { ref attrs, ref annotation, ref nested_particle } = **e;
+                self.process_sequence(attrs, nested_particle, inlinable)
+            },
+            xs::NestedParticle::Any(e) => self.process_any(e),
+        }
+    }
+
     fn process_particle(&mut self, particle: &'ast xs::Particle<'input>, inlinable: bool) -> RichType<'input> {
         match particle {
             xs::Particle::Element(e) => {
@@ -463,12 +572,18 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 self.process_element(attrs, type_)
             },
             xs::Particle::Group(e) => {
-                let inline_elements::Group { ref attrs, ref annotation, ref particle } = **e;
-                self.process_group(attrs, particle)
+                let inline_elements::GroupGroupRef { ref attrs, ref annotation } = **e;
+                self.process_group_ref(attrs)
             },
             xs::Particle::All(_) => unimplemented!("all"),
-            xs::Particle::Choice(e) => self.process_choice(e, inlinable),
-            xs::Particle::Sequence(sequence) => self.process_sequence(sequence, inlinable),
+            xs::Particle::Choice(e) => {
+                let xs::Choice { ref attrs, ref annotation, ref nested_particle } = **e;
+                self.process_choice(attrs, nested_particle, inlinable)
+            },
+            xs::Particle::Sequence(e) => {
+                let xs::Sequence { ref attrs, ref annotation, ref nested_particle } = **e;
+                self.process_sequence(attrs, nested_particle, inlinable)
+            },
             xs::Particle::Any(e) => self.process_any(e),
         }
     }
@@ -477,10 +592,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         RichType::new(NameHint::new("any"), Type::Any)
     }
 
-    fn process_sequence(&mut self, sequence: &'ast xs::Sequence<'input>, inlinable: bool) -> RichType<'input> {
+    fn process_sequence(&mut self, attrs: &'ast HashMap<QName<'input>, &'input str>, particles: &'ast Vec<xs::NestedParticle<'input>>, inlinable: bool) -> RichType<'input> {
         let mut min_occurs = 1;
         let mut max_occurs = 1;
-        for (key, &value) in sequence.attrs.iter() {
+        for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "minOccurs") =>
                     min_occurs = value.parse().unwrap(),
@@ -491,13 +606,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("sequence");
-        let particles = &sequence.particle;
         if min_occurs == 1 && max_occurs == 1 && inlinable && particles.len() == 1 {
-            self.process_particle(particles.get(0).unwrap(), true)
+            self.process_nested_particle(particles.get(0).unwrap(), true)
         }
         else {
             for particle in particles.iter() {
-                let ty = self.process_particle(particle, false);
+                let ty = self.process_nested_particle(particle, false);
                 name_hint.extend(&ty.name_hint);
                 items.push(ty);
             }
@@ -512,10 +626,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn process_choice(&mut self, choice: &'ast xs::Choice<'input>, inlinable: bool) -> RichType<'input> {
+    fn process_choice(&mut self, attrs: &HashMap<QName<'input>, &'input str>, particles: &'ast Vec<xs::NestedParticle<'input>>, inlinable: bool) -> RichType<'input> {
         let mut min_occurs = 1;
         let mut max_occurs = 1;
-        for (key, &value) in choice.attrs.iter() {
+        for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "minOccurs") =>
                     min_occurs = value.parse().unwrap(),
@@ -526,8 +640,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("choice");
-        for particle in choice.particle.iter() {
-            let ty = self.process_particle(particle, false);
+        for particle in particles.iter() {
+            let ty = self.process_nested_particle(particle, false);
             name_hint.extend(&ty.name_hint);
             items.push(ty);
         }
@@ -541,6 +655,21 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 RichType::new(name_hint, Type::Choice(min_occurs, max_occurs, name))
             }
         }
+    }
+
+    fn process_simple_extension(&mut self,
+            attrs: &'ast HashMap<QName<'input>, &'input str>,
+            ) -> RichType<'input> {
+        let mut base = None;
+        for (key, &value) in attrs.iter() {
+            match self.namespaces.expand_qname(*key).as_tuple() {
+                (SCHEMA_URI, "base") => base = Some(value),
+                _ => panic!("Unknown attribute {} in <extension>", key),
+            }
+        }
+        let base = base.expect("<extension> has no base");
+        let base = self.namespaces.parse_qname(base);
+        RichType::new(NameHint::new_empty(), Type::Alias(base))
     }
 
     fn process_extension(&mut self,

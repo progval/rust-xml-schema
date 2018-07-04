@@ -186,7 +186,7 @@ macro_rules! impl_element {
                                                     assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
                                                     return ret;
                                                 }
-                                                _ => panic!(format!("Did not expect token {:?}", next_tok)),
+                                                _ => panic!(format!("Expected closing tag for {}:{}, got {:?}", prefix, name, next_tok)),
                                             }
                                         }
                                     },
@@ -202,7 +202,7 @@ macro_rules! impl_element {
                                         tx.rollback(stream);
                                         return None
                                     },
-                                    _ => panic!(format!("Did not expect token {:?}", tok)),
+                                    _ => panic!(format!("Expected element end for {}:{}, got {:?}", prefix, name, tok)),
                                 }
                             }
                         }
@@ -215,7 +215,7 @@ macro_rules! impl_element {
                         tx.rollback(stream);
                         return None
                     },
-                    _ => panic!(format!("Did not expect token {:?}", tok)),
+                    _ => panic!(format!("Expected element start for {}, got {:?}", Self::NODE_NAME, tok)),
                 }
             }
         }
