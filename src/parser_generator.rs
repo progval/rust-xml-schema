@@ -97,7 +97,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     elements: HashMap<FullName<'input>, RichType<'input>>,
     types: HashMap<FullName<'input>, (RichType<'input>, Documentation<'input>)>,
     choices: HashMap<Vec<RichType<'input>>, HashSet<String>>,
-    sequences: HashMap<String, (Vec<RichType<'input>>, Documentation<'input>)>,
+    sequences: HashMap<Vec<RichType<'input>>, (HashSet<String>, Documentation<'input>)>,
     groups: HashMap<FullName<'input>, RichType<'input>>,
     attribute_groups: HashMap<FullName<'input>, &'ast xs::AttributeGroup<'input>>,
     renames: HashMap<String, String>,
@@ -673,7 +673,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
             else {
                 let name = self.namespaces.name_from_hint(&name_hint).unwrap();
-                self.sequences.insert(name.clone(), (items, doc.clone()));
+                let (names, docs) = self.sequences.entry(items)
+                    .or_insert((HashSet::new(), Documentation::new()));
+                names.insert(name.clone());
+                docs.extend(&doc);
                 RichType::new(
                     name_hint,
                     Type::Sequence(min_occurs, max_occurs, name),
@@ -719,7 +722,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 (_, _, type_) => {
                     let name = self.namespaces.name_from_hint(&name_hint).unwrap();
                     let items = vec![RichType { name_hint: name_hint.clone(), type_, doc: doc.clone() }];
-                    self.sequences.insert(name.clone(), (items, doc.clone()));
+                    let (names, docs) = self.sequences.entry(items)
+                        .or_insert((HashSet::new(), Documentation::new()));
+                    names.insert(name.clone());
+                    docs.extend(&doc);
                     let type_ = Type::Sequence(min_occurs, max_occurs, name);
                     return RichType { name_hint, type_, doc }
                 },
@@ -1063,10 +1069,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         module.scope().raw("use super::*;");
         let mut sequences: Vec<_> = self.sequences.iter().collect();
 
-        sequences.sort_by_key(|&(n,_)| n);
-        for (name, (sequence, doc)) in sequences {
-            module.vis("pub");
-            self.gen_group_or_sequence(module, name, &sequence.iter().collect(), doc);
+        sequences.sort_by_key(|&(i,(n,_))| (n.iter().collect::<Vec<_>>(), i));
+        for (sequence, (names, doc)) in sequences {
+            for name in names.iter() {
+                self.gen_group_or_sequence(module, name, &sequence.iter().collect(), doc);
+            }
         }
     }
 
@@ -1231,12 +1238,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 self.write_type_in_struct_def(field_writer, doc_writer, &target_type.type_);
             },
             Type::InlineSequence(items) => {
-                for item in items {
-                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_);
-                }
-            }
-            Type::Sequence(1, 1, name) => { // shortcut, and a lot more readable
-                let (items, doc) = self.sequences.get(name).unwrap();
                 for item in items {
                     self.write_type_in_struct_def(field_writer, doc_writer, &item.type_);
                 }
