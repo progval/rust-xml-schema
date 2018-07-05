@@ -44,7 +44,6 @@ impl<'input> RichType<'input> {
 enum Type<'input> {
     Any,
     Empty,
-    TypeRef(FullName<'input>),
     Alias(FullName<'input>),
     List(Box<RichType<'input>>),
     Union(Vec<RichType<'input>>),
@@ -245,58 +244,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
         self.groups.insert(name, type_);
         RichType::new(NameHint::from_fullname(&name), Type::Group(min_occurs, max_occurs, name))
-    }
-
-    fn process_group(&mut self, 
-            attrs: &'ast HashMap<QName<'input>, &'input str>,
-            particles: &'ast Vec<xs::Particle<'input>>,
-            ) -> RichType<'input> {
-        let mut name = None;
-        let mut ref_ = None;
-        let mut max_occurs = 1;
-        let mut min_occurs = 1;
-        for (key, &value) in attrs.iter() {
-            match self.namespaces.expand_qname(*key).as_tuple() {
-                (SCHEMA_URI, "name") =>
-                    name = Some(self.namespaces.parse_qname(value)),
-                (SCHEMA_URI, "ref") =>
-                    ref_ = Some(self.namespaces.parse_qname(value)),
-                (SCHEMA_URI, "minOccurs") =>
-                    min_occurs = value.parse().unwrap(),
-                (SCHEMA_URI, "maxOccurs") =>
-                    max_occurs = parse_max_occurs(value).unwrap(),
-                _ => panic!("Unknown attribute {} in <group>", key),
-            }
-        }
-
-        if let Some(ref_) = ref_ {
-            if let Some(name) = name {
-                panic!("<group> has both ref={:?} and name={:?}", ref_, name)
-            }
-            let (_, field_name) = ref_.as_tuple();
-            RichType::new(NameHint::new(field_name), Type::Group(min_occurs, max_occurs, ref_))
-        }
-        else {
-            let name = name.expect("<group> has no name or ref.");
-
-            let mut items = Vec::new();
-            if particles.len() == 1 {
-                let type_ = self.process_particle(particles.get(0).unwrap(), true);
-                self.groups.insert(name, type_);
-                RichType::new(NameHint::from_fullname(&name), Type::Group(min_occurs, max_occurs, name))
-            }
-            else {
-                for particle in particles.iter() {
-                    items.push(self.process_particle(particle, false));
-                }
-
-                assert_eq!(items.len(), 1, "{:?}", items);
-                let type_ = items.remove(0);
-
-                self.groups.insert(name, type_);
-                RichType::new(NameHint::from_fullname(&name), Type::Group(min_occurs, max_occurs, name))
-            }
-        }
     }
 
     fn process_attribute_group(&mut self, group: &'ast xs::AttributeGroup<'input>) {
@@ -544,29 +491,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 self.process_sequence(attrs, nested_particle, inlinable)
             },
             xs::NestedParticle::Any(e) => self.process_any(e),
-        }
-    }
-
-    fn process_particle(&mut self, particle: &'ast xs::Particle<'input>, inlinable: bool) -> RichType<'input> {
-        match particle {
-            xs::Particle::Element(e) => {
-                let inline_elements::ElementLocalElement { ref attrs, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
-                self.process_element(attrs, type_)
-            },
-            xs::Particle::Group(e) => {
-                let inline_elements::GroupGroupRef { ref attrs, ref annotation } = **e;
-                self.process_group_ref(attrs)
-            },
-            xs::Particle::All(_) => unimplemented!("all"),
-            xs::Particle::Choice(e) => {
-                let xs::Choice { ref attrs, ref annotation, ref nested_particle } = **e;
-                self.process_choice(attrs, nested_particle, inlinable)
-            },
-            xs::Particle::Sequence(e) => {
-                let xs::Sequence { ref attrs, ref annotation, ref nested_particle } = **e;
-                self.process_sequence(attrs, nested_particle, inlinable)
-            },
-            xs::Particle::Any(e) => self.process_any(e),
         }
     }
 
