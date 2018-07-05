@@ -508,10 +508,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             enums::ChoiceRestrictionExtension::Restriction(ref r) => {
                 let inline_elements::ComplexRestrictionType {
                     ref attrs, annotation: ref annotation2,
-                    ref choice, ref attr_decls, ref assertions
+                    ref sequence_open_content_type_def_particle,
+                    ref attr_decls, ref assertions
                 } = **r;
-                match choice {
-                    Some(enums::Choice::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
+                match sequence_open_content_type_def_particle {
+                    Some(sequences::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
                         self.process_restriction(attrs, type_def_particle),
                     None => {
                         RichType::new(
@@ -704,7 +705,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         if particles.len() == 1 {
             let particle = particles.get(0).unwrap();
             let RichType { name_hint, type_, doc } =
-                self.process_nested_particle(particle, annotation.clone(), inlinable);
+                self.process_nested_particle(particle, annotation, inlinable);
             match (min_occurs, max_occurs, type_) {
                 (_, _, Type::Element(1, 1, e)) => return RichType {
                     name_hint, type_: Type::Element(min_occurs, max_occurs, e), doc },
@@ -715,7 +716,13 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 (_, _, Type::Sequence(1, 1, e)) => return RichType {
                     name_hint, type_: Type::Sequence(min_occurs, max_occurs, e), doc },
                 (1, 1, type_) => return RichType { name_hint, type_, doc },
-                (_, _, type_) => items.push(RichType { name_hint, type_, doc }),
+                (_, _, type_) => {
+                    let name = self.namespaces.name_from_hint(&name_hint).unwrap();
+                    let items = vec![RichType { name_hint: name_hint.clone(), type_, doc: doc.clone() }];
+                    self.sequences.insert(name.clone(), (items, doc.clone()));
+                    let type_ = Type::Sequence(min_occurs, max_occurs, name);
+                    return RichType { name_hint, type_, doc }
+                },
             }
         }
         else {

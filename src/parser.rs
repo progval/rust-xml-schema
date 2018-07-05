@@ -876,22 +876,6 @@ pub mod enums {
     );
 
     #[derive(Debug, PartialEq)]
-    pub enum Choice<'input> {
-        SequenceOpenContentTypeDefParticle {
-            open_content: Option<Box<super::xs::OpenContent<'input>> >,
-            type_def_particle: Box<super::xs::TypeDefParticle<'input>>,
-        }
-        ,
-    }
-
-    impl_enum!(Choice,
-        impl_struct_variant!(SequenceOpenContentTypeDefParticle,
-            (open_content, xs, Option<Box<OpenContent> >),
-            (type_def_particle, xs, Box<TypeDefParticle>),
-        ),
-    );
-
-    #[derive(Debug, PartialEq)]
     pub enum Type<'input> {
         SimpleType(Box<super::inline_elements::LocalSimpleType<'input>>),
         ComplexType(Box<super::inline_elements::LocalComplexType<'input>>),
@@ -924,6 +908,18 @@ pub mod sequences {
     impl_group_or_sequence!(AnnotatedOpenContent,
         (default_open_content, xs, DefaultOpenContent),
         (annotation, xs, Vec<Annotation>),
+    );
+
+    /// This choice is added simply to make this a valid restriction per the REC
+    #[derive(Debug, PartialEq)]
+    pub struct SequenceOpenContentTypeDefParticle<'input> {
+        pub open_content: Option<super::xs::OpenContent<'input>>,
+        pub type_def_particle: super::xs::TypeDefParticle<'input>,
+    }
+
+    impl_group_or_sequence!(SequenceOpenContentTypeDefParticle,
+        (open_content, xs, Option<OpenContent>),
+        (type_def_particle, xs, TypeDefParticle),
     );
 
     #[derive(Debug, PartialEq)]
@@ -1115,14 +1111,14 @@ pub mod inline_elements {
     pub struct ComplexRestrictionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
-        pub choice: Option<super::enums::Choice<'input>>,
+        pub sequence_open_content_type_def_particle: Option<super::sequences::SequenceOpenContentTypeDefParticle<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
         pub assertions: super::xs::Assertions<'input>,
     }
 
     impl_element!(ComplexRestrictionType, "restriction", {
         (annotation, xs, Option<Annotation>),
-        (choice, enums, Option<Choice>),
+        (sequence_open_content_type_def_particle, sequences, Option<SequenceOpenContentTypeDefParticle>),
         (attr_decls, xs, AttrDecls),
         (assertions, xs, Assertions),
     });
