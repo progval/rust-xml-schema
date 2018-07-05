@@ -795,8 +795,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let mut type_attr = None;
         let mut abstract_ = false;
         let mut substitution_group = None;
-        let mut min_occurs = 1;
-        let mut max_occurs = 1;
         for (key, &value) in element.attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "name") =>
@@ -805,10 +803,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     (),
                 (SCHEMA_URI, "type") =>
                     type_attr = Some(self.namespaces.parse_qname(value)),
-                (SCHEMA_URI, "minOccurs") =>
-                    min_occurs = value.parse().unwrap(),
-                (SCHEMA_URI, "maxOccurs") =>
-                    max_occurs = parse_max_occurs(value).unwrap(),
                 (SCHEMA_URI, "abstract") => {
                     match value {
                         "true" => abstract_ = true,
