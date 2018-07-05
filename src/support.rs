@@ -91,28 +91,35 @@ impl<'input> ParseXml<'input> for AnyURIElement<'input> {
 pub struct NonNegativeInteger<'input>(&'input str);
 
 #[derive(Debug, PartialEq, Default)]
-pub struct Any<'input>(Vec<XmlToken<'input>>);
+pub struct Any<'input>(pub Vec<XmlToken<'input>>);
 impl<'input> ParseXml<'input> for Any<'input> {
     const NODE_NAME: &'static str = "Any";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Any<'input>> {
-        let tx = stream.transaction();
         let mut tag_stack = Vec::new();
         let mut tokens = Vec::new();
         loop {
+            let tx = stream.transaction();
             let tok = stream.next()?;
-            tokens.push(tok);
             match tok {
                 XmlToken::Whitespaces(_) => (),
                 XmlToken::Comment(_) => (),
+                XmlToken::Text(_) => (),
                 XmlToken::ElementStart(prefix, name) => {
                     tag_stack.push(QName::from_strspans(prefix, name));
+                    tokens.push(tok);
                     break
                 },
                 _ => {
                     tx.rollback(stream);
-                    return None;
+                    if tokens.len() > 0 {
+                        return Some(Any(tokens));
+                    }
+                    else {
+                        return None;
+                    }
                 }
             }
+            tokens.push(tok);
         }
         while tag_stack.len() > 0 {
             let tok = stream.next().unwrap();

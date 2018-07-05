@@ -24,6 +24,7 @@ pub mod xs {
     #[allow(unused_imports)]
     use super::*;
 
+    ///  Only elements allowed inside
     #[derive(Debug, PartialEq)]
     pub struct All<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -44,6 +45,7 @@ pub mod xs {
         (annotation_content, enums, Vec<AnnotationContent>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Any<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -54,6 +56,7 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct AnyAttribute<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -74,6 +77,7 @@ pub mod xs {
         (sequence_any, sequences, Vec<SequenceAny>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Assertion<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -108,6 +112,7 @@ pub mod xs {
         (attr_decls, xs, AttrDecls),
     });
 
+    ///  group type for the three kinds of group
     #[derive(Debug, PartialEq)]
     pub struct Choice<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -202,6 +207,7 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  An abstract element, representing facets in general. The facets defined by this spec are substitutable for this element, and implementation-defined facets should also name this as a substitution-group head. 
     #[derive(Debug, PartialEq)]
     pub struct Facet<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -210,6 +216,7 @@ pub mod xs {
     impl_element!(Facet, "facet", {
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Field<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -242,6 +249,7 @@ pub mod xs {
         (choice_all_choice_sequence, enums, ChoiceAllChoiceSequence),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Import<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -252,6 +260,7 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Include<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -308,6 +317,7 @@ pub mod xs {
         (local_simple_type, inline_elements, Option<LocalSimpleType>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct MaxExclusive<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -318,6 +328,7 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct MaxInclusive<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -338,6 +349,7 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct MinExclusive<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -348,6 +360,7 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct MinInclusive<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -368,6 +381,7 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Notation<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -448,6 +462,7 @@ pub mod xs {
         (sequence_schema_top_annotation, sequences, Vec<SequenceSchemaTopAnnotation>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Selector<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -458,6 +473,7 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  group type for the three kinds of group
     #[derive(Debug, PartialEq)]
     pub struct Sequence<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -610,6 +626,7 @@ pub mod xs {
         impl_singleton_variant!(Annotation, xs, Box<Annotation>),
     );
 
+    /// The three kinds of identity constraints, all with type of or derived from 'keybase'. 
     #[derive(Debug, PartialEq)]
     pub enum IdentityConstraint<'input> {
         Unique(Box<super::xs::Unique<'input>>),
@@ -659,6 +676,7 @@ pub mod xs {
         impl_singleton_variant!(Any, xs, Box<Any>),
     );
 
+    ///  This group is for the elements which can self-redefine (see <redefine> below).
     #[derive(Debug, PartialEq)]
     pub enum Redefinable<'input> {
         SimpleType(Box<super::xs::SimpleType<'input>>),
@@ -674,6 +692,7 @@ pub mod xs {
         impl_singleton_variant!(AttributeGroup, xs, Box<AttributeGroup>),
     );
 
+    ///  This group is for the elements which occur freely at the top level of schemas. All of their types are based on the "annotated" type by extension.
     #[derive(Debug, PartialEq)]
     pub enum SchemaTop<'input> {
         Redefinable(Box<super::xs::Redefinable<'input>>),
@@ -713,6 +732,7 @@ pub mod xs {
         (choice_facet_any, enums, Vec<ChoiceFacetAny>),
     );
 
+    ///  'complexType' uses this
     #[derive(Debug, PartialEq)]
     pub enum TypeDefParticle<'input> {
         Group(Box<super::inline_elements::GroupRef<'input>>),
@@ -951,6 +971,7 @@ pub mod inline_elements {
         (all_model, xs, AllModel),
     });
 
+    ///  This type is used for 'alternative' elements. 
     #[derive(Debug, PartialEq)]
     pub struct AlternativeAltType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -963,6 +984,7 @@ pub mod inline_elements {
         (type_, enums, Option<Type>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct AnyWildcard<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -973,6 +995,7 @@ pub mod inline_elements {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Assertion<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
