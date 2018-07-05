@@ -508,11 +508,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             enums::ChoiceRestrictionExtension::Restriction(ref r) => {
                 let inline_elements::ComplexRestrictionType {
                     ref attrs, annotation: ref annotation2,
-                    ref choice_sequence_open_content_type_def_particle,
-                    ref attr_decls, ref assertions
+                    ref choice, ref attr_decls, ref assertions
                 } = **r;
-                match choice_sequence_open_content_type_def_particle {
-                    Some(enums::ChoiceSequenceOpenContentTypeDefParticle::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
+                match choice {
+                    Some(enums::Choice::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
                         self.process_restriction(attrs, type_def_particle),
                     None => {
                         RichType::new(
@@ -702,13 +701,29 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("choice");
-        if min_occurs == 1 && max_occurs == 1 && particles.len() == 1 {
-            return self.process_nested_particle(particles.get(0).unwrap(), annotation, inlinable);
+        if particles.len() == 1 {
+            let particle = particles.get(0).unwrap();
+            let RichType { name_hint, type_, doc } =
+                self.process_nested_particle(particle, annotation.clone(), inlinable);
+            match (min_occurs, max_occurs, type_) {
+                (_, _, Type::Element(1, 1, e)) => return RichType {
+                    name_hint, type_: Type::Element(min_occurs, max_occurs, e), doc },
+                (_, _, Type::Group(1, 1, e)) => return RichType {
+                    name_hint, type_: Type::Group(min_occurs, max_occurs, e), doc },
+                (_, _, Type::Choice(1, 1, e)) => return RichType {
+                    name_hint, type_: Type::Choice(min_occurs, max_occurs, e), doc },
+                (_, _, Type::Sequence(1, 1, e)) => return RichType {
+                    name_hint, type_: Type::Sequence(min_occurs, max_occurs, e), doc },
+                (1, 1, type_) => return RichType { name_hint, type_, doc },
+                (_, _, type_) => items.push(RichType { name_hint, type_, doc }),
+            }
         }
-        for particle in particles.iter() {
-            let ty = self.process_nested_particle(particle, vec![], false);
-            name_hint.extend(&ty.name_hint);
-            items.push(ty);
+        else {
+            for particle in particles.iter() {
+                let ty = self.process_nested_particle(particle, vec![], false);
+                name_hint.extend(&ty.name_hint);
+                items.push(ty);
+            }
         }
         let doc = self.process_annotation(&annotation);
         match (min_occurs, max_occurs, inlinable) {

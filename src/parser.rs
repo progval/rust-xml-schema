@@ -858,22 +858,6 @@ pub mod enums {
     );
 
     #[derive(Debug, PartialEq)]
-    pub enum ChoiceSequenceOpenContentTypeDefParticle<'input> {
-        SequenceOpenContentTypeDefParticle {
-            open_content: Option<Box<super::xs::OpenContent<'input>> >,
-            type_def_particle: Box<super::xs::TypeDefParticle<'input>>,
-        }
-        ,
-    }
-
-    impl_enum!(ChoiceSequenceOpenContentTypeDefParticle,
-        impl_struct_variant!(SequenceOpenContentTypeDefParticle,
-            (open_content, xs, Option<Box<OpenContent> >),
-            (type_def_particle, xs, Box<TypeDefParticle>),
-        ),
-    );
-
-    #[derive(Debug, PartialEq)]
     pub enum ChoiceSequenceOpenContentTypeDefParticleSimpleRestrictionModel<'input> {
         SequenceOpenContentTypeDefParticle {
             open_content: Option<Box<super::xs::OpenContent<'input>> >,
@@ -892,12 +876,19 @@ pub mod enums {
     );
 
     #[derive(Debug, PartialEq)]
-    pub enum ChoiceSimpleRestrictionModel<'input> {
-        SimpleRestrictionModel(Box<super::xs::SimpleRestrictionModel<'input>>),
+    pub enum Choice<'input> {
+        SequenceOpenContentTypeDefParticle {
+            open_content: Option<Box<super::xs::OpenContent<'input>> >,
+            type_def_particle: Box<super::xs::TypeDefParticle<'input>>,
+        }
+        ,
     }
 
-    impl_enum!(ChoiceSimpleRestrictionModel,
-        impl_singleton_variant!(SimpleRestrictionModel, xs, Box<SimpleRestrictionModel>),
+    impl_enum!(Choice,
+        impl_struct_variant!(SequenceOpenContentTypeDefParticle,
+            (open_content, xs, Option<Box<OpenContent> >),
+            (type_def_particle, xs, Box<TypeDefParticle>),
+        ),
     );
 
     #[derive(Debug, PartialEq)]
@@ -1124,14 +1115,14 @@ pub mod inline_elements {
     pub struct ComplexRestrictionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
-        pub choice_sequence_open_content_type_def_particle: Option<super::enums::ChoiceSequenceOpenContentTypeDefParticle<'input>>,
+        pub choice: Option<super::enums::Choice<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
         pub assertions: super::xs::Assertions<'input>,
     }
 
     impl_element!(ComplexRestrictionType, "restriction", {
         (annotation, xs, Option<Annotation>),
-        (choice_sequence_open_content_type_def_particle, enums, Option<ChoiceSequenceOpenContentTypeDefParticle>),
+        (choice, enums, Option<Choice>),
         (attr_decls, xs, AttrDecls),
         (assertions, xs, Assertions),
     });
@@ -1140,14 +1131,14 @@ pub mod inline_elements {
     pub struct SimpleRestrictionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
-        pub choice_simple_restriction_model: Option<super::enums::ChoiceSimpleRestrictionModel<'input>>,
+        pub simple_restriction_model: Option<super::xs::SimpleRestrictionModel<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
         pub assertions: super::xs::Assertions<'input>,
     }
 
     impl_element!(SimpleRestrictionType, "restriction", {
         (annotation, xs, Option<Annotation>),
-        (choice_simple_restriction_model, enums, Option<ChoiceSimpleRestrictionModel>),
+        (simple_restriction_model, xs, Option<SimpleRestrictionModel>),
         (attr_decls, xs, AttrDecls),
         (assertions, xs, Assertions),
     });
