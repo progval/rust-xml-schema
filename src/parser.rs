@@ -88,12 +88,12 @@ pub mod xs {
     pub struct Attribute<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
-        pub simple_type_local_simple_type: Option<super::inline_elements::SimpleTypeLocalSimpleType<'input>>,
+        pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
     }
 
     impl_element!(Attribute, "attribute", {
         (annotation, xs, Option<Annotation>),
-        (simple_type_local_simple_type, inline_elements, Option<SimpleTypeLocalSimpleType>),
+        (local_simple_type, inline_elements, Option<LocalSimpleType>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -300,12 +300,12 @@ pub mod xs {
     pub struct List<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
-        pub simple_type_local_simple_type: Option<super::inline_elements::SimpleTypeLocalSimpleType<'input>>,
+        pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
     }
 
     impl_element!(List, "list", {
         (annotation, xs, Option<Annotation>),
-        (simple_type_local_simple_type, inline_elements, Option<SimpleTypeLocalSimpleType>),
+        (local_simple_type, inline_elements, Option<LocalSimpleType>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -508,12 +508,12 @@ pub mod xs {
     pub struct Union<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
-        pub simple_type_local_simple_type: Vec<super::inline_elements::SimpleTypeLocalSimpleType<'input>>,
+        pub local_simple_type: Vec<super::inline_elements::LocalSimpleType<'input>>,
     }
 
     impl_element!(Union, "union", {
         (annotation, xs, Option<Annotation>),
-        (simple_type_local_simple_type, inline_elements, Vec<SimpleTypeLocalSimpleType>),
+        (local_simple_type, inline_elements, Vec<LocalSimpleType>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -551,11 +551,11 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Assertions<'input> {
-        pub assert_assertion: Vec<super::inline_elements::AssertAssertion<'input>>,
+        pub assertion: Vec<super::inline_elements::Assertion<'input>>,
     }
 
     impl_group_or_sequence!(Assertions,
-        (assert_assertion, inline_elements, Vec<AssertAssertion>),
+        (assertion, inline_elements, Vec<Assertion>),
     );
 
     #[derive(Debug, PartialEq)]
@@ -625,16 +625,16 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub enum NestedParticle<'input> {
-        Element(Box<super::inline_elements::ElementLocalElement<'input>>),
-        Group(Box<super::inline_elements::GroupGroupRef<'input>>),
+        Element(Box<super::inline_elements::LocalElement<'input>>),
+        Group(Box<super::inline_elements::GroupRef<'input>>),
         Choice(Box<super::xs::Choice<'input>>),
         Sequence(Box<super::xs::Sequence<'input>>),
         Any(Box<super::xs::Any<'input>>),
     }
 
     impl_enum!(NestedParticle,
-        impl_singleton_variant!(Element, inline_elements, Box<ElementLocalElement>),
-        impl_singleton_variant!(Group, inline_elements, Box<GroupGroupRef>),
+        impl_singleton_variant!(Element, inline_elements, Box<LocalElement>),
+        impl_singleton_variant!(Group, inline_elements, Box<GroupRef>),
         impl_singleton_variant!(Choice, xs, Box<Choice>),
         impl_singleton_variant!(Sequence, xs, Box<Sequence>),
         impl_singleton_variant!(Any, xs, Box<Any>),
@@ -642,8 +642,8 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub enum Particle<'input> {
-        Element(Box<super::inline_elements::ElementLocalElement<'input>>),
-        Group(Box<super::inline_elements::GroupGroupRef<'input>>),
+        Element(Box<super::inline_elements::LocalElement<'input>>),
+        Group(Box<super::inline_elements::GroupRef<'input>>),
         All(Box<super::xs::All<'input>>),
         Choice(Box<super::xs::Choice<'input>>),
         Sequence(Box<super::xs::Sequence<'input>>),
@@ -651,8 +651,8 @@ pub mod xs {
     }
 
     impl_enum!(Particle,
-        impl_singleton_variant!(Element, inline_elements, Box<ElementLocalElement>),
-        impl_singleton_variant!(Group, inline_elements, Box<GroupGroupRef>),
+        impl_singleton_variant!(Element, inline_elements, Box<LocalElement>),
+        impl_singleton_variant!(Group, inline_elements, Box<GroupRef>),
         impl_singleton_variant!(All, xs, Box<All>),
         impl_singleton_variant!(Choice, xs, Box<Choice>),
         impl_singleton_variant!(Sequence, xs, Box<Sequence>),
@@ -704,25 +704,25 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct SimpleRestrictionModel<'input> {
-        pub simple_type_local_simple_type: Option<super::inline_elements::SimpleTypeLocalSimpleType<'input>>,
+        pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
         pub choice_facet_any: Vec<super::enums::ChoiceFacetAny<'input>>,
     }
 
     impl_group_or_sequence!(SimpleRestrictionModel,
-        (simple_type_local_simple_type, inline_elements, Option<SimpleTypeLocalSimpleType>),
+        (local_simple_type, inline_elements, Option<LocalSimpleType>),
         (choice_facet_any, enums, Vec<ChoiceFacetAny>),
     );
 
     #[derive(Debug, PartialEq)]
     pub enum TypeDefParticle<'input> {
-        Group(Box<super::inline_elements::GroupGroupRef<'input>>),
+        Group(Box<super::inline_elements::GroupRef<'input>>),
         All(Box<super::xs::All<'input>>),
         Choice(Box<super::xs::Choice<'input>>),
         Sequence(Box<super::xs::Sequence<'input>>),
     }
 
     impl_enum!(TypeDefParticle,
-        impl_singleton_variant!(Group, inline_elements, Box<GroupGroupRef>),
+        impl_singleton_variant!(Group, inline_elements, Box<GroupRef>),
         impl_singleton_variant!(All, xs, Box<All>),
         impl_singleton_variant!(Choice, xs, Box<Choice>),
         impl_singleton_variant!(Sequence, xs, Box<Sequence>),
@@ -782,24 +782,24 @@ pub mod enums {
 
     #[derive(Debug, PartialEq)]
     pub enum AttrOrAttrGroup<'input> {
-        Attribute(Box<super::inline_elements::AttributeAttribute<'input>>),
-        AttributeGroup(Box<super::inline_elements::AttributeGroupAttributeGroupRef<'input>>),
+        Attribute(Box<super::inline_elements::Attribute<'input>>),
+        AttributeGroup(Box<super::inline_elements::AttributeGroupRef<'input>>),
     }
 
     impl_enum!(AttrOrAttrGroup,
-        impl_singleton_variant!(Attribute, inline_elements, Box<AttributeAttribute>),
-        impl_singleton_variant!(AttributeGroup, inline_elements, Box<AttributeGroupAttributeGroupRef>),
+        impl_singleton_variant!(Attribute, inline_elements, Box<Attribute>),
+        impl_singleton_variant!(AttributeGroup, inline_elements, Box<AttributeGroupRef>),
     );
 
     #[derive(Debug, PartialEq)]
     pub enum ChoiceElementAnyGroup<'input> {
-        Element(Box<super::inline_elements::ElementLocalElement<'input>>),
+        Element(Box<super::inline_elements::LocalElement<'input>>),
         Any(Box<super::xs::Any<'input>>),
         Group(Box<super::inline_elements::GroupSequenceAnnotation<'input>>),
     }
 
     impl_enum!(ChoiceElementAnyGroup,
-        impl_singleton_variant!(Element, inline_elements, Box<ElementLocalElement>),
+        impl_singleton_variant!(Element, inline_elements, Box<LocalElement>),
         impl_singleton_variant!(Any, xs, Box<Any>),
         impl_singleton_variant!(Group, inline_elements, Box<GroupSequenceAnnotation>),
     );
@@ -817,24 +817,24 @@ pub mod enums {
 
     #[derive(Debug, PartialEq)]
     pub enum ChoiceRestrictionExtension<'input> {
-        Restriction(Box<super::inline_elements::RestrictionComplexRestrictionType<'input>>),
-        Extension(Box<super::inline_elements::ExtensionExtensionType<'input>>),
+        Restriction(Box<super::inline_elements::ComplexRestrictionType<'input>>),
+        Extension(Box<super::inline_elements::ExtensionType<'input>>),
     }
 
     impl_enum!(ChoiceRestrictionExtension,
-        impl_singleton_variant!(Restriction, inline_elements, Box<RestrictionComplexRestrictionType>),
-        impl_singleton_variant!(Extension, inline_elements, Box<ExtensionExtensionType>),
+        impl_singleton_variant!(Restriction, inline_elements, Box<ComplexRestrictionType>),
+        impl_singleton_variant!(Extension, inline_elements, Box<ExtensionType>),
     );
 
     #[derive(Debug, PartialEq)]
     pub enum ChoiceRestrictionExtension_<'input> {
-        Restriction(Box<super::inline_elements::RestrictionSimpleRestrictionType<'input>>),
-        Extension(Box<super::inline_elements::ExtensionSimpleExtensionType<'input>>),
+        Restriction(Box<super::inline_elements::SimpleRestrictionType<'input>>),
+        Extension(Box<super::inline_elements::SimpleExtensionType<'input>>),
     }
 
     impl_enum!(ChoiceRestrictionExtension_,
-        impl_singleton_variant!(Restriction, inline_elements, Box<RestrictionSimpleRestrictionType>),
-        impl_singleton_variant!(Extension, inline_elements, Box<ExtensionSimpleExtensionType>),
+        impl_singleton_variant!(Restriction, inline_elements, Box<SimpleRestrictionType>),
+        impl_singleton_variant!(Extension, inline_elements, Box<SimpleExtensionType>),
     );
 
     #[derive(Debug, PartialEq)]
@@ -882,13 +882,13 @@ pub mod enums {
 
     #[derive(Debug, PartialEq)]
     pub enum Type<'input> {
-        SimpleType(Box<super::inline_elements::SimpleTypeLocalSimpleType<'input>>),
-        ComplexType(Box<super::inline_elements::ComplexTypeLocalComplexType<'input>>),
+        SimpleType(Box<super::inline_elements::LocalSimpleType<'input>>),
+        ComplexType(Box<super::inline_elements::LocalComplexType<'input>>),
     }
 
     impl_enum!(Type,
-        impl_singleton_variant!(SimpleType, inline_elements, Box<SimpleTypeLocalSimpleType>),
-        impl_singleton_variant!(ComplexType, inline_elements, Box<ComplexTypeLocalComplexType>),
+        impl_singleton_variant!(SimpleType, inline_elements, Box<LocalSimpleType>),
+        impl_singleton_variant!(ComplexType, inline_elements, Box<LocalComplexType>),
     );
 }
 
@@ -974,34 +974,34 @@ pub mod inline_elements {
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct AssertAssertion<'input> {
+    pub struct Assertion<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(AssertAssertion, "assert", {
+    impl_element!(Assertion, "assert", {
         (annotation, xs, Option<Annotation>),
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct AttributeAttribute<'input> {
+    pub struct Attribute<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
-        pub simple_type_local_simple_type: Option<super::inline_elements::SimpleTypeLocalSimpleType<'input>>,
+        pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
     }
 
-    impl_element!(AttributeAttribute, "attribute", {
+    impl_element!(Attribute, "attribute", {
         (annotation, xs, Option<Annotation>),
-        (simple_type_local_simple_type, inline_elements, Option<SimpleTypeLocalSimpleType>),
+        (local_simple_type, inline_elements, Option<LocalSimpleType>),
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct AttributeGroupAttributeGroupRef<'input> {
+    pub struct AttributeGroupRef<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(AttributeGroupAttributeGroupRef, "attributeGroup", {
+    impl_element!(AttributeGroupRef, "attributeGroup", {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -1018,19 +1018,19 @@ pub mod inline_elements {
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct ComplexTypeLocalComplexType<'input> {
+    pub struct LocalComplexType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub complex_type_model: super::xs::ComplexTypeModel<'input>,
     }
 
-    impl_element!(ComplexTypeLocalComplexType, "complexType", {
+    impl_element!(LocalComplexType, "complexType", {
         (annotation, xs, Option<Annotation>),
         (complex_type_model, xs, ComplexTypeModel),
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct ElementLocalElement<'input> {
+    pub struct LocalElement<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub type_: Option<super::enums::Type<'input>>,
@@ -1038,7 +1038,7 @@ pub mod inline_elements {
         pub identity_constraint: Vec<super::xs::IdentityConstraint<'input>>,
     }
 
-    impl_element!(ElementLocalElement, "element", {
+    impl_element!(LocalElement, "element", {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),
         (alternative_alt_type, inline_elements, Vec<AlternativeAltType>),
@@ -1046,7 +1046,7 @@ pub mod inline_elements {
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct ExtensionExtensionType<'input> {
+    pub struct ExtensionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub open_content: Option<super::xs::OpenContent<'input>>,
@@ -1055,7 +1055,7 @@ pub mod inline_elements {
         pub assertions: super::xs::Assertions<'input>,
     }
 
-    impl_element!(ExtensionExtensionType, "extension", {
+    impl_element!(ExtensionType, "extension", {
         (annotation, xs, Option<Annotation>),
         (open_content, xs, Option<OpenContent>),
         (type_def_particle, xs, Option<TypeDefParticle>),
@@ -1064,26 +1064,26 @@ pub mod inline_elements {
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct ExtensionSimpleExtensionType<'input> {
+    pub struct SimpleExtensionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
         pub assertions: super::xs::Assertions<'input>,
     }
 
-    impl_element!(ExtensionSimpleExtensionType, "extension", {
+    impl_element!(SimpleExtensionType, "extension", {
         (annotation, xs, Option<Annotation>),
         (attr_decls, xs, AttrDecls),
         (assertions, xs, Assertions),
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct GroupGroupRef<'input> {
+    pub struct GroupRef<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(GroupGroupRef, "group", {
+    impl_element!(GroupRef, "group", {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -1098,7 +1098,7 @@ pub mod inline_elements {
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct RestrictionComplexRestrictionType<'input> {
+    pub struct ComplexRestrictionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub choice_sequence_open_content_type_def_particle: Option<super::enums::ChoiceSequenceOpenContentTypeDefParticle<'input>>,
@@ -1106,7 +1106,7 @@ pub mod inline_elements {
         pub assertions: super::xs::Assertions<'input>,
     }
 
-    impl_element!(RestrictionComplexRestrictionType, "restriction", {
+    impl_element!(ComplexRestrictionType, "restriction", {
         (annotation, xs, Option<Annotation>),
         (choice_sequence_open_content_type_def_particle, enums, Option<ChoiceSequenceOpenContentTypeDefParticle>),
         (attr_decls, xs, AttrDecls),
@@ -1114,7 +1114,7 @@ pub mod inline_elements {
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct RestrictionSimpleRestrictionType<'input> {
+    pub struct SimpleRestrictionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub choice_simple_restriction_model: Option<super::enums::ChoiceSimpleRestrictionModel<'input>>,
@@ -1122,7 +1122,7 @@ pub mod inline_elements {
         pub assertions: super::xs::Assertions<'input>,
     }
 
-    impl_element!(RestrictionSimpleRestrictionType, "restriction", {
+    impl_element!(SimpleRestrictionType, "restriction", {
         (annotation, xs, Option<Annotation>),
         (choice_simple_restriction_model, enums, Option<ChoiceSimpleRestrictionModel>),
         (attr_decls, xs, AttrDecls),
@@ -1142,13 +1142,13 @@ pub mod inline_elements {
     });
 
     #[derive(Debug, PartialEq)]
-    pub struct SimpleTypeLocalSimpleType<'input> {
+    pub struct LocalSimpleType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub simple_derivation: super::xs::SimpleDerivation<'input>,
     }
 
-    impl_element!(SimpleTypeLocalSimpleType, "simpleType", {
+    impl_element!(LocalSimpleType, "simpleType", {
         (annotation, xs, Option<Annotation>),
         (simple_derivation, xs, SimpleDerivation),
     });

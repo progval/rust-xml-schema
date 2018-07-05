@@ -299,9 +299,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
         }
         
-        let item_type = match (item_type, &list.simple_type_local_simple_type) {
+        let item_type = match (item_type, &list.local_simple_type) {
             (None, Some(st)) => {
-                let inline_elements::SimpleTypeLocalSimpleType { attrs, annotation, simple_derivation } = st;
+                let inline_elements::LocalSimpleType { attrs, annotation, simple_derivation } = st;
                 self.process_simple_type(attrs, simple_derivation)
             },
             (Some(n), None) => RichType::new(NameHint::new_empty(), Type::Alias(n)),
@@ -330,9 +330,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
 
         let mut name_hint = NameHint::new("union");
-        for t in union.simple_type_local_simple_type.iter() {
+        for t in union.local_simple_type.iter() {
             let ty = {
-                let inline_elements::SimpleTypeLocalSimpleType { attrs, annotation, simple_derivation } = t;
+                let inline_elements::LocalSimpleType { attrs, annotation, simple_derivation } = t;
                 self.process_simple_type(attrs, simple_derivation)
             };
             name_hint.extend(&ty.name_hint);
@@ -401,7 +401,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let xs::ComplexContent { ref attrs, ref annotation, ref choice_restriction_extension } = model;
         match choice_restriction_extension {
             enums::ChoiceRestrictionExtension::Restriction(ref r) => {
-                let inline_elements::RestrictionComplexRestrictionType { ref attrs, ref annotation, ref choice_sequence_open_content_type_def_particle, ref attr_decls, ref assertions } = **r;
+                let inline_elements::ComplexRestrictionType { ref attrs, ref annotation, ref choice_sequence_open_content_type_def_particle, ref attr_decls, ref assertions } = **r;
                 match choice_sequence_open_content_type_def_particle {
                     Some(enums::ChoiceSequenceOpenContentTypeDefParticle::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
                         self.process_restriction(attrs, type_def_particle),
@@ -409,7 +409,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 }
             },
             enums::ChoiceRestrictionExtension::Extension(ref e) => {
-                let inline_elements::ExtensionExtensionType { ref attrs, ref annotation, ref open_content, ref type_def_particle, ref attr_decls, ref assertions } = **e;
+                let inline_elements::ExtensionType { ref attrs, ref annotation, ref open_content, ref type_def_particle, ref attr_decls, ref assertions } = **e;
                 match type_def_particle {
                     Some(type_def_particle) => self.process_extension(attrs, type_def_particle, inlinable),
                     None => self.process_simple_extension(attrs),
@@ -446,9 +446,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
         }
         let base = base.expect("<restriction> has no base");
-        let xs::SimpleRestrictionModel { ref simple_type_local_simple_type, ref choice_facet_any } = model;
-        match simple_type_local_simple_type {
-            Some(inline_elements::SimpleTypeLocalSimpleType { ref attrs, ref annotation, ref simple_derivation }) =>
+        let xs::SimpleRestrictionModel { ref local_simple_type, ref choice_facet_any } = model;
+        match local_simple_type {
+            Some(inline_elements::LocalSimpleType { ref attrs, ref annotation, ref simple_derivation }) =>
                 self.process_simple_type(attrs, simple_derivation),
             None => RichType::new(NameHint::new(base.as_tuple().1), Type::Empty),
         }
@@ -457,7 +457,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn process_type_def_particle(&mut self, particle: &'ast xs::TypeDefParticle<'input>, inlinable: bool) -> RichType<'input> {
         match particle {
             xs::TypeDefParticle::Group(e) => {
-                let inline_elements::GroupGroupRef { ref attrs, ref annotation } = **e;
+                let inline_elements::GroupRef { ref attrs, ref annotation } = **e;
                 self.process_group_ref(attrs)
             },
             xs::TypeDefParticle::All(_) => unimplemented!("all"),
@@ -475,11 +475,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn process_nested_particle(&mut self, particle: &'ast xs::NestedParticle<'input>, inlinable: bool) -> RichType<'input> {
         match particle {
             xs::NestedParticle::Element(e) => {
-                let inline_elements::ElementLocalElement { ref attrs, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
+                let inline_elements::LocalElement { ref attrs, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
                 self.process_element(attrs, type_)
             },
             xs::NestedParticle::Group(e) => {
-                let inline_elements::GroupGroupRef { ref attrs, ref annotation } = **e;
+                let inline_elements::GroupRef { ref attrs, ref annotation } = **e;
                 self.process_group_ref(attrs)
             },
             xs::NestedParticle::Choice(e) => {
@@ -636,11 +636,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let type_ = match (type_attr, &child_type) {
             (None, Some(ref c)) => match c {
                 enums::Type::SimpleType(ref e) => {
-                    let inline_elements::SimpleTypeLocalSimpleType { ref attrs, ref annotation, ref simple_derivation } = **e;
+                    let inline_elements::LocalSimpleType { ref attrs, ref annotation, ref simple_derivation } = **e;
                     self.process_simple_type(attrs, simple_derivation)
                 },
                 enums::Type::ComplexType(ref e) => {
-                    let inline_elements::ComplexTypeLocalComplexType { ref attrs, ref annotation, ref complex_type_model } = **e;
+                    let inline_elements::LocalComplexType { ref attrs, ref annotation, ref complex_type_model } = **e;
                     self.process_complex_type(attrs, complex_type_model, false)
                 },
             },
@@ -707,11 +707,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 (None, Some(ref c)) => {
                     let t = match c {
                         enums::Type::SimpleType(ref e) => {
-                            let inline_elements::SimpleTypeLocalSimpleType { ref attrs, ref annotation, ref simple_derivation } = **e;
+                            let inline_elements::LocalSimpleType { ref attrs, ref annotation, ref simple_derivation } = **e;
                             self.process_simple_type(attrs, simple_derivation)
                         },
                         enums::Type::ComplexType(ref e) => {
-                            let inline_elements::ComplexTypeLocalComplexType { ref attrs, ref annotation, ref complex_type_model } = **e;
+                            let inline_elements::LocalComplexType { ref attrs, ref annotation, ref complex_type_model } = **e;
                             self.process_complex_type(attrs, complex_type_model, false)
                         },
                     };
@@ -726,8 +726,16 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 },
                 (Some(t), None) => {
                     let (prefix, local) = name.as_tuple();
-                    let mut name_hint = NameHint::new(local);
-                    name_hint.push(t.as_tuple().1);
+                    let name_hint1 = NameHint::new(t.as_tuple().1);
+                    let mut name_hint2 = NameHint::new(local);
+                    name_hint2.push(t.as_tuple().1);
+                    // TODO: move this heuristic in names.rs
+                    let name_hint = if t.as_tuple().1.to_lowercase().contains(&local.to_lowercase()) {
+                        name_hint1
+                    }
+                    else {
+                        name_hint2
+                    };
                     let struct_name = self.namespaces.name_from_hint(&name_hint).unwrap();
                     self.inline_elements.entry((name, Type::Alias(t)))
                             .or_insert(HashSet::new())
