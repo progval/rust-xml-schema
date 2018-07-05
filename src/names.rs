@@ -27,6 +27,7 @@ impl NameGenerator {
     }
 }
 
+/*
 macro_rules! str_alias {
     ($name:ident) => {
         #[derive(Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -41,6 +42,7 @@ macro_rules! str_alias {
         }
     }
 }
+*/
 
 #[derive(Debug)]
 pub(crate) struct Namespaces<'input> {
@@ -92,6 +94,22 @@ impl<'input> Namespaces<'input> {
     pub fn name_from_hint(&self, hint: &NameHint<'input>) -> Option<String> {
         if hint.tokens.len() > 0 {
             Some(hint.tokens.iter().map(|&s| escape_keyword(s)).collect::<Vec<_>>().join("_"))
+        }
+        else {
+            None
+        }
+    }
+    pub fn name_from_hints<'a: 'input, T>(&self, hints: T) -> Option<String>
+            where T: Iterator<Item=&'a NameHint<'a>>{
+        let mut candidates = Vec::new();
+        for hint in hints {
+            if let Some(candidate) = self.name_from_hint(&hint) {
+                candidates.push(candidate);
+            }
+        }
+        if candidates.len() > 0 {
+            candidates.sort_by_key(|c| c.len());
+            Some(candidates.swap_remove(0))
         }
         else {
             None

@@ -45,5 +45,5 @@ fn main() {
     let mut gen = ParserGenerator::new(&doc, renames);
     let scope = gen.gen(&doc);
     //println!("#[allow(bad_style)]\nextern crate xml_schema;use xml_schema::support;\n{}\n{}", MACROS, scope.to_string());
-    println!("#[allow(bad_style)]\n#[macro_use] use support;\n{}", scope.to_string());
+    println!("#[allow(unused_imports)]\nuse support;\n{}", scope.to_string());
 }

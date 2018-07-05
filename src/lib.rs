@@ -23,7 +23,7 @@ mod test_parser_schema;
 use support::{ParseXml, InnerStream};
 
 pub fn parse_xsd(xsd: &str) -> parser::xs::Schema {
-    let mut tokenizer = xmlparser::Tokenizer::from(xsd);
+    let tokenizer = xmlparser::Tokenizer::from(xsd);
     let mut stream = Box::new(InnerStream::new(tokenizer));
     parser::xs::Schema::parse_xml(&mut stream, &mut (), &()).unwrap()
 }

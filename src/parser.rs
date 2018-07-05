@@ -1,5 +1,5 @@
-#[allow(bad_style)]
-#[macro_use] use support;
+#[allow(unused_imports)]
+use support;
 extern crate xmlparser;
 
 pub use std::collections::HashMap;
@@ -11,14 +11,17 @@ pub use support::*;
 pub use xmlparser::{Token, ElementEnd};
 
 pub mod xml {
+    #[allow(unused_imports)]
     use super::*;
 }
 
 pub mod xmlns {
+    #[allow(unused_imports)]
     use super::*;
 }
 
 pub mod xs {
+    #[allow(unused_imports)]
     use super::*;
 
     #[derive(Debug, PartialEq)]

@@ -4,7 +4,7 @@ use std::num::ParseIntError;
 use codegen as cg;
 use heck::{SnakeCase, CamelCase};
 
-use support::*;
+//use support::*;
 use parser::*;
 use names::*;
 
@@ -125,10 +125,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     pub fn gen(&mut self, ast: &'ast xs::Schema<'input>) -> cg::Scope {
         self.process_ast(ast);
-        self.gen_target_scope(ast)
+        self.gen_target_scope()
     }
 
-    fn gen_target_scope(&mut self, ast: &xs::Schema<'input>) -> cg::Scope {
+    fn gen_target_scope(&mut self) -> cg::Scope {
         let mut scope = cg::Scope::new();
         scope.raw("extern crate xmlparser;");
         scope.raw("pub use std::collections::HashMap;");
@@ -150,7 +150,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         for mod_name in mod_names {
             let mut module = scope.new_module(mod_name);
             module.vis("pub");
-            module.scope().raw("use super::*;");
+            module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
         }
     }
 
@@ -839,7 +839,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let enum_name = self.renames.get(enum_name).unwrap_or(enum_name);
         impl_code.push(format!("impl_enum!({},", enum_name));
         {
-            let mut enum_ = scope.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            let enum_ = scope.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             for (i, item) in items.iter().enumerate() {
                 let mut fields = Vec::new();
                 {
@@ -901,7 +901,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn gen_sequences(&mut self, scope: &mut cg::Scope) {
-        let mut module = scope.new_module("sequences");
+        let module = scope.new_module("sequences");
         module.vis("pub");
         module.scope().raw("use super::*;");
         let mut sequences: Vec<_> = self.sequences.iter().collect();
@@ -940,7 +940,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         impl_code.push(format!("impl_group_or_sequence!({},", struct_name));
         {
             let mut empty_struct = true;
-            let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             let mut name_gen = NameGenerator::new();
             {
                 let writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
@@ -978,7 +978,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn gen_inline_elements(&mut self, scope: &mut cg::Scope) {
-        let mut module = scope.new_module("inline_elements");
+        let module = scope.new_module("inline_elements");
         module.vis("pub");
         module.scope().raw("use super::*;");
         let mut elements: Vec<_> = self.inline_elements.iter().collect();
@@ -1017,7 +1017,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let (_, tag_name) = tag_name.as_tuple();
         impl_code.push(format!("impl_element!({}, \"{}\", {{", struct_name, tag_name));
         {
-            let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             struct_.field("pub attrs", "HashMap<QName<'input>, &'input str>");
             let mut name_gen = NameGenerator::new();
             let writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {

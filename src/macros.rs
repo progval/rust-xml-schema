@@ -16,7 +16,7 @@ macro_rules! impl_enum {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("enum ", stringify!($name));
 
-            fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_empty<TParseContext, TParentContext>(_parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {
                 None
             }
 
@@ -103,7 +103,7 @@ macro_rules! impl_group_or_sequence {
                 Some($name(Default::default()))
             }
 
-            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {
                 None
             }
         }
@@ -112,6 +112,7 @@ macro_rules! impl_group_or_sequence {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("group or sequence ", stringify!($name));
 
+            #[allow(unused_variables)]
             fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
                 Some($name {
                     $(
@@ -120,6 +121,7 @@ macro_rules! impl_group_or_sequence {
                 })
             }
 
+            #[allow(unused_variables)]
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 Some($name {
@@ -138,10 +140,11 @@ macro_rules! impl_element {
         impl<'input> ParseXml<'input> for $struct_name<'input> {
             const NODE_NAME: &'static str = concat!("element ", stringify!($struct_name));
 
-            fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_empty<TParseContext, TParentContext>(_parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {
                 None
             }
 
+            #[allow(unused_variables)]
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 let mut tok = stream.next().unwrap();
@@ -219,20 +222,6 @@ macro_rules! impl_element {
                 }
             }
         }
-    }
-}
-
-macro_rules! gen_empty_element {
-    ( false, $struct_name:ident, $attrs:expr, $($field_name:ident,)* ) => {
-        None
-    };
-    ( true, $struct_name:ident, $attrs:expr, $($field_name:ident,)* ) => {
-        Some($struct_name {
-            attrs: $attrs,
-            $(
-                $field_name: Default::default(), // This fails to compile if you told gen_element!() that it can gen_empty_element() whereas there is a field that does not implement Default (ie. not a Vec or an Option)
-            )*
-        })
     }
 }
 
