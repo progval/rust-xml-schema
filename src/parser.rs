@@ -42,7 +42,7 @@ pub mod xs {
     }
 
     impl_element!(Annotation, "annotation", {
-        (annotation_content, enums, Vec<AnnotationContent>),
+        (annotation_content, enums, Vec<AnnotationContent; min=0;>),
     });
 
     ///  This type is extended by all types which allow annotation other than <schema> itself 
@@ -74,7 +74,7 @@ pub mod xs {
     }
 
     impl_element!(Appinfo, "appinfo", {
-        (sequence_any, sequences, Vec<SequenceAny>),
+        (sequence_any, sequences, Vec<SequenceAny; min=0;>),
     });
 
     ///  This type is extended by all types which allow annotation other than <schema> itself 
@@ -122,7 +122,7 @@ pub mod xs {
 
     impl_element!(Choice, "choice", {
         (annotation, xs, Option<Annotation>),
-        (nested_particle, xs, Vec<NestedParticle>),
+        (nested_particle, xs, Vec<NestedParticle; min=0;>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -168,7 +168,7 @@ pub mod xs {
     }
 
     impl_element!(Documentation, "documentation", {
-        (sequence_any, sequences, Vec<SequenceAny>),
+        (sequence_any, sequences, Vec<SequenceAny; min=0;>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -183,8 +183,8 @@ pub mod xs {
     impl_element!(Element, "element", {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),
-        (alternative_alt_type, inline_elements, Vec<AlternativeAltType>),
-        (identity_constraint, xs, Vec<IdentityConstraint>),
+        (alternative_alt_type, inline_elements, Vec<AlternativeAltType; min=0;>),
+        (identity_constraint, xs, Vec<IdentityConstraint; min=0;>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -413,7 +413,7 @@ pub mod xs {
 
     impl_element!(Override, "override", {
         (annotation, xs, Option<Annotation>),
-        (schema_top, xs, Vec<SchemaTop>),
+        (schema_top, xs, Vec<SchemaTop; min=0;>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -433,7 +433,7 @@ pub mod xs {
     }
 
     impl_element!(Redefine, "redefine", {
-        (choice_annotation_redefinable, enums, Vec<ChoiceAnnotationRedefinable>),
+        (choice_annotation_redefinable, enums, Vec<ChoiceAnnotationRedefinable; min=0;>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -457,9 +457,9 @@ pub mod xs {
     }
 
     impl_element!(Schema, "schema", {
-        (composition, xs, Vec<Composition>),
+        (composition, xs, Vec<Composition; min=0;>),
         (open_content, sequences, Option<AnnotatedOpenContent>),
-        (sequence_schema_top_annotation, sequences, Vec<SequenceSchemaTopAnnotation>),
+        (sequence_schema_top_annotation, sequences, Vec<SequenceSchemaTopAnnotation; min=0;>),
     });
 
     ///  This type is extended by all types which allow annotation other than <schema> itself 
@@ -483,7 +483,7 @@ pub mod xs {
 
     impl_element!(Sequence, "sequence", {
         (annotation, xs, Option<Annotation>),
-        (nested_particle, xs, Vec<NestedParticle>),
+        (nested_particle, xs, Vec<NestedParticle; min=0;>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -529,7 +529,7 @@ pub mod xs {
 
     impl_element!(Union, "union", {
         (annotation, xs, Option<Annotation>),
-        (local_simple_type, inline_elements, Vec<LocalSimpleType>),
+        (local_simple_type, inline_elements, Vec<LocalSimpleType; min=0;>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -562,7 +562,7 @@ pub mod xs {
 
     impl_group_or_sequence!(AllModel,
         (annotation, xs, Option<Annotation>),
-        (choice_element_any_group, enums, Vec<ChoiceElementAnyGroup>),
+        (choice_element_any_group, enums, Vec<ChoiceElementAnyGroup; min=0;>),
     );
 
     #[derive(Debug, PartialEq)]
@@ -571,7 +571,7 @@ pub mod xs {
     }
 
     impl_group_or_sequence!(Assertions,
-        (assertion, inline_elements, Vec<Assertion>),
+        (assertion, inline_elements, Vec<Assertion; min=0;>),
     );
 
     #[derive(Debug, PartialEq)]
@@ -581,7 +581,7 @@ pub mod xs {
     }
 
     impl_group_or_sequence!(AttrDecls,
-        (attribute, enums, Vec<AttrOrAttrGroup>),
+        (attribute, enums, Vec<AttrOrAttrGroup; min=0;>),
         (any_attribute, xs, Option<AnyAttribute>),
     );
 
@@ -729,7 +729,7 @@ pub mod xs {
 
     impl_group_or_sequence!(SimpleRestrictionModel,
         (local_simple_type, inline_elements, Option<LocalSimpleType>),
-        (choice_facet_any, enums, Vec<ChoiceFacetAny>),
+        (choice_facet_any, enums, Vec<ChoiceFacetAny; min=0;>),
     );
 
     ///  'complexType' uses this
@@ -907,7 +907,7 @@ pub mod sequences {
 
     impl_group_or_sequence!(AnnotatedOpenContent,
         (default_open_content, xs, DefaultOpenContent),
-        (annotation, xs, Vec<Annotation>),
+        (annotation, xs, Vec<Annotation; min=0;>),
     );
 
     /// This choice is added simply to make this a valid restriction per the REC
@@ -930,7 +930,7 @@ pub mod sequences {
 
     impl_group_or_sequence!(SequenceSchemaTopAnnotation,
         (schema_top, xs, SchemaTop),
-        (annotation, xs, Vec<Annotation>),
+        (annotation, xs, Vec<Annotation; min=0;>),
     );
 
     #[derive(Debug, PartialEq)]
@@ -941,7 +941,7 @@ pub mod sequences {
 
     impl_group_or_sequence!(UniquenessSpec,
         (selector, xs, Selector),
-        (field, xs, Vec<Field>),
+        (field, xs, Vec<Field; min=1;>),
     );
 }
 
@@ -1024,7 +1024,7 @@ pub mod inline_elements {
 
     impl_element!(ChoiceSimpleExplicitGroup, "choice", {
         (annotation, xs, Option<Annotation>),
-        (nested_particle, xs, Vec<NestedParticle>),
+        (nested_particle, xs, Vec<NestedParticle; min=0;>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -1051,8 +1051,8 @@ pub mod inline_elements {
     impl_element!(LocalElement, "element", {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),
-        (alternative_alt_type, inline_elements, Vec<AlternativeAltType>),
-        (identity_constraint, xs, Vec<IdentityConstraint>),
+        (alternative_alt_type, inline_elements, Vec<AlternativeAltType; min=0;>),
+        (identity_constraint, xs, Vec<IdentityConstraint; min=0;>),
     });
 
     #[derive(Debug, PartialEq)]
@@ -1148,7 +1148,7 @@ pub mod inline_elements {
 
     impl_element!(SequenceSimpleExplicitGroup, "sequence", {
         (annotation, xs, Option<Annotation>),
-        (nested_particle, xs, Vec<NestedParticle>),
+        (nested_particle, xs, Vec<NestedParticle; min=0;>),
     });
 
     #[derive(Debug, PartialEq)]

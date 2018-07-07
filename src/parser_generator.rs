@@ -1124,9 +1124,13 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                             struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
                             impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
                         },
+                        (_, ::std::usize::MAX) => {
+                            struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                            impl_code.push(format!("    ({}, {}, Vec<{}; min={};>),", name, type_mod_name, type_name, min_occurs))
+                        },
                         (_, _) => {
                             struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
+                            impl_code.push(format!("    ({}, {}, Vec<{}; min={}; max={};>),", name, type_mod_name, type_name, min_occurs, max_occurs))
                         },
                     }
                 };
@@ -1204,13 +1208,13 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                             struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
                             impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
                         },
-                        (0, _) => {
+                        (_, ::std::usize::MAX) => {
                             struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
+                            impl_code.push(format!("    ({}, {}, Vec<{}; min={};>),", name, type_mod_name, type_name, min_occurs))
                         },
                         (_, _) => {
                             struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Vec<{}>),", name, type_mod_name, type_name))
+                            impl_code.push(format!("    ({}, {}, Vec<{}; min={}; max={};>),", name, type_mod_name, type_name, min_occurs, max_occurs))
                         },
                     }
                 };

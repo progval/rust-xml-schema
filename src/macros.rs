@@ -232,13 +232,32 @@ macro_rules! impl_element_field {
     ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Option < $type_name:ident > ) => {
         super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context)
     };
-    ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Vec < $type_name:ident > ) => {{
+    ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Vec < $type_name:ident ; min=$min:expr ; max=$max:expr ; > ) => {{
         let mut items = Vec::new();
+        let min: usize = $min;
+        let max: usize = $max;
+        while let Some(item) = super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context) {
+            items.push(item);
+            if items.len() > max {
+                return None;
+            }
+        }
+        if items.len() < min {
+            return None;
+        }
+        items
+    }};
+    ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Vec < $type_name:ident ; min=$min:expr ; > ) => {{
+        let mut items = Vec::new();
+        let min: usize = $min;
         while let Some(item) = super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context) {
             items.push(item);
         }
+        if items.len() < min {
+            return None;
+        }
         items
-    }}
+    }};
 }
 
 
@@ -252,7 +271,10 @@ macro_rules! impl_empty_element_field {
     ( $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Option < $type_name:ident > ) => {
         None
     };
-    ( $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Vec < $type_name:ident > ) => {{
+    ( $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Vec < $type_name:ident ; min=$min:expr ; max=$max:expr ; > ) => {{
         Vec::new()
-    }}
+    }};
+    ( $parse_context:expr, $parent_context:expr, $type_mod_name:ident, Vec < $type_name:ident ; min=$min:expr ; > ) => {{
+        Vec::new()
+    }};
 }
