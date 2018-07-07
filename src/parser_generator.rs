@@ -61,14 +61,36 @@ impl<'input> ToString for Documentation<'input> {
 }
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+struct Attrs<'input> {
+    named: Vec<(FullName<'input>, Type<'input>)>,
+    refs: Vec<(Option<FullName<'input>>, FullName<'input>)>,
+    any_attributes: bool,
+}
+impl<'input> Attrs<'input> {
+    fn new() -> Attrs<'input> {
+        Attrs { named: Vec::new(), refs: Vec::new(), any_attributes: false }
+    }
+    fn extend(&mut self, other: Attrs<'input>) {
+        self.named.extend(other.named);
+        self.refs.extend(other.refs);
+        self.any_attributes |= other.any_attributes;
+    }
+}
+
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 struct RichType<'input> {
     name_hint: NameHint<'input>,
     type_: Type<'input>,
     doc: Documentation<'input>,
+    attrs: Attrs<'input>,
 }
 impl<'input> RichType<'input> {
     fn new(name_hint: NameHint<'input>, type_: Type<'input>, doc: Documentation<'input>) -> RichType<'input> {
-        RichType { name_hint, type_, doc }
+        RichType { name_hint, type_, doc, attrs: Attrs::new() }
+    }
+    fn add_attrs(mut self, attrs: Attrs<'input>) -> RichType<'input> {
+        self.attrs.named.extend(attrs.named);
+        self
     }
 }
 
@@ -101,7 +123,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     groups: HashMap<FullName<'input>, RichType<'input>>,
     attribute_groups: HashMap<FullName<'input>, &'ast xs::AttributeGroup<'input>>,
     renames: HashMap<String, String>,
-    inline_elements: HashMap<(FullName<'input>, Type<'input>), (HashSet<String>, Documentation<'input>)>,
+    inline_elements: HashMap<(FullName<'input>, Type<'input>, Attrs<'input>), (HashSet<String>, Documentation<'input>)>,
 }
 
 impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
@@ -238,6 +260,70 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             })
         }).flat_map(|v| v).collect();
         Documentation(strings)
+    }
+
+    fn process_attr_decls(&mut self, attr_decls: &'ast xs::AttrDecls<'input>) -> Attrs<'input> {
+        let mut attrs = Attrs::new();
+        for attr_decl in &attr_decls.attribute {
+            match attr_decl {
+                enums::AttrOrAttrGroup::Attribute(e) => {
+                    let mut name = None;
+                    let mut ref_ = None;
+                    let mut type_attr = None;
+                    let mut use_ = None;
+                    for (key, &value) in e.attrs.iter() {
+                        match self.namespaces.expand_qname(*key).as_tuple() {
+                            (SCHEMA_URI, "name") =>
+                                name = Some(self.namespaces.parse_qname(value)),
+                            (SCHEMA_URI, "type") =>
+                                type_attr = Some(self.namespaces.parse_qname(value)),
+                            (SCHEMA_URI, "use") =>
+                                use_ = Some(value),
+                            (SCHEMA_URI, "default") => (), // TODO
+                            (SCHEMA_URI, "ref") =>
+                                ref_ = Some(self.namespaces.parse_qname(value)), // TODO
+                            (SCHEMA_URI, "fixed") => (), // TODO
+                            _ => panic!("Unknown attribute {} in <attribute>", key),
+                        }
+                    }
+                    match use_ {
+                        Some("prohibited") => continue,
+                        Some("required") => (), // TODO
+                        Some("optional") => (), // TODO
+                        None => (),
+                        Some(s) => panic!("Unknown attribute value use={:?}", s),
+                    }
+                    match (name, ref_, type_attr, &e.local_simple_type) {
+                        (Some(name), None, Some(t), None) => {
+                            attrs.named.push((name, Type::Alias(t)));
+                        },
+                        (Some(name), None, None, Some(t)) => {
+                            let inline_elements::LocalSimpleType {
+                                attrs: ref sub_attrs, ref simple_derivation, ref annotation } = t;
+                            let t = self.process_simple_type(sub_attrs, simple_derivation, annotation.iter().collect());
+                            attrs.named.push((name, t.type_));
+                        },
+                        (_, None, None, None) =>
+                            (), // TODO
+                        (_, _, Some(ref t1), Some(ref t2)) =>
+                            panic!("<attribute> has both a type attribute ({:?}) and a child type ({:?}).", t1, t2),
+                        (None, None, Some(_), None) | (None, None, None, Some(_)) =>
+                            panic!("<attribute> has a type but no name."),
+                        (_, Some(_), Some(_), None) | (_, Some(_), None, Some(_)) =>
+                            panic!("<attribute> has a type and a ref."),
+                        (_, Some(ref_), None, None) => (), // TODO
+                    }
+                },
+                enums::AttrOrAttrGroup::AttributeGroup(e) => {
+                    () // TODO
+                    //attrs.extend(self.process_attr_decls(e.attr_decls));
+                },
+            }
+        }
+        if attr_decls.any_attribute.is_some() {
+            attrs.any_attributes = true;
+        }
+        attrs
     }
 
     fn process_group_ref(&mut self, 
@@ -474,7 +560,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let ty = match model {
             xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
             xs::ComplexTypeModel::ComplexContent(ref model) => self.process_complex_content(model, false),
-            xs::ComplexTypeModel::CompleteContentModel { ref open_content, ref type_def_particle, ref attr_decls, ref assertions } => self.process_complete_content_model(open_content, type_def_particle, attr_decls, assertions, inlinable),
+            xs::ComplexTypeModel::CompleteContentModel { ref open_content, ref type_def_particle, ref attr_decls, ref assertions } => {
+                let ty = self.process_complete_content_model(open_content, type_def_particle, assertions, inlinable);
+                ty.add_attrs(self.process_attr_decls(attr_decls))
+            },
         };
 
         if let Some(name) = name {
@@ -487,14 +576,13 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 )
         }
         else {
-           ty 
+            ty
         }
     }
 
     fn process_complete_content_model(&mut self,
             open_content: &'ast Option<Box<xs::OpenContent<'input>>>,
             type_def_particle: &'ast Option<Box<xs::TypeDefParticle<'input>>>,
-            attr_decls: &'ast xs::AttrDecls<'input>,
             assertions: &'ast xs::Assertions<'input>,
             inlinable: bool,
             ) -> RichType<'input> {
@@ -511,7 +599,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     ref sequence_open_content_type_def_particle,
                     ref attr_decls, ref assertions
                 } = **r;
-                match sequence_open_content_type_def_particle {
+                let ty = match sequence_open_content_type_def_particle {
                     Some(sequences::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
                         self.process_restriction(attrs, type_def_particle),
                     None => {
@@ -521,18 +609,20 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                             self.process_annotation(&vec_concat_opt(&annotation, annotation2.as_ref())),
                             )
                     },
-                }
+                };
+                ty.add_attrs(self.process_attr_decls(attr_decls))
             },
             enums::ChoiceRestrictionExtension::Extension(ref e) => {
                 let inline_elements::ExtensionType {
                     ref attrs, annotation: ref annotation2, ref open_content,
                     ref type_def_particle, ref attr_decls, ref assertions
                 } = **e;
-                match type_def_particle {
+                let ty = match type_def_particle {
                     Some(type_def_particle) =>
                         self.process_extension(attrs, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref()), inlinable),
                     None => self.process_simple_extension(attrs, vec_concat_opt(&annotation, annotation2.as_ref())),
-                }
+                };
+                ty.add_attrs(self.process_attr_decls(attr_decls))
             },
         }
     }
@@ -707,27 +797,27 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let mut name_hint = NameHint::new("choice");
         if particles.len() == 1 {
             let particle = particles.get(0).unwrap();
-            let RichType { name_hint, type_, doc } =
+            let RichType { name_hint, type_, doc, attrs } =
                 self.process_nested_particle(particle, annotation, inlinable);
             match (min_occurs, max_occurs, type_) {
                 (_, _, Type::Element(1, 1, e)) => return RichType {
-                    name_hint, type_: Type::Element(min_occurs, max_occurs, e), doc },
+                    name_hint, type_: Type::Element(min_occurs, max_occurs, e), doc, attrs },
                 (_, _, Type::Group(1, 1, e)) => return RichType {
-                    name_hint, type_: Type::Group(min_occurs, max_occurs, e), doc },
+                    name_hint, type_: Type::Group(min_occurs, max_occurs, e), doc, attrs },
                 (_, _, Type::Choice(1, 1, e)) => return RichType {
-                    name_hint, type_: Type::Choice(min_occurs, max_occurs, e), doc },
+                    name_hint, type_: Type::Choice(min_occurs, max_occurs, e), doc, attrs },
                 (_, _, Type::Sequence(1, 1, e)) => return RichType {
-                    name_hint, type_: Type::Sequence(min_occurs, max_occurs, e), doc },
-                (1, 1, type_) => return RichType { name_hint, type_, doc },
+                    name_hint, type_: Type::Sequence(min_occurs, max_occurs, e), doc, attrs },
+                (1, 1, type_) => return RichType { name_hint, type_, doc, attrs },
                 (_, _, type_) => {
                     let name = self.namespaces.name_from_hint(&name_hint).unwrap();
-                    let items = vec![RichType { name_hint: name_hint.clone(), type_, doc: doc.clone() }];
+                    let items = vec![RichType { name_hint: name_hint.clone(), type_, doc: doc.clone(), attrs: Attrs::new() }];
                     let (names, docs) = self.sequences.entry(items)
                         .or_insert((HashSet::new(), Documentation::new()));
                     names.insert(name.clone());
                     docs.extend(&doc);
                     let type_ = Type::Sequence(min_occurs, max_occurs, name);
-                    return RichType { name_hint, type_, doc }
+                    return RichType { name_hint, type_, doc, attrs }
                 },
             }
         }
@@ -932,7 +1022,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     let struct_name = self.namespaces.name_from_hint(&name_hint).unwrap();
                     let mut doc = self.process_annotation(&annotation);
                     doc.extend(&t.doc);
-                    let (elems, doc2) = self.inline_elements.entry((name, t.type_))
+                    let (elems, doc2) = self.inline_elements.entry((name, t.type_, t.attrs))
                             .or_insert((HashSet::new(), Documentation::new()));
                     elems.insert(struct_name.clone());
                     doc.extend(doc2);
@@ -956,7 +1046,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     };
                     let struct_name = self.namespaces.name_from_hint(&name_hint).unwrap();
                     let mut doc = self.process_annotation(&annotation);
-                    let (elems, doc2) = self.inline_elements.entry((name, Type::Alias(t)))
+                    let (elems, doc2) = self.inline_elements.entry((name, Type::Alias(t), Attrs::new()))
                             .or_insert((HashSet::new(), Documentation::new()));
                     elems.insert(struct_name.clone());
                     doc.extend(doc2);
@@ -1012,7 +1102,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                         fields.push((variant_name, type_mod_name, min_occurs, max_occurs, type_name));
                     };
                     let doc_writer = &mut |doc2: &Documentation<'input>| doc.extend(doc2);
-                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_);
+                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_, None);
                 }
                 enum_.doc(&doc.to_string());
                 let variant_name = self.namespaces.name_from_hint(&item.name_hint)
@@ -1136,7 +1226,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 };
                 let doc_writer = &mut |doc2| doc.extend(doc2);
                 for item in items {
-                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_);
+                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_, None);
                 }
             }
             struct_.doc(&doc.to_string());
@@ -1154,8 +1244,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         module.scope().raw("use super::*;");
         let mut elements: Vec<_> = self.inline_elements.iter().collect();
 
-        elements.sort_by_key(|&((n, _),(n2,_))| (n, n2.iter().collect::<Vec<_>>()));
-        for ((tag_name, element), (struct_names, doc)) in elements {
+        elements.sort_by_key(|&((n, _, _),(n2,_))| (n, n2.iter().collect::<Vec<_>>()));
+        for ((tag_name, element, attrs), (struct_names, doc)) in elements {
             // struct_names is always non-empty.
 
             let mut struct_names: Vec<_> = struct_names.iter().map(|s| s.to_camel_case()).collect();
@@ -1166,7 +1256,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 module.scope().raw(&format!("pub type {}<'input> = {}<'input>;", alias, struct_names[0]));
             }
 
-            self.gen_element(module, &struct_names[0], tag_name, element, doc);
+            self.gen_element(module, &struct_names[0], tag_name, element, attrs, doc);
         }
     }
 
@@ -1179,48 +1269,72 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut module = scope.get_module_mut(mod_name).unwrap();
             let (prefix, local) = name.as_tuple();
             let struct_name = escape_keyword(&local.to_camel_case());
-            self.gen_element(module, &struct_name, &name, &element.type_, &element.doc);
+            self.gen_element(module, &struct_name, &name, &element.type_, &element.attrs, &element.doc);
         }
     }
 
-    fn gen_element(&self, module: &mut cg::Module, struct_name: &str, tag_name: &FullName<'input>, type_: &Type<'input>, doc: &Documentation<'input>) {
+    fn gen_element_fields(&self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, doc: &mut Documentation<'input>, name_gen: &mut NameGenerator, type_: &Type<'input>, prefered_name: Option<&'input str>, field_name_prefix: Option<&'static str>, field_name_prefix2: Option<&'input str>) {
+        let field_writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
+            let name = if let Some(field_name_prefix2) = field_name_prefix2 {
+                if field_name_prefix2 != name {
+                    format!("{}_{}", field_name_prefix2, name)
+                }
+                else {
+                    name.to_string()
+                }
+            } else {
+                name.to_string()
+            };
+            let name = if let Some(field_name_prefix) = field_name_prefix {
+                format!("{}{}", field_name_prefix, name)
+            } else {
+                name
+            };
+            let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
+            let name = self.renames.get(&name).unwrap_or(&name);
+            let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
+            let type_name = escape_keyword(&type_name.to_camel_case());
+            let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
+            match (min_occurs, max_occurs) {
+                (1, 1) => {
+                    struct_.field(&format!("pub {}", name), &format!("super::{}::{}<'input>", type_mod_name, type_name));
+                    impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
+                },
+                (0, 1) => {
+                    struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
+                    impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
+                },
+                (_, ::std::usize::MAX) => {
+                    struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                    impl_code.push(format!("    ({}, {}, Vec<{}; min={};>),", name, type_mod_name, type_name, min_occurs))
+                },
+                (_, _) => {
+                    struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                    impl_code.push(format!("    ({}, {}, Vec<{}; min={}; max={};>),", name, type_mod_name, type_name, min_occurs, max_occurs))
+                },
+            }
+        };
+        let doc_writer = &mut |doc2| doc.extend(doc2);
+        self.write_type_in_struct_def(field_writer, doc_writer, type_, prefered_name);
+    }
+
+    fn gen_element(&self, module: &mut cg::Module, struct_name: &str, tag_name: &FullName<'input>, type_: &Type<'input>, attrs: &Attrs<'input>, doc: &Documentation<'input>) {
         let mut impl_code = Vec::new();
         let (_, tag_name) = tag_name.as_tuple();
-        impl_code.push(format!("impl_element!({}, \"{}\", {{", struct_name, tag_name));
+        impl_code.push(format!("impl_element!({}, \"{}\", attributes = {{", struct_name, tag_name));
         {
-            let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            let mut struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             struct_.field("pub attrs", "HashMap<QName<'input>, &'input str>");
             let mut name_gen = NameGenerator::new();
             let mut doc = doc.clone();
-            {
-                let field_writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
-                    let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
-                    let name = self.renames.get(&name).unwrap_or(&name);
-                    let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                    let type_name = escape_keyword(&type_name.to_camel_case());
-                    let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
-                    match (min_occurs, max_occurs) {
-                        (1, 1) => {
-                            struct_.field(&format!("pub {}", name), &format!("super::{}::{}<'input>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
-                        },
-                        (0, 1) => {
-                            struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
-                        },
-                        (_, ::std::usize::MAX) => {
-                            struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Vec<{}; min={};>),", name, type_mod_name, type_name, min_occurs))
-                        },
-                        (_, _) => {
-                            struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Vec<{}; min={}; max={};>),", name, type_mod_name, type_name, min_occurs, max_occurs))
-                        },
-                    }
-                };
-                let doc_writer = &mut |doc2| doc.extend(doc2);
-                self.write_type_in_struct_def(field_writer, doc_writer, type_);
+
+            for (attr_name, attr_type) in &attrs.named {
+                let (attr_mod_name, attr_name) = attr_name.as_tuple();
+                self.gen_element_fields(&mut struct_, &mut impl_code, &mut doc, &mut name_gen, attr_type, Some(attr_name), Some("attr_"), Some(attr_name));
             }
+            impl_code.push(format!("}}, fields = {{"));
+
+            self.gen_element_fields(&mut struct_, &mut impl_code, &mut doc, &mut name_gen, type_, None, None, None);
             struct_.doc(&doc.to_string());
         }
         impl_code.push(format!("}});"));
@@ -1231,26 +1345,32 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             field_writer: &mut F,
             doc_writer: &mut G,
             type_: &'a Type<'input>,
+            prefered_name: Option<&'input str>,
             ) where
             F: FnMut(&'a str, &'a str, usize, usize, &'a str),
             G: FnMut(&'a Documentation<'input>),
             'ast: 'a {
         match &type_ {
             Type::Alias(name) => {
-                let (target_type, doc) = self.types.get(name).unwrap();
+                let (target_type, doc) = self.types.get(name).expect(&format!("unknown type reference {:?}", name));
                 doc_writer(doc);
-                self.write_type_in_struct_def(field_writer, doc_writer, &target_type.type_);
+                self.write_type_in_struct_def(field_writer, doc_writer, &target_type.type_, prefered_name);
             },
+            Type::InlineSequence(items) if items.len() == 1 => {
+                for item in items {
+                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_, prefered_name);
+                }
+            }
             Type::InlineSequence(items) => {
                 for item in items {
-                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_);
+                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_, None);
                 }
             }
             Type::Sequence(min_occurs, max_occurs, name) => {
-                field_writer(name, "sequences", *min_occurs, *max_occurs, name);
+                field_writer(prefered_name.unwrap_or(name), "sequences", *min_occurs, *max_occurs, name);
             }
             Type::Element(min_occurs, max_occurs, name) => {
-                field_writer(name, "inline_elements", *min_occurs, *max_occurs, name);
+                field_writer(prefered_name.unwrap_or(name), "inline_elements", *min_occurs, *max_occurs, name);
             }
             Type::Group(min_occurs, max_occurs, name) |
             Type::ElementRef(min_occurs, max_occurs, name) => {
@@ -1260,12 +1380,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 field_writer(field_name, mod_name, *min_occurs, *max_occurs, type_name);
             },
             Type::Choice(min_occurs, max_occurs, ref name) => {
-                field_writer(name, "enums", *min_occurs, *max_occurs, name);
+                field_writer(prefered_name.unwrap_or(name), "enums", *min_occurs, *max_occurs, name);
             },
             Type::Extension(base, ext_type) => {
                 let (base_type, doc) = &self.types.get(base).unwrap();
-                self.write_type_in_struct_def(field_writer, doc_writer, &base_type.type_);
-                self.write_type_in_struct_def(field_writer, doc_writer, &ext_type.type_);
+                self.write_type_in_struct_def(field_writer, doc_writer, &base_type.type_, None); // TODO: don't pass doc_writer
+                self.write_type_in_struct_def(field_writer, doc_writer, &ext_type.type_, prefered_name);
             },
             Type::Empty => (), // TODO ?
             Type::Any => {
