@@ -45,10 +45,9 @@ macro_rules! str_alias {
 */
 
 #[derive(Debug)]
-pub(crate) struct Namespaces<'input> {
+pub struct Namespaces<'input> {
     pub target_namespace: &'input str,
     pub namespaces: HashMap<&'input str, &'input str>, // namespace -> URI
-    pub module_names: HashMap<&'input str, &'input str>, // URI -> module name
 }
 
 impl<'input> Namespaces<'input> {
@@ -59,14 +58,9 @@ impl<'input> Namespaces<'input> {
         if let Some(uri) = namespaces.insert("xmlns", "xmlns") {
             panic!("Cannot have a namespaces named \"xmlns\": {}", uri);
         }
-        let mut module_names = HashMap::new();
-        for (ns, uri) in namespaces.iter() {
-            module_names.insert(*uri, *ns);
-        }
         Namespaces {
             target_namespace,
             namespaces,
-            module_names,
         }
     }
 
@@ -86,37 +80,16 @@ impl<'input> Namespaces<'input> {
         qname1.1 == qname2.1 && self.expand_prefix(qname1.0) == self.expand_prefix(qname2.0)
     }
 
-    pub fn get_module_name(&self, qname: FullName<'input>) -> &'input str {
-        let (prefix, _) = qname.as_tuple();
-        self.module_names.get(prefix).cloned().unwrap_or("UNQUAL")
-    }
-
-    pub fn name_from_hint(&self, hint: &NameHint<'input>) -> Option<String> {
-        if hint.tokens.len() > 0 {
-            Some(hint.tokens.iter().map(|&s| escape_keyword(s)).collect::<Vec<_>>().join("_"))
-        }
-        else {
-            None
-        }
-    }
-    pub fn name_from_hints<'a: 'input, T>(&self, hints: T) -> Option<String>
-            where T: Iterator<Item=&'a NameHint<'a>>{
-        let mut candidates = Vec::new();
-        for hint in hints {
-            if let Some(candidate) = self.name_from_hint(&hint) {
-                candidates.push(candidate);
-            }
-        }
-        if candidates.len() > 0 {
-            candidates.sort_by_key(|c| c.len());
-            Some(candidates.swap_remove(0))
-        }
-        else {
-            None
-        }
-    }
     pub fn modules(&self) -> impl Iterator<Item=(&&'input str, &&'input str)> {
         self.namespaces.iter()
+    }
+}
+pub fn name_from_hint<'input>(hint: &NameHint<'input>) -> Option<String> {
+    if hint.tokens.len() > 0 {
+        Some(hint.tokens.iter().map(|&s| escape_keyword(s)).collect::<Vec<_>>().join("_"))
+    }
+    else {
+        None
     }
 }
 

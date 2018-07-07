@@ -13,6 +13,7 @@ pub mod names;
 pub mod support;
 
 pub mod parser;
+pub mod processor;
 pub mod parser_generator;
 
 #[cfg(test)]

@@ -6,6 +6,7 @@ extern crate xmlparser;
 extern crate xml_schema;
 extern crate codegen;
 use xml_schema::parser::xs;
+use xml_schema::processor::*;
 use xml_schema::parser_generator::*;
 use xml_schema::support::*;
 
@@ -42,8 +43,10 @@ fn main() {
         renames.insert(from_.to_string(), to_.to_string());
     }
 
-    let mut gen = ParserGenerator::new(&doc, renames);
-    let scope = gen.gen(&doc);
+    let mut proc = Processor::new(&doc);
+    proc.process_ast(&doc);
+    let mut gen = ParserGenerator::new(vec![proc], renames);
+    let scope = gen.gen_target_scope();
     //println!("#[allow(bad_style)]\nextern crate xml_schema;use xml_schema::support;\n{}\n{}", MACROS, scope.to_string());
     println!("#[allow(unused_imports)]\nuse support;\n{}", scope.to_string());
 }
