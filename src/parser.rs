@@ -1,3 +1,4 @@
+// Input: "XMLSchema.xsd"
 #[allow(unused_imports)]
 use support;
 extern crate xmlparser;

@@ -289,6 +289,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             match self.namespaces.expand_qname(*key).as_tuple() {
                 (SCHEMA_URI, "name") =>
                     name = Some(self.namespaces.parse_qname(value)),
+                (SCHEMA_URI, "id") => (), // TODO
                 _ => panic!("Unknown attribute {} in <simpleType>", key),
             }
         }

@@ -7,5 +7,5 @@ cache: cargo
 script:
     - wget https://www.w3.org/2009/XMLSchema/XMLSchema.xsd
     - cargo test
-    - cargo run --bin gen < XMLSchema.xsd > foo.rs
+    - cargo run --bin gen XMLSchema.xsd > foo.rs
     - diff foo.rs src/parser.rs # Fails if they are different.

@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use codegen as cg;
 use heck::{SnakeCase, CamelCase};
@@ -58,13 +58,17 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn create_modules(&mut self, scope: &mut cg::Scope) {
+        let mut created = HashSet::new();
         for proc in &self.processors {
             let mut mod_names: Vec<_> = proc.namespaces.modules().map(|(n,_)| n).collect();
             mod_names.sort();
             for mod_name in mod_names {
-                let mut module = scope.new_module(mod_name);
-                module.vis("pub");
-                module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
+                if !created.contains(mod_name) {
+                    let mut module = scope.new_module(mod_name);
+                    module.vis("pub");
+                    module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
+                    created.insert(mod_name);
+                }
             }
         }
     }
