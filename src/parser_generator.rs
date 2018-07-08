@@ -195,6 +195,37 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
+    fn gen_fields(&self, empty_struct: &mut bool, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, doc: &mut Documentation<'input>, name_gen: &mut NameGenerator, type_: &Type<'input>) {
+        let field_writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
+            *empty_struct = false;
+            let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
+            let name = self.renames.get(&name).unwrap_or(&name);
+            let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
+            let type_name = escape_keyword(&type_name.to_camel_case());
+            let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
+            match (min_occurs, max_occurs) {
+                (1, 1) => {
+                    struct_.field(&format!("pub {}", name), &format!("super::{}::{}<'input>", type_mod_name, type_name));
+                    impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
+                },
+                (0, 1) => {
+                    struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
+                    impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
+                },
+                (_, ::std::usize::MAX) => {
+                    struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                    impl_code.push(format!("    ({}, {}, Vec<{}; min={};>),", name, type_mod_name, type_name, min_occurs))
+                },
+                (_, _) => {
+                    struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                    impl_code.push(format!("    ({}, {}, Vec<{}; min={}; max={};>),", name, type_mod_name, type_name, min_occurs, max_occurs))
+                },
+            }
+        };
+        let doc_writer = &mut |doc2| doc.extend(doc2);
+        self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), &type_);
+    }
+
     fn gen_group_or_sequence(&self, module: &mut cg::Module, struct_name: &'input str, items: &Vec<&RichType<'input>>, doc: &Documentation<'input>) {
         let mut impl_code = Vec::new();
         let struct_name = escape_keyword(&struct_name.to_camel_case());
@@ -206,35 +237,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut name_gen = NameGenerator::new();
             let mut doc = doc.clone();
             {
-                let field_writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
-                    empty_struct = false;
-                    let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
-                    let name = self.renames.get(&name).unwrap_or(&name);
-                    let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                    let type_name = escape_keyword(&type_name.to_camel_case());
-                    let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
-                    match (min_occurs, max_occurs) {
-                        (1, 1) => {
-                            struct_.field(&format!("pub {}", name), &format!("super::{}::{}<'input>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
-                        },
-                        (0, 1) => {
-                            struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
-                        },
-                        (_, ::std::usize::MAX) => {
-                            struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Vec<{}; min={};>),", name, type_mod_name, type_name, min_occurs))
-                        },
-                        (_, _) => {
-                            struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Vec<{}; min={}; max={};>),", name, type_mod_name, type_name, min_occurs, max_occurs))
-                        },
-                    }
-                };
-                let doc_writer = &mut |doc2| doc.extend(doc2);
                 for item in items {
-                    self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), &item.type_);
+                    self.gen_fields(&mut empty_struct, struct_, &mut impl_code, &mut doc, &mut name_gen, &item.type_);
                 }
             }
             struct_.doc(&doc.to_string());
@@ -291,38 +295,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         impl_code.push(format!("impl_element!({}, \"{}\", {{", struct_name, tag_name));
         {
             let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            let mut empty_struct = false;
             struct_.field("pub attrs", "HashMap<QName<'input>, &'input str>");
             let mut name_gen = NameGenerator::new();
             let mut doc = doc.clone();
-            {
-                let field_writer = &mut |name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
-                    let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
-                    let name = self.renames.get(&name).unwrap_or(&name);
-                    let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                    let type_name = escape_keyword(&type_name.to_camel_case());
-                    let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
-                    match (min_occurs, max_occurs) {
-                        (1, 1) => {
-                            struct_.field(&format!("pub {}", name), &format!("super::{}::{}<'input>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
-                        },
-                        (0, 1) => {
-                            struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
-                        },
-                        (_, ::std::usize::MAX) => {
-                            struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Vec<{}; min={};>),", name, type_mod_name, type_name, min_occurs))
-                        },
-                        (_, _) => {
-                            struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                            impl_code.push(format!("    ({}, {}, Vec<{}; min={}; max={};>),", name, type_mod_name, type_name, min_occurs, max_occurs))
-                        },
-                    }
-                };
-                let doc_writer = &mut |doc2| doc.extend(doc2);
-                self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), type_);
-            }
+            self.gen_fields(&mut empty_struct, struct_, &mut impl_code, &mut doc, &mut name_gen, type_);
             struct_.doc(&doc.to_string());
         }
         impl_code.push(format!("}});"));
