@@ -30,7 +30,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let mut name_gen = NameGenerator::new();
         for proc in &processors {
             for (ns, uri) in proc.namespaces.namespaces.iter() {
-                if Some(&uri.to_string()) != module_names.get(uri) {
+                if Some(&ns.to_string()) != module_names.get(uri) {
                     module_names.insert(*uri, name_gen.gen_name(ns.to_string()));
                 }
             }
@@ -60,18 +60,13 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn create_modules(&mut self, scope: &mut cg::Scope) {
-        let mut created = HashSet::new();
-        for proc in &self.processors {
-            let mut mod_names: Vec<_> = proc.namespaces.modules().map(|(n,_)| n).collect();
-            mod_names.sort();
-            for mod_name in mod_names {
-                if !created.contains(mod_name) {
-                    let mut module = scope.new_module(mod_name);
-                    module.vis("pub");
-                    module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
-                    created.insert(mod_name);
-                }
-            }
+        let mut modules: Vec<_> = self.module_names.iter().collect();
+        modules.sort();
+        for (uri, mod_name) in modules {
+            let mut module = scope.new_module(mod_name);
+            module.vis("pub");
+            module.scope().raw(&format!("//! {}", uri));
+            module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
         }
     }
 
@@ -282,7 +277,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             elements.sort_by_key(|&(n,_)| n);
             for (&name, element) in elements {
                 let mod_name = self.get_module_name(name);
-                let mut module = scope.get_module_mut(&mod_name).unwrap();
+                let mut module = scope.get_module_mut(&mod_name).expect(&mod_name);
                 let (prefix, local) = name.as_tuple();
                 let struct_name = escape_keyword(&local.to_camel_case());
                 self.gen_element(module, &struct_name, &name, &element.type_, &element.doc);

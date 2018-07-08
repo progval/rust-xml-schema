@@ -11,17 +11,9 @@ pub use support::*;
 
 pub use xmlparser::{Token, ElementEnd};
 
-pub mod xml {
-    #[allow(unused_imports)]
-    use super::*;
-}
-
-pub mod xmlns {
-    #[allow(unused_imports)]
-    use super::*;
-}
-
 pub mod xs {
+    //! http://www.w3.org/2001/XMLSchema
+
     #[allow(unused_imports)]
     use super::*;
 
@@ -748,6 +740,20 @@ pub mod xs {
         impl_singleton_variant!(Choice, xs, Box<Choice>),
         impl_singleton_variant!(Sequence, xs, Box<Sequence>),
     );
+}
+
+pub mod xml {
+    //! xml
+
+    #[allow(unused_imports)]
+    use super::*;
+}
+
+pub mod xmlns {
+    //! xmlns
+
+    #[allow(unused_imports)]
+    use super::*;
 }
 
 pub mod enums {
