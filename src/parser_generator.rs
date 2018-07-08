@@ -184,32 +184,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     for item in items.iter() {
                         let RichType { name_hint, type_, doc } = item;
                         let variant_name = name_from_hint(&item.name_hint).unwrap();
-                        // TODO: deduplicate this match{} with gen_lists
-                        let (type_mod_name, type_name) = match type_ {
-                            SimpleType::Alias(name) => {
-                                let (type_mod_name, type_name) = name.as_tuple();
-                                let type_mod_name = self.module_names.get(type_mod_name).expect(type_mod_name);
-                                let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                                let type_name = escape_keyword(&type_name.to_camel_case());
-                                (type_mod_name, type_name)
-                            },
-                            SimpleType::Primitive(field_name, type_name) => {
-                                ("support".to_string(), type_name.to_string())
-                            },
-                            SimpleType::Union(type_name) => {
-                                let type_name = escape_keyword(&type_name.to_camel_case());
-                                ("unions".to_string(), type_name)
-                            },
-                            SimpleType::List(name) => {
-                                let type_name = escape_keyword(&name.to_camel_case());
-                                ("lists".to_string(), type_name)
-                            },
-                            SimpleType::Empty => {
-                                continue; // TODO?
-                            },
-                            _ => unimplemented!("Union of {:?}", type_),
-                        };
-                        enum_.new_variant(&variant_name).tuple(&format!("{}::{}<'input>", type_mod_name, type_name));
+                        let type_name = self.get_simple_type_name(type_);
+                        if let Some(type_name) = type_name {
+                            enum_.new_variant(&variant_name).tuple(&format!("{}<'input>", type_name));
+                        }
                     }
                 }
             }
@@ -228,36 +206,43 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 for name in names.iter() {
                     let name = escape_keyword(&name.to_camel_case());
                     let name = name_gen.gen_name(name);
-                    let type_ = &item_type.type_;
-                    let (type_mod_name, type_name) = match &item_type.type_ {
-                        SimpleType::Alias(name) => {
-                            let (type_mod_name, type_name) = name.as_tuple();
-                            let type_mod_name = self.module_names.get(type_mod_name).expect(type_mod_name);
-                            let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                            let type_name = escape_keyword(&type_name.to_camel_case());
-                            (type_mod_name, type_name)
-                        },
-                        SimpleType::Primitive(field_name, type_name) => {
-                            ("support".to_string(), type_name.to_string())
-                        },
-                        SimpleType::Union(type_name) => {
-                            let type_name = escape_keyword(&type_name.to_camel_case());
-                            ("unions".to_string(), type_name)
-                        },
-                        SimpleType::List(name) => {
-                            let type_name = escape_keyword(&name.to_camel_case());
-                            ("lists".to_string(), type_name)
-                        },
-                        SimpleType::Empty => {
-                            continue; // TODO?
-                        },
-                        _ => unimplemented!("List of {:?}", item_type),
-                    };
-                    module.scope().raw(&format!("pub type {}<'input> = support::List<'input, {}::{}<'input>>;", name, type_mod_name, type_name));
+                    let type_name = self.get_simple_type_name(&item_type.type_);
+                    if let Some(type_name) = type_name {
+                        module.scope().raw(&format!("pub type {}<'input> = support::List<'input, {}<'input>>;", name, type_name));
+                    }
                 }
             }
         }
     }
+
+    fn get_simple_type_name(&self, ty: &SimpleType<'input>) -> Option<String> {
+        let (type_mod_name, type_name) = match ty {
+            SimpleType::Alias(name) => {
+                let (type_mod_name, type_name) = name.as_tuple();
+                let type_mod_name = self.module_names.get(type_mod_name).expect(type_mod_name);
+                let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
+                let type_name = escape_keyword(&type_name.to_camel_case());
+                (type_mod_name, type_name)
+            },
+            SimpleType::Primitive(field_name, type_name) => {
+                ("support".to_string(), type_name.to_string())
+            },
+            SimpleType::Union(type_name) => {
+                let type_name = escape_keyword(&type_name.to_camel_case());
+                ("unions".to_string(), type_name)
+            },
+            SimpleType::List(name) => {
+                let type_name = escape_keyword(&name.to_camel_case());
+                ("lists".to_string(), type_name)
+            },
+            SimpleType::Empty => {
+                return None
+            },
+            _ => unimplemented!("Simple type of {:?}", ty),
+        };
+        Some(format!("{}::{}", type_mod_name, type_name))
+    }
+
     fn gen_simple_types(&self, scope: &mut cg::Scope) {
         let mut name_gen = NameGenerator::new();
         for proc in &self.processors {
@@ -267,33 +252,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let (mod_name, name) = name.as_tuple();
                 let name = escape_keyword(&name.to_camel_case());
                 let name = name_gen.gen_name(name);
-                let (type_mod_name, type_name) = match &ty.type_ {
-                    SimpleType::Alias(name) => {
-                        let (type_mod_name, type_name) = name.as_tuple();
-                        let type_mod_name = self.module_names.get(type_mod_name).expect(type_mod_name);
-                        let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                        let type_name = escape_keyword(&type_name.to_camel_case());
-                        (type_mod_name, type_name)
-                    },
-                    SimpleType::Primitive(field_name, type_name) => {
-                        ("support".to_string(), type_name.to_string())
-                    },
-                    SimpleType::Union(type_name) => {
-                        let type_name = escape_keyword(&type_name.to_camel_case());
-                        ("unions".to_string(), type_name)
-                    },
-                    SimpleType::List(name) => {
-                        let type_name = escape_keyword(&name.to_camel_case());
-                        ("lists".to_string(), type_name)
-                    },
-                    SimpleType::Empty => {
-                        continue; // TODO?
-                    },
-                    _ => unimplemented!("Simple type of {:?}", ty),
-                };
-                scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
-                    .unwrap().scope()
-                    .raw(&format!("pub type {}<'input> = {}::{}<'input>;", name, type_mod_name, type_name));
+                let type_name = self.get_simple_type_name(&ty.type_);
+                if let Some(type_name) = type_name {
+                    scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
+                        .unwrap().scope()
+                        .raw(&format!("pub type {}<'input> = {}<'input>;", name, type_name));
+                }
             }
         }
     }
