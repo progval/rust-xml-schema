@@ -469,7 +469,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 } = **r;
                 match sequence_open_content_type_def_particle {
                     Some(sequences::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
-                        self.process_restriction(attrs, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref())),
+                        self.process_complex_restriction(attrs, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref())),
                     None => {
                         RichType::new(
                             NameHint::new("empty_extension"),
@@ -487,13 +487,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 match type_def_particle {
                     Some(type_def_particle) =>
                         self.process_extension(attrs, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref()), inlinable),
-                    None => self.process_simple_extension(attrs, vec_concat_opt(&annotation, annotation2.as_ref())),
+                    None => self.process_trivial_extension(attrs, vec_concat_opt(&annotation, annotation2.as_ref())),
                 }
             },
         }
     }
 
-    fn process_restriction(&mut self, 
+    fn process_complex_restriction(&mut self, 
             attrs: &'ast HashMap<QName<'input>, &'input str>,
             type_def_particle: &'ast xs::TypeDefParticle<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
@@ -723,7 +723,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         }
     }
 
-    fn process_simple_extension(&mut self,
+    fn process_trivial_extension(&mut self,
             attrs: &'ast HashMap<QName<'input>, &'input str>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input> {
