@@ -995,43 +995,43 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionToken<'input> {
         QName(xs::QName<'input>),
-        token(xs::Token<'input>),
+        Token(xs::Token<'input>),
     }
 
     #[derive(Debug, PartialEq)]
     pub enum UnionToken_<'input> {
-        anyURI(xs::AnyUri<'input>),
-        token(xs::Token<'input>),
+        AnyUri(xs::AnyUri<'input>),
+        Token(xs::Token<'input>),
     }
 
     #[derive(Debug, PartialEq)]
     pub enum UnionToken__<'input> {
-        anyURI(xs::AnyUri<'input>),
-        token(xs::Token<'input>),
+        AnyUri(xs::AnyUri<'input>),
+        Token(xs::Token<'input>),
     }
 
     #[derive(Debug, PartialEq)]
     pub enum UnionNmtoken<'input> {
-        nonNegativeInteger(xs::NonNegativeInteger<'input>),
-        NMTOKEN(xs::Nmtoken<'input>),
+        NonNegativeInteger(xs::NonNegativeInteger<'input>),
+        Nmtoken(xs::Nmtoken<'input>),
     }
 
     #[derive(Debug, PartialEq)]
     pub enum Union<'input> {
-        specialNamespaceList(xs::SpecialNamespaceList<'input>),
-        basicNamespaceList(xs::BasicNamespaceList<'input>),
+        SpecialNamespaceList(xs::SpecialNamespaceList<'input>),
+        BasicNamespaceList(xs::BasicNamespaceList<'input>),
     }
 
     #[derive(Debug, PartialEq)]
     pub enum UnionTokenDerivationControlList<'input> {
-        token(xs::Token<'input>),
-        derivationControl_list(lists::DerivationControlList<'input>),
+        Token(xs::Token<'input>),
+        DerivationControlList(lists::DerivationControlList<'input>),
     }
 
     #[derive(Debug, PartialEq)]
     pub enum UnionTokenList<'input> {
-        token(xs::Token<'input>),
-        list(lists::List<'input>),
+        Token(xs::Token<'input>),
+        List(lists::List<'input>),
     }
 }
 

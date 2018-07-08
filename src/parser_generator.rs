@@ -183,7 +183,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     let enum_ = module.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
                     for item in items.iter() {
                         let RichType { name_hint, type_, doc } = item;
-                        let variant_name = name_from_hint(&item.name_hint).unwrap();
+                        let variant_name = name_from_hint(&item.name_hint).unwrap().to_camel_case();
                         let type_name = self.get_simple_type_name(type_);
                         if let Some(type_name) = type_name {
                             enum_.new_variant(&variant_name).tuple(&format!("{}<'input>", type_name));
