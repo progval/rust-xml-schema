@@ -105,7 +105,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                         fields.push((variant_name, type_mod_name, min_occurs, max_occurs, type_name));
                     };
                     let doc_writer = &mut |doc2: &Documentation<'input>| doc.extend(doc2);
-                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_);
+                    self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), &item.type_);
                 }
                 enum_.doc(&doc.to_string());
                 let variant_name = name_from_hint(&item.name_hint)
@@ -234,7 +234,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 };
                 let doc_writer = &mut |doc2| doc.extend(doc2);
                 for item in items {
-                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_);
+                    self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), &item.type_);
                 }
             }
             struct_.doc(&doc.to_string());
@@ -321,7 +321,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     }
                 };
                 let doc_writer = &mut |doc2| doc.extend(doc2);
-                self.write_type_in_struct_def(field_writer, doc_writer, type_);
+                self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), type_);
             }
             struct_.doc(&doc.to_string());
         }
@@ -349,21 +349,24 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     fn write_type_in_struct_def<'a, F, G>(&'a self,
             field_writer: &mut F,
-            doc_writer: &mut G,
+            doc_writer: &mut Option<&mut G>,
             type_: &'a Type<'input>,
             ) where
             F: FnMut(&'a str, &'a str, usize, usize, &'a str),
             G: FnMut(&'a Documentation<'input>),
             'ast: 'a {
+        let mut doc_non_writer: Option<&mut G> = None;
         match &type_ {
             Type::Alias(name) => {
                 let (target_type, doc) = self.get_type(name);
-                doc_writer(&doc);
+                if let Some(ref mut f) = doc_writer {
+                    f(&doc);
+                }
                 self.write_type_in_struct_def(field_writer, doc_writer, &target_type.type_);
             },
             Type::InlineSequence(items) => {
                 for item in items {
-                    self.write_type_in_struct_def(field_writer, doc_writer, &item.type_);
+                    self.write_type_in_struct_def(field_writer, &mut doc_non_writer, &item.type_);
                 }
             }
             Type::Sequence(min_occurs, max_occurs, name) => {
@@ -384,7 +387,15 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             },
             Type::Extension(base, ext_type) => {
                 let (base_type, doc) = &self.get_type(base);
-                self.write_type_in_struct_def(field_writer, doc_writer, &base_type.type_);
+                self.write_type_in_struct_def(field_writer, &mut doc_non_writer, &base_type.type_);
+                self.write_type_in_struct_def(field_writer, doc_writer, &ext_type.type_);
+            },
+            Type::Restriction(base, ext_type) => {
+                if let Some(ref mut f) = doc_writer {
+                    f(&ext_type.doc);
+                }
+                let (base_type, doc) = &self.get_type(base);
+                // TODO: do something with the base
                 self.write_type_in_struct_def(field_writer, doc_writer, &ext_type.type_);
             },
             Type::Empty => (), // TODO ?

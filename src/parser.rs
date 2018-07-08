@@ -774,13 +774,13 @@ pub mod enums {
 
     #[derive(Debug, PartialEq)]
     pub enum ChoiceAllChoiceSequence_<'input> {
-        All(Box<super::inline_elements::AllAllModel<'input>>),
+        All(Box<super::inline_elements::All<'input>>),
         Choice(Box<super::inline_elements::ChoiceSimpleExplicitGroup<'input>>),
         Sequence(Box<super::inline_elements::SequenceSimpleExplicitGroup<'input>>),
     }
 
     impl_enum!(ChoiceAllChoiceSequence_,
-        impl_singleton_variant!(All, inline_elements, Box<AllAllModel>),
+        impl_singleton_variant!(All, inline_elements, Box<All>),
         impl_singleton_variant!(Choice, inline_elements, Box<ChoiceSimpleExplicitGroup>),
         impl_singleton_variant!(Sequence, inline_elements, Box<SequenceSimpleExplicitGroup>),
     );
@@ -822,13 +822,13 @@ pub mod enums {
     pub enum ChoiceElementAnyGroup<'input> {
         Element(Box<super::inline_elements::LocalElement<'input>>),
         Any(Box<super::xs::Any<'input>>),
-        Group(Box<super::inline_elements::GroupSequenceAnnotation<'input>>),
+        Group(Box<super::inline_elements::Group<'input>>),
     }
 
     impl_enum!(ChoiceElementAnyGroup,
         impl_singleton_variant!(Element, inline_elements, Box<LocalElement>),
         impl_singleton_variant!(Any, xs, Box<Any>),
-        impl_singleton_variant!(Group, inline_elements, Box<GroupSequenceAnnotation>),
+        impl_singleton_variant!(Group, inline_elements, Box<Group>),
     );
 
     #[derive(Debug, PartialEq)]
@@ -956,12 +956,12 @@ pub mod inline_elements {
     use super::*;
 
     #[derive(Debug, PartialEq)]
-    pub struct AllAllModel<'input> {
+    pub struct All<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub all_model: super::xs::AllModel<'input>,
     }
 
-    impl_element!(AllAllModel, "all", {
+    impl_element!(All, "all", {
         (all_model, xs, AllModel),
     });
 
@@ -1080,6 +1080,7 @@ pub mod inline_elements {
         (assertions, xs, Assertions),
     });
 
+    ///  No typeDefParticle group reference
     #[derive(Debug, PartialEq)]
     pub struct SimpleExtensionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -1095,22 +1096,22 @@ pub mod inline_elements {
     });
 
     #[derive(Debug, PartialEq)]
+    pub struct Group<'input> {
+        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub annotation: Option<super::xs::Annotation<'input>>,
+    }
+
+    impl_element!(Group, "group", {
+        (annotation, xs, Option<Annotation>),
+    });
+
+    #[derive(Debug, PartialEq)]
     pub struct GroupRef<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(GroupRef, "group", {
-        (annotation, xs, Option<Annotation>),
-    });
-
-    #[derive(Debug, PartialEq)]
-    pub struct GroupSequenceAnnotation<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
-        pub annotation: Option<super::xs::Annotation<'input>>,
-    }
-
-    impl_element!(GroupSequenceAnnotation, "group", {
         (annotation, xs, Option<Annotation>),
     });
 

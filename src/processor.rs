@@ -67,6 +67,7 @@ pub enum Type<'input> {
     List(Box<RichType<'input>>),
     Union(Vec<RichType<'input>>),
     Extension(FullName<'input>, Box<RichType<'input>>),
+    Restriction(FullName<'input>, Box<RichType<'input>>),
     ElementRef(usize, usize, FullName<'input>),
     Element(usize, usize, String),
     Group(usize, usize, FullName<'input>),
@@ -468,7 +469,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 } = **r;
                 match sequence_open_content_type_def_particle {
                     Some(sequences::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
-                        self.process_restriction(attrs, type_def_particle),
+                        self.process_restriction(attrs, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref())),
                     None => {
                         RichType::new(
                             NameHint::new("empty_extension"),
@@ -495,6 +496,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_restriction(&mut self, 
             attrs: &'ast HashMap<QName<'input>, &'input str>,
             type_def_particle: &'ast xs::TypeDefParticle<'input>,
+            annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input> {
         let mut base = None;
         for (key, &value) in attrs.iter() {
@@ -505,7 +507,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         }
         let base = base.expect("<restriction> has no base");
         // TODO: use the base
-        self.process_type_def_particle(type_def_particle, false)
+        let ty = self.process_type_def_particle(type_def_particle, false);
+        RichType::new(
+            NameHint::new_empty(),
+            Type::Restriction(base, Box::new(ty)),
+            self.process_annotation(&annotation),
+            )
     }
 
     fn process_simple_restriction(&mut self, 
