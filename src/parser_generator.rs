@@ -20,25 +20,27 @@ fn escape_keyword(name: &str) -> String {
 #[derive(Debug)]
 pub struct ParserGenerator<'ast, 'input: 'ast> {
     processors: Vec<Processor<'ast, 'input>>,
-    module_names: HashMap<&'input str, &'input str>, // URI -> module name
+    module_names: HashMap<&'input str, String>, // URI -> module name
     renames: HashMap<String, String>,
 }
 
 impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     pub fn new(processors: Vec<Processor<'ast, 'input>>, renames: HashMap<String, String>) -> ParserGenerator<'ast, 'input> {
-        let mut module_names = HashMap::new();
+        let mut module_names: HashMap<&'input str, String> = HashMap::new();
+        let mut name_gen = NameGenerator::new();
         for proc in &processors {
             for (ns, uri) in proc.namespaces.namespaces.iter() {
-                // TODO: make sure there is no conflict
-                module_names.insert(*uri, *ns);
+                if Some(&uri.to_string()) != module_names.get(uri) {
+                    module_names.insert(*uri, name_gen.gen_name(ns.to_string()));
+                }
             }
         }
         ParserGenerator { processors, renames, module_names }
     }
 
-    pub fn get_module_name(&self, qname: FullName<'input>) -> &'input str {
+    pub fn get_module_name(&self, qname: FullName<'input>) -> String {
         let (prefix, _) = qname.as_tuple();
-        self.module_names.get(prefix).cloned().unwrap_or("UNQUAL")
+        self.module_names.get(prefix).cloned().unwrap_or("UNQUAL".to_string())
     }
 
     pub fn gen_target_scope(&mut self) -> cg::Scope {
@@ -183,7 +185,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             groups.sort_by_key(|&(n,_)| n);
             for (&name, group) in groups {
                 let mod_name = self.get_module_name(name);
-                let mut module = scope.get_module_mut(mod_name).unwrap();
+                let mut module = scope.get_module_mut(&mod_name).unwrap();
                 let (mod_name, struct_name) = name.as_tuple();
                 if let Type::InlineChoice(ref items) = group.type_ {
                     self.gen_choice(module.scope(), &struct_name.to_string().to_camel_case(), items, &group.doc);
@@ -280,7 +282,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             elements.sort_by_key(|&(n,_)| n);
             for (&name, element) in elements {
                 let mod_name = self.get_module_name(name);
-                let mut module = scope.get_module_mut(mod_name).unwrap();
+                let mut module = scope.get_module_mut(&mod_name).unwrap();
                 let (prefix, local) = name.as_tuple();
                 let struct_name = escape_keyword(&local.to_camel_case());
                 self.gen_element(module, &struct_name, &name, &element.type_, &element.doc);
