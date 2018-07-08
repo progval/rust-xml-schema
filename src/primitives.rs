@@ -2,7 +2,7 @@ use std::fmt;
 
 use xmlparser::{Token as XmlToken, ElementEnd, StrSpan};
 
-use support::{ParseXml, Stream};
+use support::{ParseXml, ParseXmlStr, Stream};
 
 pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ("token", "Token"),
@@ -29,6 +29,12 @@ impl<'input> ParseXml<'input> for Token<'input> {
         }
     }
 }
+impl<'input> ParseXmlStr<'input> for Token<'input> {
+    const NODE_NAME: &'static str = "token";
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Token<'input>)> {
+        unimplemented!()
+    }
+}
 impl<'input> Default for Token<'input> {
     fn default() -> Self {
         Token(StrSpan::from_substr("", 0, 0))
@@ -39,6 +45,12 @@ impl<'input> Default for Token<'input> {
 pub type Nmtoken<'input> = NMToken<'input>; // TODO: remove this
 #[derive(Debug, PartialEq)]
 pub struct NMToken<'input>(StrSpan<'input>);
+impl<'input> ParseXmlStr<'input> for NMToken<'input> {
+    const NODE_NAME: &'static str = "NMToken";
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, NMToken<'input>)> {
+        unimplemented!()
+    }
+}
 
 impl<'input> ParseXml<'input> for NMToken<'input> {
     const NODE_NAME: &'static str = "NMToken";
@@ -57,6 +69,12 @@ impl<'input> Default for NMToken<'input> {
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
 pub struct QName<'input>(pub Option<&'input str>, pub &'input str);
+impl<'input> ParseXmlStr<'input> for QName<'input> {
+    const NODE_NAME: &'static str = "QName";
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, QName<'input>)> {
+        unimplemented!()
+    }
+}
 
 impl<'input> From<&'input str> for QName<'input> {
     fn from(s: &'input str) -> QName<'input> {
@@ -91,6 +109,12 @@ impl<'input> fmt::Display for QName<'input> {
 
 #[derive(Debug, PartialEq, Default)]
 pub struct AnyUri<'input>(&'input str);
+impl<'input> ParseXmlStr<'input> for AnyUri<'input> {
+    const NODE_NAME: &'static str = "AnyUri";
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, AnyUri<'input>)> {
+        unimplemented!()
+    }
+}
 
 #[derive(Debug, PartialEq)]
 pub struct AnyURIElement<'input>(StrSpan<'input>);
@@ -106,6 +130,12 @@ impl<'input> ParseXml<'input> for AnyURIElement<'input> {
 
 #[derive(Debug, PartialEq, Default)]
 pub struct NonNegativeInteger<'input>(&'input str);
+impl<'input> ParseXmlStr<'input> for NonNegativeInteger<'input> {
+    const NODE_NAME: &'static str = "NonNegativeInteger";
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, NonNegativeInteger<'input>)> {
+        unimplemented!()
+    }
+}
 
 #[derive(Debug, PartialEq, Default)]
 pub struct Any<'input>(pub Vec<XmlToken<'input>>);

@@ -285,3 +285,50 @@ macro_rules! impl_empty_element_field {
         Vec::new()
     }};
 }
+
+#[macro_export]
+macro_rules! impl_union {
+    ( $name:ident, { $($variant_macro:ident ! ( $($variant_args: tt )* ), )* } ) => {
+        impl<'input> ParseXmlStr<'input> for $name<'input> {
+            const NODE_NAME: &'static str = concat!("union ", stringify!($name));
+
+            fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
+                $(
+                    match $variant_macro!($name, input, parse_context, parent_context, $($variant_args)*) {
+                        Some((o, x)) => return Some((o, x)),
+                        None => (),
+                    }
+                )*
+
+                None
+            }
+        }
+    }
+}
+
+macro_rules! impl_union_variant {
+    ( $name:ident, $input:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident) => {
+        ParseXmlStr::parse_xml_str($input, $parse_context, $parent_context)
+            .map(|(o, x)| (o, $name::$variant_name(x)))
+    }
+}
+
+#[macro_export]
+macro_rules! impl_list {
+    ( $name:ident, $item_type_mod_name:ident :: $item_type:ident ) => {
+        impl<'input> ParseXmlStr<'input> for $name<'input> {
+            const NODE_NAME: &'static str = concat!("list ", stringify!($name));
+
+            #[allow(unused_variables)]
+            fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
+                let mut input = input;
+                let mut items = Vec::new();
+                while let Some((output, item)) = ParseXmlStr::parse_self_xml_str(input, parse_context, parent_context) {
+                    input = output;
+                    items.push(item)
+                }
+                Some((input, $name(items)))
+            }
+        }
+    }
+}

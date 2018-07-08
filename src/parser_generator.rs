@@ -180,15 +180,22 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 for name in names.iter() {
                     let enum_name = escape_keyword(&name.to_camel_case());
                     let enum_name = name_gen.gen_name(enum_name);
-                    let enum_ = module.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-                    for item in items.iter() {
-                        let RichType { name_hint, type_, doc } = item;
-                        let variant_name = name_from_hint(&item.name_hint).unwrap().to_camel_case();
-                        let type_name = self.get_simple_type_name(type_);
-                        if let Some(type_name) = type_name {
-                            enum_.new_variant(&variant_name).tuple(&format!("{}<'input>", type_name));
+                    let mut impl_code = Vec::new();
+                    impl_code.push(format!("impl_union!({}, {{", enum_name));
+                    {
+                        let enum_ = module.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+                        for item in items.iter() {
+                            let RichType { name_hint, type_, doc } = item;
+                            let variant_name = name_from_hint(&item.name_hint).unwrap().to_camel_case();
+                            let type_name = self.get_simple_type_name(type_);
+                            if let Some(type_name) = type_name {
+                                enum_.new_variant(&variant_name).tuple(&format!("{}<'input>", type_name));
+                                impl_code.push(format!("    impl_union_variant!({}),", variant_name));
+                            }
                         }
                     }
+                    impl_code.push(format!("}});"));
+                    module.scope().raw(&impl_code.join("\n"));
                 }
             }
         }
@@ -205,10 +212,14 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             for (ref item_type, ref names) in lists {
                 for name in names.iter() {
                     let name = escape_keyword(&name.to_camel_case());
-                    let name = name_gen.gen_name(name);
+                    let struct_name = name_gen.gen_name(name);
                     let type_name = self.get_simple_type_name(&item_type.type_);
                     if let Some(type_name) = type_name {
-                        module.scope().raw(&format!("pub type {}<'input> = support::List<'input, {}<'input>>;", name, type_name));
+                        {
+                            let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+                            struct_.tuple_field(&format!("Vec<{}<'input>>", type_name));
+                        }
+                        module.scope().raw(&format!("impl_list!({}, {});", struct_name, type_name));
                     }
                 }
             }

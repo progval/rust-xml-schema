@@ -371,7 +371,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             },
             (Some(n), None) => {
                 RichType::new(
-                    NameHint::new_empty(),
+                    NameHint::new(n.as_tuple().1),
                     SimpleType::Alias(n),
                     self.process_annotation(&annotation),
                     )

@@ -25,11 +25,11 @@ pub mod xs {
 
     pub type DerivationControl<'input> = xs::Nmtoken<'input>;
 
-    pub type DerivationSet<'input> = unions::UnionTokenList<'input>;
+    pub type DerivationSet<'input> = unions::UnionTokenReducedDerivationControlList<'input>;
 
     pub type FormChoice<'input> = xs::Nmtoken<'input>;
 
-    pub type FullDerivationSet<'input> = unions::UnionTokenList<'input>;
+    pub type FullDerivationSet<'input> = unions::UnionTokenTypeDerivationControlList<'input>;
 
     pub type NamespaceList<'input> = unions::Union<'input>;
 
@@ -976,17 +976,35 @@ pub mod enums {
 pub mod lists {
     use super::*;
 
-    pub type List<'input> = support::List<'input, xs::QName<'input>>;
+    #[derive(Debug, PartialEq)]
+    pub struct QNameList<'input>(Vec<xs::QName<'input>>);
 
-    pub type List_<'input> = support::List<'input, xs::ReducedDerivationControl<'input>>;
+    impl_list!(QNameList, xs::QName);
 
-    pub type List__<'input> = support::List<'input, xs::TypeDerivationControl<'input>>;
+    #[derive(Debug, PartialEq)]
+    pub struct DerivationControlList<'input>(Vec<xs::DerivationControl<'input>>);
 
-    pub type DerivationControlList<'input> = support::List<'input, xs::DerivationControl<'input>>;
+    impl_list!(DerivationControlList, xs::DerivationControl);
 
-    pub type UnionTokenList<'input> = support::List<'input, unions::UnionToken<'input>>;
+    #[derive(Debug, PartialEq)]
+    pub struct ReducedDerivationControlList<'input>(Vec<xs::ReducedDerivationControl<'input>>);
 
-    pub type UnionTokenList_<'input> = support::List<'input, unions::UnionToken<'input>>;
+    impl_list!(ReducedDerivationControlList, xs::ReducedDerivationControl);
+
+    #[derive(Debug, PartialEq)]
+    pub struct TypeDerivationControlList<'input>(Vec<xs::TypeDerivationControl<'input>>);
+
+    impl_list!(TypeDerivationControlList, xs::TypeDerivationControl);
+
+    #[derive(Debug, PartialEq)]
+    pub struct UnionTokenList<'input>(Vec<unions::UnionToken<'input>>);
+
+    impl_list!(UnionTokenList, unions::UnionToken);
+
+    #[derive(Debug, PartialEq)]
+    pub struct UnionTokenList_<'input>(Vec<unions::UnionToken<'input>>);
+
+    impl_list!(UnionTokenList_, unions::UnionToken);
 }
 
 pub mod unions {
@@ -998,11 +1016,21 @@ pub mod unions {
         Token(xs::Token<'input>),
     }
 
+    impl_union!(UnionToken, {
+        impl_union_variant!(QName),
+        impl_union_variant!(Token),
+    });
+
     #[derive(Debug, PartialEq)]
     pub enum UnionToken_<'input> {
         AnyUri(xs::AnyUri<'input>),
         Token(xs::Token<'input>),
     }
+
+    impl_union!(UnionToken_, {
+        impl_union_variant!(AnyUri),
+        impl_union_variant!(Token),
+    });
 
     #[derive(Debug, PartialEq)]
     pub enum UnionToken__<'input> {
@@ -1010,11 +1038,21 @@ pub mod unions {
         Token(xs::Token<'input>),
     }
 
+    impl_union!(UnionToken__, {
+        impl_union_variant!(AnyUri),
+        impl_union_variant!(Token),
+    });
+
     #[derive(Debug, PartialEq)]
     pub enum UnionNmtoken<'input> {
         NonNegativeInteger(xs::NonNegativeInteger<'input>),
         Nmtoken(xs::Nmtoken<'input>),
     }
+
+    impl_union!(UnionNmtoken, {
+        impl_union_variant!(NonNegativeInteger),
+        impl_union_variant!(Nmtoken),
+    });
 
     #[derive(Debug, PartialEq)]
     pub enum Union<'input> {
@@ -1022,17 +1060,43 @@ pub mod unions {
         BasicNamespaceList(xs::BasicNamespaceList<'input>),
     }
 
+    impl_union!(Union, {
+        impl_union_variant!(SpecialNamespaceList),
+        impl_union_variant!(BasicNamespaceList),
+    });
+
     #[derive(Debug, PartialEq)]
     pub enum UnionTokenDerivationControlList<'input> {
         Token(xs::Token<'input>),
         DerivationControlList(lists::DerivationControlList<'input>),
     }
 
+    impl_union!(UnionTokenDerivationControlList, {
+        impl_union_variant!(Token),
+        impl_union_variant!(DerivationControlList),
+    });
+
     #[derive(Debug, PartialEq)]
-    pub enum UnionTokenList<'input> {
+    pub enum UnionTokenReducedDerivationControlList<'input> {
         Token(xs::Token<'input>),
-        List(lists::List<'input>),
+        ReducedDerivationControlList(lists::ReducedDerivationControlList<'input>),
     }
+
+    impl_union!(UnionTokenReducedDerivationControlList, {
+        impl_union_variant!(Token),
+        impl_union_variant!(ReducedDerivationControlList),
+    });
+
+    #[derive(Debug, PartialEq)]
+    pub enum UnionTokenTypeDerivationControlList<'input> {
+        Token(xs::Token<'input>),
+        TypeDerivationControlList(lists::TypeDerivationControlList<'input>),
+    }
+
+    impl_union!(UnionTokenTypeDerivationControlList, {
+        impl_union_variant!(Token),
+        impl_union_variant!(TypeDerivationControlList),
+    });
 }
 
 pub mod sequences {

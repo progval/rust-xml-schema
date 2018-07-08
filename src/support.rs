@@ -84,9 +84,9 @@ pub trait ParseXml<'input>: Sized {
 pub trait ParseXmlStr<'input>: Sized {
     const NODE_NAME: &'static str;
 
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input [u8], parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input [u8], Self)>;
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)>;
 
-    fn parse_xml_str<TParseContext, TParentContext>(input: &'input [u8], parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input [u8], Self)> {
+    fn parse_xml_str<TParseContext, TParentContext>(input: &'input str, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
         //println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml_str(input, parse_context, parent_context);
         /*
