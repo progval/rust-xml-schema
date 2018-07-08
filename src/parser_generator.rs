@@ -229,7 +229,14 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn get_simple_type_name(&self, ty: &SimpleType<'input>) -> Option<String> {
         let (type_mod_name, type_name) = match ty {
             SimpleType::Alias(name) => {
-                let (type_mod_name, type_name) = name.as_tuple();
+                let (ref type_mod_name, ref type_name) = name.as_tuple();
+                if type_mod_name == &SCHEMA_URI {
+                    for (prim_name, prim_type_name) in PRIMITIVE_TYPES {
+                        if prim_name == type_name {
+                            return Some(format!("support::{}", prim_type_name));
+                        }
+                    }
+                }
                 let type_mod_name = self.module_names.get(type_mod_name).expect(type_mod_name);
                 let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
                 let type_name = escape_keyword(&type_name.to_camel_case());
@@ -418,7 +425,13 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut name_gen = NameGenerator::new();
             let mut doc = doc.clone();
             for (attr_name, attr_type) in &attrs.named {
-                () // TODO
+                let type_name = self.get_simple_type_name(attr_type);
+                let (prefix, local) = attr_name.as_tuple();
+                if let Some(type_name) = type_name {
+                    let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
+                    struct_.field(&format!("pub {}", field_name), &format!("Option<{}<'input>>", type_name));
+                    impl_code.push(format!("    (\"{}\", \"{}\") => {},", prefix, local, field_name));
+                }
             }
             impl_code.push(format!("}}, fields = {{"));
             self.gen_fields(&mut empty_struct, struct_, &mut impl_code, &mut doc, &mut name_gen, type_, None);

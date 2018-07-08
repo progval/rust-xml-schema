@@ -136,7 +136,7 @@ macro_rules! impl_group_or_sequence {
 
 #[macro_export]
 macro_rules! impl_element {
-    ( $struct_name:ident, $name:expr, attributes = { $( ( $attr_name:ident, $( $attr_args:tt )* ), )* }, fields = { $( ( $field_name:ident, $( $field_args:tt )* ), )* } ) => {
+    ( $struct_name:ident, $name:expr, attributes = { $( ($attr_prefix:expr, $attr_local:expr) => $attr_name:ident , )* }, fields = { $( ( $field_name:ident, $( $field_args:tt )* ), )* } ) => {
         impl<'input> ParseXml<'input> for $struct_name<'input> {
             const NODE_NAME: &'static str = concat!("element ", stringify!($struct_name));
 
@@ -162,6 +162,9 @@ macro_rules! impl_element {
                     Token::ElementStart(prefix, name) => {
                         if name.to_str() == $name {
                             let mut attrs = HashMap::new();
+                            $(
+                                let mut $attr_name = None;
+                            )*
                             loop {
                                 let tok = stream.next().unwrap();
                                 match tok {
@@ -169,8 +172,26 @@ macro_rules! impl_element {
                                     Token::Comment(_) => (),
                                     Token::Text(_) => (),
                                     Token::Attribute((key_prefix, key_local), value) => {
-                                        let key = QName(match key_prefix.to_str() { "" => None, s => Some(s) }, key_local.to_str());
-                                        let old = attrs.insert(key, value.to_str()); assert_eq!(old, None)
+                                        let key_prefix = key_prefix.to_str();
+                                        let key_local = key_local.to_str();
+                                        let value = value.to_str();
+                                        let key = QName(match key_prefix { "" => None, s => Some(s) }, key_local);
+                                        let old = attrs.insert(key, value); assert_eq!(old, None);
+                                        match (key_prefix, key_local) {
+                                            $(
+                                                (_, $attr_local) => { // TODO: match the namespace too
+                                                    match ParseXmlStr::parse_xml_str(value, parse_context, parent_context) {
+                                                        Some(("", value)) =>
+                                                            $attr_name = Some(value),
+                                                        Some((out, _)) =>
+                                                            panic!("Unmatched data at the end of {}={:?}: {:?}", $attr_local, value, out),
+                                                        None => 
+                                                            panic!("Could not parse {}={:?}.", $attr_local, value),
+                                                    }
+                                                },
+                                            )*
+                                            _ => (), // TODO: unknown attribute
+                                        }
                                     },
                                     Token::ElementEnd(ElementEnd::Open) => {
                                         let ret = Some($struct_name {
@@ -323,7 +344,7 @@ macro_rules! impl_list {
             fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
                 let mut input = input;
                 let mut items = Vec::new();
-                while let Some((output, item)) = ParseXmlStr::parse_self_xml_str(input, parse_context, parent_context) {
+                while let Some((output, item)) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context) {
                     input = output;
                     items.push(item)
                 }

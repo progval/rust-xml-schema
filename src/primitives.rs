@@ -13,18 +13,23 @@ pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ("ID", "Id"),
     ("anyURI", "AnyUri"),
     ("boolean", "Boolean"),
-    ("NCName", "NCName"),
+    ("NCName", "NcName"),
     ("nonNegativeInteger", "NonNegativeInteger"),
     ];
 
+pub type Id<'input> = Token<'input>;
+pub type PositiveInteger<'input> = Token<'input>;
+pub type NcName<'input> = Token<'input>;
+pub type Boolean<'input> = Token<'input>;
+
 #[derive(Debug, PartialEq)]
-pub struct Token<'input>(StrSpan<'input>);
+pub struct Token<'input>(&'input str);
 
 impl<'input> ParseXml<'input> for Token<'input> {
     const NODE_NAME: &'static str = "token";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Token<'input>> {
         match stream.next() {
-            Some(XmlToken::Text(strspan)) => Some(Token(strspan)),
+            Some(XmlToken::Text(strspan)) => Some(Token(strspan.to_str())),
             _ => None,
         }
     }
@@ -32,23 +37,45 @@ impl<'input> ParseXml<'input> for Token<'input> {
 impl<'input> ParseXmlStr<'input> for Token<'input> {
     const NODE_NAME: &'static str = "token";
     fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Token<'input>)> {
-        unimplemented!()
+        if input.len() == 0 {
+            return None;
+        }
+        for (i, c) in input.char_indices() {
+            if c == ' ' { // TODO
+                if i == 0 {
+                    return None;
+                }
+                return Some((&input[i+1..], Token(&input[0..i+1])))
+            }
+        }
+        Some(("", Token(input)))
     }
 }
 impl<'input> Default for Token<'input> {
     fn default() -> Self {
-        Token(StrSpan::from_substr("", 0, 0))
+        Token("")
     }
 }
 
 
 pub type Nmtoken<'input> = NMToken<'input>; // TODO: remove this
 #[derive(Debug, PartialEq)]
-pub struct NMToken<'input>(StrSpan<'input>);
+pub struct NMToken<'input>(&'input str);
 impl<'input> ParseXmlStr<'input> for NMToken<'input> {
     const NODE_NAME: &'static str = "NMToken";
     fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, NMToken<'input>)> {
-        unimplemented!()
+        if input.len() == 0 {
+            return None;
+        }
+        for (i, c) in input.char_indices() {
+            if c == ' ' { // TODO
+                if i == 0 {
+                    return None;
+                }
+                return Some((&input[i+1..], NMToken(&input[0..i+1])))
+            }
+        }
+        Some(("", NMToken(input)))
     }
 }
 
@@ -56,14 +83,14 @@ impl<'input> ParseXml<'input> for NMToken<'input> {
     const NODE_NAME: &'static str = "NMToken";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<NMToken<'input>> {
         match stream.next() {
-            Some(XmlToken::Text(strspan)) => Some(NMToken(strspan)),
+            Some(XmlToken::Text(strspan)) => Some(NMToken(strspan.to_str())),
             _ => None,
         }
     }
 }
 impl<'input> Default for NMToken<'input> {
     fn default() -> Self {
-        NMToken(StrSpan::from_substr("", 0, 0))
+        NMToken("")
     }
 }
 
@@ -72,7 +99,32 @@ pub struct QName<'input>(pub Option<&'input str>, pub &'input str);
 impl<'input> ParseXmlStr<'input> for QName<'input> {
     const NODE_NAME: &'static str = "QName";
     fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, QName<'input>)> {
-        unimplemented!()
+        if input.len() == 0 {
+            return None;
+        }
+        let mut i1 = 0;
+        for (i, c) in input.char_indices() {
+            if c == ':' {
+                i1 = i;
+            }
+            else if c == ' ' { // TODO
+                if i == 0 || i <= i1+1 {
+                    return None;
+                }
+                if i1 > 0 {
+                    return Some((&input[i+1..], QName(Some(&input[0..i1+1]), &input[i1+1..i+1])))
+                }
+                else {
+                    return Some((&input[i+1..], QName(None, &input[0..i+1])))
+                }
+            }
+        }
+        if i1 > 0 {
+            return Some(("", QName(Some(&input[0..i1+1]), &input[i1+1..])))
+        }
+        else {
+            return Some(("", QName(None, input)))
+        }
     }
 }
 
@@ -112,7 +164,18 @@ pub struct AnyUri<'input>(&'input str);
 impl<'input> ParseXmlStr<'input> for AnyUri<'input> {
     const NODE_NAME: &'static str = "AnyUri";
     fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, AnyUri<'input>)> {
-        unimplemented!()
+        if input.len() == 0 {
+            return None;
+        }
+        for (i, c) in input.char_indices() {
+            if c == ' ' { // TODO
+                if i == 0 {
+                    return None;
+                }
+                return Some((&input[i+1..], AnyUri(&input[0..i+1])))
+            }
+        }
+        Some(("", AnyUri(input)))
     }
 }
 
@@ -197,6 +260,12 @@ impl<'input> ParseXml<'input> for XmlString<'input> {
             Some(XmlToken::Text(strspan)) => Some(XmlString(strspan)),
             _ => None, // TODO: put it back in the stream
         }
+    }
+}
+impl<'input> ParseXmlStr<'input> for XmlString<'input> {
+    const NODE_NAME: &'static str = "XmlString";
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, XmlString<'input>)> {
+        unimplemented!()
     }
 }
 

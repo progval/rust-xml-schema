@@ -208,12 +208,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_annotation(&self, annotation: &Vec<&'ast xs::Annotation<'input>>) -> Documentation<'input> {
-        let strings = annotation.iter().flat_map(|xs::Annotation { ref attrs, ref annotation_content }| {
+        let strings = annotation.iter().flat_map(|xs::Annotation { ref attrs, ref attr_id, ref annotation_content }| {
             annotation_content.iter().filter_map(|c| {
                 match c {
                     enums::AnnotationContent::Appinfo(_) => None,
                     enums::AnnotationContent::Documentation(e) => {
-                        let xs::Documentation { ref attrs, ref sequence_any } = **e;
+                        let xs::Documentation { ref attrs, ref attr_source, ref sequence_any } = **e;
                         Some(sequence_any.iter().flat_map(|sequences::SequenceAny { any }| {
                             any.0.iter().filter_map(|tok| {
                                 match tok {
@@ -331,7 +331,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         //let struct_name = self.namespaces.new_type(QName::from(name));
         let ty = match simple_derivation {
             xs::SimpleDerivation::Restriction(e) => {
-                let xs::Restriction { ref attrs, annotation: ref annotation2, ref simple_restriction_model } = **e;
+                let xs::Restriction { ref attrs, ref attr_base, annotation: ref annotation2, ref simple_restriction_model } = **e;
                 self.process_simple_restriction(attrs, simple_restriction_model, vec_concat_opt(&annotation, annotation2.as_ref()))
             },
             xs::SimpleDerivation::List(ref e) => self.process_list(e, annotation.clone()),
@@ -504,7 +504,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>, inlinable: bool) -> (Attrs<'input>, RichType<'input, Type<'input>>) {
-        let xs::ComplexContent { ref attrs, ref annotation, ref choice_restriction_extension } = model;
+        let xs::ComplexContent { ref attrs, ref attr_mixed, ref annotation, ref choice_restriction_extension } = model;
         let annotation = annotation.iter().collect();
         match choice_restriction_extension {
             enums::ChoiceRestrictionExtension::Restriction(ref r) => {
