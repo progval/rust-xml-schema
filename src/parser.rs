@@ -9,13 +9,45 @@ pub use std::marker::PhantomData;
 
 pub use support::*;
 
-pub use xmlparser::{Token, ElementEnd};
-
 pub mod xs {
     //! http://www.w3.org/2001/XMLSchema
 
     #[allow(unused_imports)]
     use super::*;
+
+    pub(crate) use primitives::*;
+
+    pub type AllNni<'input> = unions::UnionNmtoken<'input>;
+
+    pub type BasicNamespaceList<'input> = lists::UnionTokenList<'input>;
+
+    pub type BlockSet<'input> = unions::UnionTokenDerivationControlList<'input>;
+
+    pub type DerivationControl<'input> = xs::Nmtoken<'input>;
+
+    pub type DerivationSet<'input> = unions::UnionTokenList<'input>;
+
+    pub type FormChoice<'input> = xs::Nmtoken<'input>;
+
+    pub type FullDerivationSet<'input> = unions::UnionTokenList<'input>;
+
+    pub type NamespaceList<'input> = unions::Union<'input>;
+
+    pub type Public<'input> = xs::Token<'input>;
+
+    pub type QnameList<'input> = lists::UnionTokenList<'input>;
+
+    pub type QnameListA<'input> = lists::UnionTokenList<'input>;
+
+    pub type ReducedDerivationControl<'input> = xs::DerivationControl<'input>;
+
+    pub type SimpleDerivationSet<'input> = unions::UnionTokenDerivationControlList<'input>;
+
+    pub type SpecialNamespaceList<'input> = xs::Token<'input>;
+
+    pub type TypeDerivationControl<'input> = xs::DerivationControl<'input>;
+
+    pub type XpathDefaultNamespace<'input> = unions::UnionToken<'input>;
 
     ///  Only elements allowed inside
     #[derive(Debug, PartialEq)]
@@ -24,7 +56,8 @@ pub mod xs {
         pub all_model: super::xs::AllModel<'input>,
     }
 
-    impl_element!(All, "all", {
+    impl_element!(All, "all", attributes = {
+    }, fields = {
         (all_model, xs, AllModel),
     });
 
@@ -34,7 +67,8 @@ pub mod xs {
         pub annotation_content: Vec<super::enums::AnnotationContent<'input>>,
     }
 
-    impl_element!(Annotation, "annotation", {
+    impl_element!(Annotation, "annotation", attributes = {
+    }, fields = {
         (annotation_content, enums, Vec<AnnotationContent; min=0;>),
     });
 
@@ -45,7 +79,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Any, "any", {
+    impl_element!(Any, "any", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -56,7 +91,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(AnyAttribute, "anyAttribute", {
+    impl_element!(AnyAttribute, "anyAttribute", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -66,7 +102,8 @@ pub mod xs {
         pub sequence_any: Vec<super::sequences::SequenceAny<'input>>,
     }
 
-    impl_element!(Appinfo, "appinfo", {
+    impl_element!(Appinfo, "appinfo", attributes = {
+    }, fields = {
         (sequence_any, sequences, Vec<SequenceAny; min=0;>),
     });
 
@@ -77,7 +114,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Assertion, "assertion", {
+    impl_element!(Assertion, "assertion", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -88,7 +126,8 @@ pub mod xs {
         pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
     }
 
-    impl_element!(Attribute, "attribute", {
+    impl_element!(Attribute, "attribute", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (local_simple_type, inline_elements, Option<LocalSimpleType>),
     });
@@ -100,7 +139,8 @@ pub mod xs {
         pub attr_decls: super::xs::AttrDecls<'input>,
     }
 
-    impl_element!(AttributeGroup, "attributeGroup", {
+    impl_element!(AttributeGroup, "attributeGroup", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (attr_decls, xs, AttrDecls),
     });
@@ -113,7 +153,8 @@ pub mod xs {
         pub nested_particle: Vec<super::xs::NestedParticle<'input>>,
     }
 
-    impl_element!(Choice, "choice", {
+    impl_element!(Choice, "choice", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (nested_particle, xs, Vec<NestedParticle; min=0;>),
     });
@@ -125,7 +166,8 @@ pub mod xs {
         pub choice_restriction_extension: super::enums::ChoiceRestrictionExtension<'input>,
     }
 
-    impl_element!(ComplexContent, "complexContent", {
+    impl_element!(ComplexContent, "complexContent", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (choice_restriction_extension, enums, ChoiceRestrictionExtension),
     });
@@ -137,7 +179,8 @@ pub mod xs {
         pub complex_type_model: super::xs::ComplexTypeModel<'input>,
     }
 
-    impl_element!(ComplexType, "complexType", {
+    impl_element!(ComplexType, "complexType", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (complex_type_model, xs, ComplexTypeModel),
     });
@@ -149,7 +192,8 @@ pub mod xs {
         pub any_wildcard: super::inline_elements::AnyWildcard<'input>,
     }
 
-    impl_element!(DefaultOpenContent, "defaultOpenContent", {
+    impl_element!(DefaultOpenContent, "defaultOpenContent", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (any_wildcard, inline_elements, AnyWildcard),
     });
@@ -160,7 +204,8 @@ pub mod xs {
         pub sequence_any: Vec<super::sequences::SequenceAny<'input>>,
     }
 
-    impl_element!(Documentation, "documentation", {
+    impl_element!(Documentation, "documentation", attributes = {
+    }, fields = {
         (sequence_any, sequences, Vec<SequenceAny; min=0;>),
     });
 
@@ -173,7 +218,8 @@ pub mod xs {
         pub identity_constraint: Vec<super::xs::IdentityConstraint<'input>>,
     }
 
-    impl_element!(Element, "element", {
+    impl_element!(Element, "element", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),
         (alternative_alt_type, inline_elements, Vec<AlternativeAltType; min=0;>),
@@ -186,7 +232,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Enumeration, "enumeration", {
+    impl_element!(Enumeration, "enumeration", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -196,7 +243,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(ExplicitTimezone, "explicitTimezone", {
+    impl_element!(ExplicitTimezone, "explicitTimezone", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -206,7 +254,8 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
     }
 
-    impl_element!(Facet, "facet", {
+    impl_element!(Facet, "facet", attributes = {
+    }, fields = {
     });
 
     ///  This type is extended by all types which allow annotation other than <schema> itself 
@@ -216,7 +265,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Field, "field", {
+    impl_element!(Field, "field", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -226,7 +276,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(FractionDigits, "fractionDigits", {
+    impl_element!(FractionDigits, "fractionDigits", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -237,7 +288,8 @@ pub mod xs {
         pub choice_all_choice_sequence: super::enums::ChoiceAllChoiceSequence<'input>,
     }
 
-    impl_element!(Group, "group", {
+    impl_element!(Group, "group", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (choice_all_choice_sequence, enums, ChoiceAllChoiceSequence),
     });
@@ -249,7 +301,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Import, "import", {
+    impl_element!(Import, "import", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -260,7 +313,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Include, "include", {
+    impl_element!(Include, "include", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -271,7 +325,8 @@ pub mod xs {
         pub uniqueness_spec: Option<super::sequences::UniquenessSpec<'input>>,
     }
 
-    impl_element!(Key, "key", {
+    impl_element!(Key, "key", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (uniqueness_spec, sequences, Option<UniquenessSpec>),
     });
@@ -283,7 +338,8 @@ pub mod xs {
         pub uniqueness_spec: Option<super::sequences::UniquenessSpec<'input>>,
     }
 
-    impl_element!(Keyref, "keyref", {
+    impl_element!(Keyref, "keyref", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (uniqueness_spec, sequences, Option<UniquenessSpec>),
     });
@@ -294,7 +350,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Length, "length", {
+    impl_element!(Length, "length", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -305,7 +362,8 @@ pub mod xs {
         pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
     }
 
-    impl_element!(List, "list", {
+    impl_element!(List, "list", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (local_simple_type, inline_elements, Option<LocalSimpleType>),
     });
@@ -317,7 +375,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(MaxExclusive, "maxExclusive", {
+    impl_element!(MaxExclusive, "maxExclusive", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -328,7 +387,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(MaxInclusive, "maxInclusive", {
+    impl_element!(MaxInclusive, "maxInclusive", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -338,7 +398,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(MaxLength, "maxLength", {
+    impl_element!(MaxLength, "maxLength", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -349,7 +410,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(MinExclusive, "minExclusive", {
+    impl_element!(MinExclusive, "minExclusive", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -360,7 +422,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(MinInclusive, "minInclusive", {
+    impl_element!(MinInclusive, "minInclusive", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -370,7 +433,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(MinLength, "minLength", {
+    impl_element!(MinLength, "minLength", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -381,7 +445,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Notation, "notation", {
+    impl_element!(Notation, "notation", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -392,7 +457,8 @@ pub mod xs {
         pub any_wildcard: Option<super::inline_elements::AnyWildcard<'input>>,
     }
 
-    impl_element!(OpenContent, "openContent", {
+    impl_element!(OpenContent, "openContent", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (any_wildcard, inline_elements, Option<AnyWildcard>),
     });
@@ -404,7 +470,8 @@ pub mod xs {
         pub schema_top: Vec<super::xs::SchemaTop<'input>>,
     }
 
-    impl_element!(Override, "override", {
+    impl_element!(Override, "override", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (schema_top, xs, Vec<SchemaTop; min=0;>),
     });
@@ -415,7 +482,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Pattern, "pattern", {
+    impl_element!(Pattern, "pattern", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -425,7 +493,8 @@ pub mod xs {
         pub choice_annotation_redefinable: Vec<super::enums::ChoiceAnnotationRedefinable<'input>>,
     }
 
-    impl_element!(Redefine, "redefine", {
+    impl_element!(Redefine, "redefine", attributes = {
+    }, fields = {
         (choice_annotation_redefinable, enums, Vec<ChoiceAnnotationRedefinable; min=0;>),
     });
 
@@ -436,7 +505,8 @@ pub mod xs {
         pub simple_restriction_model: super::xs::SimpleRestrictionModel<'input>,
     }
 
-    impl_element!(Restriction, "restriction", {
+    impl_element!(Restriction, "restriction", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (simple_restriction_model, xs, SimpleRestrictionModel),
     });
@@ -449,7 +519,8 @@ pub mod xs {
         pub sequence_schema_top_annotation: Vec<super::sequences::SequenceSchemaTopAnnotation<'input>>,
     }
 
-    impl_element!(Schema, "schema", {
+    impl_element!(Schema, "schema", attributes = {
+    }, fields = {
         (composition, xs, Vec<Composition; min=0;>),
         (open_content, sequences, Option<AnnotatedOpenContent>),
         (sequence_schema_top_annotation, sequences, Vec<SequenceSchemaTopAnnotation; min=0;>),
@@ -462,7 +533,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Selector, "selector", {
+    impl_element!(Selector, "selector", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -474,7 +546,8 @@ pub mod xs {
         pub nested_particle: Vec<super::xs::NestedParticle<'input>>,
     }
 
-    impl_element!(Sequence, "sequence", {
+    impl_element!(Sequence, "sequence", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (nested_particle, xs, Vec<NestedParticle; min=0;>),
     });
@@ -486,7 +559,8 @@ pub mod xs {
         pub choice_restriction_extension: super::enums::ChoiceRestrictionExtension<'input>,
     }
 
-    impl_element!(SimpleContent, "simpleContent", {
+    impl_element!(SimpleContent, "simpleContent", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (choice_restriction_extension, enums, ChoiceRestrictionExtension),
     });
@@ -498,7 +572,8 @@ pub mod xs {
         pub simple_derivation: super::xs::SimpleDerivation<'input>,
     }
 
-    impl_element!(SimpleType, "simpleType", {
+    impl_element!(SimpleType, "simpleType", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (simple_derivation, xs, SimpleDerivation),
     });
@@ -509,7 +584,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(TotalDigits, "totalDigits", {
+    impl_element!(TotalDigits, "totalDigits", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -520,7 +596,8 @@ pub mod xs {
         pub local_simple_type: Vec<super::inline_elements::LocalSimpleType<'input>>,
     }
 
-    impl_element!(Union, "union", {
+    impl_element!(Union, "union", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (local_simple_type, inline_elements, Vec<LocalSimpleType; min=0;>),
     });
@@ -532,7 +609,8 @@ pub mod xs {
         pub uniqueness_spec: Option<super::sequences::UniquenessSpec<'input>>,
     }
 
-    impl_element!(Unique, "unique", {
+    impl_element!(Unique, "unique", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (uniqueness_spec, sequences, Option<UniquenessSpec>),
     });
@@ -543,7 +621,8 @@ pub mod xs {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(WhiteSpace, "whiteSpace", {
+    impl_element!(WhiteSpace, "whiteSpace", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -894,6 +973,68 @@ pub mod enums {
     );
 }
 
+pub mod lists {
+    use super::*;
+
+    pub type List<'input> = support::List<'input, xs::QName<'input>>;
+
+    pub type List_<'input> = support::List<'input, xs::ReducedDerivationControl<'input>>;
+
+    pub type List__<'input> = support::List<'input, xs::TypeDerivationControl<'input>>;
+
+    pub type DerivationControlList<'input> = support::List<'input, xs::DerivationControl<'input>>;
+
+    pub type UnionTokenList<'input> = support::List<'input, unions::UnionToken<'input>>;
+
+    pub type UnionTokenList_<'input> = support::List<'input, unions::UnionToken<'input>>;
+}
+
+pub mod unions {
+    use super::*;
+
+    #[derive(Debug, PartialEq)]
+    pub enum UnionToken<'input> {
+        QName(xs::QName<'input>),
+        token(xs::Token<'input>),
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum UnionToken_<'input> {
+        anyURI(xs::AnyUri<'input>),
+        token(xs::Token<'input>),
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum UnionToken__<'input> {
+        anyURI(xs::AnyUri<'input>),
+        token(xs::Token<'input>),
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum UnionNmtoken<'input> {
+        nonNegativeInteger(xs::NonNegativeInteger<'input>),
+        NMTOKEN(xs::Nmtoken<'input>),
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum Union<'input> {
+        specialNamespaceList(xs::SpecialNamespaceList<'input>),
+        basicNamespaceList(xs::BasicNamespaceList<'input>),
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum UnionTokenDerivationControlList<'input> {
+        token(xs::Token<'input>),
+        derivationControl_list(lists::DerivationControlList<'input>),
+    }
+
+    #[derive(Debug, PartialEq)]
+    pub enum UnionTokenList<'input> {
+        token(xs::Token<'input>),
+        list(lists::List<'input>),
+    }
+}
+
 pub mod sequences {
     use super::*;
 
@@ -961,7 +1102,8 @@ pub mod inline_elements {
         pub all_model: super::xs::AllModel<'input>,
     }
 
-    impl_element!(All, "all", {
+    impl_element!(All, "all", attributes = {
+    }, fields = {
         (all_model, xs, AllModel),
     });
 
@@ -973,7 +1115,8 @@ pub mod inline_elements {
         pub type_: Option<super::enums::Type<'input>>,
     }
 
-    impl_element!(AlternativeAltType, "alternative", {
+    impl_element!(AlternativeAltType, "alternative", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),
     });
@@ -985,7 +1128,8 @@ pub mod inline_elements {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(AnyWildcard, "any", {
+    impl_element!(AnyWildcard, "any", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -996,7 +1140,8 @@ pub mod inline_elements {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Assertion, "assert", {
+    impl_element!(Assertion, "assert", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -1007,7 +1152,8 @@ pub mod inline_elements {
         pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
     }
 
-    impl_element!(Attribute, "attribute", {
+    impl_element!(Attribute, "attribute", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (local_simple_type, inline_elements, Option<LocalSimpleType>),
     });
@@ -1018,7 +1164,8 @@ pub mod inline_elements {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(AttributeGroupRef, "attributeGroup", {
+    impl_element!(AttributeGroupRef, "attributeGroup", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -1029,7 +1176,8 @@ pub mod inline_elements {
         pub nested_particle: Vec<super::xs::NestedParticle<'input>>,
     }
 
-    impl_element!(ChoiceSimpleExplicitGroup, "choice", {
+    impl_element!(ChoiceSimpleExplicitGroup, "choice", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (nested_particle, xs, Vec<NestedParticle; min=0;>),
     });
@@ -1041,7 +1189,8 @@ pub mod inline_elements {
         pub complex_type_model: super::xs::ComplexTypeModel<'input>,
     }
 
-    impl_element!(LocalComplexType, "complexType", {
+    impl_element!(LocalComplexType, "complexType", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (complex_type_model, xs, ComplexTypeModel),
     });
@@ -1055,7 +1204,8 @@ pub mod inline_elements {
         pub identity_constraint: Vec<super::xs::IdentityConstraint<'input>>,
     }
 
-    impl_element!(LocalElement, "element", {
+    impl_element!(LocalElement, "element", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),
         (alternative_alt_type, inline_elements, Vec<AlternativeAltType; min=0;>),
@@ -1072,7 +1222,8 @@ pub mod inline_elements {
         pub assertions: super::xs::Assertions<'input>,
     }
 
-    impl_element!(ExtensionType, "extension", {
+    impl_element!(ExtensionType, "extension", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (open_content, xs, Option<OpenContent>),
         (type_def_particle, xs, Option<TypeDefParticle>),
@@ -1089,7 +1240,8 @@ pub mod inline_elements {
         pub assertions: super::xs::Assertions<'input>,
     }
 
-    impl_element!(SimpleExtensionType, "extension", {
+    impl_element!(SimpleExtensionType, "extension", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (attr_decls, xs, AttrDecls),
         (assertions, xs, Assertions),
@@ -1101,7 +1253,8 @@ pub mod inline_elements {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(Group, "group", {
+    impl_element!(Group, "group", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -1111,7 +1264,8 @@ pub mod inline_elements {
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
-    impl_element!(GroupRef, "group", {
+    impl_element!(GroupRef, "group", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
     });
 
@@ -1124,7 +1278,8 @@ pub mod inline_elements {
         pub assertions: super::xs::Assertions<'input>,
     }
 
-    impl_element!(ComplexRestrictionType, "restriction", {
+    impl_element!(ComplexRestrictionType, "restriction", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (sequence_open_content_type_def_particle, sequences, Option<SequenceOpenContentTypeDefParticle>),
         (attr_decls, xs, AttrDecls),
@@ -1140,7 +1295,8 @@ pub mod inline_elements {
         pub assertions: super::xs::Assertions<'input>,
     }
 
-    impl_element!(SimpleRestrictionType, "restriction", {
+    impl_element!(SimpleRestrictionType, "restriction", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (simple_restriction_model, xs, Option<SimpleRestrictionModel>),
         (attr_decls, xs, AttrDecls),
@@ -1154,7 +1310,8 @@ pub mod inline_elements {
         pub nested_particle: Vec<super::xs::NestedParticle<'input>>,
     }
 
-    impl_element!(SequenceSimpleExplicitGroup, "sequence", {
+    impl_element!(SequenceSimpleExplicitGroup, "sequence", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (nested_particle, xs, Vec<NestedParticle; min=0;>),
     });
@@ -1166,7 +1323,8 @@ pub mod inline_elements {
         pub simple_derivation: super::xs::SimpleDerivation<'input>,
     }
 
-    impl_element!(LocalSimpleType, "simpleType", {
+    impl_element!(LocalSimpleType, "simpleType", attributes = {
+    }, fields = {
         (annotation, xs, Option<Annotation>),
         (simple_derivation, xs, SimpleDerivation),
     });

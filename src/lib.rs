@@ -11,6 +11,7 @@ extern crate pretty_assertions;
 #[macro_use] pub mod macros;
 pub mod names;
 pub mod support;
+pub mod primitives;
 
 pub mod parser;
 pub mod processor;

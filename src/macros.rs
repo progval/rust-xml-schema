@@ -136,7 +136,7 @@ macro_rules! impl_group_or_sequence {
 
 #[macro_export]
 macro_rules! impl_element {
-    ( $struct_name:ident, $name:expr, { $( ( $field_name:ident, $( $field_args:tt )* ), )* } ) => {
+    ( $struct_name:ident, $name:expr, attributes = { $( ( $attr_name:ident, $( $attr_args:tt )* ), )* }, fields = { $( ( $field_name:ident, $( $field_args:tt )* ), )* } ) => {
         impl<'input> ParseXml<'input> for $struct_name<'input> {
             const NODE_NAME: &'static str = concat!("element ", stringify!($struct_name));
 
@@ -146,6 +146,7 @@ macro_rules! impl_element {
 
             #[allow(unused_variables)]
             fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+                use xmlparser::{Token,ElementEnd};
                 let tx = stream.transaction();
                 let mut tok = stream.next().unwrap();
                 loop {
@@ -175,6 +176,9 @@ macro_rules! impl_element {
                                         let ret = Some($struct_name {
                                             attrs,
                                             $(
+                                                $attr_name,
+                                            )*
+                                            $(
                                                 $field_name: impl_element_field!(stream, tx, parse_context, parent_context, $($field_args)*),
                                             )*
                                         });
@@ -196,6 +200,9 @@ macro_rules! impl_element {
                                     Token::ElementEnd(ElementEnd::Empty) => {
                                         return Some($struct_name {
                                             attrs,
+                                            $(
+                                                $attr_name,
+                                            )*
                                             $(
                                                 $field_name: impl_empty_element_field!(parse_context, parent_context, $($field_args)*),
                                             )*

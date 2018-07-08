@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+use std::hash::Hash;
 use std::collections::{HashMap, HashSet};
 use std::num::ParseIntError;
 
@@ -7,7 +9,7 @@ use xmlparser::{TextUnescape, XmlSpace};
 use parser::*;
 use names::*;
 
-const SCHEMA_URI: &'static str = "http://www.w3.org/2001/XMLSchema";
+pub const SCHEMA_URI: &'static str = "http://www.w3.org/2001/XMLSchema";
 
 fn parse_max_occurs(s: &str) -> Result<usize, ParseIntError> {
     if s == "unbounded" {
@@ -46,25 +48,33 @@ impl<'input> ToString for Documentation<'input> {
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Attrs<'input> {
-    named: Vec<(FullName<'input>, Type<'input>)>,
-    refs: Vec<(Option<FullName<'input>>, FullName<'input>)>,
-    any_attributes: bool,
+    pub named: Vec<(FullName<'input>, SimpleType<'input>)>,
+    pub refs: Vec<(Option<FullName<'input>>, FullName<'input>)>,
+    pub group_refs: Vec<(Option<FullName<'input>>, FullName<'input>)>,
+    pub any_attributes: bool,
 }
 impl<'input> Attrs<'input> {
     fn new() -> Attrs<'input> {
-        Attrs { named: Vec::new(), refs: Vec::new(), any_attributes: false }
+        Attrs { named: Vec::new(), refs: Vec::new(), group_refs: Vec::new(), any_attributes: false }
     }
 }
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct RichType<'input> {
+pub struct RichType<'input, T: Debug + Hash + PartialEq + Eq + PartialOrd + Ord> {
     pub name_hint: NameHint<'input>,
-    pub type_: Type<'input>,
+    pub type_: T,
     pub doc: Documentation<'input>,
 }
-impl<'input> RichType<'input> {
-    fn new(name_hint: NameHint<'input>, type_: Type<'input>, doc: Documentation<'input>) -> RichType<'input> {
+impl<'input, T: Debug + Hash + PartialEq + Eq + PartialOrd + Ord> RichType<'input, T> {
+    pub fn new(name_hint: NameHint<'input>, type_: T, doc: Documentation<'input>) -> RichType<'input, T> {
         RichType { name_hint, type_, doc }
+    }
+}
+
+impl<'input> RichType<'input, SimpleType<'input>> {
+    pub fn into_complex(self) -> RichType<'input, Type<'input>> {
+        let RichType { name_hint, type_, doc } = self;
+        RichType { name_hint, type_: Type::Simple(type_), doc }
     }
 }
 
@@ -73,17 +83,25 @@ pub enum Type<'input> {
     Any,
     Empty,
     Alias(FullName<'input>),
-    List(Box<RichType<'input>>),
-    Union(Vec<RichType<'input>>),
-    Extension(FullName<'input>, Box<RichType<'input>>),
-    Restriction(FullName<'input>, Box<RichType<'input>>),
+    Extension(FullName<'input>, Box<RichType<'input, Type<'input>>>),
+    Restriction(FullName<'input>, Box<RichType<'input, Type<'input>>>),
     ElementRef(usize, usize, FullName<'input>),
     Element(usize, usize, String),
     Group(usize, usize, FullName<'input>),
     Choice(usize, usize, String),
-    InlineChoice(Vec<RichType<'input>>),
+    InlineChoice(Vec<RichType<'input, Type<'input>>>),
     Sequence(usize, usize, String),
-    InlineSequence(Vec<RichType<'input>>),
+    InlineSequence(Vec<RichType<'input, Type<'input>>>),
+    Simple(SimpleType<'input>),
+}
+
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum SimpleType<'input> {
+    Primitive(&'static str, &'static str),
+    Alias(FullName<'input>),
+    List(String),
+    Union(String),
+    Empty,
 }
 
 #[derive(Debug)]
@@ -91,13 +109,17 @@ pub struct Processor<'ast, 'input: 'ast> {
     pub namespaces: Namespaces<'input>,
     pub element_form_default_qualified: bool,
     pub attribute_form_default_qualified: bool,
-    pub elements: HashMap<FullName<'input>, (Attrs<'input>, RichType<'input>)>,
-    pub types: HashMap<FullName<'input>, (RichType<'input>, Documentation<'input>)>,
-    pub choices: HashMap<Vec<RichType<'input>>, HashSet<String>>,
-    pub sequences: HashMap<Vec<RichType<'input>>, (HashSet<String>, Documentation<'input>)>,
-    pub groups: HashMap<FullName<'input>, RichType<'input>>,
+    pub elements: HashMap<FullName<'input>, (Attrs<'input>, RichType<'input, Type<'input>>)>,
+    pub types: HashMap<FullName<'input>, (RichType<'input, Type<'input>>, Documentation<'input>)>,
+    pub simple_types: HashMap<FullName<'input>, (RichType<'input, SimpleType<'input>>, Documentation<'input>)>,
+    pub choices: HashMap<Vec<RichType<'input, Type<'input>>>, HashSet<String>>,
+    pub sequences: HashMap<Vec<RichType<'input, Type<'input>>>, (HashSet<String>, Documentation<'input>)>,
+    pub groups: HashMap<FullName<'input>, RichType<'input, Type<'input>>>,
     pub attribute_groups: HashMap<FullName<'input>, &'ast xs::AttributeGroup<'input>>,
     pub inline_elements: HashMap<(FullName<'input>, Attrs<'input>, Type<'input>), (HashSet<String>, Documentation<'input>)>,
+
+    pub lists: HashMap<RichType<'input, SimpleType<'input>>, HashSet<String>>,
+    pub unions: HashMap<Vec<RichType<'input, SimpleType<'input>>>, HashSet<String>>,
 }
 
 impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
@@ -143,9 +165,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             types: HashMap::new(),
             groups: HashMap::new(),
             choices: HashMap::new(),
+            lists: HashMap::new(),
+            unions: HashMap::new(),
             sequences: HashMap::new(),
             attribute_groups: HashMap::new(),
             inline_elements: HashMap::new(),
+            simple_types: HashMap::new(),
         }
     }
 
@@ -207,7 +232,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_group_ref(&mut self, 
             attrs: &'ast HashMap<QName<'input>, &'input str>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, Type<'input>> {
         let mut ref_ = None;
         let mut max_occurs = 1;
         let mut min_occurs = 1;
@@ -236,7 +261,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attrs: &'ast HashMap<QName<'input>, &'input str>,
             content: &'ast enums::ChoiceAllChoiceSequence<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, Type<'input>> {
         let mut name = None;
         let mut max_occurs = 1;
         let mut min_occurs = 1;
@@ -293,7 +318,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attrs: &'ast HashMap<QName<'input>, &'input str>,
             simple_derivation: &'ast xs::SimpleDerivation<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, SimpleType<'input>> {
         let mut name = None;
         for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
@@ -315,10 +340,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
         if let Some(name) = name {
             let doc = self.process_annotation(&annotation);
-            self.types.insert(name, (ty, doc.clone()));
+            self.simple_types.insert(name, (ty, doc.clone()));
             RichType::new(
                 NameHint::from_fullname(&name),
-                Type::Alias(name),
+                SimpleType::Alias(name),
                 doc,
                 )
         }
@@ -330,7 +355,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_list(&mut self,
             list: &'ast xs::List<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, SimpleType<'input>> {
         let mut item_type = None;
         for (key, &value) in list.attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
@@ -347,7 +372,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             (Some(n), None) => {
                 RichType::new(
                     NameHint::new_empty(),
-                    Type::Alias(n),
+                    SimpleType::Alias(n),
                     self.process_annotation(&annotation),
                     )
             },
@@ -358,9 +383,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let mut name_hint = item_type.name_hint.clone();
         name_hint.push("list");
         let doc = self.process_annotation(&annotation);
+        let name = name_from_hint(&name_hint).unwrap();
+        self.lists.entry(item_type)
+                .or_insert(HashSet::new())
+                .insert(name.clone());
         RichType::new(
             name_hint,
-            Type::List(Box::new(item_type)),
+            SimpleType::List(name),
             doc,
             )
     }
@@ -368,7 +397,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_union(&mut self,
             union: &'ast xs::Union<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, SimpleType<'input>> {
         let mut member_types = Vec::new();
         for (key, &value) in union.attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
@@ -378,7 +407,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         let (_, field_name) = name.as_tuple();
                         RichType::new(
                             NameHint::new(field_name),
-                            Type::Alias(name),
+                            SimpleType::Alias(name),
                             self.process_annotation(&annotation),
                             )
                     }).collect()
@@ -398,9 +427,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         }
 
         let doc = self.process_annotation(&annotation);
+        let name = name_from_hint(&name_hint).unwrap();
+        self.unions.entry(member_types)
+                .or_insert(HashSet::new())
+                .insert(name.clone());
         RichType::new(
             name_hint,
-            Type::Union(member_types),
+            SimpleType::Union(name),
             doc,
             )
     }
@@ -410,7 +443,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             model: &'ast xs::ComplexTypeModel<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool,
-            ) -> (Attrs<'input>, RichType<'input>) {
+            ) -> (Attrs<'input>, RichType<'input, Type<'input>>) {
         let mut name = None;
         let mut abstract_ = false;
         let mut mixed = false;
@@ -465,12 +498,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attr_decls: &'ast xs::AttrDecls<'input>,
             assertions: &'ast xs::Assertions<'input>,
             inlinable: bool,
-            ) -> (Attrs<'input>, RichType<'input>) {
+            ) -> (Attrs<'input>, RichType<'input, Type<'input>>) {
         let ty = self.process_type_def_particle(type_def_particle.as_ref().unwrap(), inlinable);
         (self.process_attr_decls(attr_decls), ty)
     }
 
-    fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>, inlinable: bool) -> (Attrs<'input>, RichType<'input>) {
+    fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>, inlinable: bool) -> (Attrs<'input>, RichType<'input, Type<'input>>) {
         let xs::ComplexContent { ref attrs, ref annotation, ref choice_restriction_extension } = model;
         let annotation = annotation.iter().collect();
         match choice_restriction_extension {
@@ -512,7 +545,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attrs: &'ast HashMap<QName<'input>, &'input str>,
             type_def_particle: &'ast xs::TypeDefParticle<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, Type<'input>> {
         let mut base = None;
         for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
@@ -534,7 +567,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attrs: &'ast HashMap<QName<'input>, &'input str>,
             model: &'ast xs::SimpleRestrictionModel<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, SimpleType<'input>> {
         let mut base = None;
         for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
@@ -545,19 +578,25 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let base = base.expect("<restriction> has no base");
         let xs::SimpleRestrictionModel { ref local_simple_type, ref choice_facet_any } = model;
         match local_simple_type {
-            Some(inline_elements::LocalSimpleType { ref attrs, annotation: ref annotation2, ref simple_derivation }) =>
-                self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref())),
+            Some(inline_elements::LocalSimpleType { ref attrs, annotation: ref annotation2, ref simple_derivation }) => {
+                // TODO: self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref()))
+                RichType::new(
+                    NameHint::new(base.as_tuple().1),
+                    SimpleType::Alias(base),
+                    self.process_annotation(&annotation),
+                    )
+            },
             None => {
                 RichType::new(
                     NameHint::new(base.as_tuple().1),
-                    Type::Empty,
+                    SimpleType::Alias(base),
                     self.process_annotation(&annotation),
                     )
             },
         }
     }
 
-    fn process_type_def_particle(&mut self, particle: &'ast xs::TypeDefParticle<'input>, inlinable: bool) -> RichType<'input> {
+    fn process_type_def_particle(&mut self, particle: &'ast xs::TypeDefParticle<'input>, inlinable: bool) -> RichType<'input, Type<'input>> {
         match particle {
             xs::TypeDefParticle::Group(e) => {
                 let inline_elements::GroupRef { ref attrs, ref annotation } = **e;
@@ -579,7 +618,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             particle: &'ast xs::NestedParticle<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool
-            ) -> RichType<'input> {
+            ) -> RichType<'input, Type<'input>> {
         match particle {
             xs::NestedParticle::Element(e) => {
                 let inline_elements::LocalElement { ref attrs, annotation: ref annotation2, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
@@ -604,7 +643,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_any(&mut self,
             any: &'ast xs::Any<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, Type<'input>> {
         RichType::new(
             NameHint::new("any"),
             Type::Any,
@@ -617,7 +656,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             particles: &'ast Vec<xs::NestedParticle<'input>>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, Type<'input>> {
         let mut min_occurs = 1;
         let mut max_occurs = 1;
         for (key, &value) in attrs.iter() {
@@ -668,7 +707,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             particles: &'ast Vec<xs::NestedParticle<'input>>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool
-            ) -> RichType<'input> {
+            ) -> RichType<'input, Type<'input>> {
         let mut min_occurs = 1;
         let mut max_occurs = 1;
         for (key, &value) in attrs.iter() {
@@ -741,7 +780,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_trivial_extension(&mut self,
             attrs: &'ast HashMap<QName<'input>, &'input str>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, Type<'input>> {
         let mut base = None;
         for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
@@ -763,7 +802,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             type_def_particle: &'ast xs::TypeDefParticle<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, Type<'input>> {
         let mut base = None;
         for (key, &value) in attrs.iter() {
             match self.namespaces.expand_qname(*key).as_tuple() {
@@ -812,7 +851,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             (None, Some(ref c)) => match c {
                 enums::Type::SimpleType(ref e) => {
                     let inline_elements::LocalSimpleType { ref attrs, annotation: ref annotation2, ref simple_derivation } = **e;
-                    let ty = self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref()));
+                    let ty = self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref())).into_complex();
                     (Attrs::new(), ty)
                 },
                 enums::Type::ComplexType(ref e) => {
@@ -847,7 +886,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attrs: &'ast HashMap<QName<'input>, &'input str>,
             child_type: &'ast Option<enums::Type<'input>>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input> {
+            ) -> RichType<'input, Type<'input>> {
         let mut name = None;
         let mut ref_ = None;
         let mut type_attr = None;
@@ -899,7 +938,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     let (attrs, t) = match c {
                         enums::Type::SimpleType(ref e) => {
                             let inline_elements::LocalSimpleType { ref attrs, annotation: ref annotation2, ref simple_derivation } = **e;
-                            let ty = self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref()));
+                            let ty = self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref())).into_complex();
                             (Attrs::new(), ty)
                         },
                         enums::Type::ComplexType(ref e) => {
@@ -992,7 +1031,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     }
                     match (name, ref_, type_attr, &e.local_simple_type) {
                         (Some(name), None, Some(t), None) => {
-                            attrs.named.push((name, Type::Alias(t)));
+                            attrs.named.push((name, SimpleType::Alias(t)));
                         },
                         (Some(name), None, None, Some(t)) => {
                             let inline_elements::LocalSimpleType {
@@ -1012,8 +1051,15 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     }
                 },
                 enums::AttrOrAttrGroup::AttributeGroup(e) => {
-                    () // TODO
-                    //attrs.extend(self.process_attr_decls(e.attr_decls));
+                    let mut ref_ = None;
+                    for (key, &value) in e.attrs.iter() {
+                        match self.namespaces.expand_qname(*key).as_tuple() {
+                            (SCHEMA_URI, "ref") =>
+                                ref_ = Some(self.namespaces.parse_qname(value)),
+                            _ => panic!("Unknown attribute {} in <attributeGroup>", key),
+                        }
+                    }
+                    attrs.group_refs.push((None, ref_.unwrap()));
                 },
             }
         }
