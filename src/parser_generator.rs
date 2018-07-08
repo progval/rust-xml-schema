@@ -338,7 +338,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let mut type_ = None;
         let mut doc = None;
         for proc in &self.processors {
-            // TODO: make sure we get it from the correct processor
+            if proc.namespaces.target_namespace != name.as_tuple().0 {
+                continue;
+            }
             if let Some(ref t) = proc.types.get(name) {
                 type_ = Some(&t.0);
                 doc = Some(&t.1);
