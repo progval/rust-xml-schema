@@ -257,8 +257,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         for proc in &self.processors {
             let mut elements: Vec<_> = proc.inline_elements.iter().collect();
 
-            elements.sort_by_key(|&((n, _),(n2,_))| (n, n2.iter().collect::<Vec<_>>()));
-            for ((tag_name, element), (struct_names, doc)) in elements {
+            elements.sort_by_key(|&((n,_,_),(n2,_))| (n, n2.iter().collect::<Vec<_>>()));
+            for ((tag_name, attrs, element), (struct_names, doc)) in elements {
                 // struct_names is always non-empty.
 
                 let mut struct_names: Vec<_> = struct_names.iter().map(|s| s.to_camel_case()).collect();
@@ -269,7 +269,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     module.scope().raw(&format!("pub type {}<'input> = {}<'input>;", alias, struct_names[0]));
                 }
 
-                self.gen_element(module, &struct_names[0], tag_name, element, doc);
+                self.gen_element(module, &struct_names[0], tag_name, attrs, element, doc);
             }
         }
     }
@@ -279,17 +279,17 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut elements: Vec<_> = proc.elements.iter().collect();
 
             elements.sort_by_key(|&(n,_)| n);
-            for (&name, element) in elements {
+            for (&name, (attrs, element)) in elements {
                 let mod_name = self.get_module_name(name);
                 let mut module = scope.get_module_mut(&mod_name).expect(&mod_name);
                 let (prefix, local) = name.as_tuple();
                 let struct_name = escape_keyword(&local.to_camel_case());
-                self.gen_element(module, &struct_name, &name, &element.type_, &element.doc);
+                self.gen_element(module, &struct_name, &name, attrs, &element.type_, &element.doc);
             }
         }
     }
 
-    fn gen_element(&self, module: &mut cg::Module, struct_name: &str, tag_name: &FullName<'input>, type_: &Type<'input>, doc: &Documentation<'input>) {
+    fn gen_element(&self, module: &mut cg::Module, struct_name: &str, tag_name: &FullName<'input>, attrs: &Attrs<'input>, type_: &Type<'input>, doc: &Documentation<'input>) {
         let mut impl_code = Vec::new();
         let (_, tag_name) = tag_name.as_tuple();
         impl_code.push(format!("impl_element!({}, \"{}\", {{", struct_name, tag_name));
