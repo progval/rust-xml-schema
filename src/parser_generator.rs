@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use codegen as cg;
 use heck::{SnakeCase, CamelCase};
@@ -363,7 +363,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 field_writer(name, "enums", *min_occurs, *max_occurs, name);
             },
             Type::Extension(base, ext_type) => {
-                let (base_type, doc) = &self.get_type(base);
+                let (base_type, _doc) = &self.get_type(base);
                 self.write_type_in_struct_def(field_writer, &mut doc_non_writer, &base_type.type_);
                 self.write_type_in_struct_def(field_writer, doc_writer, &ext_type.type_);
             },
@@ -371,7 +371,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 if let Some(ref mut f) = doc_writer {
                     f(&ext_type.doc);
                 }
-                let (base_type, doc) = &self.get_type(base);
+                let (base_type, _doc) = &self.get_type(base);
                 // TODO: do something with the base
                 self.write_type_in_struct_def(field_writer, doc_writer, &ext_type.type_);
             },

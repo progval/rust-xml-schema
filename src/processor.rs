@@ -33,9 +33,6 @@ impl<'input> Documentation<'input> {
     pub fn new() -> Documentation<'input> {
         Documentation(Vec::new())
     }
-    fn push(&mut self, s: &'input str) {
-        self.0.push(s);
-    }
     pub fn extend(&mut self, v: &Documentation<'input>) {
         self.0.extend(v.0.iter());
     }
@@ -56,11 +53,6 @@ pub struct Attrs<'input> {
 impl<'input> Attrs<'input> {
     fn new() -> Attrs<'input> {
         Attrs { named: Vec::new(), refs: Vec::new(), any_attributes: false }
-    }
-    fn extend(&mut self, other: Attrs<'input>) {
-        self.named.extend(other.named);
-        self.refs.extend(other.refs);
-        self.any_attributes |= other.any_attributes;
     }
 }
 
