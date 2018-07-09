@@ -251,13 +251,13 @@ impl<'input> ParseXml<'input> for Any<'input> {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct XmlString<'input>(StrSpan<'input>);
+pub struct XmlString<'input>(&'input str);
 
 impl<'input> ParseXml<'input> for XmlString<'input> {
     const NODE_NAME: &'static str = "string";
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<XmlString<'input>> {
         match stream.next() {
-            Some(XmlToken::Text(strspan)) => Some(XmlString(strspan)),
+            Some(XmlToken::Text(strspan)) => Some(XmlString(strspan.to_str())),
             _ => None, // TODO: put it back in the stream
         }
     }
@@ -265,13 +265,13 @@ impl<'input> ParseXml<'input> for XmlString<'input> {
 impl<'input> ParseXmlStr<'input> for XmlString<'input> {
     const NODE_NAME: &'static str = "XmlString";
     fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, XmlString<'input>)> {
-        unimplemented!()
+        Some(("", XmlString(input)))
     }
 }
 
 impl<'input> Default for XmlString<'input> {
     fn default() -> Self {
-        XmlString(StrSpan::from_substr("", 0, 0))
+        XmlString("")
     }
 }
 
