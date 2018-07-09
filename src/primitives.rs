@@ -5,6 +5,7 @@ use xmlparser::{Token as XmlToken, ElementEnd, StrSpan};
 use support::{ParseXml, ParseXmlStr, Stream};
 
 pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
+    ("anySimpleType", "AnySimpleType"),
     ("token", "Token"),
     ("NMToken", "NMToken"),
     ("QName", "QName"),
@@ -15,12 +16,19 @@ pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ("boolean", "Boolean"),
     ("NCName", "NcName"),
     ("nonNegativeInteger", "NonNegativeInteger"),
+    ("dateTime", "DateTime"),
+    ("duration", "Duration"),
+    ("decimal", "Decimal"),
     ];
 
+pub type AnySimpleType<'input> = XmlString<'input>;
 pub type Id<'input> = Token<'input>;
 pub type PositiveInteger<'input> = Token<'input>;
 pub type NcName<'input> = Token<'input>;
 pub type Boolean<'input> = Token<'input>;
+pub type DateTime<'input> = Token<'input>;
+pub type Duration<'input> = Token<'input>;
+pub type Decimal<'input> = Token<'input>;
 
 #[derive(Debug, PartialEq)]
 pub struct Token<'input>(&'input str);
@@ -37,6 +45,7 @@ impl<'input> ParseXml<'input> for Token<'input> {
 impl<'input> ParseXmlStr<'input> for Token<'input> {
     const NODE_NAME: &'static str = "token";
     fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Token<'input>)> {
+        /*
         if input.len() == 0 {
             return None;
         }
@@ -45,9 +54,10 @@ impl<'input> ParseXmlStr<'input> for Token<'input> {
                 if i == 0 {
                     return None;
                 }
-                return Some((&input[i+1..], Token(&input[0..i+1])))
+                return Some((&input[i..], Token(&input[0..i])))
             }
         }
+        */
         Some(("", Token(input)))
     }
 }
@@ -72,7 +82,7 @@ impl<'input> ParseXmlStr<'input> for NMToken<'input> {
                 if i == 0 {
                     return None;
                 }
-                return Some((&input[i+1..], NMToken(&input[0..i+1])))
+                return Some((&input[i..], NMToken(&input[0..i])))
             }
         }
         Some(("", NMToken(input)))
@@ -112,15 +122,15 @@ impl<'input> ParseXmlStr<'input> for QName<'input> {
                     return None;
                 }
                 if i1 > 0 {
-                    return Some((&input[i+1..], QName(Some(&input[0..i1+1]), &input[i1+1..i+1])))
+                    return Some((&input[i..], QName(Some(&input[0..i1+1]), &input[i1+1..i+1])))
                 }
                 else {
-                    return Some((&input[i+1..], QName(None, &input[0..i+1])))
+                    return Some((&input[i..], QName(None, &input[0..i+1])))
                 }
             }
         }
         if i1 > 0 {
-            return Some(("", QName(Some(&input[0..i1+1]), &input[i1+1..])))
+            return Some(("", QName(Some(&input[0..i1]), &input[i1+1..])))
         }
         else {
             return Some(("", QName(None, input)))
@@ -172,7 +182,7 @@ impl<'input> ParseXmlStr<'input> for AnyUri<'input> {
                 if i == 0 {
                     return None;
                 }
-                return Some((&input[i+1..], AnyUri(&input[0..i+1])))
+                return Some((&input[i..], AnyUri(&input[0..i])))
             }
         }
         Some(("", AnyUri(input)))

@@ -588,7 +588,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 _ => panic!("Unknown attribute {} in <restriction>", key),
             }
         }
-        let base = base.expect("<restriction> has no base");
+        let base = base.unwrap_or(FullName::new(SCHEMA_URI, "anySimpleType"));
         let xs::SimpleRestrictionModel { ref local_simple_type, ref choice_facet_any } = model;
         match local_simple_type {
             Some(inline_elements::LocalSimpleType { ref attrs, annotation: ref annotation2, ref simple_derivation }) => {

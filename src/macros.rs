@@ -345,10 +345,16 @@ macro_rules! impl_list {
                 let mut input = input;
                 let mut items = Vec::new();
                 while let Some((output, item)) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context) {
-                    input = output;
-                    items.push(item)
+                    items.push(item);
+                    if output.len() == 0 {
+                        return Some(("", $name(items)));
+                    }
+                    if &output[0..1] != " " {
+                        return None;
+                    }
+                    input = &output[1..];
                 }
-                Some((input, $name(items)))
+                None
             }
         }
     }

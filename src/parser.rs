@@ -1,3 +1,4 @@
+// Input: "derived.nxsd"
 // Input: "XMLSchema.xsd"
 #[allow(unused_imports)]
 use support;
@@ -16,6 +17,62 @@ pub mod xs {
     use super::*;
 
     pub(crate) use primitives::*;
+
+    pub type Entities<'input> = support::AnySimpleType<'input>;
+
+    pub type Entity<'input> = support::NcName<'input>;
+
+    pub type Id<'input> = support::NcName<'input>;
+
+    pub type Idref<'input> = support::NcName<'input>;
+
+    pub type Idrefs<'input> = support::AnySimpleType<'input>;
+
+    pub type NcName<'input> = xs::Name<'input>;
+
+    pub type Nmtoken<'input> = support::Token<'input>;
+
+    pub type Nmtokens<'input> = support::AnySimpleType<'input>;
+
+    pub type Name<'input> = support::Token<'input>;
+
+    pub type Byte<'input> = xs::Short<'input>;
+
+    pub type DateTimeStamp<'input> = support::DateTime<'input>;
+
+    pub type DayTimeDuration<'input> = support::Duration<'input>;
+
+    pub type Int<'input> = xs::Long<'input>;
+
+    pub type Integer<'input> = support::Decimal<'input>;
+
+    pub type Language<'input> = support::Token<'input>;
+
+    pub type Long<'input> = xs::Integer<'input>;
+
+    pub type NegativeInteger<'input> = xs::NonPositiveInteger<'input>;
+
+    pub type NonNegativeInteger<'input> = xs::Integer<'input>;
+
+    pub type NonPositiveInteger<'input> = xs::Integer<'input>;
+
+    pub type NormalizedString<'input> = support::XmlString<'input>;
+
+    pub type PositiveInteger<'input> = support::NonNegativeInteger<'input>;
+
+    pub type Short<'input> = xs::Int<'input>;
+
+    pub type Token<'input> = xs::NormalizedString<'input>;
+
+    pub type UnsignedByte<'input> = xs::UnsignedShort<'input>;
+
+    pub type UnsignedInt<'input> = xs::UnsignedLong<'input>;
+
+    pub type UnsignedLong<'input> = support::NonNegativeInteger<'input>;
+
+    pub type UnsignedShort<'input> = xs::UnsignedInt<'input>;
+
+    pub type YearMonthDuration<'input> = support::Duration<'input>;
 
     pub type AllNni<'input> = unions::UnionNmtoken<'input>;
 
@@ -993,6 +1050,13 @@ pub mod xs {
         impl_singleton_variant!(Choice, xs, Box<Choice>),
         impl_singleton_variant!(Sequence, xs, Box<Sequence>),
     );
+}
+
+pub mod hfp {
+    //! http://www.w3.org/2001/XMLSchema-hasFacetAndProperty
+
+    #[allow(unused_imports)]
+    use super::*;
 }
 
 pub mod xml {
