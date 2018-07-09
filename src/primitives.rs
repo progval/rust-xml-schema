@@ -4,6 +4,14 @@ use xmlparser::{Token as XmlToken, ElementEnd, StrSpan};
 
 use support::{ParseXml, ParseXmlStr, Stream};
 
+macro_rules! return_split {
+    ( $input:expr, $position:expr, $pred:expr ) => {{
+        let input = $input;
+        let pos = $position;
+        return Some((&input[pos..], $pred(&input[0..pos])))
+    }}
+}
+
 pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ("anySimpleType", "AnySimpleType"),
     ("token", "Token"),
@@ -45,19 +53,26 @@ impl<'input> ParseXml<'input> for Token<'input> {
 impl<'input> ParseXmlStr<'input> for Token<'input> {
     const NODE_NAME: &'static str = "token";
     fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Token<'input>)> {
-        /*
         if input.len() == 0 {
             return None;
         }
-        for (i, c) in input.char_indices() {
-            if c == ' ' { // TODO
-                if i == 0 {
-                    return None;
+        let mut iter = input.char_indices().peekable();
+        while let Some((i, c)) = iter.next() {
+            match (i, c) {
+                (0, ' ') => return None,
+                (_, ' ') => {
+                    // If this space is followed by a whitespace, split before both
+                    match iter.peek() {
+                        Some((_, ' ')) | Some((_, '\r')) | Some((_, '\n')) |
+                        Some((_, '\t')) => return_split!(input, i, Token),
+                        Some((_, _)) => (),
+                        None => return_split!(input, i, Token),
+                    }
                 }
-                return Some((&input[i..], Token(&input[0..i])))
+                (_, '\r') | (_, '\n') | (_, '\t') => return_split!(input, i, Token),
+                _ => (),
             }
         }
-        */
         Some(("", Token(input)))
     }
 }
