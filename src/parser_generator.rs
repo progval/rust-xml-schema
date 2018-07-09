@@ -414,6 +414,18 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
+    fn gen_attrs(&self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, name_gen: &mut NameGenerator, attrs: &Attrs<'input>) {
+        for (attr_name, attr_type) in &attrs.named {
+            let type_name = self.get_simple_type_name(attr_type);
+            let (prefix, local) = attr_name.as_tuple();
+            if let Some(type_name) = type_name {
+                let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
+                struct_.field(&format!("pub {}", field_name), &format!("Option<{}<'input>>", type_name));
+                impl_code.push(format!("    (\"{}\", \"{}\") => {},", prefix, local, field_name));
+            }
+        }
+    }
+
     fn gen_element(&self, module: &mut cg::Module, struct_name: &str, tag_name: &FullName<'input>, attrs: &Attrs<'input>, type_: &Type<'input>, doc: &Documentation<'input>) {
         let mut impl_code = Vec::new();
         let (_, tag_name) = tag_name.as_tuple();
@@ -424,15 +436,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             struct_.field("pub attrs", "HashMap<QName<'input>, &'input str>");
             let mut name_gen = NameGenerator::new();
             let mut doc = doc.clone();
-            for (attr_name, attr_type) in &attrs.named {
-                let type_name = self.get_simple_type_name(attr_type);
-                let (prefix, local) = attr_name.as_tuple();
-                if let Some(type_name) = type_name {
-                    let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
-                    struct_.field(&format!("pub {}", field_name), &format!("Option<{}<'input>>", type_name));
-                    impl_code.push(format!("    (\"{}\", \"{}\") => {},", prefix, local, field_name));
-                }
-            }
+            self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs);
             impl_code.push(format!("}}, fields = {{"));
             self.gen_fields(&mut empty_struct, struct_, &mut impl_code, &mut doc, &mut name_gen, type_, None);
             struct_.doc(&doc.to_string());
