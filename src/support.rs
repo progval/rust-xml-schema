@@ -65,7 +65,7 @@ pub trait ParseXml<'input>: Sized {
     fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self>;
 
 
-    fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+    fn parse_empty<TParseContext, TParentContext>(_parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {
         None
     }
 

@@ -53,10 +53,10 @@ pub struct Namespaces<'input> {
 impl<'input> Namespaces<'input> {
     pub fn new(mut namespaces: HashMap<&'input str, &'input str>, target_namespace: &'input str) -> Namespaces<'input> {
         if let Some(uri) = namespaces.insert("xml", "xml") {
-            panic!("Cannot have a namespaces named \"xml\": {}", uri);
+            panic!("Cannot have a namespace named \"xml\": {}", uri);
         }
         if let Some(uri) = namespaces.insert("xmlns", "xmlns") {
-            panic!("Cannot have a namespaces named \"xmlns\": {}", uri);
+            panic!("Cannot have a namespace named \"xmlns\": {}", uri);
         }
         Namespaces {
             target_namespace,
