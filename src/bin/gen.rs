@@ -53,7 +53,7 @@ fn main() {
                 _ => panic!("Unexpected token {:?}", tok),
             }
         }
-        documents.push((filename, xs::Schema::parse_xml(&mut stream, &mut (), &()).unwrap()));
+        documents.push((filename, xs::Schema::parse_xml(&mut stream, &mut ParseContext::default(), &()).unwrap()));
     }
 
     let mut processors = Vec::new();

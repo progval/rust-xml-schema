@@ -16,11 +16,11 @@ macro_rules! impl_enum {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("enum ", stringify!($name));
 
-            fn parse_empty<TParseContext, TParentContext>(_parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {
+            fn parse_empty<TParentContext>(_parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<Self> {
                 None
             }
 
-            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 $(
                     match $variant_macro!($name, stream, parse_context, parent_context, $($variant_args)*) {
@@ -99,11 +99,11 @@ macro_rules! impl_group_or_sequence {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("empty group or sequence ", stringify!($name));
 
-            fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_empty<TParentContext>(parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
                 Some($name(Default::default()))
             }
 
-            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {
+            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<Self> {
                 None
             }
         }
@@ -113,7 +113,7 @@ macro_rules! impl_group_or_sequence {
             const NODE_NAME: &'static str = concat!("group or sequence ", stringify!($name));
 
             #[allow(unused_variables)]
-            fn parse_empty<TParseContext, TParentContext>(parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_empty<TParentContext>(parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
                 Some($name {
                     $(
                         $field_name: impl_empty_element_field!(parse_context, parent_context, $($field_args)*),
@@ -122,7 +122,7 @@ macro_rules! impl_group_or_sequence {
             }
 
             #[allow(unused_variables)]
-            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 Some($name {
                     $(
@@ -140,12 +140,12 @@ macro_rules! impl_element {
         impl<'input> ParseXml<'input> for $struct_name<'input> {
             const NODE_NAME: &'static str = concat!("element ", stringify!($struct_name));
 
-            fn parse_empty<TParseContext, TParentContext>(_parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {
+            fn parse_empty<TParentContext>(_parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<Self> {
                 None
             }
 
             #[allow(unused_variables)]
-            fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
                 use xmlparser::{Token,ElementEnd};
                 let tx = stream.transaction();
                 let mut tok = stream.next().unwrap();
@@ -313,7 +313,7 @@ macro_rules! impl_union {
         impl<'input> ParseXmlStr<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("union ", stringify!($name));
 
-            fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
+            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
                 $(
                     match $variant_macro!($name, input, parse_context, parent_context, $($variant_args)*) {
                         Some((o, x)) => return Some((o, x)),
@@ -341,7 +341,7 @@ macro_rules! impl_list {
             const NODE_NAME: &'static str = concat!("list ", stringify!($name));
 
             #[allow(unused_variables)]
-            fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
+            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
                 let mut input = input;
                 let mut items = Vec::new();
                 while let Some((output, item)) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context) {

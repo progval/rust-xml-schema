@@ -57,19 +57,21 @@ impl<'input> Iterator for InnerStream<'input> {
 }
 
 
-pub trait ParseContext {
-} // TODO: remove this
+#[derive(Default)]
+pub struct ParseContext {
+}
+
 pub trait ParseXml<'input>: Sized {
     const NODE_NAME: &'static str;
 
-    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self>;
+    fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self>;
 
 
-    fn parse_empty<TParseContext, TParentContext>(_parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Self> {
+    fn parse_empty<TParentContext>(_parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<Self> {
         None
     }
 
-    fn parse_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<Self> {
+    fn parse_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
         //println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml(stream, parse_context, parent_context);
         /*
@@ -84,9 +86,9 @@ pub trait ParseXml<'input>: Sized {
 pub trait ParseXmlStr<'input>: Sized {
     const NODE_NAME: &'static str;
 
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)>;
+    fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)>;
 
-    fn parse_xml_str<TParseContext, TParentContext>(input: &'input str, parse_context: &mut TParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
+    fn parse_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
         //println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml_str(input, parse_context, parent_context);
         /*

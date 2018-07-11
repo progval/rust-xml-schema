@@ -3,7 +3,7 @@ use std::fmt;
 
 use xmlparser::{Token as XmlToken, ElementEnd, StrSpan};
 
-use support::{ParseXml, ParseXmlStr, Stream};
+use support::{ParseXml, ParseXmlStr, Stream, ParseContext};
 use xml_utils::*;
 
 macro_rules! return_split {
@@ -44,7 +44,7 @@ pub struct Token<'input>(&'input str);
 
 impl<'input> ParseXmlStr<'input> for Token<'input> {
     const NODE_NAME: &'static str = "token";
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Token<'input>)> {
+    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Token<'input>)> {
         if input.len() == 0 {
             return None;
         }
@@ -80,7 +80,7 @@ pub type Nmtoken<'input> = NMToken<'input>; // TODO: remove this
 pub struct NMToken<'input>(&'input str);
 impl<'input> ParseXmlStr<'input> for NMToken<'input> {
     const NODE_NAME: &'static str = "NMToken";
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, NMToken<'input>)> {
+    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<(&'input str, NMToken<'input>)> {
         if input.len() == 0 {
             return None;
         }
@@ -98,7 +98,7 @@ impl<'input> ParseXmlStr<'input> for NMToken<'input> {
 
 impl<'input> ParseXml<'input> for NMToken<'input> {
     const NODE_NAME: &'static str = "NMToken";
-    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<NMToken<'input>> {
+    fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<NMToken<'input>> {
         match stream.next() {
             Some(XmlToken::Text(strspan)) => Some(NMToken(strspan.to_str())),
             _ => None,
@@ -115,7 +115,7 @@ impl<'input> Default for NMToken<'input> {
 pub struct QName<'input>(pub Option<&'input str>, pub &'input str);
 impl<'input> ParseXmlStr<'input> for QName<'input> {
     const NODE_NAME: &'static str = "QName";
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, QName<'input>)> {
+    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<(&'input str, QName<'input>)> {
         if input.len() == 0 {
             return None;
         }
@@ -180,7 +180,7 @@ impl<'input> fmt::Display for QName<'input> {
 pub struct AnyUri<'input>(&'input str);
 impl<'input> ParseXmlStr<'input> for AnyUri<'input> {
     const NODE_NAME: &'static str = "AnyUri";
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, AnyUri<'input>)> {
+    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<(&'input str, AnyUri<'input>)> {
         if input.len() == 0 {
             return None;
         }
@@ -200,7 +200,7 @@ impl<'input> ParseXmlStr<'input> for AnyUri<'input> {
 pub struct AnyURIElement<'input>(StrSpan<'input>);
 impl<'input> ParseXml<'input> for AnyURIElement<'input> {
     const NODE_NAME: &'static str = "AnyURIElement";
-    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<AnyURIElement<'input>> {
+    fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<AnyURIElement<'input>> {
         match stream.next() {
             Some(XmlToken::Text(strspan)) => Some(AnyURIElement(strspan)),
             _ => None,
@@ -212,7 +212,7 @@ impl<'input> ParseXml<'input> for AnyURIElement<'input> {
 pub struct Integer<'input>(i64, PhantomData<&'input ()>);
 impl<'input> ParseXmlStr<'input> for Integer<'input> {
     const NODE_NAME: &'static str = "Integer";
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Integer<'input>)> {
+    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Integer<'input>)> {
         let mut iter = input.char_indices();
         let mut n: i64 = 0;
         let mut multiplier = 1;
@@ -247,7 +247,7 @@ impl<'input> ParseXmlStr<'input> for Integer<'input> {
 pub struct Any<'input>(pub Vec<XmlToken<'input>>);
 impl<'input> ParseXml<'input> for Any<'input> {
     const NODE_NAME: &'static str = "Any";
-    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Any<'input>> {
+    fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<Any<'input>> {
         let mut tag_stack = Vec::new();
         let mut tokens = Vec::new();
         loop {
@@ -299,7 +299,7 @@ pub struct XmlString<'input>(&'input str);
 
 impl<'input> ParseXmlStr<'input> for XmlString<'input> {
     const NODE_NAME: &'static str = "XmlString";
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, XmlString<'input>)> {
+    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<(&'input str, XmlString<'input>)> {
         for (i, c) in input.char_indices() {
             if !is_xml_char(c) {
                 return_split!(input, i, XmlString);
@@ -321,7 +321,7 @@ pub struct AnySimpleType<'input>(&'input str);
 
 impl<'input> ParseXmlStr<'input> for AnySimpleType<'input> {
     const NODE_NAME: &'static str = "AnySimpleType";
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, AnySimpleType<'input>)> {
+    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<(&'input str, AnySimpleType<'input>)> {
         Some(("", AnySimpleType(input)))
     }
 }
@@ -339,7 +339,7 @@ pub struct NcName<'input>(&'input str);
 
 impl<'input> ParseXmlStr<'input> for NcName<'input> {
     const NODE_NAME: &'static str = "NcName";
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, NcName<'input>)> {
+    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<(&'input str, NcName<'input>)> {
         let mut iter = input.char_indices();
         let c = iter.next()?.1;
         if c == ':' || !is_name_start_char(c) { return None };
@@ -358,7 +358,7 @@ impl<'input> ParseXmlStr<'input> for NcName<'input> {
 pub struct Boolean<'input>(bool, PhantomData<&'input ()>);
 impl<'input> ParseXmlStr<'input> for Boolean<'input> {
     const NODE_NAME: &'static str = "Boolean";
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Boolean<'input>)> {
+    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Boolean<'input>)> {
         if input.len() >= 1 {
             match &input[0..1] {
                 "0" => return Some((&input[1..], Boolean(false, PhantomData::default()))),
