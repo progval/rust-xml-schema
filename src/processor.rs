@@ -50,7 +50,7 @@ impl<'input> ToString for Documentation<'input> {
 pub struct Attrs<'input> {
     pub named: Vec<(FullName<'input>, SimpleType<'input>)>,
     pub refs: Vec<(Option<FullName<'input>>, FullName<'input>)>,
-    pub group_refs: Vec<(Option<FullName<'input>>, FullName<'input>)>,
+    pub group_refs: Vec<FullName<'input>>,
     pub any_attributes: bool,
 }
 impl<'input> Attrs<'input> {
@@ -129,11 +129,12 @@ pub struct Processor<'ast, 'input: 'ast> {
     pub choices: HashMap<Vec<RichType<'input, Type<'input>>>, HashSet<String>>,
     pub sequences: HashMap<Vec<RichType<'input, Type<'input>>>, (HashSet<String>, Documentation<'input>)>,
     pub groups: HashMap<FullName<'input>, RichType<'input, Type<'input>>>,
-    pub attribute_groups: HashMap<FullName<'input>, &'ast xs::AttributeGroup<'input>>,
+    pub attribute_groups: HashMap<FullName<'input>, Attrs<'input>>,
     pub inline_elements: HashMap<(FullName<'input>, Attrs<'input>, Type<'input>), (HashSet<String>, Documentation<'input>)>,
 
     pub lists: HashMap<RichType<'input, SimpleType<'input>>, HashSet<String>>,
     pub unions: HashMap<Vec<RichType<'input, SimpleType<'input>>>, HashSet<String>>,
+    _phantom: PhantomData<&'ast ()>, // Sometimes I need 'ast when prototyping
 }
 
 impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
@@ -185,6 +186,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attribute_groups: HashMap::new(),
             inline_elements: HashMap::new(),
             simple_types: HashMap::new(),
+            _phantom: PhantomData::default(),
         }
     }
 
@@ -325,7 +327,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
         let name = name.expect("<attributeGroup> has no name.");
-        self.attribute_groups.insert(self.namespaces.parse_qname(name), group);
+        let attrs = self.process_attr_decls(&group.attr_decls);
+        self.attribute_groups.insert(self.namespaces.parse_qname(name), attrs);
     }
 
     fn process_simple_type(&mut self,
@@ -1068,7 +1071,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                             _ => panic!("Unknown attribute {} in <attributeGroup>", key),
                         }
                     }
-                    attrs.group_refs.push((None, ref_.unwrap()));
+                    attrs.group_refs.push(ref_.unwrap());
                 },
             }
         }

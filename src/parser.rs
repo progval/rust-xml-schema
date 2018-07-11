@@ -140,12 +140,22 @@ pub mod xs {
     pub struct Any<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_not_q_name: Option<xs::QnameList<'input>>,
+        pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
+        pub attr_max_occurs: Option<xs::AllNni<'input>>,
+        pub attr_namespace: Option<xs::NamespaceList<'input>>,
+        pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
+        pub attr_process_contents: Option<xs::Nmtoken<'input>>,
         pub attr_id: Option<support::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(Any, "any", attributes = {
         ("http://www.w3.org/2001/XMLSchema", "notQName") => attr_not_q_name,
+        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs,
+        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs,
+        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace,
+        ("http://www.w3.org/2001/XMLSchema", "notNamespace") => attr_not_namespace,
+        ("http://www.w3.org/2001/XMLSchema", "processContents") => attr_process_contents,
         ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
     }, fields = {
         (annotation, xs, Option<Annotation>),
@@ -156,12 +166,18 @@ pub mod xs {
     pub struct AnyAttribute<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_not_q_name: Option<xs::QnameListA<'input>>,
+        pub attr_namespace: Option<xs::NamespaceList<'input>>,
+        pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
+        pub attr_process_contents: Option<xs::Nmtoken<'input>>,
         pub attr_id: Option<support::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(AnyAttribute, "anyAttribute", attributes = {
         ("http://www.w3.org/2001/XMLSchema", "notQName") => attr_not_q_name,
+        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace,
+        ("http://www.w3.org/2001/XMLSchema", "notNamespace") => attr_not_namespace,
+        ("http://www.w3.org/2001/XMLSchema", "processContents") => attr_process_contents,
         ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
     }, fields = {
         (annotation, xs, Option<Annotation>),
@@ -1435,11 +1451,17 @@ pub mod inline_elements {
     #[derive(Debug, PartialEq)]
     pub struct AnyWildcard<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attr_namespace: Option<xs::NamespaceList<'input>>,
+        pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
+        pub attr_process_contents: Option<xs::Nmtoken<'input>>,
         pub attr_id: Option<support::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(AnyWildcard, "any", attributes = {
+        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace,
+        ("http://www.w3.org/2001/XMLSchema", "notNamespace") => attr_not_namespace,
+        ("http://www.w3.org/2001/XMLSchema", "processContents") => attr_process_contents,
         ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
     }, fields = {
         (annotation, xs, Option<Annotation>),
@@ -1473,6 +1495,8 @@ pub mod inline_elements {
         pub attr_form: Option<xs::FormChoice<'input>>,
         pub attr_target_namespace: Option<support::AnyUri<'input>>,
         pub attr_inheritable: Option<support::Boolean<'input>>,
+        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_ref: Option<support::QName<'input>>,
         pub attr_id: Option<support::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
@@ -1486,6 +1510,8 @@ pub mod inline_elements {
         ("http://www.w3.org/2001/XMLSchema", "form") => attr_form,
         ("http://www.w3.org/2001/XMLSchema", "targetNamespace") => attr_target_namespace,
         ("http://www.w3.org/2001/XMLSchema", "inheritable") => attr_inheritable,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref,
         ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
     }, fields = {
         (annotation, xs, Option<Annotation>),

@@ -426,6 +426,19 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 impl_code.push(format!("    (\"{}\", \"{}\") => {},", prefix, local, field_name));
             }
         }
+        for group_name in &attrs.group_refs {
+            let mut found = false;
+            for processor in self.processors.iter() {
+                if let Some(attrs) = processor.attribute_groups.get(group_name) {
+                    self.gen_attrs(struct_, impl_code, name_gen, attrs);
+                    found = true;
+                    break;
+                }
+            }
+            if !found {
+                panic!("unknown attribute group: {:?}", group_name);
+            }
+        }
     }
 
     fn gen_element(&self, module: &mut cg::Module, struct_name: &str, tag_name: &FullName<'input>, attrs: &Attrs<'input>, type_: &Type<'input>, doc: &Documentation<'input>) {
