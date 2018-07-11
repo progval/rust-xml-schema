@@ -21,7 +21,7 @@ fn generated_parses_person_xsd() {
     stream.next(); // Eat comment
     stream.next(); // Eat comment
     stream.next(); // Eat the DTD end
-    let doc = xs::Schema::parse_xml(&mut stream, &mut (), &());
+    let doc = xs::Schema::parse_xml(&mut stream, &mut Default::default(), &());
     assert_ne!(doc, None);
 }
 
@@ -37,7 +37,7 @@ fn round1_parser_person_xsd() {
     stream.next(); // Eat comment
     stream.next(); // Eat comment
     stream.next(); // Eat the DTD end
-    let doc = xs::Schema::parse_xml(&mut stream, &mut (), &());
+    let doc = xs::Schema::parse_xml(&mut stream, &mut Default::default(), &());
     assert_ne!(doc, None);
     //let mut parser_generator = ParserGenerator::new(doc.as_ref().unwrap(), HashMap::new());
     //parser_generator.gen(doc.as_ref().unwrap()).to_string();
