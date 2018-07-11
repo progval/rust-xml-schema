@@ -9,6 +9,7 @@ extern crate heck;
 extern crate pretty_assertions;
 
 #[macro_use] pub mod macros;
+pub mod xml_utils;
 pub mod names;
 pub mod support;
 pub mod primitives;

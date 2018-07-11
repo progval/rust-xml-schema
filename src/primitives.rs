@@ -1,8 +1,10 @@
+use std::marker::PhantomData;
 use std::fmt;
 
 use xmlparser::{Token as XmlToken, ElementEnd, StrSpan};
 
 use support::{ParseXml, ParseXmlStr, Stream};
+use xml_utils::*;
 
 macro_rules! return_split {
     ( $input:expr, $position:expr, $pred:expr ) => {{
@@ -29,27 +31,17 @@ pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ("decimal", "Decimal"),
     ];
 
-pub type AnySimpleType<'input> = XmlString<'input>;
-pub type Id<'input> = Token<'input>;
-pub type PositiveInteger<'input> = Token<'input>;
-pub type NcName<'input> = Token<'input>;
-pub type Boolean<'input> = Token<'input>;
-pub type DateTime<'input> = Token<'input>;
-pub type Duration<'input> = Token<'input>;
-pub type Decimal<'input> = Token<'input>;
+pub type Id<'input> = NcName<'input>; // TODO ?
+pub type PositiveInteger<'input> = Integer<'input>; // TODO
+pub type NonNegativeInteger<'input> = Integer<'input>; // TODO
+pub type DateTime<'input> = Token<'input>; // TODO
+pub type Duration<'input> = Token<'input>; // TODO
+pub type Decimal<'input> = Token<'input>; // TODO
 
+/// https://www.w3.org/TR/xmlschema11-2/#token
 #[derive(Debug, PartialEq)]
 pub struct Token<'input>(&'input str);
 
-impl<'input> ParseXml<'input> for Token<'input> {
-    const NODE_NAME: &'static str = "token";
-    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<Token<'input>> {
-        match stream.next() {
-            Some(XmlToken::Text(strspan)) => Some(Token(strspan.to_str())),
-            _ => None,
-        }
-    }
-}
 impl<'input> ParseXmlStr<'input> for Token<'input> {
     const NODE_NAME: &'static str = "token";
     fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Token<'input>)> {
@@ -217,11 +209,37 @@ impl<'input> ParseXml<'input> for AnyURIElement<'input> {
 }
 
 #[derive(Debug, PartialEq, Default)]
-pub struct NonNegativeInteger<'input>(&'input str);
-impl<'input> ParseXmlStr<'input> for NonNegativeInteger<'input> {
-    const NODE_NAME: &'static str = "NonNegativeInteger";
-    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, NonNegativeInteger<'input>)> {
-        unimplemented!()
+pub struct Integer<'input>(i64, PhantomData<&'input ()>);
+impl<'input> ParseXmlStr<'input> for Integer<'input> {
+    const NODE_NAME: &'static str = "Integer";
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Integer<'input>)> {
+        let mut iter = input.char_indices();
+        let mut n: i64 = 0;
+        let mut multiplier = 1;
+        let c = iter.next()?.1;
+        match c {
+            '+' => multiplier = 1,
+            '-' => multiplier = -1,
+            '0'...'9' => n = (c as i64) - ('0' as i64),
+            _ => return None,
+        }
+
+        if c == '+' || c == '-' {
+            let c = iter.next()?.1;
+            match c {
+                '0'...'9' => n = (c as i64) - ('0' as i64),
+                _ => return None,
+            }
+        }
+
+        for (i,c) in iter {
+            match c {
+                '0'...'9' => n = n * 10 + ((c as i64) - ('0' as i64)),
+                _ => return Some((&input[i..], Integer(multiplier * n, PhantomData::default()))),
+            }
+        }
+        
+        Some(("", Integer(multiplier * n, PhantomData::default())))
     }
 }
 
@@ -275,21 +293,18 @@ impl<'input> ParseXml<'input> for Any<'input> {
     }
 }
 
+/// https://www.w3.org/TR/xmlschema11-2/#string
 #[derive(Debug, PartialEq)]
 pub struct XmlString<'input>(&'input str);
 
-impl<'input> ParseXml<'input> for XmlString<'input> {
-    const NODE_NAME: &'static str = "string";
-    fn parse_self_xml<TParseContext, TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<XmlString<'input>> {
-        match stream.next() {
-            Some(XmlToken::Text(strspan)) => Some(XmlString(strspan.to_str())),
-            _ => None, // TODO: put it back in the stream
-        }
-    }
-}
 impl<'input> ParseXmlStr<'input> for XmlString<'input> {
     const NODE_NAME: &'static str = "XmlString";
     fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, XmlString<'input>)> {
+        for (i, c) in input.char_indices() {
+            if !is_xml_char(c) {
+                return_split!(input, i, XmlString);
+            }
+        }
         Some(("", XmlString(input)))
     }
 }
@@ -300,3 +315,63 @@ impl<'input> Default for XmlString<'input> {
     }
 }
 
+/// https://www.w3.org/TR/xmlschema11-2/#anySimpleType
+#[derive(Debug, PartialEq)]
+pub struct AnySimpleType<'input>(&'input str);
+
+impl<'input> ParseXmlStr<'input> for AnySimpleType<'input> {
+    const NODE_NAME: &'static str = "AnySimpleType";
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, AnySimpleType<'input>)> {
+        Some(("", AnySimpleType(input)))
+    }
+}
+
+impl<'input> Default for AnySimpleType<'input> {
+    fn default() -> Self {
+        AnySimpleType("")
+    }
+}
+
+
+/// https://www.w3.org/TR/xmlschema11-2/#NCName
+#[derive(Debug, PartialEq)]
+pub struct NcName<'input>(&'input str);
+
+impl<'input> ParseXmlStr<'input> for NcName<'input> {
+    const NODE_NAME: &'static str = "NcName";
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, NcName<'input>)> {
+        let mut iter = input.char_indices();
+        let c = iter.next()?.1;
+        if c == ':' || !is_name_start_char(c) { return None };
+
+        for (i, c) in iter {
+            if c == ':' || !is_name_char(c) {
+                return_split!(input, i, NcName);
+            }
+        }
+
+        Some(("", NcName(input)))
+    }
+}
+
+#[derive(Debug, PartialEq, Default)]
+pub struct Boolean<'input>(bool, PhantomData<&'input ()>);
+impl<'input> ParseXmlStr<'input> for Boolean<'input> {
+    const NODE_NAME: &'static str = "Boolean";
+    fn parse_self_xml_str<TParseContext, TParentContext>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Boolean<'input>)> {
+        if input.len() >= 1 {
+            match &input[0..1] {
+                "0" => return Some((&input[1..], Boolean(false, PhantomData::default()))),
+                "1" => return Some((&input[1..], Boolean(true, PhantomData::default()))),
+                _ => (),
+            }
+        }
+        if input.len() >= 4 && &input[0..4] == "true" {
+            return Some((&input[4..], Boolean(true, PhantomData::default())))
+        }
+        if input.len() >= 5 && &input[0..4] == "false" {
+            return Some((&input[5..], Boolean(false, PhantomData::default())))
+        }
+        None
+    }
+}
