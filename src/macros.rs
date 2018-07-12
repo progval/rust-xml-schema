@@ -136,7 +136,7 @@ macro_rules! impl_group_or_sequence {
 
 #[macro_export]
 macro_rules! impl_element {
-    ( $struct_name:ident, $name:expr, attributes = { $( ($attr_prefix:expr, $attr_local:expr) => $attr_name:ident , )* }, fields = { $( ( $field_name:ident, $( $field_args:tt )* ), )* } ) => {
+    ( $struct_name:ident, $name:expr, attributes = { $( ($attr_prefix:expr, $attr_local:expr) => $attr_name:ident : $use:ident, )* }, fields = { $( ( $field_name:ident, $( $field_args:tt )* ), )* } ) => {
         impl<'input> ParseXml<'input> for $struct_name<'input> {
             const NODE_NAME: &'static str = concat!("element ", stringify!($struct_name));
 
@@ -181,8 +181,10 @@ macro_rules! impl_element {
                                             $(
                                                 (_, $attr_local) => { // TODO: match the namespace too
                                                     match ParseXmlStr::parse_xml_str(value, parse_context, parent_context) {
-                                                        Some(("", value)) =>
-                                                            $attr_name = Some(value),
+                                                        Some(("", value)) => {
+                                                            $attr_name = Some(value)
+                                                            // TODO: check for duplicates
+                                                        },
                                                         Some((out, _)) =>
                                                             panic!("Unmatched data at the end of {}={:?}: {:?}", $attr_local, value, out),
                                                         None => 
@@ -197,7 +199,7 @@ macro_rules! impl_element {
                                         let ret = Some($struct_name {
                                             attrs,
                                             $(
-                                                $attr_name,
+                                                $attr_name: extract_attribute!($attr_name, $attr_local, $use),
                                             )*
                                             $(
                                                 $field_name: impl_element_field!(stream, tx, parse_context, parent_context, $($field_args)*),
@@ -222,7 +224,7 @@ macro_rules! impl_element {
                                         return Some($struct_name {
                                             attrs,
                                             $(
-                                                $attr_name,
+                                                $attr_name: extract_attribute!($attr_name, $attr_local, $use),
                                             )*
                                             $(
                                                 $field_name: impl_empty_element_field!(parse_context, parent_context, $($field_args)*),
@@ -251,6 +253,15 @@ macro_rules! impl_element {
             }
         }
     }
+}
+
+macro_rules! extract_attribute {
+    ( $attr_name:ident, $attr_local:expr, required ) => {
+        $attr_name.expect(&format!("Missing attribute {}", $attr_local))
+    };
+    ( $attr_name:ident, $attr_local:expr, optional ) => {
+        $attr_name
+    };
 }
 
 macro_rules! impl_element_field {

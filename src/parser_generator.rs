@@ -426,11 +426,16 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let (prefix, local) = attr_name.as_tuple();
             if let Some(type_name) = type_name {
                 match use_ {
-                    AttrUse::Optional | AttrUse::Required => {
+                    AttrUse::Optional => {
                         let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
                         struct_.field(&format!("pub {}", field_name), &format!("Option<{}<'input>>", type_name.expect("Missing type")));
-                        impl_code.push(format!("    (\"{}\", \"{}\") => {},", prefix, local, field_name));
-                    }
+                        impl_code.push(format!("    (\"{}\", \"{}\") => {}: optional,", prefix, local, field_name));
+                    },
+                    AttrUse::Required => {
+                        let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
+                        struct_.field(&format!("pub {}", field_name), &format!("{}<'input>", type_name.expect("Missing type")));
+                        impl_code.push(format!("    (\"{}\", \"{}\") => {}: required,", prefix, local, field_name));
+                    },
                     AttrUse::Prohibited => (),
                 }
             }

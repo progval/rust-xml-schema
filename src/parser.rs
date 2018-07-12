@@ -116,8 +116,8 @@ pub mod xs {
     }
 
     impl_element!(All, "all", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs,
-        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs,
+        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs: optional,
+        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs: optional,
     }, fields = {
         (all_model, xs, AllModel),
     });
@@ -130,7 +130,7 @@ pub mod xs {
     }
 
     impl_element!(Annotation, "annotation", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation_content, enums, Vec<AnnotationContent; min=0;>),
     });
@@ -150,13 +150,13 @@ pub mod xs {
     }
 
     impl_element!(Any, "any", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "notQName") => attr_not_q_name,
-        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs,
-        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs,
-        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "notNamespace") => attr_not_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "processContents") => attr_process_contents,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "notQName") => attr_not_q_name: optional,
+        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs: optional,
+        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs: optional,
+        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "notNamespace") => attr_not_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "processContents") => attr_process_contents: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -174,11 +174,11 @@ pub mod xs {
     }
 
     impl_element!(AnyAttribute, "anyAttribute", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "notQName") => attr_not_q_name,
-        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "notNamespace") => attr_not_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "processContents") => attr_process_contents,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "notQName") => attr_not_q_name: optional,
+        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "notNamespace") => attr_not_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "processContents") => attr_process_contents: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -191,7 +191,7 @@ pub mod xs {
     }
 
     impl_element!(Appinfo, "appinfo", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "source") => attr_source,
+        ("http://www.w3.org/2001/XMLSchema", "source") => attr_source: optional,
     }, fields = {
         (sequence_any, sequences, Vec<SequenceAny; min=0;>),
     });
@@ -207,9 +207,9 @@ pub mod xs {
     }
 
     impl_element!(Assertion, "assertion", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "test") => attr_test,
-        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "test") => attr_test: optional,
+        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -217,7 +217,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Attribute<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_name: support::NcName<'input>,
         pub attr_inheritable: Option<support::Boolean<'input>>,
         pub attr_type: Option<support::QName<'input>>,
         pub attr_default: Option<support::XmlString<'input>>,
@@ -227,11 +227,11 @@ pub mod xs {
     }
 
     impl_element!(Attribute, "attribute", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
-        ("http://www.w3.org/2001/XMLSchema", "inheritable") => attr_inheritable,
-        ("http://www.w3.org/2001/XMLSchema", "type") => attr_type,
-        ("http://www.w3.org/2001/XMLSchema", "default") => attr_default,
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: required,
+        ("http://www.w3.org/2001/XMLSchema", "inheritable") => attr_inheritable: optional,
+        ("http://www.w3.org/2001/XMLSchema", "type") => attr_type: optional,
+        ("http://www.w3.org/2001/XMLSchema", "default") => attr_default: optional,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (local_simple_type, inline_elements, Option<LocalSimpleType>),
@@ -240,13 +240,13 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct AttributeGroup<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_name: support::NcName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
     }
 
     impl_element!(AttributeGroup, "attributeGroup", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: required,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (attr_decls, xs, AttrDecls),
@@ -276,8 +276,8 @@ pub mod xs {
     }
 
     impl_element!(ComplexContent, "complexContent", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "mixed") => attr_mixed,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "mixed") => attr_mixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (choice_restriction_extension, enums, ChoiceRestrictionExtension),
@@ -286,7 +286,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct ComplexType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_name: support::NcName<'input>,
         pub attr_mixed: Option<support::Boolean<'input>>,
         pub attr_abstract: Option<support::Boolean<'input>>,
         pub attr_final: Option<xs::DerivationSet<'input>>,
@@ -297,12 +297,12 @@ pub mod xs {
     }
 
     impl_element!(ComplexType, "complexType", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
-        ("http://www.w3.org/2001/XMLSchema", "mixed") => attr_mixed,
-        ("http://www.w3.org/2001/XMLSchema", "abstract") => attr_abstract,
-        ("http://www.w3.org/2001/XMLSchema", "final") => attr_final,
-        ("http://www.w3.org/2001/XMLSchema", "block") => attr_block,
-        ("http://www.w3.org/2001/XMLSchema", "defaultAttributesApply") => attr_default_attributes_apply,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: required,
+        ("http://www.w3.org/2001/XMLSchema", "mixed") => attr_mixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "abstract") => attr_abstract: optional,
+        ("http://www.w3.org/2001/XMLSchema", "final") => attr_final: optional,
+        ("http://www.w3.org/2001/XMLSchema", "block") => attr_block: optional,
+        ("http://www.w3.org/2001/XMLSchema", "defaultAttributesApply") => attr_default_attributes_apply: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (complex_type_model, xs, ComplexTypeModel),
@@ -319,9 +319,9 @@ pub mod xs {
     }
 
     impl_element!(DefaultOpenContent, "defaultOpenContent", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "appliesToEmpty") => attr_applies_to_empty,
-        ("http://www.w3.org/2001/XMLSchema", "mode") => attr_mode,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "appliesToEmpty") => attr_applies_to_empty: optional,
+        ("http://www.w3.org/2001/XMLSchema", "mode") => attr_mode: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (any_wildcard, inline_elements, AnyWildcard),
@@ -335,7 +335,7 @@ pub mod xs {
     }
 
     impl_element!(Documentation, "documentation", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "source") => attr_source,
+        ("http://www.w3.org/2001/XMLSchema", "source") => attr_source: optional,
     }, fields = {
         (sequence_any, sequences, Vec<SequenceAny; min=0;>),
     });
@@ -343,7 +343,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Element<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_name: support::NcName<'input>,
         pub attr_type: Option<support::QName<'input>>,
         pub attr_substitution_group: Option<lists::QNameList<'input>>,
         pub attr_default: Option<support::XmlString<'input>>,
@@ -359,15 +359,15 @@ pub mod xs {
     }
 
     impl_element!(Element, "element", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
-        ("http://www.w3.org/2001/XMLSchema", "type") => attr_type,
-        ("http://www.w3.org/2001/XMLSchema", "substitutionGroup") => attr_substitution_group,
-        ("http://www.w3.org/2001/XMLSchema", "default") => attr_default,
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
-        ("http://www.w3.org/2001/XMLSchema", "nillable") => attr_nillable,
-        ("http://www.w3.org/2001/XMLSchema", "abstract") => attr_abstract,
-        ("http://www.w3.org/2001/XMLSchema", "final") => attr_final,
-        ("http://www.w3.org/2001/XMLSchema", "block") => attr_block,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: required,
+        ("http://www.w3.org/2001/XMLSchema", "type") => attr_type: optional,
+        ("http://www.w3.org/2001/XMLSchema", "substitutionGroup") => attr_substitution_group: optional,
+        ("http://www.w3.org/2001/XMLSchema", "default") => attr_default: optional,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "nillable") => attr_nillable: optional,
+        ("http://www.w3.org/2001/XMLSchema", "abstract") => attr_abstract: optional,
+        ("http://www.w3.org/2001/XMLSchema", "final") => attr_final: optional,
+        ("http://www.w3.org/2001/XMLSchema", "block") => attr_block: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),
@@ -389,14 +389,14 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct ExplicitTimezone<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_value: Option<xs::Nmtoken<'input>>,
+        pub attr_value: xs::Nmtoken<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(ExplicitTimezone, "explicitTimezone", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value,
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
+        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value: required,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -415,16 +415,16 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Field<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_xpath: Option<support::Token<'input>>,
+        pub attr_xpath: support::Token<'input>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
         pub attr_id: Option<support::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(Field, "field", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "xpath") => attr_xpath,
-        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "xpath") => attr_xpath: required,
+        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -432,14 +432,14 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct FractionDigits<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_value: Option<support::NonNegativeInteger<'input>>,
+        pub attr_value: support::NonNegativeInteger<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(FractionDigits, "fractionDigits", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value,
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
+        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value: required,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -447,13 +447,13 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Group<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_name: support::NcName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub choice_all_choice_sequence: super::enums::ChoiceAllChoiceSequence<'input>,
     }
 
     impl_element!(Group, "group", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: required,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (choice_all_choice_sequence, enums, ChoiceAllChoiceSequence),
@@ -470,9 +470,9 @@ pub mod xs {
     }
 
     impl_element!(Import, "import", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "schemaLocation") => attr_schema_location,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "schemaLocation") => attr_schema_location: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -481,14 +481,14 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Include<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_schema_location: Option<support::AnyUri<'input>>,
+        pub attr_schema_location: support::AnyUri<'input>,
         pub attr_id: Option<support::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(Include, "include", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "schemaLocation") => attr_schema_location,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "schemaLocation") => attr_schema_location: required,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -504,9 +504,9 @@ pub mod xs {
     }
 
     impl_element!(Key, "key", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
-        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: optional,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (uniqueness_spec, sequences, Option<UniquenessSpec>),
@@ -524,10 +524,10 @@ pub mod xs {
     }
 
     impl_element!(Keyref, "keyref", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "refer") => attr_refer,
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
-        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "refer") => attr_refer: optional,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: optional,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (uniqueness_spec, sequences, Option<UniquenessSpec>),
@@ -536,14 +536,14 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Length<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_value: Option<support::NonNegativeInteger<'input>>,
+        pub attr_value: support::NonNegativeInteger<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(Length, "length", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value,
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
+        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value: required,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -558,8 +558,8 @@ pub mod xs {
     }
 
     impl_element!(List, "list", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "itemType") => attr_item_type,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "itemType") => attr_item_type: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (local_simple_type, inline_elements, Option<LocalSimpleType>),
@@ -575,8 +575,8 @@ pub mod xs {
     }
 
     impl_element!(MaxExclusive, "maxExclusive", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -591,8 +591,8 @@ pub mod xs {
     }
 
     impl_element!(MaxInclusive, "maxInclusive", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -600,14 +600,14 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct MaxLength<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_value: Option<support::NonNegativeInteger<'input>>,
+        pub attr_value: support::NonNegativeInteger<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(MaxLength, "maxLength", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value,
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
+        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value: required,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -622,8 +622,8 @@ pub mod xs {
     }
 
     impl_element!(MinExclusive, "minExclusive", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -638,8 +638,8 @@ pub mod xs {
     }
 
     impl_element!(MinInclusive, "minInclusive", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -647,14 +647,14 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct MinLength<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_value: Option<support::NonNegativeInteger<'input>>,
+        pub attr_value: support::NonNegativeInteger<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(MinLength, "minLength", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value,
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
+        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value: required,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -663,7 +663,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Notation<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_name: support::NcName<'input>,
         pub attr_public: Option<xs::Public<'input>>,
         pub attr_system: Option<support::AnyUri<'input>>,
         pub attr_id: Option<support::Id<'input>>,
@@ -671,10 +671,10 @@ pub mod xs {
     }
 
     impl_element!(Notation, "notation", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
-        ("http://www.w3.org/2001/XMLSchema", "public") => attr_public,
-        ("http://www.w3.org/2001/XMLSchema", "system") => attr_system,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: required,
+        ("http://www.w3.org/2001/XMLSchema", "public") => attr_public: optional,
+        ("http://www.w3.org/2001/XMLSchema", "system") => attr_system: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -689,8 +689,8 @@ pub mod xs {
     }
 
     impl_element!(OpenContent, "openContent", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "mode") => attr_mode,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "mode") => attr_mode: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (any_wildcard, inline_elements, Option<AnyWildcard>),
@@ -699,15 +699,15 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Override<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_schema_location: Option<support::AnyUri<'input>>,
+        pub attr_schema_location: support::AnyUri<'input>,
         pub attr_id: Option<support::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub schema_top: Vec<super::xs::SchemaTop<'input>>,
     }
 
     impl_element!(Override, "override", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "schemaLocation") => attr_schema_location,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "schemaLocation") => attr_schema_location: required,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (schema_top, xs, Vec<SchemaTop; min=0;>),
@@ -716,12 +716,12 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Pattern<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_value: Option<support::XmlString<'input>>,
+        pub attr_value: support::XmlString<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(Pattern, "pattern", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value,
+        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value: required,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -729,14 +729,14 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Redefine<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_schema_location: Option<support::AnyUri<'input>>,
+        pub attr_schema_location: support::AnyUri<'input>,
         pub attr_id: Option<support::Id<'input>>,
         pub choice_annotation_redefinable: Vec<super::enums::ChoiceAnnotationRedefinable<'input>>,
     }
 
     impl_element!(Redefine, "redefine", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "schemaLocation") => attr_schema_location,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "schemaLocation") => attr_schema_location: required,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (choice_annotation_redefinable, enums, Vec<ChoiceAnnotationRedefinable; min=0;>),
     });
@@ -751,8 +751,8 @@ pub mod xs {
     }
 
     impl_element!(Restriction, "restriction", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "base") => attr_base,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "base") => attr_base: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (simple_restriction_model, xs, SimpleRestrictionModel),
@@ -776,15 +776,15 @@ pub mod xs {
     }
 
     impl_element!(Schema, "schema", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "targetNamespace") => attr_target_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "version") => attr_version,
-        ("http://www.w3.org/2001/XMLSchema", "finalDefault") => attr_final_default,
-        ("http://www.w3.org/2001/XMLSchema", "blockDefault") => attr_block_default,
-        ("http://www.w3.org/2001/XMLSchema", "attributeFormDefault") => attr_attribute_form_default,
-        ("http://www.w3.org/2001/XMLSchema", "elementFormDefault") => attr_element_form_default,
-        ("http://www.w3.org/2001/XMLSchema", "defaultAttributes") => attr_default_attributes,
-        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "targetNamespace") => attr_target_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "version") => attr_version: optional,
+        ("http://www.w3.org/2001/XMLSchema", "finalDefault") => attr_final_default: optional,
+        ("http://www.w3.org/2001/XMLSchema", "blockDefault") => attr_block_default: optional,
+        ("http://www.w3.org/2001/XMLSchema", "attributeFormDefault") => attr_attribute_form_default: optional,
+        ("http://www.w3.org/2001/XMLSchema", "elementFormDefault") => attr_element_form_default: optional,
+        ("http://www.w3.org/2001/XMLSchema", "defaultAttributes") => attr_default_attributes: optional,
+        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (composition, xs, Vec<Composition; min=0;>),
         (open_content, sequences, Option<AnnotatedOpenContent>),
@@ -795,16 +795,16 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Selector<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_xpath: Option<support::Token<'input>>,
+        pub attr_xpath: support::Token<'input>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
         pub attr_id: Option<support::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(Selector, "selector", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "xpath") => attr_xpath,
-        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "xpath") => attr_xpath: required,
+        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -832,7 +832,7 @@ pub mod xs {
     }
 
     impl_element!(SimpleContent, "simpleContent", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (choice_restriction_extension, enums, ChoiceRestrictionExtension),
@@ -841,15 +841,15 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct SimpleType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_name: support::NcName<'input>,
         pub attr_final: Option<xs::SimpleDerivationSet<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub simple_derivation: super::xs::SimpleDerivation<'input>,
     }
 
     impl_element!(SimpleType, "simpleType", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
-        ("http://www.w3.org/2001/XMLSchema", "final") => attr_final,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: required,
+        ("http://www.w3.org/2001/XMLSchema", "final") => attr_final: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (simple_derivation, xs, SimpleDerivation),
@@ -858,12 +858,12 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct TotalDigits<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_value: Option<support::PositiveInteger<'input>>,
+        pub attr_value: support::PositiveInteger<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(TotalDigits, "totalDigits", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value,
+        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value: required,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -878,8 +878,8 @@ pub mod xs {
     }
 
     impl_element!(Union, "union", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "memberTypes") => attr_member_types,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "memberTypes") => attr_member_types: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (local_simple_type, inline_elements, Vec<LocalSimpleType; min=0;>),
@@ -896,9 +896,9 @@ pub mod xs {
     }
 
     impl_element!(Unique, "unique", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
-        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: optional,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (uniqueness_spec, sequences, Option<UniquenessSpec>),
@@ -907,14 +907,14 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct WhiteSpace<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_value: Option<xs::Nmtoken<'input>>,
+        pub attr_value: xs::Nmtoken<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(WhiteSpace, "whiteSpace", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value,
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
+        ("http://www.w3.org/2001/XMLSchema", "value") => attr_value: required,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -1484,10 +1484,10 @@ pub mod inline_elements {
     }
 
     impl_element!(AlternativeAltType, "alternative", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "test") => attr_test,
-        ("http://www.w3.org/2001/XMLSchema", "type") => attr_type,
-        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "test") => attr_test: optional,
+        ("http://www.w3.org/2001/XMLSchema", "type") => attr_type: optional,
+        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),
@@ -1505,10 +1505,10 @@ pub mod inline_elements {
     }
 
     impl_element!(AnyWildcard, "any", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "notNamespace") => attr_not_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "processContents") => attr_process_contents,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "namespace") => attr_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "notNamespace") => attr_not_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "processContents") => attr_process_contents: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -1524,9 +1524,9 @@ pub mod inline_elements {
     }
 
     impl_element!(Assertion, "assert", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "test") => attr_test,
-        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "test") => attr_test: optional,
+        ("http://www.w3.org/2001/XMLSchema", "xpathDefaultNamespace") => attr_xpath_default_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -1549,16 +1549,16 @@ pub mod inline_elements {
     }
 
     impl_element!(Attribute, "attribute", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "type") => attr_type,
-        ("http://www.w3.org/2001/XMLSchema", "use") => attr_use,
-        ("http://www.w3.org/2001/XMLSchema", "default") => attr_default,
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
-        ("http://www.w3.org/2001/XMLSchema", "form") => attr_form,
-        ("http://www.w3.org/2001/XMLSchema", "targetNamespace") => attr_target_namespace,
-        ("http://www.w3.org/2001/XMLSchema", "inheritable") => attr_inheritable,
-        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name,
-        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "type") => attr_type: optional,
+        ("http://www.w3.org/2001/XMLSchema", "use") => attr_use: optional,
+        ("http://www.w3.org/2001/XMLSchema", "default") => attr_default: optional,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "form") => attr_form: optional,
+        ("http://www.w3.org/2001/XMLSchema", "targetNamespace") => attr_target_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "inheritable") => attr_inheritable: optional,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: optional,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: optional,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (local_simple_type, inline_elements, Option<LocalSimpleType>),
@@ -1567,12 +1567,12 @@ pub mod inline_elements {
     #[derive(Debug, PartialEq)]
     pub struct AttributeGroupRef<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_ref: Option<support::QName<'input>>,
+        pub attr_ref: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(AttributeGroupRef, "attributeGroup", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: required,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -1600,8 +1600,8 @@ pub mod inline_elements {
     }
 
     impl_element!(LocalComplexType, "complexType", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "mixed") => attr_mixed,
-        ("http://www.w3.org/2001/XMLSchema", "defaultAttributesApply") => attr_default_attributes_apply,
+        ("http://www.w3.org/2001/XMLSchema", "mixed") => attr_mixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "defaultAttributesApply") => attr_default_attributes_apply: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (complex_type_model, xs, ComplexTypeModel),
@@ -1624,13 +1624,13 @@ pub mod inline_elements {
     }
 
     impl_element!(LocalElement, "element", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "type") => attr_type,
-        ("http://www.w3.org/2001/XMLSchema", "default") => attr_default,
-        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed,
-        ("http://www.w3.org/2001/XMLSchema", "nillable") => attr_nillable,
-        ("http://www.w3.org/2001/XMLSchema", "block") => attr_block,
-        ("http://www.w3.org/2001/XMLSchema", "form") => attr_form,
-        ("http://www.w3.org/2001/XMLSchema", "targetNamespace") => attr_target_namespace,
+        ("http://www.w3.org/2001/XMLSchema", "type") => attr_type: optional,
+        ("http://www.w3.org/2001/XMLSchema", "default") => attr_default: optional,
+        ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "nillable") => attr_nillable: optional,
+        ("http://www.w3.org/2001/XMLSchema", "block") => attr_block: optional,
+        ("http://www.w3.org/2001/XMLSchema", "form") => attr_form: optional,
+        ("http://www.w3.org/2001/XMLSchema", "targetNamespace") => attr_target_namespace: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),
@@ -1641,7 +1641,7 @@ pub mod inline_elements {
     #[derive(Debug, PartialEq)]
     pub struct ExtensionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_base: Option<support::QName<'input>>,
+        pub attr_base: support::QName<'input>,
         pub attr_id: Option<support::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub open_content: Option<super::xs::OpenContent<'input>>,
@@ -1651,8 +1651,8 @@ pub mod inline_elements {
     }
 
     impl_element!(ExtensionType, "extension", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "base") => attr_base,
-        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id,
+        ("http://www.w3.org/2001/XMLSchema", "base") => attr_base: required,
+        ("http://www.w3.org/2001/XMLSchema", "id") => attr_id: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (open_content, xs, Option<OpenContent>),
@@ -1665,14 +1665,14 @@ pub mod inline_elements {
     #[derive(Debug, PartialEq)]
     pub struct SimpleExtensionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_base: Option<support::QName<'input>>,
+        pub attr_base: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
         pub assertions: super::xs::Assertions<'input>,
     }
 
     impl_element!(SimpleExtensionType, "extension", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "base") => attr_base,
+        ("http://www.w3.org/2001/XMLSchema", "base") => attr_base: required,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (attr_decls, xs, AttrDecls),
@@ -1684,14 +1684,14 @@ pub mod inline_elements {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
         pub attr_max_occurs: Option<support::NonNegativeInteger<'input>>,
-        pub attr_ref: Option<support::QName<'input>>,
+        pub attr_ref: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(Group, "group", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs,
-        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs,
-        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref,
+        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs: optional,
+        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs: optional,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: required,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -1699,12 +1699,12 @@ pub mod inline_elements {
     #[derive(Debug, PartialEq)]
     pub struct GroupRef<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_ref: Option<support::QName<'input>>,
+        pub attr_ref: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(GroupRef, "group", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: required,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });
@@ -1712,7 +1712,7 @@ pub mod inline_elements {
     #[derive(Debug, PartialEq)]
     pub struct ComplexRestrictionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_base: Option<support::QName<'input>>,
+        pub attr_base: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub sequence_open_content_type_def_particle: Option<super::sequences::SequenceOpenContentTypeDefParticle<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
@@ -1720,7 +1720,7 @@ pub mod inline_elements {
     }
 
     impl_element!(ComplexRestrictionType, "restriction", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "base") => attr_base,
+        ("http://www.w3.org/2001/XMLSchema", "base") => attr_base: required,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (sequence_open_content_type_def_particle, sequences, Option<SequenceOpenContentTypeDefParticle>),
@@ -1731,7 +1731,7 @@ pub mod inline_elements {
     #[derive(Debug, PartialEq)]
     pub struct SimpleRestrictionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_base: Option<support::QName<'input>>,
+        pub attr_base: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub simple_restriction_model: Option<super::xs::SimpleRestrictionModel<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
@@ -1739,7 +1739,7 @@ pub mod inline_elements {
     }
 
     impl_element!(SimpleRestrictionType, "restriction", attributes = {
-        ("http://www.w3.org/2001/XMLSchema", "base") => attr_base,
+        ("http://www.w3.org/2001/XMLSchema", "base") => attr_base: required,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (simple_restriction_model, xs, Option<SimpleRestrictionModel>),
