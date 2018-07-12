@@ -327,18 +327,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
         let name = name.expect("<group> has no name or ref.");
 
-        let type_ = match content {
+        let mut type_ = match content {
             enums::ChoiceAllChoiceSequence::All(_) => unimplemented!("all"),
-            enums::ChoiceAllChoiceSequence::Choice(e) => {
-                let xs::Choice { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
-                self.process_choice(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), true)
-            },
-            enums::ChoiceAllChoiceSequence::Sequence(e) => {
-                let xs::Sequence { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
-                self.process_sequence(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), true)
-            },
+            enums::ChoiceAllChoiceSequence::Choice(e) => self.process_choice(e, true),
+            enums::ChoiceAllChoiceSequence::Sequence(e) => self.process_sequence(e, true),
         };
 
+        type_.doc.extend(&self.process_annotation(&annotation));
         let doc = type_.doc.clone();
 
         self.groups.insert(name, type_);
@@ -651,14 +646,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 self.process_group_ref(attrs, annotation.iter().collect())
             },
             xs::TypeDefParticle::All(_) => unimplemented!("all"),
-            xs::TypeDefParticle::Choice(e) => {
-                let xs::Choice { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = **e;
-                self.process_choice(attrs, nested_particle, annotation.iter().collect(), inlinable)
-            },
-            xs::TypeDefParticle::Sequence(e) => {
-                let xs::Sequence { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = **e;
-                self.process_sequence(attrs, nested_particle, annotation.iter().collect(), inlinable)
-            },
+            xs::TypeDefParticle::Choice(e) => self.process_choice(e, inlinable),
+            xs::TypeDefParticle::Sequence(e) => self.process_sequence(e, inlinable),
         }
     }
 
@@ -667,7 +656,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool
             ) -> RichType<'input, Type<'input>> {
-        match particle {
+        let mut ty = match particle {
             xs::NestedParticle::Element(e) => {
                 let inline_elements::LocalElement { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, annotation: ref annotation2, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
                 self.process_element(attrs, type_, vec_concat_opt(&annotation, annotation2.as_ref()))
@@ -676,16 +665,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 let inline_elements::GroupRef { ref attrs, ref attr_ref, annotation: ref annotation2 } = **e;
                 self.process_group_ref(attrs, vec_concat_opt(&annotation, annotation2.as_ref()))
             },
-            xs::NestedParticle::Choice(e) => {
-                let xs::Choice { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
-                self.process_choice(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), inlinable)
-            },
-            xs::NestedParticle::Sequence(e) => {
-                let xs::Sequence { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
-                self.process_sequence(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), inlinable)
-            },
-            xs::NestedParticle::Any(e) => self.process_any(e, annotation),
-        }
+            xs::NestedParticle::Choice(e) => self.process_choice(e, inlinable),
+            xs::NestedParticle::Sequence(e) => self.process_sequence(e, inlinable),
+            xs::NestedParticle::Any(e) => self.process_any(e, Vec::new()),
+        };
+
+        ty.doc.extend(&self.process_annotation(&annotation));
+        ty
     }
 
     fn process_any(&mut self,
@@ -700,11 +686,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_sequence(&mut self,
-            attrs: &'ast HashMap<QName<'input>, &'input str>,
-            particles: &'ast Vec<xs::NestedParticle<'input>>,
-            annotation: Vec<&'ast xs::Annotation<'input>>,
+            seq: &'ast xs::Sequence<'input>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
+        let xs::Sequence { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = seq;
+        let particles = nested_particle;
         let mut min_occurs = 1;
         let mut max_occurs = 1;
         for (key, &value) in attrs.iter() {
@@ -719,7 +705,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("sequence");
         if min_occurs == 1 && max_occurs == 1 && inlinable && particles.len() == 1 {
-            self.process_nested_particle(particles.get(0).unwrap(), annotation, inlinable)
+            self.process_nested_particle(particles.get(0).unwrap(), annotation.iter().collect(), inlinable)
         }
         else {
             for particle in particles.iter() {
@@ -727,7 +713,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 name_hint.extend(&ty.name_hint);
                 items.push(ty);
             }
-            let doc = self.process_annotation(&annotation);
+            let doc = self.process_annotation(&annotation.iter().collect());
             if min_occurs == 1 && max_occurs == 1 {
                 RichType::new(
                     name_hint,
@@ -751,11 +737,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_choice(&mut self,
-            attrs: &HashMap<QName<'input>, &'input str>,
-            particles: &'ast Vec<xs::NestedParticle<'input>>,
-            annotation: Vec<&'ast xs::Annotation<'input>>,
+            choice: &'ast xs::Choice<'input>,
             inlinable: bool
             ) -> RichType<'input, Type<'input>> {
+        let xs::Choice { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = choice;
+        let particles = nested_particle;
         let mut min_occurs = 1;
         let mut max_occurs = 1;
         for (key, &value) in attrs.iter() {
@@ -772,7 +758,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         if particles.len() == 1 {
             let particle = particles.get(0).unwrap();
             let RichType { name_hint, attrs, type_, doc } =
-                self.process_nested_particle(particle, annotation, inlinable);
+                self.process_nested_particle(particle, annotation.iter().collect(), inlinable);
             match (min_occurs, max_occurs, type_) {
                 (_, _, Type::Element(1, 1, e)) => return RichType {
                     name_hint, attrs, type_: Type::Element(min_occurs, max_occurs, e), doc },
@@ -802,7 +788,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 items.push(ty);
             }
         }
-        let doc = self.process_annotation(&annotation);
+        let doc = self.process_annotation(&annotation.iter().collect());
         match (min_occurs, max_occurs, inlinable) {
             (1, 1, true) => {
                 RichType::new(

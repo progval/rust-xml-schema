@@ -209,7 +209,7 @@ impl<'input> ParseXml<'input> for AnyURIElement<'input> {
 }
 
 #[derive(Debug, PartialEq, Default)]
-pub struct Integer<'input>(i64, PhantomData<&'input ()>);
+pub struct Integer<'input>(pub i64, PhantomData<&'input ()>);
 impl<'input> ParseXmlStr<'input> for Integer<'input> {
     const NODE_NAME: &'static str = "Integer";
     fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<(&'input str, Integer<'input>)> {
