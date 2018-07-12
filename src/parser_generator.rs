@@ -416,14 +416,19 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn gen_attrs(&self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, name_gen: &mut NameGenerator, attrs: &Attrs<'input>, seen_attrs: &mut HashMap<FullName<'input>, AttrUse>, generated_attrs: &mut HashSet<FullName<'input>>) {
+    fn gen_attrs(&self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, name_gen: &mut NameGenerator, attrs: &Attrs<'input>, seen_attrs: &mut HashMap<FullName<'input>, AttrUse>, generated_attrs: &mut HashSet<FullName<'input>>, inherited: bool) {
         for (attr_name, use_, attr_type) in &attrs.named {
-            if generated_attrs.contains(attr_name) || seen_attrs.get(attr_name) == Some(&AttrUse::Prohibited) {
+            if generated_attrs.contains(attr_name) {
                 continue;
             }
             let type_name = attr_type.as_ref().map(|t| self.get_simple_type_name(t));
             let (prefix, local) = attr_name.as_tuple();
-            let use_ = *seen_attrs.get(attr_name).unwrap_or(use_);
+            let use_ = if inherited {
+                *seen_attrs.get(attr_name).unwrap_or(use_)
+            }
+            else {
+                *use_
+            };
             seen_attrs.insert(attr_name.clone(), use_);
             if let Some(type_name) = type_name {
                 generated_attrs.insert(attr_name.clone());
@@ -445,11 +450,13 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 // TODO
             }
         }
+        //impl_code.push(format!("//// {:?}", attrs));
         for group_name in &attrs.group_refs {
             let mut found = false;
             for processor in self.processors.iter() {
                 if let Some(attrs) = processor.attribute_groups.get(group_name) {
-                    self.gen_attrs(struct_, impl_code, name_gen, attrs, seen_attrs, generated_attrs);
+                    //impl_code.push(format!("// {:?}", attrs));
+                    self.gen_attrs(struct_, impl_code, name_gen, attrs, seen_attrs, generated_attrs, false);
                     found = true;
                     break;
                 }
@@ -476,10 +483,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             // Do not swap these two calls of gen_attrs, the first one takes precedence
             // in case of duplicate attributes (most important when dealing with
             // prohibited attributes).
-            self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut seen_attrs, &mut generated_attrs);
+            self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut seen_attrs, &mut generated_attrs, false);
             {
                 let attr_writer = &mut |attrs: &Attrs<'input>| {
-                    self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut seen_attrs, &mut generated_attrs);
+                    self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut seen_attrs, &mut generated_attrs, true);
                 };
                 let field_writer = &mut |_, _, _, _, _| ();
                 let doc_writer = &mut |_| ();

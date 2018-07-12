@@ -222,6 +222,7 @@ pub mod xs {
         pub attr_type: Option<support::QName<'input>>,
         pub attr_default: Option<support::XmlString<'input>>,
         pub attr_fixed: Option<support::XmlString<'input>>,
+        pub attr_ref: Option<support::QName<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
     }
@@ -232,6 +233,7 @@ pub mod xs {
         ("http://www.w3.org/2001/XMLSchema", "type") => attr_type: optional,
         ("http://www.w3.org/2001/XMLSchema", "default") => attr_default: optional,
         ("http://www.w3.org/2001/XMLSchema", "fixed") => attr_fixed: optional,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (local_simple_type, inline_elements, Option<LocalSimpleType>),
@@ -241,12 +243,14 @@ pub mod xs {
     pub struct AttributeGroup<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_name: support::NcName<'input>,
+        pub attr_ref: Option<support::QName<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
     }
 
     impl_element!(AttributeGroup, "attributeGroup", attributes = {
         ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: required,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (attr_decls, xs, AttrDecls),
@@ -256,6 +260,8 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Choice<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_ref: Option<support::QName<'input>>,
         pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
         pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -263,6 +269,8 @@ pub mod xs {
     }
 
     impl_element!(Choice, "choice", attributes = {
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: optional,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: optional,
         ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs: optional,
         ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs: optional,
     }, fields = {
@@ -356,6 +364,9 @@ pub mod xs {
         pub attr_abstract: Option<support::Boolean<'input>>,
         pub attr_final: Option<xs::DerivationSet<'input>>,
         pub attr_block: Option<xs::BlockSet<'input>>,
+        pub attr_ref: Option<support::QName<'input>>,
+        pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
+        pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub type_: Option<super::enums::Type<'input>>,
         pub alternative_alt_type: Vec<super::inline_elements::AlternativeAltType<'input>>,
@@ -372,6 +383,9 @@ pub mod xs {
         ("http://www.w3.org/2001/XMLSchema", "abstract") => attr_abstract: optional,
         ("http://www.w3.org/2001/XMLSchema", "final") => attr_final: optional,
         ("http://www.w3.org/2001/XMLSchema", "block") => attr_block: optional,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: optional,
+        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs: optional,
+        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),
@@ -817,6 +831,8 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Sequence<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_ref: Option<support::QName<'input>>,
         pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
         pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -824,6 +840,8 @@ pub mod xs {
     }
 
     impl_element!(Sequence, "sequence", attributes = {
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: optional,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: optional,
         ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs: optional,
         ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs: optional,
     }, fields = {
@@ -1576,11 +1594,13 @@ pub mod inline_elements {
     pub struct AttributeGroupRef<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_ref: support::QName<'input>,
+        pub attr_name: Option<support::NcName<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
     impl_element!(AttributeGroupRef, "attributeGroup", attributes = {
         ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: required,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
     });

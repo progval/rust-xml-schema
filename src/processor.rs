@@ -330,11 +330,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let type_ = match content {
             enums::ChoiceAllChoiceSequence::All(_) => unimplemented!("all"),
             enums::ChoiceAllChoiceSequence::Choice(e) => {
-                let xs::Choice { ref attrs, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
+                let xs::Choice { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
                 self.process_choice(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), true)
             },
             enums::ChoiceAllChoiceSequence::Sequence(e) => {
-                let xs::Sequence { ref attrs, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
+                let xs::Sequence { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
                 self.process_sequence(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), true)
             },
         };
@@ -652,11 +652,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             },
             xs::TypeDefParticle::All(_) => unimplemented!("all"),
             xs::TypeDefParticle::Choice(e) => {
-                let xs::Choice { ref attrs, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = **e;
+                let xs::Choice { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = **e;
                 self.process_choice(attrs, nested_particle, annotation.iter().collect(), inlinable)
             },
             xs::TypeDefParticle::Sequence(e) => {
-                let xs::Sequence { ref attrs, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = **e;
+                let xs::Sequence { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = **e;
                 self.process_sequence(attrs, nested_particle, annotation.iter().collect(), inlinable)
             },
         }
@@ -677,11 +677,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 self.process_group_ref(attrs, vec_concat_opt(&annotation, annotation2.as_ref()))
             },
             xs::NestedParticle::Choice(e) => {
-                let xs::Choice { ref attrs, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
+                let xs::Choice { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
                 self.process_choice(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), inlinable)
             },
             xs::NestedParticle::Sequence(e) => {
-                let xs::Sequence { ref attrs, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
+                let xs::Sequence { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
                 self.process_sequence(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), inlinable)
             },
             xs::NestedParticle::Any(e) => self.process_any(e, annotation),
@@ -893,7 +893,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
         let name = name.expect("<element> has no name.");
-        let xs::Element { ref attrs, ref attr_name, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
+        let xs::Element { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         let type_ = match (type_attr, &child_type) {
             (None, Some(ref c)) => match c {
