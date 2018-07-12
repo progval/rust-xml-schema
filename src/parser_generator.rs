@@ -416,15 +416,17 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn gen_attrs(&self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, name_gen: &mut NameGenerator, attrs: &Attrs<'input>, generated_attrs: &mut HashSet<FullName<'input>>) {
+    fn gen_attrs(&self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, name_gen: &mut NameGenerator, attrs: &Attrs<'input>, seen_attrs: &mut HashMap<FullName<'input>, AttrUse>, generated_attrs: &mut HashSet<FullName<'input>>) {
         for (attr_name, use_, attr_type) in &attrs.named {
-            if generated_attrs.contains(attr_name) {
+            if generated_attrs.contains(attr_name) || seen_attrs.get(attr_name) == Some(&AttrUse::Prohibited) {
                 continue;
             }
-            generated_attrs.insert(attr_name.clone());
             let type_name = attr_type.as_ref().map(|t| self.get_simple_type_name(t));
             let (prefix, local) = attr_name.as_tuple();
+            let use_ = *seen_attrs.get(attr_name).unwrap_or(use_);
+            seen_attrs.insert(attr_name.clone(), use_);
             if let Some(type_name) = type_name {
+                generated_attrs.insert(attr_name.clone());
                 match use_ {
                     AttrUse::Optional => {
                         let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
@@ -447,7 +449,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut found = false;
             for processor in self.processors.iter() {
                 if let Some(attrs) = processor.attribute_groups.get(group_name) {
-                    self.gen_attrs(struct_, impl_code, name_gen, attrs, generated_attrs);
+                    self.gen_attrs(struct_, impl_code, name_gen, attrs, seen_attrs, generated_attrs);
                     found = true;
                     break;
                 }
@@ -469,14 +471,15 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut name_gen = NameGenerator::new();
             let mut doc = doc.clone();
             let mut generated_attrs = HashSet::new();
+            let mut seen_attrs = HashMap::new();
             
             // Do not swap these two calls of gen_attrs, the first one takes precedence
             // in case of duplicate attributes (most important when dealing with
             // prohibited attributes).
-            self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut generated_attrs);
+            self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut seen_attrs, &mut generated_attrs);
             {
                 let attr_writer = &mut |attrs: &Attrs<'input>| {
-                    self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut generated_attrs);
+                    self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut seen_attrs, &mut generated_attrs);
                 };
                 let field_writer = &mut |_, _, _, _, _| ();
                 let doc_writer = &mut |_| ();
