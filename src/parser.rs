@@ -566,6 +566,7 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  itemType attribute and simpleType child are mutually exclusive, but one or other is required 
     #[derive(Debug, PartialEq)]
     pub struct List<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -759,6 +760,7 @@ pub mod xs {
         (choice_annotation_redefinable, enums, Vec<ChoiceAnnotationRedefinable; min=0;>),
     });
 
+    ///  base attribute and simpleType child are mutually exclusive, but one or other is required 
     #[derive(Debug, PartialEq)]
     pub struct Restriction<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
@@ -894,6 +896,7 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    ///  memberTypes attribute must be non-empty or there must be at least one simpleType child 
     #[derive(Debug, PartialEq)]
     pub struct Union<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,

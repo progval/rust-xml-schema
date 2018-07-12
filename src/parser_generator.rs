@@ -500,23 +500,20 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         module.scope().raw(&impl_code.join("\n"));
     }
 
-    fn get_type(&self, name: &FullName<'input>) -> (&RichType<'input, Type<'input>>, &Documentation<'input>) {
+    fn get_type(&self, name: &FullName<'input>) -> &RichType<'input, Type<'input>> {
         let mut type_ = None;
-        let mut doc = None;
         let (prefix, local) = name.as_tuple();
         for proc in &self.processors {
             if proc.namespaces.target_namespace != prefix {
                 continue;
             }
-            if let Some(ref t) = proc.types.get(name) {
-                type_ = Some(&t.0);
-                doc = Some(&t.1);
+            type_ = proc.types.get(name);
+            if type_.is_some() {
                 break;
             }
         }
         let type_ = type_.expect(&format!("Unknown type name: {:?}", name));
-        let doc = doc.unwrap();
-        (type_, doc) // TODO: why is doc returned both as .1 and in type_ (a RichType)?
+        type_
     }
 
     fn write_type_in_struct_def<'a, F, G, H>(&'a self,
@@ -532,9 +529,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let mut doc_non_writer: Option<&mut H> = None;
         match &type_ {
             Type::Alias(name) => {
-                let (target_type, doc) = self.get_type(name);
+                let target_type = self.get_type(name);
                 if let Some(ref mut f) = doc_writer {
-                    f(&doc);
+                    f(&target_type.doc);
                 }
                 attr_writer(&target_type.attrs);
                 self.write_type_in_struct_def(field_writer, attr_writer, doc_writer, &target_type.type_);
@@ -561,7 +558,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 field_writer(name, "enums", *min_occurs, *max_occurs, name);
             },
             Type::Extension(base, ext_type) => {
-                let (base_type, _doc) = &self.get_type(base);
+                let base_type = &self.get_type(base);
                 attr_writer(&base_type.attrs);
                 attr_writer(&ext_type.attrs);
                 self.write_type_in_struct_def(field_writer, attr_writer, &mut doc_non_writer, &base_type.type_);
@@ -571,7 +568,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 if let Some(ref mut f) = doc_writer {
                     f(&ext_type.doc);
                 }
-                let (base_type, _doc) = &self.get_type(base);
+                let base_type = &self.get_type(base);
                 let mut attrs = base_type.attrs.restrict(&ext_type.attrs);
                 attr_writer(&attrs);
                 // TODO: do something with the base's type

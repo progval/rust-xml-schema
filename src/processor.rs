@@ -156,7 +156,7 @@ pub struct Processor<'ast, 'input: 'ast> {
     pub element_form_default_qualified: bool,
     pub attribute_form_default_qualified: bool,
     pub elements: HashMap<FullName<'input>, RichType<'input, Type<'input>>>,
-    pub types: HashMap<FullName<'input>, (RichType<'input, Type<'input>>, Documentation<'input>)>,
+    pub types: HashMap<FullName<'input>, RichType<'input, Type<'input>>>,
     pub simple_types: HashMap<FullName<'input>, (RichType<'input, SimpleType<'input>>, Documentation<'input>)>,
     pub choices: HashMap<Vec<RichType<'input, Type<'input>>>, HashSet<String>>,
     pub sequences: HashMap<Vec<RichType<'input, Type<'input>>>, (HashSet<String>, Documentation<'input>)>,
@@ -513,17 +513,18 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
         //let struct_name = self.namespaces.new_type(QName::from(name));
-        let ty = match model {
+        let mut ty = match model {
             xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
             xs::ComplexTypeModel::ComplexContent(ref model) =>
                 self.process_complex_content(model, false),
             xs::ComplexTypeModel::CompleteContentModel { ref open_content, ref type_def_particle, ref attr_decls, ref assertions } =>
                 self.process_complete_content_model(open_content, type_def_particle, attr_decls, assertions, inlinable),
         };
+        ty.doc.extend(&self.process_annotation(&annotation));
 
         if let Some(name) = name {
-            let doc = self.process_annotation(&annotation);
-            self.types.insert(name, (ty, doc.clone()));
+            let doc = ty.doc.clone();
+            self.types.insert(name, ty);
             RichType::new(
                 NameHint::from_fullname(&name),
                 Type::Alias(name),
