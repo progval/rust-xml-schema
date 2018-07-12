@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use codegen as cg;
 use heck::{SnakeCase, CamelCase};
@@ -416,21 +416,33 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn gen_attrs(&self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, name_gen: &mut NameGenerator, attrs: &Attrs<'input>) {
-        for (attr_name, attr_type) in &attrs.named {
-            let type_name = self.get_simple_type_name(attr_type);
+    fn gen_attrs(&self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, name_gen: &mut NameGenerator, attrs: &Attrs<'input>, generated_attrs: &mut HashSet<FullName<'input>>) {
+        for (attr_name, use_, attr_type) in &attrs.named {
+            if generated_attrs.contains(attr_name) {
+                continue;
+            }
+            generated_attrs.insert(attr_name.clone());
+            let type_name = attr_type.as_ref().map(|t| self.get_simple_type_name(t));
             let (prefix, local) = attr_name.as_tuple();
             if let Some(type_name) = type_name {
-                let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
-                struct_.field(&format!("pub {}", field_name), &format!("Option<{}<'input>>", type_name));
-                impl_code.push(format!("    (\"{}\", \"{}\") => {},", prefix, local, field_name));
+                match use_ {
+                    AttrUse::Optional | AttrUse::Required => {
+                        let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
+                        struct_.field(&format!("pub {}", field_name), &format!("Option<{}<'input>>", type_name.expect("Missing type")));
+                        impl_code.push(format!("    (\"{}\", \"{}\") => {},", prefix, local, field_name));
+                    }
+                    AttrUse::Prohibited => (),
+                }
+            }
+            else {
+                // TODO
             }
         }
         for group_name in &attrs.group_refs {
             let mut found = false;
             for processor in self.processors.iter() {
                 if let Some(attrs) = processor.attribute_groups.get(group_name) {
-                    self.gen_attrs(struct_, impl_code, name_gen, attrs);
+                    self.gen_attrs(struct_, impl_code, name_gen, attrs, generated_attrs);
                     found = true;
                     break;
                 }
@@ -451,10 +463,15 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             struct_.field("pub attrs", "HashMap<QName<'input>, &'input str>");
             let mut name_gen = NameGenerator::new();
             let mut doc = doc.clone();
-            self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs);
+            let mut generated_attrs = HashSet::new();
+            
+            // Do not swap these two calls of gen_attrs, the first one takes precedence
+            // in case of duplicate attributes (most important when dealing with
+            // prohibited attributes).
+            self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut generated_attrs);
             {
                 let attr_writer = &mut |attrs: &Attrs<'input>| {
-                    self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs);
+                    self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut generated_attrs);
                 };
                 let field_writer = &mut |_, _, _, _, _| ();
                 let doc_writer = &mut |_| ();
@@ -540,8 +557,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     f(&ext_type.doc);
                 }
                 let (base_type, _doc) = &self.get_type(base);
-                attr_writer(&ext_type.attrs);
-                // TODO: do something with the base
+                let mut attrs = base_type.attrs.restrict(&ext_type.attrs);
+                attr_writer(&attrs);
+                // TODO: do something with the base's type
                 self.write_type_in_struct_def(field_writer, attr_writer, doc_writer, &ext_type.type_);
             },
             Type::Empty => (), // TODO ?

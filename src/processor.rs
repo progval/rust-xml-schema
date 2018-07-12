@@ -46,9 +46,16 @@ impl<'input> ToString for Documentation<'input> {
     }
 }
 
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum AttrUse {
+    Prohibited,
+    Required,
+    Optional,
+}
+
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Attrs<'input> {
-    pub named: Vec<(FullName<'input>, SimpleType<'input>)>,
+    pub named: Vec<(FullName<'input>, AttrUse, Option<SimpleType<'input>>)>,
     pub refs: Vec<(Option<FullName<'input>>, FullName<'input>)>,
     pub group_refs: Vec<FullName<'input>>,
     pub any_attributes: bool,
@@ -63,6 +70,20 @@ impl<'input> Attrs<'input> {
         self.refs.extend(refs);
         self.group_refs.extend(group_refs);
         self.any_attributes |= any_attributes;
+    }
+    pub fn restrict(&self, other: &Attrs<'input>) -> Attrs<'input> {
+        let mut other_named: HashMap<FullName<'input>, (AttrUse, &Option<SimpleType<'input>>)>;
+        other_named = HashMap::new();
+        for (name, attr_use, type_) in other.named.iter() {
+            other_named.insert(name.clone(), (*attr_use, type_));
+        }
+        let named = self.named.iter().map(|(name, attr_use, type_)| {
+            match other_named.get(name) {
+                None => (name.clone(), *attr_use, (*type_).clone()),
+                Some((attr_use, type_)) => (name.clone(), *attr_use, (*type_).clone()),
+            }
+        }).collect();
+        Attrs { named, refs: other.refs.clone(), group_refs: other.group_refs.clone(), any_attributes: other.any_attributes }
     }
 }
 
@@ -109,7 +130,7 @@ pub enum Type<'input> {
     Simple(SimpleType<'input>),
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SimpleType<'input> {
     Primitive(&'static str, &'static str),
     Alias(FullName<'input>),
@@ -1034,25 +1055,27 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                             _ => panic!("Unknown attribute {} in <attribute>", key),
                         }
                     }
-                    match use_ {
-                        Some("prohibited") => continue,
-                        Some("required") => (), // TODO
-                        Some("optional") => (), // TODO
-                        None => (),
+                    let use_ = match use_ {
+                        Some("prohibited") => AttrUse::Prohibited,
+                        Some("required") => AttrUse::Required,
+                        Some("optional") => AttrUse::Optional,
+                        None => AttrUse::Optional, // TODO
                         Some(s) => panic!("Unknown attribute value use={:?}", s),
-                    }
+                    };
                     match (name, ref_, type_attr, &e.local_simple_type) {
                         (Some(name), None, Some(t), None) => {
-                            attrs.named.push((name, SimpleType::Alias(t)));
+                            attrs.named.push((name, use_, Some(SimpleType::Alias(t))));
                         },
                         (Some(name), None, None, Some(t)) => {
                             let inline_elements::LocalSimpleType {
                                 attrs: ref sub_attrs, ref simple_derivation, ref annotation } = t;
                             let t = self.process_simple_type(sub_attrs, simple_derivation, annotation.iter().collect());
-                            attrs.named.push((name, t.type_));
+                            attrs.named.push((name, use_, Some(t.type_)));
                         },
-                        (_, None, None, None) =>
-                            (), // TODO
+                        (Some(name), None, None, None) =>
+                            attrs.named.push((name, use_, None)),
+                        (None, None, None, None) =>
+                            panic!("no attribute on <attribute>."),
                         (_, _, Some(ref t1), Some(ref t2)) =>
                             panic!("<attribute> has both a type attribute ({:?}) and a child type ({:?}).", t1, t2),
                         (None, None, Some(_), None) | (None, None, None, Some(_)) =>
