@@ -256,11 +256,15 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Choice<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
+        pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub nested_particle: Vec<super::xs::NestedParticle<'input>>,
     }
 
     impl_element!(Choice, "choice", attributes = {
+        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs: optional,
+        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (nested_particle, xs, Vec<NestedParticle; min=0;>),
@@ -813,11 +817,15 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Sequence<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
+        pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub nested_particle: Vec<super::xs::NestedParticle<'input>>,
     }
 
     impl_element!(Sequence, "sequence", attributes = {
+        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs: optional,
+        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (nested_particle, xs, Vec<NestedParticle; min=0;>),
@@ -1617,6 +1625,10 @@ pub mod inline_elements {
         pub attr_block: Option<xs::BlockSet<'input>>,
         pub attr_form: Option<xs::FormChoice<'input>>,
         pub attr_target_namespace: Option<support::AnyUri<'input>>,
+        pub attr_name: Option<support::NcName<'input>>,
+        pub attr_ref: Option<support::QName<'input>>,
+        pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
+        pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub type_: Option<super::enums::Type<'input>>,
         pub alternative_alt_type: Vec<super::inline_elements::AlternativeAltType<'input>>,
@@ -1631,6 +1643,10 @@ pub mod inline_elements {
         ("http://www.w3.org/2001/XMLSchema", "block") => attr_block: optional,
         ("http://www.w3.org/2001/XMLSchema", "form") => attr_form: optional,
         ("http://www.w3.org/2001/XMLSchema", "targetNamespace") => attr_target_namespace: optional,
+        ("http://www.w3.org/2001/XMLSchema", "name") => attr_name: optional,
+        ("http://www.w3.org/2001/XMLSchema", "ref") => attr_ref: optional,
+        ("http://www.w3.org/2001/XMLSchema", "minOccurs") => attr_min_occurs: optional,
+        ("http://www.w3.org/2001/XMLSchema", "maxOccurs") => attr_max_occurs: optional,
     }, fields = {
         (annotation, xs, Option<Annotation>),
         (type_, enums, Option<Type>),

@@ -56,7 +56,7 @@ pub enum AttrUse {
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Attrs<'input> {
     pub named: Vec<(FullName<'input>, AttrUse, Option<SimpleType<'input>>)>,
-    pub refs: Vec<(Option<FullName<'input>>, FullName<'input>)>,
+    pub refs: Vec<(Option<FullName<'input>>, AttrUse, FullName<'input>)>,
     pub group_refs: Vec<FullName<'input>>,
     pub any_attributes: bool,
 }
@@ -72,8 +72,7 @@ impl<'input> Attrs<'input> {
         self.any_attributes |= any_attributes;
     }
     pub fn restrict(&self, other: &Attrs<'input>) -> Attrs<'input> {
-        let mut other_named: HashMap<FullName<'input>, (AttrUse, &Option<SimpleType<'input>>)>;
-        other_named = HashMap::new();
+        let mut other_named = HashMap::new();
         for (name, attr_use, type_) in other.named.iter() {
             other_named.insert(name.clone(), (*attr_use, type_));
         }
@@ -83,7 +82,19 @@ impl<'input> Attrs<'input> {
                 Some((attr_use, type_)) => (name.clone(), *attr_use, (*type_).clone()),
             }
         }).collect();
-        Attrs { named, refs: other.refs.clone(), group_refs: other.group_refs.clone(), any_attributes: other.any_attributes }
+
+        let mut other_refs = HashMap::new();
+        for (name, attr_use, ref_) in other.refs.iter() {
+            other_refs.insert((name.clone(), ref_.clone()), *attr_use);
+        }
+        let refs = self.refs.iter().map(|(name, attr_use, ref_)| {
+            match other_refs.get(&(*name, *ref_)) {
+                None => (name.clone(), *attr_use, (*ref_).clone()),
+                Some(attr_use) => (name.clone(), *attr_use, (*ref_).clone()),
+            }
+        }).collect();
+
+        Attrs { named, refs, group_refs: self.group_refs.clone(), any_attributes: other.any_attributes }
     }
 }
 
@@ -319,11 +330,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let type_ = match content {
             enums::ChoiceAllChoiceSequence::All(_) => unimplemented!("all"),
             enums::ChoiceAllChoiceSequence::Choice(e) => {
-                let xs::Choice { ref attrs, annotation: ref annotation2, ref nested_particle } = **e;
+                let xs::Choice { ref attrs, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
                 self.process_choice(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), true)
             },
             enums::ChoiceAllChoiceSequence::Sequence(e) => {
-                let xs::Sequence { ref attrs, annotation: ref annotation2, ref nested_particle } = **e;
+                let xs::Sequence { ref attrs, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
                 self.process_sequence(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), true)
             },
         };
@@ -641,11 +652,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             },
             xs::TypeDefParticle::All(_) => unimplemented!("all"),
             xs::TypeDefParticle::Choice(e) => {
-                let xs::Choice { ref attrs, ref annotation, ref nested_particle } = **e;
+                let xs::Choice { ref attrs, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = **e;
                 self.process_choice(attrs, nested_particle, annotation.iter().collect(), inlinable)
             },
             xs::TypeDefParticle::Sequence(e) => {
-                let xs::Sequence { ref attrs, ref annotation, ref nested_particle } = **e;
+                let xs::Sequence { ref attrs, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = **e;
                 self.process_sequence(attrs, nested_particle, annotation.iter().collect(), inlinable)
             },
         }
@@ -658,7 +669,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, Type<'input>> {
         match particle {
             xs::NestedParticle::Element(e) => {
-                let inline_elements::LocalElement { ref attrs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, annotation: ref annotation2, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
+                let inline_elements::LocalElement { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, annotation: ref annotation2, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
                 self.process_element(attrs, type_, vec_concat_opt(&annotation, annotation2.as_ref()))
             },
             xs::NestedParticle::Group(e) => {
@@ -666,11 +677,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 self.process_group_ref(attrs, vec_concat_opt(&annotation, annotation2.as_ref()))
             },
             xs::NestedParticle::Choice(e) => {
-                let xs::Choice { ref attrs, annotation: ref annotation2, ref nested_particle } = **e;
+                let xs::Choice { ref attrs, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
                 self.process_choice(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), inlinable)
             },
             xs::NestedParticle::Sequence(e) => {
-                let xs::Sequence { ref attrs, annotation: ref annotation2, ref nested_particle } = **e;
+                let xs::Sequence { ref attrs, ref attr_min_occurs, ref attr_max_occurs, annotation: ref annotation2, ref nested_particle } = **e;
                 self.process_sequence(attrs, nested_particle, vec_concat_opt(&annotation, annotation2.as_ref()), inlinable)
             },
             xs::NestedParticle::Any(e) => self.process_any(e, annotation),
