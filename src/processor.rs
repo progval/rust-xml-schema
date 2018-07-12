@@ -229,11 +229,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_redefinable(&mut self, r: &'ast xs::Redefinable<'input>, inlinable: bool) {
         match r {
             xs::Redefinable::SimpleType(ref e) => {
-                let xs::SimpleType { ref attrs, ref attr_name, ref annotation, ref simple_derivation } = **e;
+                let xs::SimpleType { ref attrs, ref attr_name, ref attr_final, ref annotation, ref simple_derivation } = **e;
                 self.process_simple_type(attrs, simple_derivation, annotation.iter().collect());
             },
             xs::Redefinable::ComplexType(e) => {
-                    let xs::ComplexType { ref attrs, ref attr_name, ref annotation, ref complex_type_model } = **e;
+                    let xs::ComplexType { ref attrs, ref attr_name, ref attr_mixed, ref attr_abstract, ref attr_final, ref attr_block, ref attr_default_attributes_apply, ref annotation, ref complex_type_model } = **e;
                     self.process_complex_type(attrs, complex_type_model, annotation.iter().collect(), inlinable);
                 },
             xs::Redefinable::Group(e) => {
@@ -546,7 +546,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         match choice_restriction_extension {
             enums::ChoiceRestrictionExtension::Restriction(ref r) => {
                 let inline_elements::ComplexRestrictionType {
-                    ref attrs, annotation: ref annotation2,
+                    ref attrs, ref attr_base, annotation: ref annotation2,
                     ref sequence_open_content_type_def_particle,
                     ref attr_decls, ref assertions
                 } = **r;
@@ -658,7 +658,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, Type<'input>> {
         match particle {
             xs::NestedParticle::Element(e) => {
-                let inline_elements::LocalElement { ref attrs, annotation: ref annotation2, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
+                let inline_elements::LocalElement { ref attrs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, annotation: ref annotation2, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
                 self.process_element(attrs, type_, vec_concat_opt(&annotation, annotation2.as_ref()))
             },
             xs::NestedParticle::Group(e) => {
@@ -882,7 +882,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
         let name = name.expect("<element> has no name.");
-        let xs::Element { ref attrs, ref attr_name, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
+        let xs::Element { ref attrs, ref attr_name, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         let type_ = match (type_attr, &child_type) {
             (None, Some(ref c)) => match c {
@@ -891,7 +891,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref())).into_complex()
                 },
                 enums::Type::ComplexType(ref e) => {
-                    let inline_elements::LocalComplexType { ref attrs, annotation: ref annotation2, ref complex_type_model } = **e;
+                    let inline_elements::LocalComplexType { ref attrs, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = **e;
                     self.process_complex_type(attrs, complex_type_model, vec_concat_opt(&annotation, annotation2.as_ref()), false)
                 },
             },
@@ -975,7 +975,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                             self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref())).into_complex()
                         },
                         enums::Type::ComplexType(ref e) => {
-                            let inline_elements::LocalComplexType { ref attrs, annotation: ref annotation2, ref complex_type_model } = **e;
+                            let inline_elements::LocalComplexType { ref attrs, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = **e;
                             self.process_complex_type(attrs, complex_type_model, vec_concat_opt(&annotation, annotation2.as_ref()), false)
                         },
                     };
