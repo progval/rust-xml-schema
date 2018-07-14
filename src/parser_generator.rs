@@ -457,7 +457,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             if generated_attrs.contains(attr_name) {
                 continue;
             }
-            let type_name = attr_type.as_ref().map(|t| self.get_simple_type_name(t));
+            let default_type = SimpleType::Primitive(SCHEMA_URI, "AnySimpleType");
+            let type_name = attr_type.as_ref().unwrap_or(&default_type);
+            let type_name = self.get_simple_type_name(&type_name).unwrap();
             let (prefix, local) = attr_name.as_tuple();
             let use_ = if inherited {
                 *seen_attrs.get(attr_name).unwrap_or(use_)
@@ -466,24 +468,19 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 *use_
             };
             seen_attrs.insert(attr_name.clone(), use_);
-            if let Some(type_name) = type_name {
-                generated_attrs.insert(attr_name.clone());
-                match use_ {
-                    AttrUse::Optional => {
-                        let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
-                        struct_.field(&format!("pub {}", field_name), &format!("Option<{}<'input>>", type_name.expect("Missing type")));
-                        impl_code.push(format!("    (\"{}\", \"{}\") => {}: optional,", prefix, local, field_name));
-                    },
-                    AttrUse::Required => {
-                        let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
-                        struct_.field(&format!("pub {}", field_name), &format!("{}<'input>", type_name.expect("Missing type")));
-                        impl_code.push(format!("    (\"{}\", \"{}\") => {}: required,", prefix, local, field_name));
-                    },
-                    AttrUse::Prohibited => (),
-                }
-            }
-            else {
-                // TODO
+            generated_attrs.insert(attr_name.clone());
+            match use_ {
+                AttrUse::Optional => {
+                    let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
+                    struct_.field(&format!("pub {}", field_name), &format!("Option<{}<'input>>", type_name));
+                    impl_code.push(format!("    (\"{}\", \"{}\") => {}: optional,", prefix, local, field_name));
+                },
+                AttrUse::Required => {
+                    let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
+                    struct_.field(&format!("pub {}", field_name), &format!("{}<'input>", type_name));
+                    impl_code.push(format!("    (\"{}\", \"{}\") => {}: required,", prefix, local, field_name));
+                },
+                AttrUse::Prohibited => (),
             }
         }
         //impl_code.push(format!("//// {:?}", attrs));

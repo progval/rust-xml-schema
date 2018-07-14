@@ -692,7 +692,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             seq: &'ast xs::Sequence<'input>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
-        let xs::Sequence { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = seq;
+        let xs::Sequence { ref attrs, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = seq;
         let particles = nested_particle;
         let mut min_occurs = 1;
         let mut max_occurs = 1;
@@ -743,7 +743,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             choice: &'ast xs::Choice<'input>,
             inlinable: bool
             ) -> RichType<'input, Type<'input>> {
-        let xs::Choice { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = choice;
+        let xs::Choice { ref attrs, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = choice;
         let particles = nested_particle;
         let mut min_occurs = 1;
         let mut max_occurs = 1;
@@ -882,7 +882,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
         let name = name.expect("<element> has no name.");
-        let xs::Element { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
+        let xs::Element { ref attrs, ref attr_name, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         if let Some(heads) = attr_substitution_group {
             for head in &heads.0 {
