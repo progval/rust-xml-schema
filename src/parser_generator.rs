@@ -284,9 +284,19 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let name = escape_keyword(&name.to_camel_case());
                 let name = name_gen.gen_name(name);
                 if let Some(type_name) = self.get_simple_type_name(&ty.type_) {
-                    scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
-                        .unwrap().scope()
-                        .raw(&format!("pub type {}<'input> = {}<'input>;", name, type_name));
+                    match ty.type_ {
+                        SimpleType::Restriction(_name, ref facets) => {
+                            scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
+                                .unwrap().scope()
+                                .raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}<'input>);", name, type_name))
+                                .raw(&format!("impl_simpletype_restriction!({});", name));
+                        }
+                        _ => {
+                            scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
+                                .unwrap().scope()
+                                .raw(&format!("pub type {}<'input> = {}<'input>;", name, type_name));
+                        }
+                    }
                 }
             }
         }

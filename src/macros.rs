@@ -370,3 +370,18 @@ macro_rules! impl_list {
         }
     }
 }
+
+#[macro_export]
+macro_rules! impl_simpletype_restriction {
+    ( $name:ident ) => {
+        impl<'input> ParseXmlStr<'input> for $name<'input> {
+            const NODE_NAME: &'static str = stringify!($name);
+
+            #[allow(unused_variables)]
+            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
+                let (output, v) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context)?;
+                Some((output, $name(v)))
+            }
+        }
+    }
+}

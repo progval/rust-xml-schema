@@ -18,61 +18,117 @@ pub mod xs {
 
     pub(crate) use primitives::*;
 
-    pub type Entities<'input> = support::AnySimpleType<'input>;
+    #[derive(Debug, PartialEq)] pub struct Entities<'input>(pub support::AnySimpleType<'input>);
 
-    pub type Entity<'input> = support::NcName<'input>;
+    impl_simpletype_restriction!(Entities);
 
-    pub type Id<'input> = support::NcName<'input>;
+    #[derive(Debug, PartialEq)] pub struct Entity<'input>(pub support::NcName<'input>);
 
-    pub type Idref<'input> = support::NcName<'input>;
+    impl_simpletype_restriction!(Entity);
 
-    pub type Idrefs<'input> = support::AnySimpleType<'input>;
+    #[derive(Debug, PartialEq)] pub struct Id<'input>(pub support::NcName<'input>);
 
-    pub type NcName<'input> = xs::Name<'input>;
+    impl_simpletype_restriction!(Id);
 
-    pub type Nmtoken<'input> = support::Token<'input>;
+    #[derive(Debug, PartialEq)] pub struct Idref<'input>(pub support::NcName<'input>);
 
-    pub type Nmtokens<'input> = support::AnySimpleType<'input>;
+    impl_simpletype_restriction!(Idref);
 
-    pub type Name<'input> = support::Token<'input>;
+    #[derive(Debug, PartialEq)] pub struct Idrefs<'input>(pub support::AnySimpleType<'input>);
 
-    pub type Byte<'input> = xs::Short<'input>;
+    impl_simpletype_restriction!(Idrefs);
 
-    pub type DateTimeStamp<'input> = support::DateTime<'input>;
+    #[derive(Debug, PartialEq)] pub struct NcName<'input>(pub xs::Name<'input>);
 
-    pub type DayTimeDuration<'input> = support::Duration<'input>;
+    impl_simpletype_restriction!(NcName);
 
-    pub type Int<'input> = xs::Long<'input>;
+    #[derive(Debug, PartialEq)] pub struct Nmtoken<'input>(pub support::Token<'input>);
 
-    pub type Integer<'input> = support::Decimal<'input>;
+    impl_simpletype_restriction!(Nmtoken);
 
-    pub type Language<'input> = support::Token<'input>;
+    #[derive(Debug, PartialEq)] pub struct Nmtokens<'input>(pub support::AnySimpleType<'input>);
 
-    pub type Long<'input> = xs::Integer<'input>;
+    impl_simpletype_restriction!(Nmtokens);
 
-    pub type NegativeInteger<'input> = xs::NonPositiveInteger<'input>;
+    #[derive(Debug, PartialEq)] pub struct Name<'input>(pub support::Token<'input>);
 
-    pub type NonNegativeInteger<'input> = xs::Integer<'input>;
+    impl_simpletype_restriction!(Name);
 
-    pub type NonPositiveInteger<'input> = xs::Integer<'input>;
+    #[derive(Debug, PartialEq)] pub struct Byte<'input>(pub xs::Short<'input>);
 
-    pub type NormalizedString<'input> = support::XmlString<'input>;
+    impl_simpletype_restriction!(Byte);
 
-    pub type PositiveInteger<'input> = support::NonNegativeInteger<'input>;
+    #[derive(Debug, PartialEq)] pub struct DateTimeStamp<'input>(pub support::DateTime<'input>);
 
-    pub type Short<'input> = xs::Int<'input>;
+    impl_simpletype_restriction!(DateTimeStamp);
 
-    pub type Token<'input> = xs::NormalizedString<'input>;
+    #[derive(Debug, PartialEq)] pub struct DayTimeDuration<'input>(pub support::Duration<'input>);
 
-    pub type UnsignedByte<'input> = xs::UnsignedShort<'input>;
+    impl_simpletype_restriction!(DayTimeDuration);
 
-    pub type UnsignedInt<'input> = xs::UnsignedLong<'input>;
+    #[derive(Debug, PartialEq)] pub struct Int<'input>(pub xs::Long<'input>);
 
-    pub type UnsignedLong<'input> = support::NonNegativeInteger<'input>;
+    impl_simpletype_restriction!(Int);
 
-    pub type UnsignedShort<'input> = xs::UnsignedInt<'input>;
+    #[derive(Debug, PartialEq)] pub struct Integer<'input>(pub support::Decimal<'input>);
 
-    pub type YearMonthDuration<'input> = support::Duration<'input>;
+    impl_simpletype_restriction!(Integer);
+
+    #[derive(Debug, PartialEq)] pub struct Language<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(Language);
+
+    #[derive(Debug, PartialEq)] pub struct Long<'input>(pub xs::Integer<'input>);
+
+    impl_simpletype_restriction!(Long);
+
+    #[derive(Debug, PartialEq)] pub struct NegativeInteger<'input>(pub xs::NonPositiveInteger<'input>);
+
+    impl_simpletype_restriction!(NegativeInteger);
+
+    #[derive(Debug, PartialEq)] pub struct NonNegativeInteger<'input>(pub xs::Integer<'input>);
+
+    impl_simpletype_restriction!(NonNegativeInteger);
+
+    #[derive(Debug, PartialEq)] pub struct NonPositiveInteger<'input>(pub xs::Integer<'input>);
+
+    impl_simpletype_restriction!(NonPositiveInteger);
+
+    #[derive(Debug, PartialEq)] pub struct NormalizedString<'input>(pub support::XmlString<'input>);
+
+    impl_simpletype_restriction!(NormalizedString);
+
+    #[derive(Debug, PartialEq)] pub struct PositiveInteger<'input>(pub support::NonNegativeInteger<'input>);
+
+    impl_simpletype_restriction!(PositiveInteger);
+
+    #[derive(Debug, PartialEq)] pub struct Short<'input>(pub xs::Int<'input>);
+
+    impl_simpletype_restriction!(Short);
+
+    #[derive(Debug, PartialEq)] pub struct Token<'input>(pub xs::NormalizedString<'input>);
+
+    impl_simpletype_restriction!(Token);
+
+    #[derive(Debug, PartialEq)] pub struct UnsignedByte<'input>(pub xs::UnsignedShort<'input>);
+
+    impl_simpletype_restriction!(UnsignedByte);
+
+    #[derive(Debug, PartialEq)] pub struct UnsignedInt<'input>(pub xs::UnsignedLong<'input>);
+
+    impl_simpletype_restriction!(UnsignedInt);
+
+    #[derive(Debug, PartialEq)] pub struct UnsignedLong<'input>(pub support::NonNegativeInteger<'input>);
+
+    impl_simpletype_restriction!(UnsignedLong);
+
+    #[derive(Debug, PartialEq)] pub struct UnsignedShort<'input>(pub xs::UnsignedInt<'input>);
+
+    impl_simpletype_restriction!(UnsignedShort);
+
+    #[derive(Debug, PartialEq)] pub struct YearMonthDuration<'input>(pub support::Duration<'input>);
+
+    impl_simpletype_restriction!(YearMonthDuration);
 
     pub type AllNni<'input> = unions::UnionNmtoken<'input>;
 
@@ -80,29 +136,41 @@ pub mod xs {
 
     pub type BlockSet<'input> = unions::UnionTokenDerivationControlList<'input>;
 
-    pub type DerivationControl<'input> = xs::Nmtoken<'input>;
+    #[derive(Debug, PartialEq)] pub struct DerivationControl<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(DerivationControl);
 
     pub type DerivationSet<'input> = unions::UnionTokenReducedDerivationControlList<'input>;
 
-    pub type FormChoice<'input> = xs::Nmtoken<'input>;
+    #[derive(Debug, PartialEq)] pub struct FormChoice<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(FormChoice);
 
     pub type FullDerivationSet<'input> = unions::UnionTokenTypeDerivationControlList<'input>;
 
     pub type NamespaceList<'input> = unions::Union<'input>;
 
-    pub type Public<'input> = support::Token<'input>;
+    #[derive(Debug, PartialEq)] pub struct Public<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(Public);
 
     pub type QnameList<'input> = lists::UnionTokenList<'input>;
 
     pub type QnameListA<'input> = lists::UnionTokenList<'input>;
 
-    pub type ReducedDerivationControl<'input> = xs::DerivationControl<'input>;
+    #[derive(Debug, PartialEq)] pub struct ReducedDerivationControl<'input>(pub xs::DerivationControl<'input>);
+
+    impl_simpletype_restriction!(ReducedDerivationControl);
 
     pub type SimpleDerivationSet<'input> = unions::UnionTokenDerivationControlList<'input>;
 
-    pub type SpecialNamespaceList<'input> = support::Token<'input>;
+    #[derive(Debug, PartialEq)] pub struct SpecialNamespaceList<'input>(pub support::Token<'input>);
 
-    pub type TypeDerivationControl<'input> = xs::DerivationControl<'input>;
+    impl_simpletype_restriction!(SpecialNamespaceList);
+
+    #[derive(Debug, PartialEq)] pub struct TypeDerivationControl<'input>(pub xs::DerivationControl<'input>);
+
+    impl_simpletype_restriction!(TypeDerivationControl);
 
     pub type XpathDefaultNamespace<'input> = unions::UnionToken<'input>;
 
