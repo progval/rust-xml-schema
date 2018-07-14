@@ -1,3 +1,4 @@
+use std::cmp::max;
 use std::marker::PhantomData;
 use std::fmt;
 
@@ -88,8 +89,6 @@ pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ];
 
 pub type Id<'input> = NcName<'input>; // TODO ?
-pub type PositiveInteger<'input> = Integer<'input>; // TODO
-pub type NonNegativeInteger<'input> = Integer<'input>; // TODO
 pub type DateTime<'input> = Token<'input>; // TODO
 pub type Duration<'input> = Token<'input>; // TODO
 pub type Decimal<'input> = Token<'input>; // TODO
@@ -100,7 +99,7 @@ pub struct Token<'input>(pub &'input str);
 
 impl<'input> ParseXmlStr<'input> for Token<'input> {
     const NODE_NAME: &'static str = "token";
-    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Token<'input>)> {
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Token<'input>)> {
         if input.len() == 0 {
             return None;
         }
@@ -137,7 +136,7 @@ pub type Nmtoken<'input> = NMToken<'input>; // TODO: remove this
 pub struct NMToken<'input>(&'input str);
 impl<'input> ParseXmlStr<'input> for NMToken<'input> {
     const NODE_NAME: &'static str = "NMToken";
-    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, NMToken<'input>)> {
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, NMToken<'input>)> {
         if input.len() == 0 {
             return None;
         }
@@ -172,7 +171,7 @@ impl<'input> Default for NMToken<'input> {
 pub struct QName<'input>(pub Option<&'input str>, pub &'input str);
 impl<'input> ParseXmlStr<'input> for QName<'input> {
     const NODE_NAME: &'static str = "QName";
-    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, QName<'input>)> {
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, QName<'input>)> {
         if input.len() == 0 {
             return None;
         }
@@ -237,7 +236,7 @@ impl<'input> fmt::Display for QName<'input> {
 pub struct AnyUri<'input>(&'input str);
 impl<'input> ParseXmlStr<'input> for AnyUri<'input> {
     const NODE_NAME: &'static str = "AnyUri";
-    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, AnyUri<'input>)> {
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, AnyUri<'input>)> {
         if input.len() == 0 {
             return None;
         }
@@ -269,7 +268,7 @@ impl<'input> ParseXml<'input> for AnyURIElement<'input> {
 pub struct Integer<'input>(pub i64, PhantomData<&'input ()>);
 impl<'input> ParseXmlStr<'input> for Integer<'input> {
     const NODE_NAME: &'static str = "Integer";
-    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Integer<'input>)> {
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Integer<'input>)> {
         let mut iter = input.char_indices();
         let mut n: i64 = 0;
         let mut multiplier = 1;
@@ -303,6 +302,32 @@ impl<'input> ParseXmlStr<'input> for Integer<'input> {
         let res = multiplier * n;
         validate_int!(res, facets);
         Some(("", Integer(res, PhantomData::default())))
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct NonNegativeInteger<'input>(pub u64, PhantomData<&'input ()>);
+impl<'input> ParseXmlStr<'input> for NonNegativeInteger<'input> {
+    const NODE_NAME: &'static str = "NonNegativeInteger";
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets) -> Option<(&'input str, NonNegativeInteger<'input>)> {
+        let min = max(0, facets.min_inclusive.unwrap_or("0").parse().expect("invalid int")).to_string();
+        let mut facets = facets.clone();
+        facets.min_inclusive = Some(&min);
+        let (output, n) = Integer::parse_self_xml_str(input, parse_context, parent_context, &facets)?;
+        Some((output, NonNegativeInteger(n.0 as u64, PhantomData::default())))
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct PositiveInteger<'input>(pub u64, PhantomData<&'input ()>);
+impl<'input> ParseXmlStr<'input> for PositiveInteger<'input> {
+    const NODE_NAME: &'static str = "PositiveInteger";
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets) -> Option<(&'input str, PositiveInteger<'input>)> {
+        let min = max(1, facets.min_inclusive.unwrap_or("0").parse().expect("invalid int")).to_string();
+        let mut facets = facets.clone();
+        facets.min_inclusive = Some(&min);
+        let (output, n) = NonNegativeInteger::parse_self_xml_str(input, parse_context, parent_context, &facets)?;
+        Some((output, PositiveInteger(n.0, PhantomData::default())))
     }
 }
 
@@ -362,7 +387,7 @@ pub struct XmlString<'input>(pub &'input str);
 
 impl<'input> ParseXmlStr<'input> for XmlString<'input> {
     const NODE_NAME: &'static str = "XmlString";
-    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, XmlString<'input>)> {
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, XmlString<'input>)> {
         for (i, c) in input.char_indices() {
             if !is_xml_char(c) {
                 return_split!(input, i, XmlString, validate_str!, facets);
@@ -384,7 +409,7 @@ pub struct AnySimpleType<'input>(pub &'input str);
 
 impl<'input> ParseXmlStr<'input> for AnySimpleType<'input> {
     const NODE_NAME: &'static str = "AnySimpleType";
-    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, AnySimpleType<'input>)> {
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, AnySimpleType<'input>)> {
         Some(("", AnySimpleType(input)))
     }
 }
@@ -402,7 +427,7 @@ pub struct NcName<'input>(&'input str);
 
 impl<'input> ParseXmlStr<'input> for NcName<'input> {
     const NODE_NAME: &'static str = "NcName";
-    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, NcName<'input>)> {
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, NcName<'input>)> {
         let mut iter = input.char_indices();
         let c = iter.next()?.1;
         if c == ':' || !is_name_start_char(c) { return None };
@@ -421,7 +446,7 @@ impl<'input> ParseXmlStr<'input> for NcName<'input> {
 pub struct Boolean<'input>(bool, PhantomData<&'input ()>);
 impl<'input> ParseXmlStr<'input> for Boolean<'input> {
     const NODE_NAME: &'static str = "Boolean";
-    fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Boolean<'input>)> {
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Boolean<'input>)> {
         if input.len() >= 1 {
             match &input[0..1] {
                 "0" => return Some((&input[1..], Boolean(false, PhantomData::default()))),

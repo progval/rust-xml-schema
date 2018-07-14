@@ -324,7 +324,7 @@ macro_rules! impl_union {
         impl<'input> ParseXmlStr<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("union ", stringify!($name));
 
-            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)> {
+            fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
                 $(
                     match $variant_macro!($name, input, parse_context, parent_context, facets, $($variant_args)*) {
                         Some((o, x)) => return Some((o, x)),
@@ -352,7 +352,7 @@ macro_rules! impl_list {
             const NODE_NAME: &'static str = concat!("list ", stringify!($name));
 
             #[allow(unused_variables)]
-            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)> {
+            fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
                 let mut input = input;
                 let mut items = Vec::new();
                 while let Some((output, item)) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context, facets) {
@@ -378,7 +378,7 @@ macro_rules! impl_simpletype_restriction {
             const NODE_NAME: &'static str = stringify!($name);
 
             #[allow(unused_variables)]
-            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)> {
+            fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
                 let mut facets = facets.clone();
                 $(
                     facets.$facet_name =  $facet_value.or(facets.$facet_name);

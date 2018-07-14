@@ -10,8 +10,8 @@ pub struct Facets<'input> {
     pub min_inclusive: Option<&'input str>,
     pub max_exclusive: Option<&'input str>,
     pub max_inclusive: Option<&'input str>,
-    pub total_digits: Option<i64>,
-    pub fraction_digits: Option<i64>,
+    pub total_digits: Option<u64>,
+    pub fraction_digits: Option<u64>,
     pub length: Option<usize>,
     pub min_length: Option<usize>,
     pub max_length: Option<usize>,
@@ -104,9 +104,9 @@ pub trait ParseXml<'input>: Sized {
 pub trait ParseXmlStr<'input>: Sized {
     const NODE_NAME: &'static str;
 
-    fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)>;
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)>;
 
-    fn parse_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)> {
+    fn parse_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
         //println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml_str(input, parse_context, parent_context, facets);
         /*
