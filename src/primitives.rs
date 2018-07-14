@@ -43,6 +43,33 @@ macro_rules! validate_str {
     }}
 }
 
+macro_rules! validate_int {
+    ( $n:expr, $facets:expr) => {{
+        let facets = $facets;
+        let n: i64 = $n;
+        if let Some(ref min_exclusive) = facets.min_exclusive {
+            if n <= min_exclusive.parse::<i64>().unwrap() {
+                panic!("{} is <= {}", n, min_exclusive);
+            }
+        }
+        if let Some(ref min_inclusive) = facets.min_inclusive {
+            if n < min_inclusive.parse::<i64>().unwrap() {
+                panic!("{} is < {}", n, min_inclusive);
+            }
+        }
+        if let Some(ref max_exclusive) = facets.max_exclusive {
+            if n >= max_exclusive.parse::<i64>().unwrap() {
+                panic!("{} is >= {}", n, max_exclusive);
+            }
+        }
+        if let Some(ref max_inclusive) = facets.max_inclusive {
+            if n > max_inclusive.parse::<i64>().unwrap() {
+                panic!("{} is > {}", n, max_inclusive);
+            }
+        }
+    }}
+}
+
 pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ("anySimpleType", "AnySimpleType"),
     ("token", "Token"),
@@ -265,11 +292,17 @@ impl<'input> ParseXmlStr<'input> for Integer<'input> {
         for (i,c) in iter {
             match c {
                 '0'...'9' => n = n * 10 + ((c as i64) - ('0' as i64)),
-                _ => return Some((&input[i..], Integer(multiplier * n, PhantomData::default()))),
+                _ => {
+                    let res = multiplier * n;
+                    validate_int!(res, facets);
+                    return Some((&input[i..], Integer(res, PhantomData::default())));
+                }
             }
         }
         
-        Some(("", Integer(multiplier * n, PhantomData::default())))
+        let res = multiplier * n;
+        validate_int!(res, facets);
+        Some(("", Integer(res, PhantomData::default())))
     }
 }
 
