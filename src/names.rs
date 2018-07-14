@@ -20,8 +20,13 @@ impl NameGenerator {
     }
 
     pub fn gen_name(&mut self, name: String) -> String {
-        let nb_uses = self.0.get(&name).cloned().unwrap_or(0);
-        let ret = format!("{}{}", name, "_".repeat(nb_uses));
+        let nb_uses = self.0.get(&name).cloned().unwrap_or(1);
+        let ret = if nb_uses > 1 {
+            format!("{}{}", name, nb_uses)
+        }
+        else {
+            name.to_string()
+        };
         self.0.insert(name, nb_uses+1);
         ret
     }

@@ -1210,13 +1210,13 @@ pub mod enums {
     );
 
     #[derive(Debug, PartialEq)]
-    pub enum ChoiceAllChoiceSequence_<'input> {
+    pub enum ChoiceAllChoiceSequence2<'input> {
         All(Box<super::inline_elements::All<'input>>),
         Choice(Box<super::inline_elements::ChoiceSimpleExplicitGroup<'input>>),
         Sequence(Box<super::inline_elements::SequenceSimpleExplicitGroup<'input>>),
     }
 
-    impl_enum!(ChoiceAllChoiceSequence_,
+    impl_enum!(ChoiceAllChoiceSequence2,
         impl_singleton_variant!(All, inline_elements, Box<All>),
         impl_singleton_variant!(Choice, inline_elements, Box<ChoiceSimpleExplicitGroup>),
         impl_singleton_variant!(Sequence, inline_elements, Box<SequenceSimpleExplicitGroup>),
@@ -1291,12 +1291,12 @@ pub mod enums {
     );
 
     #[derive(Debug, PartialEq)]
-    pub enum ChoiceRestrictionExtension_<'input> {
+    pub enum ChoiceRestrictionExtension2<'input> {
         Restriction(Box<super::inline_elements::SimpleRestrictionType<'input>>),
         Extension(Box<super::inline_elements::SimpleExtensionType<'input>>),
     }
 
-    impl_enum!(ChoiceRestrictionExtension_,
+    impl_enum!(ChoiceRestrictionExtension2,
         impl_singleton_variant!(Restriction, inline_elements, Box<SimpleRestrictionType>),
         impl_singleton_variant!(Extension, inline_elements, Box<SimpleExtensionType>),
     );
@@ -1345,9 +1345,9 @@ pub mod lists {
     impl_list!(DerivationControlList, xs::DerivationControl);
 
     #[derive(Debug, PartialEq)]
-    pub struct DerivationControlList_<'input>(pub Vec<xs::DerivationControl<'input>>);
+    pub struct DerivationControlList2<'input>(pub Vec<xs::DerivationControl<'input>>);
 
-    impl_list!(DerivationControlList_, xs::DerivationControl);
+    impl_list!(DerivationControlList2, xs::DerivationControl);
 
     #[derive(Debug, PartialEq)]
     pub struct ReducedDerivationControlList<'input>(pub Vec<xs::ReducedDerivationControl<'input>>);
@@ -1365,9 +1365,9 @@ pub mod lists {
     impl_list!(UnionTokenList, unions::UnionToken);
 
     #[derive(Debug, PartialEq)]
-    pub struct UnionTokenList_<'input>(pub Vec<unions::UnionToken<'input>>);
+    pub struct UnionTokenList2<'input>(pub Vec<unions::UnionToken<'input>>);
 
-    impl_list!(UnionTokenList_, unions::UnionToken);
+    impl_list!(UnionTokenList2, unions::UnionToken);
 }
 
 pub mod unions {
@@ -1385,34 +1385,34 @@ pub mod unions {
     });
 
     #[derive(Debug, PartialEq)]
-    pub enum UnionToken_<'input> {
+    pub enum UnionToken2<'input> {
         QName(support::QName<'input>),
         Token(support::Token<'input>),
     }
 
-    impl_union!(UnionToken_, {
+    impl_union!(UnionToken2, {
         impl_union_variant!(QName),
         impl_union_variant!(Token),
     });
 
     #[derive(Debug, PartialEq)]
-    pub enum UnionToken__<'input> {
+    pub enum UnionToken3<'input> {
         AnyUri(support::AnyUri<'input>),
         Token(support::Token<'input>),
     }
 
-    impl_union!(UnionToken__, {
+    impl_union!(UnionToken3, {
         impl_union_variant!(AnyUri),
         impl_union_variant!(Token),
     });
 
     #[derive(Debug, PartialEq)]
-    pub enum UnionToken___<'input> {
+    pub enum UnionToken4<'input> {
         AnyUri(support::AnyUri<'input>),
         Token(support::Token<'input>),
     }
 
-    impl_union!(UnionToken___, {
+    impl_union!(UnionToken4, {
         impl_union_variant!(AnyUri),
         impl_union_variant!(Token),
     });
