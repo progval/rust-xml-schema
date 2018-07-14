@@ -4,6 +4,26 @@ use xmlparser::{Token as XmlToken, Tokenizer};
 
 pub use primitives::*; // TODO: remove the pub?
 
+pub trait ParseFacets {
+    const MIN_EXCLUSIVE: Option<&'static str> = None;
+    const MIN_INCLUSIVE: Option<&'static str> = None;
+    const MAX_EXCLUSIVE: Option<&'static str> = None;
+    const MAX_INCLUSIVE: Option<&'static str> = None;
+    const TOTAL_DIGITS: Option<&'static str> = None;
+    const FRACTION_DIGITS: Option<&'static str> = None;
+    const LENGTH: Option<&'static i64> = None;
+    const MIN_LENGTH: Option<&'static i64> = None;
+    const MAX_LENGTH: Option<&'static i64> = None;
+    const ENUMERATION: Option<&'static str> = None;
+    const WHITE_SPACE: Option<&'static str> = None;
+    const PATTERN: Option<&'static str> = None;
+    const ASSERTION: Option<&'static str> = None;
+    const EXPLICIT_TIMEZONE: Option<&'static str> = None;
+}
+pub struct DefaultFacets(PhantomData<()>);
+impl ParseFacets for DefaultFacets {
+}
+
 #[derive(Debug,PartialEq)]
 pub struct List<'input, Item>(Vec<Item>, PhantomData<&'input ()>);
 

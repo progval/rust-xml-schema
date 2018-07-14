@@ -141,10 +141,29 @@ pub enum Type<'input> {
     Simple(SimpleType<'input>),
 }
 
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Default)]
+pub struct Facets<'input> {
+    pub min_exclusive: Option<&'input str>,
+    pub min_inclusive: Option<&'input str>,
+    pub max_exclusive: Option<&'input str>,
+    pub max_inclusive: Option<&'input str>,
+    pub total_digits: Option<i64>,
+    pub fraction_digits: Option<i64>,
+    pub length: Option<i64>,
+    pub min_length: Option<i64>,
+    pub max_length: Option<i64>,
+    pub enumeration: Option<&'input str>,
+    pub white_space: Option<&'input str>,
+    pub pattern: Option<&'input str>,
+    pub assertion: Option<&'input str>,
+    pub explicit_timezone: Option<&'input str>,
+}
+
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SimpleType<'input> {
     Primitive(&'static str, &'static str),
     Alias(FullName<'input>),
+    Restriction(FullName<'input>, Facets<'input>),
     List(String),
     Union(String),
     Empty,
@@ -608,6 +627,37 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             self.process_annotation(&annotation),
             )
     }
+    
+    fn process_facets(&mut self, facet_list: &Vec<enums::ChoiceFacetAny<'input>>) -> Facets<'input> {
+        let mut facets = Facets::default();
+        use parser::xs::Facet::*;
+        for facet_or_any in facet_list {
+            match facet_or_any {
+                enums::ChoiceFacetAny::Facet(e) => {
+                    match **e {
+                        FacetHead(_) => panic!("abstract element"),
+                        MinExclusive(ref e) => facets.min_exclusive = Some(e.attr_value.0),
+                        MinInclusive(ref e) => facets.min_inclusive = Some(e.attr_value.0),
+                        MaxExclusive(ref e) => facets.max_exclusive = Some(e.attr_value.0),
+                        MaxInclusive(ref e) => facets.max_inclusive = Some(e.attr_value.0),
+                        TotalDigits(ref e) => facets.total_digits = Some(e.attr_value.0),
+                        FractionDigits(ref e) => facets.fraction_digits = Some(e.attr_value.0),
+                        Length(ref e) => facets.length = Some(e.attr_value.0),
+                        MinLength(ref e) => facets.min_length = Some(e.attr_value.0),
+                        MaxLength(ref e) => facets.max_length = Some(e.attr_value.0),
+                        Enumeration(ref e) => facets.enumeration = Some(e.attr_value.0),
+                        WhiteSpace(ref e) => facets.white_space = Some(e.attr_value.0),
+                        Pattern(ref e) => facets.pattern = Some(e.attr_value.0),
+                        Assertion(ref e) => unimplemented!("assertion facet"),
+                        ExplicitTimezone(ref e) => facets.explicit_timezone = Some(e.attr_value.0),
+                        _ => unimplemented!("{:?}", e),// TODO
+                    };
+                },
+                enums::ChoiceFacetAny::Any(_) => (), // TODO (probably just whitespaces)
+            }
+        }
+        facets
+    }
 
     fn process_simple_restriction(&mut self, 
             attrs: &'ast HashMap<QName<'input>, &'input str>,
@@ -623,19 +673,20 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         }
         let base = base.unwrap_or(FullName::new(SCHEMA_URI, "anySimpleType"));
         let xs::SimpleRestrictionModel { ref local_simple_type, ref choice_facet_any } = model;
+        let facets = self.process_facets(choice_facet_any);
+
         match local_simple_type {
             Some(inline_elements::LocalSimpleType { ref attrs, annotation: ref annotation2, ref simple_derivation }) => {
-                // TODO: self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref()))
                 RichType::new(
                     NameHint::new(base.as_tuple().1),
-                    SimpleType::Alias(base),
+                    SimpleType::Restriction(base, facets),
                     self.process_annotation(&annotation),
                     )
             },
             None => {
                 RichType::new(
                     NameHint::new(base.as_tuple().1),
-                    SimpleType::Alias(base),
+                    SimpleType::Restriction(base, facets),
                     self.process_annotation(&annotation),
                     )
             },

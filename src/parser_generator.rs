@@ -188,8 +188,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                         for item in items.iter() {
                             let RichType { name_hint, attrs, type_, doc } = item;
                             let variant_name = name_from_hint(&item.name_hint).unwrap().to_camel_case();
-                            let type_name = self.get_simple_type_name(type_);
-                            if let Some(type_name) = type_name {
+                            if let Some(type_name) = self.get_simple_type_name(type_) {
                                 enum_.new_variant(&variant_name).tuple(&format!("{}<'input>", type_name));
                                 impl_code.push(format!("    impl_union_variant!({}),", variant_name));
                             }
@@ -214,8 +213,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 for name in names.iter() {
                     let name = escape_keyword(&name.to_camel_case());
                     let struct_name = name_gen.gen_name(name);
-                    let type_name = self.get_simple_type_name(&item_type.type_);
-                    if let Some(type_name) = type_name {
+                    if let Some(type_name) = self.get_simple_type_name(&item_type.type_) {
                         {
                             let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
                             struct_.tuple_field(&format!("pub Vec<{}<'input>>", type_name));
@@ -243,6 +241,21 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let type_name = escape_keyword(&type_name.to_camel_case());
                 (type_mod_name, type_name)
             },
+            SimpleType::Restriction(name, _facets) => {
+                // TODO: deduplicate/factorize with Alias
+                let (ref type_mod_name, ref type_name) = name.as_tuple();
+                if type_mod_name == &SCHEMA_URI {
+                    for (prim_name, prim_type_name) in PRIMITIVE_TYPES {
+                        if prim_name == type_name {
+                            return Some(format!("support::{}", prim_type_name));
+                        }
+                    }
+                }
+                let type_mod_name = self.module_names.get(type_mod_name).expect(type_mod_name);
+                let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
+                let type_name = escape_keyword(&type_name.to_camel_case());
+                (type_mod_name, type_name)
+            }
             SimpleType::Primitive(field_name, type_name) => {
                 ("support".to_string(), type_name.to_string())
             },
@@ -257,7 +270,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             SimpleType::Empty => {
                 return None
             },
-            _ => unimplemented!("Simple type of {:?}", ty),
         };
         Some(format!("{}::{}", type_mod_name, type_name))
     }
@@ -271,8 +283,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let (mod_name, name) = name.as_tuple();
                 let name = escape_keyword(&name.to_camel_case());
                 let name = name_gen.gen_name(name);
-                let type_name = self.get_simple_type_name(&ty.type_);
-                if let Some(type_name) = type_name {
+                if let Some(type_name) = self.get_simple_type_name(&ty.type_) {
                     scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
                         .unwrap().scope()
                         .raw(&format!("pub type {}<'input> = {}<'input>;", name, type_name));

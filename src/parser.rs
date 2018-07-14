@@ -1345,6 +1345,11 @@ pub mod lists {
     impl_list!(DerivationControlList, xs::DerivationControl);
 
     #[derive(Debug, PartialEq)]
+    pub struct DerivationControlList_<'input>(pub Vec<xs::DerivationControl<'input>>);
+
+    impl_list!(DerivationControlList_, xs::DerivationControl);
+
+    #[derive(Debug, PartialEq)]
     pub struct ReducedDerivationControlList<'input>(pub Vec<xs::ReducedDerivationControl<'input>>);
 
     impl_list!(ReducedDerivationControlList, xs::ReducedDerivationControl);
@@ -1381,12 +1386,12 @@ pub mod unions {
 
     #[derive(Debug, PartialEq)]
     pub enum UnionToken_<'input> {
-        AnyUri(support::AnyUri<'input>),
+        QName(support::QName<'input>),
         Token(support::Token<'input>),
     }
 
     impl_union!(UnionToken_, {
-        impl_union_variant!(AnyUri),
+        impl_union_variant!(QName),
         impl_union_variant!(Token),
     });
 
@@ -1397,6 +1402,17 @@ pub mod unions {
     }
 
     impl_union!(UnionToken__, {
+        impl_union_variant!(AnyUri),
+        impl_union_variant!(Token),
+    });
+
+    #[derive(Debug, PartialEq)]
+    pub enum UnionToken___<'input> {
+        AnyUri(support::AnyUri<'input>),
+        Token(support::Token<'input>),
+    }
+
+    impl_union!(UnionToken___, {
         impl_union_variant!(AnyUri),
         impl_union_variant!(Token),
     });

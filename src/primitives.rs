@@ -40,7 +40,7 @@ pub type Decimal<'input> = Token<'input>; // TODO
 
 /// https://www.w3.org/TR/xmlschema11-2/#token
 #[derive(Debug, PartialEq)]
-pub struct Token<'input>(&'input str);
+pub struct Token<'input>(pub &'input str);
 
 impl<'input> ParseXmlStr<'input> for Token<'input> {
     const NODE_NAME: &'static str = "token";
@@ -295,7 +295,7 @@ impl<'input> ParseXml<'input> for Any<'input> {
 
 /// https://www.w3.org/TR/xmlschema11-2/#string
 #[derive(Debug, PartialEq)]
-pub struct XmlString<'input>(&'input str);
+pub struct XmlString<'input>(pub &'input str);
 
 impl<'input> ParseXmlStr<'input> for XmlString<'input> {
     const NODE_NAME: &'static str = "XmlString";
@@ -317,7 +317,7 @@ impl<'input> Default for XmlString<'input> {
 
 /// https://www.w3.org/TR/xmlschema11-2/#anySimpleType
 #[derive(Debug, PartialEq)]
-pub struct AnySimpleType<'input>(&'input str);
+pub struct AnySimpleType<'input>(pub &'input str);
 
 impl<'input> ParseXmlStr<'input> for AnySimpleType<'input> {
     const NODE_NAME: &'static str = "AnySimpleType";
