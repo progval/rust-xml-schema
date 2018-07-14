@@ -419,13 +419,50 @@ pub mod xs {
         (annotation, xs, Option<Annotation>),
     });
 
+    #[derive(Debug, PartialEq)]
+    pub enum Facet<'input> {
+        FacetHead(Box<super::xs::FacetHead<'input>>),
+        MinExclusive(Box<super::xs::MinExclusive<'input>>),
+        MinInclusive(Box<super::xs::MinInclusive<'input>>),
+        MaxExclusive(Box<super::xs::MaxExclusive<'input>>),
+        MaxInclusive(Box<super::xs::MaxInclusive<'input>>),
+        TotalDigits(Box<super::xs::TotalDigits<'input>>),
+        FractionDigits(Box<super::xs::FractionDigits<'input>>),
+        Length(Box<super::xs::Length<'input>>),
+        MinLength(Box<super::xs::MinLength<'input>>),
+        MaxLength(Box<super::xs::MaxLength<'input>>),
+        Enumeration(Box<super::xs::Enumeration<'input>>),
+        WhiteSpace(Box<super::xs::WhiteSpace<'input>>),
+        Pattern(Box<super::xs::Pattern<'input>>),
+        Assertion(Box<super::xs::Assertion<'input>>),
+        ExplicitTimezone(Box<super::xs::ExplicitTimezone<'input>>),
+    }
+
+    impl_enum!(Facet,
+        impl_singleton_variant!(FacetHead, xs, Box<FacetHead>),
+        impl_singleton_variant!(MinExclusive, xs, Box<MinExclusive>),
+        impl_singleton_variant!(MinInclusive, xs, Box<MinInclusive>),
+        impl_singleton_variant!(MaxExclusive, xs, Box<MaxExclusive>),
+        impl_singleton_variant!(MaxInclusive, xs, Box<MaxInclusive>),
+        impl_singleton_variant!(TotalDigits, xs, Box<TotalDigits>),
+        impl_singleton_variant!(FractionDigits, xs, Box<FractionDigits>),
+        impl_singleton_variant!(Length, xs, Box<Length>),
+        impl_singleton_variant!(MinLength, xs, Box<MinLength>),
+        impl_singleton_variant!(MaxLength, xs, Box<MaxLength>),
+        impl_singleton_variant!(Enumeration, xs, Box<Enumeration>),
+        impl_singleton_variant!(WhiteSpace, xs, Box<WhiteSpace>),
+        impl_singleton_variant!(Pattern, xs, Box<Pattern>),
+        impl_singleton_variant!(Assertion, xs, Box<Assertion>),
+        impl_singleton_variant!(ExplicitTimezone, xs, Box<ExplicitTimezone>),
+    );
+
     ///  An abstract element, representing facets in general. The facets defined by this spec are substitutable for this element, and implementation-defined facets should also name this as a substitution-group head. 
     #[derive(Debug, PartialEq)]
-    pub struct Facet<'input> {
+    pub struct FacetHead<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
     }
 
-    impl_element!(Facet, "facet", attributes = {
+    impl_element!(FacetHead, "facet", attributes = {
     }, fields = {
     });
 
@@ -1306,32 +1343,32 @@ pub mod lists {
     use super::*;
 
     #[derive(Debug, PartialEq)]
-    pub struct QNameList<'input>(Vec<support::QName<'input>>);
+    pub struct QNameList<'input>(pub Vec<support::QName<'input>>);
 
     impl_list!(QNameList, support::QName);
 
     #[derive(Debug, PartialEq)]
-    pub struct DerivationControlList<'input>(Vec<xs::DerivationControl<'input>>);
+    pub struct DerivationControlList<'input>(pub Vec<xs::DerivationControl<'input>>);
 
     impl_list!(DerivationControlList, xs::DerivationControl);
 
     #[derive(Debug, PartialEq)]
-    pub struct ReducedDerivationControlList<'input>(Vec<xs::ReducedDerivationControl<'input>>);
+    pub struct ReducedDerivationControlList<'input>(pub Vec<xs::ReducedDerivationControl<'input>>);
 
     impl_list!(ReducedDerivationControlList, xs::ReducedDerivationControl);
 
     #[derive(Debug, PartialEq)]
-    pub struct TypeDerivationControlList<'input>(Vec<xs::TypeDerivationControl<'input>>);
+    pub struct TypeDerivationControlList<'input>(pub Vec<xs::TypeDerivationControl<'input>>);
 
     impl_list!(TypeDerivationControlList, xs::TypeDerivationControl);
 
     #[derive(Debug, PartialEq)]
-    pub struct UnionTokenList<'input>(Vec<unions::UnionToken<'input>>);
+    pub struct UnionTokenList<'input>(pub Vec<unions::UnionToken<'input>>);
 
     impl_list!(UnionTokenList, unions::UnionToken);
 
     #[derive(Debug, PartialEq)]
-    pub struct UnionTokenList_<'input>(Vec<unions::UnionToken<'input>>);
+    pub struct UnionTokenList_<'input>(pub Vec<unions::UnionToken<'input>>);
 
     impl_list!(UnionTokenList_, unions::UnionToken);
 }

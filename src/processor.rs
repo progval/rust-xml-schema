@@ -166,6 +166,7 @@ pub struct Processor<'ast, 'input: 'ast> {
 
     pub lists: HashMap<RichType<'input, SimpleType<'input>>, HashSet<String>>,
     pub unions: HashMap<Vec<RichType<'input, SimpleType<'input>>>, HashSet<String>>,
+    pub substitution_groups: HashMap<FullName<'input>, Vec<FullName<'input>>>,
     _phantom: PhantomData<&'ast ()>, // Sometimes I need 'ast when prototyping
 }
 
@@ -218,6 +219,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attribute_groups: HashMap::new(),
             inline_elements: HashMap::new(),
             simple_types: HashMap::new(),
+            substitution_groups: HashMap::new(),
             _phantom: PhantomData::default(),
         }
     }
@@ -882,6 +884,14 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let name = name.expect("<element> has no name.");
         let xs::Element { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
+        if let Some(heads) = attr_substitution_group {
+            for head in &heads.0 {
+                let head = self.namespaces.expand_qname(head.clone());
+                self.substitution_groups.entry(head)
+                    .or_insert(Vec::new())
+                    .push(name.clone());
+            }
+        }
         let type_ = match (type_attr, &child_type) {
             (None, Some(ref c)) => match c {
                 enums::Type::SimpleType(ref e) => {
@@ -923,7 +933,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let mut ref_ = None;
         let mut type_attr = None;
         let mut abstract_ = false;
-        let mut substitution_group = None;
+        //let mut substitution_group = None;
         let mut min_occurs = 1;
         let mut max_occurs = 1;
         for (key, &value) in attrs.iter() {
@@ -945,8 +955,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         _ => panic!("Invalid value for abstract attribute: {}", value),
                     }
                 },
-                (SCHEMA_URI, "substitutionGroup") =>
-                    substitution_group = Some(self.namespaces.parse_qname(value)),
+                //(SCHEMA_URI, "substitutionGroup") =>
+                //    substitution_group = Some(self.namespaces.parse_qname(value)),
                 (SCHEMA_URI, "ref") =>
                     ref_ = Some(self.namespaces.parse_qname(value)),
                 _ => panic!("Unknown attribute {} in <element>", key),

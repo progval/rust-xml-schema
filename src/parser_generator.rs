@@ -111,11 +111,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let mut doc = doc.clone();
                 {
                     let mut name_gen = NameGenerator::new();
-                    let field_writer = &mut |variant_name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
-                        let variant_name = escape_keyword(&name_gen.gen_name(variant_name.to_snake_case()));
+                    let field_writer = &mut |field_name: &str, type_mod_name: &str, min_occurs, max_occurs, type_name: &str| {
+                        let field_name = escape_keyword(&name_gen.gen_name(field_name.to_snake_case()));
                         let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
                         let type_name = escape_keyword(&type_name.to_camel_case());
-                        fields.push((variant_name, type_mod_name, min_occurs, max_occurs, type_name));
+                        fields.push((field_name, type_mod_name, min_occurs, max_occurs, type_name));
                     };
                     let doc_writer = &mut |doc2: &Documentation<'input>| doc.extend(doc2);
                     let mut attr_writer = &mut |_: &_| ();
@@ -218,7 +218,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     if let Some(type_name) = type_name {
                         {
                             let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-                            struct_.tuple_field(&format!("Vec<{}<'input>>", type_name));
+                            struct_.tuple_field(&format!("pub Vec<{}<'input>>", type_name));
                         }
                         module.scope().raw(&format!("impl_list!({}, {});", struct_name, type_name));
                     }
@@ -410,10 +410,46 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let mod_name = self.get_module_name(name);
                 let mut module = scope.get_module_mut(&mod_name).expect(&mod_name);
                 let (prefix, local) = name.as_tuple();
-                let struct_name = escape_keyword(&local.to_camel_case());
-                self.gen_element(module, &struct_name, &name, &element.attrs, &element.type_, &element.doc);
+                let head_local_name = format!("{}_head", local);
+                let mut substitutions = Vec::new();
+                substitutions.push(FullName::new(prefix, &head_local_name));
+                for proc in &self.processors {
+                    if let Some(members) = proc.substitution_groups.get(&name) {
+                        substitutions.extend(members);
+                    }
+                }
+                if substitutions.len() > 1 {
+                    let enum_name = escape_keyword(&local.to_camel_case());
+                    self.gen_substitution_enum(module.scope(), &enum_name, &substitutions);
+                    let struct_name = escape_keyword(&head_local_name.to_camel_case());
+                    self.gen_element(module, &struct_name, &name, &element.attrs, &element.type_, &element.doc);
+                }
+                else {
+                    let struct_name = escape_keyword(&local.to_camel_case());
+                    self.gen_element(module, &struct_name, &name, &element.attrs, &element.type_, &element.doc);
+                }
             }
         }
+    }
+
+    fn gen_substitution_enum(&self, scope: &mut cg::Scope, enum_name: &str, substitutions: &Vec<FullName<'input>>) {
+        let mut impl_code = Vec::new();
+        impl_code.push(format!("impl_enum!({},", enum_name));
+        let mut name_gen = NameGenerator::new();
+        {
+            let enum_ = scope.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            for substitution in substitutions {
+                let (prefix, local) = substitution.as_tuple();
+                let variant_name = escape_keyword(&name_gen.gen_name(local.to_camel_case()));
+                let type_mod_name = escape_keyword(&self.module_names.get(prefix).expect(prefix).to_snake_case());
+                let type_name = escape_keyword(&local.to_camel_case());
+                let mut variant = enum_.new_variant(&variant_name);
+                variant.tuple(&format!("Box<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+                impl_code.push(format!("    impl_singleton_variant!({}, {}, Box<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
+            }
+            impl_code.push(");".to_string());
+        }
+        scope.raw(&impl_code.join("\n"));
     }
 
     fn gen_attrs(&self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, name_gen: &mut NameGenerator, attrs: &Attrs<'input>, seen_attrs: &mut HashMap<FullName<'input>, AttrUse>, generated_attrs: &mut HashSet<FullName<'input>>, inherited: bool) {
