@@ -289,7 +289,25 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                             let scope = scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
                                 .unwrap().scope();
                             scope.raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}<'input>);", name, type_name));
-                            scope.raw(&format!("impl_simpletype_restriction!({}, {:#?});", name, facets));
+                            let mut s = Vec::new();
+                            s.push(format!("min_exclusive: {:?},", facets.min_exclusive));
+                            s.push(format!("min_inclusive: {:?},", facets.min_inclusive));
+                            s.push(format!("max_exclusive: {:?},", facets.max_exclusive));
+                            s.push(format!("max_inclusive: {:?},", facets.max_inclusive));
+                            s.push(format!("total_digits: {:?},", facets.total_digits));
+                            s.push(format!("fraction_digits: {:?},", facets.fraction_digits));
+                            s.push(format!("length: {:?},", facets.length));
+                            s.push(format!("min_length: {:?},", facets.min_length));
+                            s.push(format!("max_length: {:?},", facets.max_length));
+                            match &facets.enumeration {
+                                Some(items) => s.push(format!("enumeration: Some(vec![{}]),", items.iter().map(|i| format!("{:?}", i)).collect::<Vec<_>>().join(", "))),
+                                None => s.push("enumeration: None,".to_string()),
+                            }
+                            s.push(format!("white_space: {:?},", facets.white_space));
+                            s.push(format!("pattern: {:?},", facets.pattern));
+                            s.push(format!("assertion: {:?},", facets.assertion));
+                            s.push(format!("explicit_timezone: {:?},", facets.explicit_timezone));
+                            scope.raw(&format!("impl_simpletype_restriction!({}, Facets {{\n    {}\n}});", name, s.join("\n    ")));
                         }
                         _ => {
                             scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))

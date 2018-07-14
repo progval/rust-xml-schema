@@ -373,18 +373,16 @@ macro_rules! impl_list {
 
 #[macro_export]
 macro_rules! impl_simpletype_restriction {
-    ( $name:ident, Facets { $first_facet_name:ident : $first_facet_value:expr $( , $facet_name:ident : $facet_value:expr )* } ) => {
+    ( $name:ident, Facets { $( $facet_name:ident : $facet_value:expr , )* } ) => {
         impl<'input> ParseXmlStr<'input> for $name<'input> {
             const NODE_NAME: &'static str = stringify!($name);
 
             #[allow(unused_variables)]
             fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)> {
-                let facets = Facets {
-                    $first_facet_name: $first_facet_value.or(facets.$first_facet_name),
-                    $(
-                        $facet_name: $facet_value.or(facets.$facet_name),
-                    )*
-                };
+                let mut facets = facets.clone();
+                $(
+                    facets.$facet_name =  $facet_value.or(facets.$facet_name);
+                )*
                 let (output, v) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context, &facets)?;
                 Some((output, $name(v)))
             }

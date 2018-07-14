@@ -627,7 +627,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         Length(ref e) => facets.length = Some(e.attr_value.0),
                         MinLength(ref e) => facets.min_length = Some(e.attr_value.0),
                         MaxLength(ref e) => facets.max_length = Some(e.attr_value.0),
-                        Enumeration(ref e) => facets.enumeration = Some(e.attr_value.0),
+                        Enumeration(ref e) => facets.enumeration.get_or_insert(Vec::new()).push(e.attr_value.0),
                         WhiteSpace(ref e) => facets.white_space = Some((e.attr_value.0).0),
                         Pattern(ref e) => facets.pattern = Some(e.attr_value.0),
                         Assertion(ref e) => unimplemented!("assertion facet"),

@@ -28,15 +28,13 @@ pub mod xs {
         total_digits: None,
         fraction_digits: None,
         length: None,
-        min_length: Some(
-            1
-        ),
+        min_length: Some(1),
         max_length: None,
         enumeration: None,
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Entity<'input>(pub support::NcName<'input>);
@@ -55,7 +53,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Id<'input>(pub support::NcName<'input>);
@@ -74,7 +72,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Idref<'input>(pub support::NcName<'input>);
@@ -93,7 +91,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Idrefs<'input>(pub support::AnySimpleType<'input>);
@@ -106,15 +104,13 @@ pub mod xs {
         total_digits: None,
         fraction_digits: None,
         length: None,
-        min_length: Some(
-            1
-        ),
+        min_length: Some(1),
         max_length: None,
         enumeration: None,
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct NcName<'input>(pub xs::Name<'input>);
@@ -131,11 +127,9 @@ pub mod xs {
         max_length: None,
         enumeration: None,
         white_space: None,
-        pattern: Some(
-            "[\\i-[:]][\\c-[:]]*"
-        ),
+        pattern: Some("[\\i-[:]][\\c-[:]]*"),
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Nmtoken<'input>(pub support::Token<'input>);
@@ -152,11 +146,9 @@ pub mod xs {
         max_length: None,
         enumeration: None,
         white_space: None,
-        pattern: Some(
-            "\\c+"
-        ),
+        pattern: Some("\\c+"),
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Nmtokens<'input>(pub support::AnySimpleType<'input>);
@@ -169,15 +161,13 @@ pub mod xs {
         total_digits: None,
         fraction_digits: None,
         length: None,
-        min_length: Some(
-            1
-        ),
+        min_length: Some(1),
         max_length: None,
         enumeration: None,
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Name<'input>(pub support::Token<'input>);
@@ -194,24 +184,18 @@ pub mod xs {
         max_length: None,
         enumeration: None,
         white_space: None,
-        pattern: Some(
-            "\\i\\c*"
-        ),
+        pattern: Some("\\i\\c*"),
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Byte<'input>(pub xs::Short<'input>);
 
     impl_simpletype_restriction!(Byte, Facets {
         min_exclusive: None,
-        min_inclusive: Some(
-            "-128"
-        ),
+        min_inclusive: Some("-128"),
         max_exclusive: None,
-        max_inclusive: Some(
-            "127"
-        ),
+        max_inclusive: Some("127"),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -221,7 +205,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct DateTimeStamp<'input>(pub support::DateTime<'input>);
@@ -240,9 +224,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: Some(
-            "required"
-        )
+        explicit_timezone: Some("required"),
     });
 
     #[derive(Debug, PartialEq)] pub struct DayTimeDuration<'input>(pub support::Duration<'input>);
@@ -259,24 +241,18 @@ pub mod xs {
         max_length: None,
         enumeration: None,
         white_space: None,
-        pattern: Some(
-            "[^YM]*(T.*)?"
-        ),
+        pattern: Some("[^YM]*(T.*)?"),
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Int<'input>(pub xs::Long<'input>);
 
     impl_simpletype_restriction!(Int, Facets {
         min_exclusive: None,
-        min_inclusive: Some(
-            "-2147483648"
-        ),
+        min_inclusive: Some("-2147483648"),
         max_exclusive: None,
-        max_inclusive: Some(
-            "2147483647"
-        ),
+        max_inclusive: Some("2147483647"),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -286,7 +262,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Integer<'input>(pub support::Decimal<'input>);
@@ -297,19 +273,15 @@ pub mod xs {
         max_exclusive: None,
         max_inclusive: None,
         total_digits: None,
-        fraction_digits: Some(
-            0
-        ),
+        fraction_digits: Some(0),
         length: None,
         min_length: None,
         max_length: None,
         enumeration: None,
         white_space: None,
-        pattern: Some(
-            "[\\-+]?[0-9]+"
-        ),
+        pattern: Some("[\\-+]?[0-9]+"),
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Language<'input>(pub support::Token<'input>);
@@ -326,24 +298,18 @@ pub mod xs {
         max_length: None,
         enumeration: None,
         white_space: None,
-        pattern: Some(
-            "[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*"
-        ),
+        pattern: Some("[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*"),
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Long<'input>(pub xs::Integer<'input>);
 
     impl_simpletype_restriction!(Long, Facets {
         min_exclusive: None,
-        min_inclusive: Some(
-            "-9223372036854775808"
-        ),
+        min_inclusive: Some("-9223372036854775808"),
         max_exclusive: None,
-        max_inclusive: Some(
-            "9223372036854775807"
-        ),
+        max_inclusive: Some("9223372036854775807"),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -353,7 +319,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct NegativeInteger<'input>(pub xs::NonPositiveInteger<'input>);
@@ -362,9 +328,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some(
-            "-1"
-        ),
+        max_inclusive: Some("-1"),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -374,16 +338,14 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct NonNegativeInteger<'input>(pub xs::Integer<'input>);
 
     impl_simpletype_restriction!(NonNegativeInteger, Facets {
         min_exclusive: None,
-        min_inclusive: Some(
-            "0"
-        ),
+        min_inclusive: Some("0"),
         max_exclusive: None,
         max_inclusive: None,
         total_digits: None,
@@ -395,7 +357,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct NonPositiveInteger<'input>(pub xs::Integer<'input>);
@@ -404,9 +366,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some(
-            "0"
-        ),
+        max_inclusive: Some("0"),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -416,7 +376,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct NormalizedString<'input>(pub support::XmlString<'input>);
@@ -432,21 +392,17 @@ pub mod xs {
         min_length: None,
         max_length: None,
         enumeration: None,
-        white_space: Some(
-            "replace"
-        ),
+        white_space: Some("replace"),
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct PositiveInteger<'input>(pub support::NonNegativeInteger<'input>);
 
     impl_simpletype_restriction!(PositiveInteger, Facets {
         min_exclusive: None,
-        min_inclusive: Some(
-            "1"
-        ),
+        min_inclusive: Some("1"),
         max_exclusive: None,
         max_inclusive: None,
         total_digits: None,
@@ -458,20 +414,16 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Short<'input>(pub xs::Int<'input>);
 
     impl_simpletype_restriction!(Short, Facets {
         min_exclusive: None,
-        min_inclusive: Some(
-            "-32768"
-        ),
+        min_inclusive: Some("-32768"),
         max_exclusive: None,
-        max_inclusive: Some(
-            "32767"
-        ),
+        max_inclusive: Some("32767"),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -481,7 +433,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct Token<'input>(pub xs::NormalizedString<'input>);
@@ -497,12 +449,10 @@ pub mod xs {
         min_length: None,
         max_length: None,
         enumeration: None,
-        white_space: Some(
-            "collapse"
-        ),
+        white_space: Some("collapse"),
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct UnsignedByte<'input>(pub xs::UnsignedShort<'input>);
@@ -511,9 +461,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some(
-            "255"
-        ),
+        max_inclusive: Some("255"),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -523,7 +471,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct UnsignedInt<'input>(pub xs::UnsignedLong<'input>);
@@ -532,9 +480,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some(
-            "4294967295"
-        ),
+        max_inclusive: Some("4294967295"),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -544,7 +490,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct UnsignedLong<'input>(pub support::NonNegativeInteger<'input>);
@@ -553,9 +499,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some(
-            "18446744073709551615"
-        ),
+        max_inclusive: Some("18446744073709551615"),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -565,7 +509,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct UnsignedShort<'input>(pub xs::UnsignedInt<'input>);
@@ -574,9 +518,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some(
-            "65535"
-        ),
+        max_inclusive: Some("65535"),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -586,7 +528,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct YearMonthDuration<'input>(pub support::Duration<'input>);
@@ -603,11 +545,9 @@ pub mod xs {
         max_length: None,
         enumeration: None,
         white_space: None,
-        pattern: Some(
-            "[^DT]*"
-        ),
+        pattern: Some("[^DT]*"),
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     pub type AllNni<'input> = unions::UnionNmtoken<'input>;
@@ -628,13 +568,11 @@ pub mod xs {
         length: None,
         min_length: None,
         max_length: None,
-        enumeration: Some(
-            "union"
-        ),
+        enumeration: Some(vec!["substitution", "extension", "restriction", "list", "union"]),
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     pub type DerivationSet<'input> = unions::UnionTokenReducedDerivationControlList<'input>;
@@ -651,13 +589,11 @@ pub mod xs {
         length: None,
         min_length: None,
         max_length: None,
-        enumeration: Some(
-            "unqualified"
-        ),
+        enumeration: Some(vec!["qualified", "unqualified"]),
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     pub type FullDerivationSet<'input> = unions::UnionTokenTypeDerivationControlList<'input>;
@@ -680,7 +616,7 @@ pub mod xs {
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     pub type QnameList<'input> = lists::UnionTokenList<'input>;
@@ -699,13 +635,11 @@ pub mod xs {
         length: None,
         min_length: None,
         max_length: None,
-        enumeration: Some(
-            "restriction"
-        ),
+        enumeration: Some(vec!["extension", "restriction"]),
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     pub type SimpleDerivationSet<'input> = unions::UnionTokenDerivationControlList<'input>;
@@ -722,13 +656,11 @@ pub mod xs {
         length: None,
         min_length: None,
         max_length: None,
-        enumeration: Some(
-            "##other"
-        ),
+        enumeration: Some(vec!["##any", "##other"]),
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     #[derive(Debug, PartialEq)] pub struct TypeDerivationControl<'input>(pub xs::DerivationControl<'input>);
@@ -743,13 +675,11 @@ pub mod xs {
         length: None,
         min_length: None,
         max_length: None,
-        enumeration: Some(
-            "union"
-        ),
+        enumeration: Some(vec!["extension", "restriction", "list", "union"]),
         white_space: None,
         pattern: None,
         assertion: None,
-        explicit_timezone: None
+        explicit_timezone: None,
     });
 
     pub type XpathDefaultNamespace<'input> = unions::UnionToken<'input>;

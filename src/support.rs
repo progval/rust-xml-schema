@@ -15,7 +15,7 @@ pub struct Facets<'input> {
     pub length: Option<i64>,
     pub min_length: Option<i64>,
     pub max_length: Option<i64>,
-    pub enumeration: Option<&'input str>,
+    pub enumeration: Option<Vec<&'input str>>,
     pub white_space: Option<&'input str>,
     pub pattern: Option<&'input str>,
     pub assertion: Option<&'input str>,
