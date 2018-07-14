@@ -286,10 +286,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 if let Some(type_name) = self.get_simple_type_name(&ty.type_) {
                     match ty.type_ {
                         SimpleType::Restriction(_name, ref facets) => {
-                            scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
-                                .unwrap().scope()
-                                .raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}<'input>);", name, type_name))
-                                .raw(&format!("impl_simpletype_restriction!({});", name));
+                            let scope = scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
+                                .unwrap().scope();
+                            scope.raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}<'input>);", name, type_name));
+                            scope.raw(&format!("impl_simpletype_restriction!({}, {:#?});", name, facets));
                         }
                         _ => {
                             scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))

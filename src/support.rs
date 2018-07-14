@@ -4,24 +4,22 @@ use xmlparser::{Token as XmlToken, Tokenizer};
 
 pub use primitives::*; // TODO: remove the pub?
 
-pub trait ParseFacets {
-    const MIN_EXCLUSIVE: Option<&'static str> = None;
-    const MIN_INCLUSIVE: Option<&'static str> = None;
-    const MAX_EXCLUSIVE: Option<&'static str> = None;
-    const MAX_INCLUSIVE: Option<&'static str> = None;
-    const TOTAL_DIGITS: Option<&'static str> = None;
-    const FRACTION_DIGITS: Option<&'static str> = None;
-    const LENGTH: Option<&'static i64> = None;
-    const MIN_LENGTH: Option<&'static i64> = None;
-    const MAX_LENGTH: Option<&'static i64> = None;
-    const ENUMERATION: Option<&'static str> = None;
-    const WHITE_SPACE: Option<&'static str> = None;
-    const PATTERN: Option<&'static str> = None;
-    const ASSERTION: Option<&'static str> = None;
-    const EXPLICIT_TIMEZONE: Option<&'static str> = None;
-}
-pub struct DefaultFacets(PhantomData<()>);
-impl ParseFacets for DefaultFacets {
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Default)]
+pub struct Facets<'input> {
+    pub min_exclusive: Option<&'input str>,
+    pub min_inclusive: Option<&'input str>,
+    pub max_exclusive: Option<&'input str>,
+    pub max_inclusive: Option<&'input str>,
+    pub total_digits: Option<i64>,
+    pub fraction_digits: Option<i64>,
+    pub length: Option<i64>,
+    pub min_length: Option<i64>,
+    pub max_length: Option<i64>,
+    pub enumeration: Option<&'input str>,
+    pub white_space: Option<&'input str>,
+    pub pattern: Option<&'input str>,
+    pub assertion: Option<&'input str>,
+    pub explicit_timezone: Option<&'input str>,
 }
 
 #[derive(Debug,PartialEq)]
@@ -106,11 +104,11 @@ pub trait ParseXml<'input>: Sized {
 pub trait ParseXmlStr<'input>: Sized {
     const NODE_NAME: &'static str;
 
-    fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)>;
+    fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)>;
 
-    fn parse_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
+    fn parse_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)> {
         //println!("// Entering: {:?}", Self::NODE_NAME);
-        let ret = Self::parse_self_xml_str(input, parse_context, parent_context);
+        let ret = Self::parse_self_xml_str(input, parse_context, parent_context, facets);
         /*
         match ret {
             Some(_) => println!("// Leaving: {:?} (succeeded)", Self::NODE_NAME),

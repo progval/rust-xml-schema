@@ -180,7 +180,7 @@ macro_rules! impl_element {
                                         match (key_prefix, key_local) {
                                             $(
                                                 (_, $attr_local) => { // TODO: match the namespace too
-                                                    match ParseXmlStr::parse_xml_str(value, parse_context, parent_context) {
+                                                    match ParseXmlStr::parse_xml_str(value, parse_context, parent_context, &Facets::default()) {
                                                         Some(("", value)) => {
                                                             $attr_name = Some(value)
                                                             // TODO: check for duplicates
@@ -324,9 +324,9 @@ macro_rules! impl_union {
         impl<'input> ParseXmlStr<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("union ", stringify!($name));
 
-            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
+            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)> {
                 $(
-                    match $variant_macro!($name, input, parse_context, parent_context, $($variant_args)*) {
+                    match $variant_macro!($name, input, parse_context, parent_context, facets, $($variant_args)*) {
                         Some((o, x)) => return Some((o, x)),
                         None => (),
                     }
@@ -339,8 +339,8 @@ macro_rules! impl_union {
 }
 
 macro_rules! impl_union_variant {
-    ( $name:ident, $input:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident) => {
-        ParseXmlStr::parse_xml_str($input, $parse_context, $parent_context)
+    ( $name:ident, $input:expr, $parse_context:expr, $parent_context:expr, $facets:expr, $variant_name:ident) => {
+        ParseXmlStr::parse_xml_str($input, $parse_context, $parent_context, $facets)
             .map(|(o, x)| (o, $name::$variant_name(x)))
     }
 }
@@ -352,10 +352,10 @@ macro_rules! impl_list {
             const NODE_NAME: &'static str = concat!("list ", stringify!($name));
 
             #[allow(unused_variables)]
-            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
+            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)> {
                 let mut input = input;
                 let mut items = Vec::new();
-                while let Some((output, item)) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context) {
+                while let Some((output, item)) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context, facets) {
                     items.push(item);
                     if output.len() == 0 {
                         return Some(("", $name(items)));
@@ -373,13 +373,19 @@ macro_rules! impl_list {
 
 #[macro_export]
 macro_rules! impl_simpletype_restriction {
-    ( $name:ident ) => {
+    ( $name:ident, Facets { $first_facet_name:ident : $first_facet_value:expr $( , $facet_name:ident : $facet_value:expr )* } ) => {
         impl<'input> ParseXmlStr<'input> for $name<'input> {
             const NODE_NAME: &'static str = stringify!($name);
 
             #[allow(unused_variables)]
-            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<(&'input str, Self)> {
-                let (output, v) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context)?;
+            fn parse_self_xml_str<TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, Self)> {
+                let facets = Facets {
+                    $first_facet_name: $first_facet_value.or(facets.$first_facet_name),
+                    $(
+                        $facet_name: $facet_value.or(facets.$facet_name),
+                    )*
+                };
+                let (output, v) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context, &facets)?;
                 Some((output, $name(v)))
             }
         }

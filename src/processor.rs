@@ -141,24 +141,6 @@ pub enum Type<'input> {
     Simple(SimpleType<'input>),
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Default)]
-pub struct Facets<'input> {
-    pub min_exclusive: Option<&'input str>,
-    pub min_inclusive: Option<&'input str>,
-    pub max_exclusive: Option<&'input str>,
-    pub max_inclusive: Option<&'input str>,
-    pub total_digits: Option<i64>,
-    pub fraction_digits: Option<i64>,
-    pub length: Option<i64>,
-    pub min_length: Option<i64>,
-    pub max_length: Option<i64>,
-    pub enumeration: Option<&'input str>,
-    pub white_space: Option<&'input str>,
-    pub pattern: Option<&'input str>,
-    pub assertion: Option<&'input str>,
-    pub explicit_timezone: Option<&'input str>,
-}
-
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SimpleType<'input> {
     Primitive(&'static str, &'static str),
