@@ -7,10 +7,39 @@ use support::{ParseXml, ParseXmlStr, Stream, ParseContext, Facets};
 use xml_utils::*;
 
 macro_rules! return_split {
-    ( $input:expr, $position:expr, $pred:expr ) => {{
+    ( $input:expr, $position:expr, $pred:expr, $validator:ident !, $facets:expr) => {{
         let input = $input;
         let pos = $position;
-        return Some((&input[pos..], $pred(&input[0..pos])))
+        let parsed = &input[0..pos];
+        $validator!(parsed, $facets);
+        return Some((&input[pos..], $pred(parsed)))
+    }}
+}
+
+macro_rules! validate_str {
+    ( $s:expr, $facets:expr) => {{
+        let facets = $facets;
+        let s: &&str = &$s;
+        if let Some(ref enumeration) = facets.enumeration {
+            if !enumeration.contains(s) {
+                panic!("Expected one of {:?}, got {:?}", enumeration, s);
+            }
+        }
+        if let Some(ref length) = facets.length {
+            if s.len() != *length {
+                panic!("{:?} has length != {}", s, length);
+            }
+        }
+        if let Some(ref min_length) = facets.min_length {
+            if s.len() < *min_length {
+                panic!("{:?} has length < {}", s, min_length);
+            }
+        }
+        if let Some(ref max_length) = facets.max_length {
+            if s.len() > *max_length {
+                panic!("{:?} has length > {}", s, max_length);
+            }
+        }
     }}
 }
 
@@ -56,15 +85,16 @@ impl<'input> ParseXmlStr<'input> for Token<'input> {
                     // If this space is followed by a whitespace, split before both
                     match iter.peek() {
                         Some((_, ' ')) | Some((_, '\r')) | Some((_, '\n')) |
-                        Some((_, '\t')) => return_split!(input, i, Token),
+                        Some((_, '\t')) => return_split!(input, i, Token, validate_str!, facets),
                         Some((_, _)) => (),
-                        None => return_split!(input, i, Token),
+                        None => return_split!(input, i, Token, validate_str!, facets),
                     }
                 }
-                (_, '\r') | (_, '\n') | (_, '\t') => return_split!(input, i, Token),
+                (_, '\r') | (_, '\n') | (_, '\t') => return_split!(input, i, Token, validate_str!, facets),
                 _ => (),
             }
         }
+        validate_str!(input, facets);
         Some(("", Token(input)))
     }
 }
@@ -302,7 +332,7 @@ impl<'input> ParseXmlStr<'input> for XmlString<'input> {
     fn parse_self_xml_str<TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'static>) -> Option<(&'input str, XmlString<'input>)> {
         for (i, c) in input.char_indices() {
             if !is_xml_char(c) {
-                return_split!(input, i, XmlString);
+                return_split!(input, i, XmlString, validate_str!, facets);
             }
         }
         Some(("", XmlString(input)))
@@ -346,7 +376,7 @@ impl<'input> ParseXmlStr<'input> for NcName<'input> {
 
         for (i, c) in iter {
             if c == ':' || !is_name_char(c) {
-                return_split!(input, i, NcName);
+                return_split!(input, i, NcName, validate_str!, facets);
             }
         }
 
