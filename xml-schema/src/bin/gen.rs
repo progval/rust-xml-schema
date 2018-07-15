@@ -6,10 +6,9 @@ use std::collections::HashMap;
 extern crate xmlparser;
 extern crate xml_schema;
 extern crate codegen;
-use xml_schema::parser::xs;
 use xml_schema::processor::*;
 use xml_schema::parser_generator::*;
-use xml_schema::support::*;
+use xml_schema::parse_xsd;
 
 const RENAMES: &[(&'static str, &'static str)] = &[
     ("SequenceDefaultOpenContentAnnotation", "AnnotatedOpenContent"),
@@ -40,20 +39,7 @@ fn main() {
 
     let mut documents = Vec::new();
     for (filename, input) in inputs2 {
-        let tokenizer = xmlparser::Tokenizer::from(&input[..]);
-        let mut stream = Box::new(InnerStream::new(tokenizer));
-        loop {
-            let tok = stream.next().unwrap();
-            match tok {
-                xmlparser::Token::EntityDeclaration(_, _) |
-                xmlparser::Token::Declaration(_, _, _) |
-                xmlparser::Token::DtdStart(_, _) |
-                xmlparser::Token::Comment(_) => (),
-                xmlparser::Token::DtdEnd => break,
-                _ => panic!("Unexpected token {:?}", tok),
-            }
-        }
-        documents.push((filename, xs::Schema::parse_xml(&mut stream, &mut ParseContext::default(), &()).unwrap()));
+        documents.push((filename, parse_xsd(input)));
     }
 
     let mut processors = Vec::new();
@@ -71,6 +57,5 @@ fn main() {
 
     let mut gen = ParserGenerator::new(processors, renames);
     let scope = gen.gen_target_scope();
-    //println!("#[allow(bad_style)]\nextern crate xml_schema;use xml_schema::support;\n{}\n{}", MACROS, scope.to_string());
     println!("#[allow(unused_imports)]\nuse support;\n{}", scope.to_string());
 }

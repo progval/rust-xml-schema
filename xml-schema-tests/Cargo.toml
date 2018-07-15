@@ -1,0 +1,12 @@
+[package]
+name = "xml-schema-tests"
+version = "0.1.0"
+authors = ["Valentin Lorentz <progval+git@progval.net>"]
+build = "build.rs"
+
+[dependencies]
+xml-schema = { path = "../xml-schema" }
+pretty_assertions = "0.4"
+
+[build-dependencies]
+xml-schema = { path = "../xml-schema" }

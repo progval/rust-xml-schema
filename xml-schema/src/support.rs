@@ -31,12 +31,13 @@ pub struct List<'input, Item>(Vec<Item>, PhantomData<&'input ()>);
 pub type Stream<'input> = Box<InnerStream<'input>>;
 pub struct InnerStream<'input> {
     pub(crate) index: usize,
+    passed_prelude: bool,
     tokens: Vec<XmlToken<'input>>,
 }
 
 impl<'input> InnerStream<'input> {
     pub fn new(tokenizer: Tokenizer<'input>) -> InnerStream<'input> {
-        InnerStream { index: 0, tokens: tokenizer.into_iter().map(|o| o.unwrap()).collect() }
+        InnerStream { index: 0, passed_prelude: false, tokens: tokenizer.into_iter().map(|o| o.unwrap()).collect() }
     }
 
     #[inline]
@@ -65,6 +66,22 @@ impl Transaction {
 impl<'input> Iterator for InnerStream<'input> {
     type Item = XmlToken<'input>;
     fn next(&mut self) -> Option<Self::Item> {
+        if !self.passed_prelude {
+            self.passed_prelude = true;
+            loop {
+                let tok = self.next().unwrap();
+                match tok {
+                    XmlToken::EntityDeclaration(_, _) |
+                    XmlToken::Declaration(_, _, _) |
+                    XmlToken::DtdStart(_, _) |
+                    XmlToken::Comment(_) => (),
+                    XmlToken::DtdEnd => break,
+                    _ => {
+                        return Some(tok);
+                    }
+                }
+            }
+        }
         let tok = self.tokens.get(self.index);
         //println!("// Reading {:?}", tok);
         match tok {

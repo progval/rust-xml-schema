@@ -16,11 +16,6 @@ fn generated_parses_person_xsd() {
     f.read_to_string(&mut s).unwrap();
     let tokenizer = xmlparser::Tokenizer::from(&s[..]);
     let mut stream = Box::new(InnerStream::new(tokenizer));
-    stream.next(); // Eat the declaration
-    stream.next(); // Eat the DTD start
-    stream.next(); // Eat comment
-    stream.next(); // Eat comment
-    stream.next(); // Eat the DTD end
     let doc = xs::Schema::parse_xml(&mut stream, &mut Default::default(), &());
     assert_ne!(doc, None);
 }
@@ -32,11 +27,6 @@ fn round1_parser_person_xsd() {
     f.read_to_string(&mut s).unwrap();
     let tokenizer = xmlparser::Tokenizer::from(&s[..]);
     let mut stream = Box::new(InnerStream::new(tokenizer));
-    stream.next(); // Eat the declaration
-    stream.next(); // Eat the DTD start
-    stream.next(); // Eat comment
-    stream.next(); // Eat comment
-    stream.next(); // Eat the DTD end
     let doc = xs::Schema::parse_xml(&mut stream, &mut Default::default(), &());
     assert_ne!(doc, None);
     //let mut parser_generator = ParserGenerator::new(doc.as_ref().unwrap(), HashMap::new());

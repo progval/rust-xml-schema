@@ -1,14 +1,10 @@
 #![recursion_limit="80"]
 
-extern crate xmlparser;
+pub extern crate xmlparser;
 extern crate codegen;
 extern crate heck;
 extern crate num_traits;
 extern crate bigdecimal;
-
-#[cfg(test)]
-#[macro_use]
-extern crate pretty_assertions;
 
 #[macro_use] pub mod macros;
 pub mod xml_utils;
@@ -27,6 +23,9 @@ mod test_parser;
 mod test_parser_schema;
 
 use support::{ParseXml, InnerStream, ParseContext};
+
+pub use processor::Processor;
+pub use parser_generator::ParserGenerator;
 
 pub fn parse_xsd(xsd: &str) -> parser::xs::Schema {
     let tokenizer = xmlparser::Tokenizer::from(xsd);
