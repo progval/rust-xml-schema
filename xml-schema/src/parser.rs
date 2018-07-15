@@ -1,5 +1,5 @@
-// Input: "derived.nxsd"
-// Input: "XMLSchema.xsd"
+// Input: "xml-schema/derived.nxsd"
+// Input: "xml-schema/XMLSchema.xsd"
 #[allow(unused_imports)]
 use support;
 extern crate xmlparser;
