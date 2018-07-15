@@ -193,9 +193,9 @@ pub mod xs {
 
     impl_simpletype_restriction!(Byte, Facets {
         min_exclusive: None,
-        min_inclusive: Some("-128"),
+        min_inclusive: Some(BigFloatNotNaN::from_str("-128").unwrap()),
         max_exclusive: None,
-        max_inclusive: Some("127"),
+        max_inclusive: Some(BigFloatNotNaN::from_str("127").unwrap()),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -250,9 +250,9 @@ pub mod xs {
 
     impl_simpletype_restriction!(Int, Facets {
         min_exclusive: None,
-        min_inclusive: Some("-2147483648"),
+        min_inclusive: Some(BigFloatNotNaN::from_str("-2147483648").unwrap()),
         max_exclusive: None,
-        max_inclusive: Some("2147483647"),
+        max_inclusive: Some(BigFloatNotNaN::from_str("2147483647").unwrap()),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -307,9 +307,9 @@ pub mod xs {
 
     impl_simpletype_restriction!(Long, Facets {
         min_exclusive: None,
-        min_inclusive: Some("-9223372036854775808"),
+        min_inclusive: Some(BigFloatNotNaN::from_str("-9223372036854775808").unwrap()),
         max_exclusive: None,
-        max_inclusive: Some("9223372036854775807"),
+        max_inclusive: Some(BigFloatNotNaN::from_str("9223372036854775807").unwrap()),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -328,7 +328,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some("-1"),
+        max_inclusive: Some(BigFloatNotNaN::from_str("-1").unwrap()),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -345,7 +345,7 @@ pub mod xs {
 
     impl_simpletype_restriction!(NonNegativeInteger, Facets {
         min_exclusive: None,
-        min_inclusive: Some("0"),
+        min_inclusive: Some(BigFloatNotNaN::from_str("0").unwrap()),
         max_exclusive: None,
         max_inclusive: None,
         total_digits: None,
@@ -366,7 +366,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some("0"),
+        max_inclusive: Some(BigFloatNotNaN::from_str("0").unwrap()),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -402,7 +402,7 @@ pub mod xs {
 
     impl_simpletype_restriction!(PositiveInteger, Facets {
         min_exclusive: None,
-        min_inclusive: Some("1"),
+        min_inclusive: Some(BigFloatNotNaN::from_str("1").unwrap()),
         max_exclusive: None,
         max_inclusive: None,
         total_digits: None,
@@ -421,9 +421,9 @@ pub mod xs {
 
     impl_simpletype_restriction!(Short, Facets {
         min_exclusive: None,
-        min_inclusive: Some("-32768"),
+        min_inclusive: Some(BigFloatNotNaN::from_str("-32768").unwrap()),
         max_exclusive: None,
-        max_inclusive: Some("32767"),
+        max_inclusive: Some(BigFloatNotNaN::from_str("32767").unwrap()),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -461,7 +461,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some("255"),
+        max_inclusive: Some(BigFloatNotNaN::from_str("255").unwrap()),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -480,7 +480,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some("4294967295"),
+        max_inclusive: Some(BigFloatNotNaN::from_str("4294967295").unwrap()),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -499,7 +499,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some("18446744073709551615"),
+        max_inclusive: Some(BigFloatNotNaN::from_str("18446744073709551615").unwrap()),
         total_digits: None,
         fraction_digits: None,
         length: None,
@@ -518,7 +518,7 @@ pub mod xs {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
-        max_inclusive: Some("65535"),
+        max_inclusive: Some(BigFloatNotNaN::from_str("65535").unwrap()),
         total_digits: None,
         fraction_digits: None,
         length: None,

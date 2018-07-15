@@ -8,6 +8,8 @@ authors = ["Valentin Lorentz <progval+git@progval.net>"]
 xmlparser = "0.5.0"
 codegen = { git = "https://github.com/carllerche/codegen" }
 heck = "0.3.0"
+bigdecimal = "0.0.12"
+num-traits = "0.2.5"
 
 [dev-dependencies]
 pretty_assertions = "^0.4"

@@ -618,10 +618,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 enums::ChoiceFacetAny::Facet(e) => {
                     match **e {
                         FacetHead(_) => panic!("abstract element"),
-                        MinExclusive(ref e) => facets.min_exclusive = Some(e.attr_value.0),
-                        MinInclusive(ref e) => facets.min_inclusive = Some(e.attr_value.0),
-                        MaxExclusive(ref e) => facets.max_exclusive = Some(e.attr_value.0),
-                        MaxInclusive(ref e) => facets.max_inclusive = Some(e.attr_value.0),
+                        MinExclusive(ref e) => facets.min_exclusive = Some(e.attr_value.0.parse().expect("invalid minexclusive")),
+                        MinInclusive(ref e) => facets.min_inclusive = Some(e.attr_value.0.parse().expect("invalid mininclusive")),
+                        MaxExclusive(ref e) => facets.max_exclusive = Some(e.attr_value.0.parse().expect("invalid maxexclusive")),
+                        MaxInclusive(ref e) => facets.max_inclusive = Some(e.attr_value.0.parse().expect("invalid maxinclusive")),
                         TotalDigits(ref e) => facets.total_digits = Some(e.attr_value.0),
                         FractionDigits(ref e) => facets.fraction_digits = Some(e.attr_value.0),
                         Length(ref e) => facets.length = Some(e.attr_value.0 as usize),

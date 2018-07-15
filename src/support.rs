@@ -1,15 +1,18 @@
 use std::marker::PhantomData;
+pub use std::str::FromStr;
 
 use xmlparser::{Token as XmlToken, Tokenizer};
 
 pub use primitives::*; // TODO: remove the pub?
 
+pub use bigfloat::BigFloatNotNaN;
+
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub struct Facets<'input> {
-    pub min_exclusive: Option<&'input str>,
-    pub min_inclusive: Option<&'input str>,
-    pub max_exclusive: Option<&'input str>,
-    pub max_inclusive: Option<&'input str>,
+    pub min_exclusive: Option<BigFloatNotNaN>,
+    pub min_inclusive: Option<BigFloatNotNaN>,
+    pub max_exclusive: Option<BigFloatNotNaN>,
+    pub max_inclusive: Option<BigFloatNotNaN>,
     pub total_digits: Option<u64>,
     pub fraction_digits: Option<u64>,
     pub length: Option<usize>,

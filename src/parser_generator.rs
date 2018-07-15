@@ -290,10 +290,16 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                                 .unwrap().scope();
                             scope.raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}<'input>);", name, type_name));
                             let mut s = Vec::new();
-                            s.push(format!("min_exclusive: {:?},", facets.min_exclusive));
-                            s.push(format!("min_inclusive: {:?},", facets.min_inclusive));
-                            s.push(format!("max_exclusive: {:?},", facets.max_exclusive));
-                            s.push(format!("max_inclusive: {:?},", facets.max_inclusive));
+                            let f = &mut |n: &Option<_>| {
+                                match n.as_ref() {
+                                    None => "None".to_string(),
+                                    Some(f) => format!("Some(BigFloatNotNaN::from_str(\"{}\").unwrap())", f),
+                                }
+                            };
+                            s.push(format!("min_exclusive: {},", f(&facets.min_exclusive)));
+                            s.push(format!("min_inclusive: {},", f(&facets.min_inclusive)));
+                            s.push(format!("max_exclusive: {},", f(&facets.max_exclusive)));
+                            s.push(format!("max_inclusive: {},", f(&facets.max_inclusive)));
                             s.push(format!("total_digits: {:?},", facets.total_digits));
                             s.push(format!("fraction_digits: {:?},", facets.fraction_digits));
                             s.push(format!("length: {:?},", facets.length));

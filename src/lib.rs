@@ -3,6 +3,8 @@
 extern crate xmlparser;
 extern crate codegen;
 extern crate heck;
+extern crate num_traits;
+extern crate bigdecimal;
 
 #[cfg(test)]
 #[macro_use]
@@ -13,6 +15,7 @@ pub mod xml_utils;
 pub mod names;
 pub mod support;
 pub mod primitives;
+pub mod bigfloat;
 
 pub mod parser;
 pub mod processor;

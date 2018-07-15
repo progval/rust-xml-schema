@@ -2,9 +2,12 @@ use std::cmp::max;
 use std::marker::PhantomData;
 use std::fmt;
 
+use bigdecimal::BigDecimal;
+use num_traits::{Zero, One};
+
 use xmlparser::{Token as XmlToken, ElementEnd, StrSpan};
 
-use support::{ParseXml, ParseXmlStr, Stream, ParseContext, Facets};
+use support::{ParseXml, ParseXmlStr, Stream, ParseContext, Facets, BigFloatNotNaN};
 use xml_utils::*;
 
 macro_rules! return_split {
@@ -47,24 +50,25 @@ macro_rules! validate_str {
 macro_rules! validate_int {
     ( $n:expr, $facets:expr) => {{
         let facets = $facets;
-        let n: i64 = $n;
+        let n: BigDecimal = $n.into();
+        let n: BigFloatNotNaN = n.into();
         if let Some(ref min_exclusive) = facets.min_exclusive {
-            if n <= min_exclusive.parse::<i64>().unwrap() {
+            if n <= *min_exclusive {
                 panic!("{} is <= {}", n, min_exclusive);
             }
         }
         if let Some(ref min_inclusive) = facets.min_inclusive {
-            if n < min_inclusive.parse::<i64>().unwrap() {
+            if n < *min_inclusive {
                 panic!("{} is < {}", n, min_inclusive);
             }
         }
         if let Some(ref max_exclusive) = facets.max_exclusive {
-            if n >= max_exclusive.parse::<i64>().unwrap() {
+            if n >= *max_exclusive {
                 panic!("{} is >= {}", n, max_exclusive);
             }
         }
         if let Some(ref max_inclusive) = facets.max_inclusive {
-            if n > max_inclusive.parse::<i64>().unwrap() {
+            if n > *max_inclusive {
                 panic!("{} is > {}", n, max_inclusive);
             }
         }
@@ -310,9 +314,9 @@ pub struct NonNegativeInteger<'input>(pub u64, PhantomData<&'input ()>);
 impl<'input> ParseXmlStr<'input> for NonNegativeInteger<'input> {
     const NODE_NAME: &'static str = "NonNegativeInteger";
     fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets) -> Option<(&'input str, NonNegativeInteger<'input>)> {
-        let min = max(0, facets.min_inclusive.unwrap_or("0").parse().expect("invalid int")).to_string();
+        let min = max(BigFloatNotNaN::zero(), facets.min_inclusive.clone().unwrap_or(BigFloatNotNaN::zero()));
         let mut facets = facets.clone();
-        facets.min_inclusive = Some(&min);
+        facets.min_inclusive = Some(min);
         let (output, n) = Integer::parse_self_xml_str(input, parse_context, parent_context, &facets)?;
         Some((output, NonNegativeInteger(n.0 as u64, PhantomData::default())))
     }
@@ -323,9 +327,9 @@ pub struct PositiveInteger<'input>(pub u64, PhantomData<&'input ()>);
 impl<'input> ParseXmlStr<'input> for PositiveInteger<'input> {
     const NODE_NAME: &'static str = "PositiveInteger";
     fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets) -> Option<(&'input str, PositiveInteger<'input>)> {
-        let min = max(1, facets.min_inclusive.unwrap_or("0").parse().expect("invalid int")).to_string();
+        let min = max(BigFloatNotNaN::one(), facets.min_inclusive.clone().unwrap_or(BigFloatNotNaN::zero()));
         let mut facets = facets.clone();
-        facets.min_inclusive = Some(&min);
+        facets.min_inclusive = Some(min);
         let (output, n) = NonNegativeInteger::parse_self_xml_str(input, parse_context, parent_context, &facets)?;
         Some((output, PositiveInteger(n.0, PhantomData::default())))
     }
