@@ -1,4 +1,5 @@
 use std::cmp::max;
+use std::str::FromStr;
 use std::marker::PhantomData;
 use std::fmt;
 
@@ -51,7 +52,13 @@ macro_rules! validate_int {
     ( $n:expr, $facets:expr) => {{
         let facets = $facets;
         let n: BigDecimal = $n.into();
-        let n: BigFloatNotNaN = n.into();
+        validate_decimal!(n, $facets);
+    }}
+}
+macro_rules! validate_decimal {
+    ( $n:expr, $facets:expr) => {{
+        let facets = $facets;
+        let n: BigFloatNotNaN = $n.into();
         if let Some(ref min_exclusive) = facets.min_exclusive {
             if n <= *min_exclusive {
                 panic!("{} is <= {}", n, min_exclusive);
@@ -95,7 +102,6 @@ pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
 pub type Id<'input> = NcName<'input>; // TODO ?
 pub type DateTime<'input> = Token<'input>; // TODO
 pub type Duration<'input> = Token<'input>; // TODO
-pub type Decimal<'input> = Token<'input>; // TODO
 
 /// https://www.w3.org/TR/xmlschema11-2/#token
 #[derive(Debug, PartialEq)]
@@ -332,6 +338,30 @@ impl<'input> ParseXmlStr<'input> for PositiveInteger<'input> {
         facets.min_inclusive = Some(min);
         let (output, n) = NonNegativeInteger::parse_self_xml_str(input, parse_context, parent_context, &facets)?;
         Some((output, PositiveInteger(n.0, PhantomData::default())))
+    }
+}
+
+#[derive(Debug, PartialEq, Default)]
+pub struct Decimal<'input>(pub BigDecimal, PhantomData<&'input ()>);
+impl<'input> ParseXmlStr<'input> for Decimal<'input> {
+    const NODE_NAME: &'static str = "Decimal";
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Decimal<'input>)> {
+        for (i, c) in input.char_indices() {
+            if c == ' ' { // TODO
+                let res = match BigDecimal::from_str(&input[0..i]) {
+                    Ok(res) => res,
+                    Err(_) => return None,
+                };
+                validate_decimal!(res.clone(), facets);
+                return Some((&input[i..], Decimal(res, PhantomData::default())))
+            }
+        }
+        let res = match BigDecimal::from_str(input) {
+            Ok(res) => res,
+            Err(_) => return None,
+        };
+        validate_decimal!(res.clone(), facets);
+        Some(("", Decimal(res, PhantomData::default())))
     }
 }
 
