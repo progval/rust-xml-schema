@@ -687,7 +687,7 @@ pub mod xs {
     ///  Only elements allowed inside
     #[derive(Debug, PartialEq)]
     pub struct All<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
         pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub all_model: super::xs::AllModel<'input>,
@@ -702,7 +702,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Annotation<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation_content: Vec<super::enums::AnnotationContent<'input>>,
     }
@@ -716,7 +716,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Any<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_not_q_name: Option<xs::QnameList<'input>>,
         pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
         pub attr_max_occurs: Option<xs::AllNni<'input>>,
@@ -742,7 +742,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct AnyAttribute<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_not_q_name: Option<xs::QnameListA<'input>>,
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
         pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
@@ -763,7 +763,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Appinfo<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_source: Option<support::AnyUri<'input>>,
         pub sequence_any: Vec<super::sequences::SequenceAny<'input>>,
     }
@@ -777,7 +777,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Assertion<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_test: Option<support::XmlString<'input>>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -794,7 +794,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Attribute<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_name: support::NcName<'input>,
         pub attr_inheritable: Option<support::Boolean<'input>>,
         pub attr_type: Option<support::QName<'input>>,
@@ -817,7 +817,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct AttributeGroup<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_name: support::NcName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
@@ -833,7 +833,7 @@ pub mod xs {
     ///  group type for the three kinds of group
     #[derive(Debug, PartialEq)]
     pub struct Choice<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
         pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -850,7 +850,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct ComplexContent<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_mixed: Option<support::Boolean<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -867,7 +867,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct ComplexType<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_name: support::NcName<'input>,
         pub attr_mixed: Option<support::Boolean<'input>>,
         pub attr_abstract: Option<support::Boolean<'input>>,
@@ -892,7 +892,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct DefaultOpenContent<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_applies_to_empty: Option<support::Boolean<'input>>,
         pub attr_mode: Option<xs::Nmtoken<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -911,7 +911,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Documentation<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_source: Option<support::AnyUri<'input>>,
         pub sequence_any: Vec<super::sequences::SequenceAny<'input>>,
     }
@@ -924,7 +924,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Element<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_name: support::NcName<'input>,
         pub attr_type: Option<support::QName<'input>>,
         pub attr_substitution_group: Option<lists::QNameList<'input>>,
@@ -959,7 +959,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Enumeration<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::AnySimpleType<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -972,7 +972,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct ExplicitTimezone<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: xs::Nmtoken<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1025,7 +1025,7 @@ pub mod xs {
     ///  An abstract element, representing facets in general. The facets defined by this spec are substitutable for this element, and implementation-defined facets should also name this as a substitution-group head. 
     #[derive(Debug, PartialEq)]
     pub struct FacetHead<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
     }
 
     impl_element!(FacetHead, "facet", attributes = {
@@ -1035,7 +1035,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Field<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_xpath: support::Token<'input>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -1052,7 +1052,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct FractionDigits<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::NonNegativeInteger<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1067,7 +1067,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Group<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_name: support::NcName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub choice_all_choice_sequence: super::enums::ChoiceAllChoiceSequence<'input>,
@@ -1083,7 +1083,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Import<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_namespace: Option<support::AnyUri<'input>>,
         pub attr_schema_location: Option<support::AnyUri<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -1101,7 +1101,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Include<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_schema_location: support::AnyUri<'input>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1116,7 +1116,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Key<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_name: Option<support::NcName<'input>>,
         pub attr_ref: Option<support::QName<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -1135,7 +1135,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Keyref<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_refer: Option<support::QName<'input>>,
         pub attr_name: Option<support::NcName<'input>>,
         pub attr_ref: Option<support::QName<'input>>,
@@ -1156,7 +1156,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Length<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::NonNegativeInteger<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1170,9 +1170,10 @@ pub mod xs {
     });
 
     ///  itemType attribute and simpleType child are mutually exclusive, but one or other is required 
+    ///  itemType attribute and simpleType child are mutually exclusive, but one or other is required 
     #[derive(Debug, PartialEq)]
     pub struct List<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_item_type: Option<support::QName<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1190,7 +1191,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct MaxExclusive<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::AnySimpleType<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -1208,7 +1209,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct MaxInclusive<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::AnySimpleType<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -1225,7 +1226,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct MaxLength<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::NonNegativeInteger<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1241,7 +1242,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct MinExclusive<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::AnySimpleType<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -1259,7 +1260,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct MinInclusive<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::AnySimpleType<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -1276,7 +1277,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct MinLength<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::NonNegativeInteger<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1292,7 +1293,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Notation<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_name: support::NcName<'input>,
         pub attr_public: Option<xs::Public<'input>>,
         pub attr_system: Option<support::AnyUri<'input>>,
@@ -1311,7 +1312,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct OpenContent<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_mode: Option<xs::Nmtoken<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1328,7 +1329,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Override<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_schema_location: support::AnyUri<'input>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1345,7 +1346,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Pattern<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::XmlString<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -1358,7 +1359,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Redefine<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_schema_location: support::AnyUri<'input>,
         pub attr_id: Option<xs::Id<'input>>,
         pub choice_annotation_redefinable: Vec<super::enums::ChoiceAnnotationRedefinable<'input>>,
@@ -1372,9 +1373,10 @@ pub mod xs {
     });
 
     ///  base attribute and simpleType child are mutually exclusive, but one or other is required 
+    ///  base attribute and simpleType child are mutually exclusive, but one or other is required 
     #[derive(Debug, PartialEq)]
     pub struct Restriction<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_base: Option<support::QName<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1391,7 +1393,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Schema<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_target_namespace: Option<support::AnyUri<'input>>,
         pub attr_version: Option<support::Token<'input>>,
         pub attr_final_default: Option<xs::FullDerivationSet<'input>>,
@@ -1425,7 +1427,7 @@ pub mod xs {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Selector<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_xpath: support::Token<'input>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -1443,7 +1445,7 @@ pub mod xs {
     ///  group type for the three kinds of group
     #[derive(Debug, PartialEq)]
     pub struct Sequence<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
         pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1460,7 +1462,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct SimpleContent<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub choice_restriction_extension: super::enums::ChoiceRestrictionExtension<'input>,
@@ -1475,7 +1477,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct SimpleType<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_name: support::NcName<'input>,
         pub attr_final: Option<xs::SimpleDerivationSet<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1492,7 +1494,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct TotalDigits<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: support::PositiveInteger<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -1504,9 +1506,10 @@ pub mod xs {
     });
 
     ///  memberTypes attribute must be non-empty or there must be at least one simpleType child 
+    ///  memberTypes attribute must be non-empty or there must be at least one simpleType child 
     #[derive(Debug, PartialEq)]
     pub struct Union<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_member_types: Option<lists::QNameList<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1523,7 +1526,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct Unique<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_name: Option<support::NcName<'input>>,
         pub attr_ref: Option<support::QName<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -1542,7 +1545,7 @@ pub mod xs {
 
     #[derive(Debug, PartialEq)]
     pub struct WhiteSpace<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_value: xs::Nmtoken<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1752,6 +1755,13 @@ pub mod xs {
 
 pub mod hfp {
     //! http://www.w3.org/2001/XMLSchema-hasFacetAndProperty
+
+    #[allow(unused_imports)]
+    use super::*;
+}
+
+pub mod unqualified {
+    //! unqualified
 
     #[allow(unused_imports)]
     use super::*;
@@ -2114,7 +2124,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct All<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub all_model: super::xs::AllModel<'input>,
     }
 
@@ -2126,7 +2136,7 @@ pub mod inline_elements {
     ///  This type is used for 'alternative' elements. 
     #[derive(Debug, PartialEq)]
     pub struct AlternativeAltType<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_test: Option<support::XmlString<'input>>,
         pub attr_type: Option<support::QName<'input>>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
@@ -2148,7 +2158,7 @@ pub mod inline_elements {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct AnyWildcard<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
         pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
         pub attr_process_contents: Option<xs::Nmtoken<'input>>,
@@ -2168,7 +2178,7 @@ pub mod inline_elements {
     ///  This type is extended by all types which allow annotation other than <schema> itself 
     #[derive(Debug, PartialEq)]
     pub struct Assertion<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_test: Option<support::XmlString<'input>>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
@@ -2185,7 +2195,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct Attribute<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_type: Option<support::QName<'input>>,
         pub attr_use: Option<xs::Nmtoken<'input>>,
         pub attr_default: Option<support::XmlString<'input>>,
@@ -2218,7 +2228,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct AttributeGroupRef<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_ref: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -2231,7 +2241,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct ChoiceSimpleExplicitGroup<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub nested_particle: Vec<super::xs::NestedParticle<'input>>,
     }
@@ -2244,7 +2254,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct LocalComplexType<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_mixed: Option<support::Boolean<'input>>,
         pub attr_default_attributes_apply: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -2261,7 +2271,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct LocalElement<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_type: Option<support::QName<'input>>,
         pub attr_default: Option<support::XmlString<'input>>,
         pub attr_fixed: Option<support::XmlString<'input>>,
@@ -2300,7 +2310,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct ExtensionType<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_base: support::QName<'input>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -2324,7 +2334,7 @@ pub mod inline_elements {
     ///  No typeDefParticle group reference
     #[derive(Debug, PartialEq)]
     pub struct SimpleExtensionType<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_base: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub attr_decls: super::xs::AttrDecls<'input>,
@@ -2341,7 +2351,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct Group<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
         pub attr_max_occurs: Option<support::NonNegativeInteger<'input>>,
         pub attr_ref: support::QName<'input>,
@@ -2358,7 +2368,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct GroupRef<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_ref: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -2371,7 +2381,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct ComplexRestrictionType<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_base: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub sequence_open_content_type_def_particle: Option<super::sequences::SequenceOpenContentTypeDefParticle<'input>>,
@@ -2390,7 +2400,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct SimpleRestrictionType<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_base: support::QName<'input>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub simple_restriction_model: Option<super::xs::SimpleRestrictionModel<'input>>,
@@ -2409,7 +2419,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct SequenceSimpleExplicitGroup<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub nested_particle: Vec<super::xs::NestedParticle<'input>>,
     }
@@ -2422,7 +2432,7 @@ pub mod inline_elements {
 
     #[derive(Debug, PartialEq)]
     pub struct LocalSimpleType<'input> {
-        pub attrs: HashMap<QName<'input>, &'input str>,
+        pub attrs: HashMap<FullName<'input>, &'input str>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub simple_derivation: super::xs::SimpleDerivation<'input>,
     }

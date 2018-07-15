@@ -1,9 +1,11 @@
 use std::marker::PhantomData;
+use std::collections::HashMap;
 pub use std::str::FromStr;
 
 use xmlparser::{Token as XmlToken, Tokenizer};
 
 pub use primitives::*; // TODO: remove the pub?
+pub use names::FullName;
 
 pub use bigfloat::BigFloatNotNaN;
 
@@ -95,21 +97,30 @@ impl<'input> Iterator for InnerStream<'input> {
 }
 
 
-#[derive(Default)]
-pub struct ParseContext {
+#[derive(Clone)]
+pub struct ParseContext<'input> {
+    pub namespaces: HashMap<&'input str, &'input str>,
+}
+impl<'input> Default for ParseContext<'input> {
+    fn default() -> ParseContext<'input> {
+        let mut namespaces = HashMap::new();
+        namespaces.insert("xmlns", "xmlns");
+        namespaces.insert("xml", "xml");
+        ParseContext { namespaces }
+    }
 }
 
 pub trait ParseXml<'input>: Sized {
     const NODE_NAME: &'static str;
 
-    fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self>;
+    fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self>;
 
 
-    fn parse_empty<TParentContext>(_parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<Self> {
+    fn parse_empty<TParentContext>(_parse_context: &mut ParseContext<'input>, _parent_context: &TParentContext) -> Option<Self> {
         None
     }
 
-    fn parse_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
+    fn parse_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self> {
         //println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml(stream, parse_context, parent_context);
         /*
@@ -124,9 +135,9 @@ pub trait ParseXml<'input>: Sized {
 pub trait ParseXmlStr<'input>: Sized {
     const NODE_NAME: &'static str;
 
-    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)>;
+    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)>;
 
-    fn parse_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
+    fn parse_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
         //println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml_str(input, parse_context, parent_context, facets);
         /*

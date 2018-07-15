@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt;
 
 use support::QName;
 
@@ -113,6 +114,15 @@ impl<'input> FullName<'input> {
     }
     pub fn local_name(&self) -> &'input str {
         self.1
+    }
+}
+
+impl<'input> fmt::Display for FullName<'input> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self.0 {
+            Some(prefix) => write!(f, "{}:{}", prefix, self.1),
+            None => write!(f, "{}", self.1),
+        }
     }
 }
 

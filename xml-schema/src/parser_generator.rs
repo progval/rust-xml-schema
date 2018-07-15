@@ -553,7 +553,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         {
             let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             let mut empty_struct = false;
-            struct_.field("pub attrs", "HashMap<QName<'input>, &'input str>");
+            struct_.field("pub attrs", "HashMap<FullName<'input>, &'input str>");
             let mut name_gen = NameGenerator::new();
             let mut doc = doc.clone();
             let mut generated_attrs = HashSet::new();

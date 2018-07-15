@@ -16,11 +16,11 @@ macro_rules! impl_enum {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("enum ", stringify!($name));
 
-            fn parse_empty<TParentContext>(_parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<Self> {
+            fn parse_empty<TParentContext>(_parse_context: &mut ParseContext<'input>, _parent_context: &TParentContext) -> Option<Self> {
                 None
             }
 
-            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 $(
                     match $variant_macro!($name, stream, parse_context, parent_context, $($variant_args)*) {
@@ -99,11 +99,11 @@ macro_rules! impl_group_or_sequence {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("empty group or sequence ", stringify!($name));
 
-            fn parse_empty<TParentContext>(parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_empty<TParentContext>(parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self> {
                 Some($name(Default::default()))
             }
 
-            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<Self> {
+            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut ParseContext<'input>, _parent_context: &TParentContext) -> Option<Self> {
                 None
             }
         }
@@ -113,7 +113,7 @@ macro_rules! impl_group_or_sequence {
             const NODE_NAME: &'static str = concat!("group or sequence ", stringify!($name));
 
             #[allow(unused_variables)]
-            fn parse_empty<TParentContext>(parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_empty<TParentContext>(parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self> {
                 Some($name {
                     $(
                         $field_name: impl_empty_element_field!(parse_context, parent_context, $($field_args)*),
@@ -122,7 +122,7 @@ macro_rules! impl_group_or_sequence {
             }
 
             #[allow(unused_variables)]
-            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self> {
                 let tx = stream.transaction();
                 Some($name {
                     $(
@@ -140,13 +140,14 @@ macro_rules! impl_element {
         impl<'input> ParseXml<'input> for $struct_name<'input> {
             const NODE_NAME: &'static str = concat!("element ", stringify!($struct_name));
 
-            fn parse_empty<TParentContext>(_parse_context: &mut ParseContext, _parent_context: &TParentContext) -> Option<Self> {
+            fn parse_empty<TParentContext>(_parse_context: &mut ParseContext<'input>, _parent_context: &TParentContext) -> Option<Self> {
                 None
             }
 
             #[allow(unused_variables)]
-            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext, parent_context: &TParentContext) -> Option<Self> {
+            fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self> {
                 use xmlparser::{Token,ElementEnd};
+                let mut parse_context = parse_context.clone();
                 let tx = stream.transaction();
                 let mut tok = stream.next().unwrap();
                 loop {
@@ -159,7 +160,7 @@ macro_rules! impl_element {
                     tok = stream.next().unwrap();
                 }
                 match tok {
-                    Token::ElementStart(prefix, name) => {
+                    Token::ElementStart(element_prefix, name) => {
                         if name.to_str() == $name {
                             let mut attrs = HashMap::new();
                             $(
@@ -175,12 +176,27 @@ macro_rules! impl_element {
                                         let key_prefix = key_prefix.to_str();
                                         let key_local = key_local.to_str();
                                         let value = value.to_str();
-                                        let key = QName(match key_prefix { "" => None, s => Some(s) }, key_local);
+                                        match (key_prefix, key_local) {
+                                            ("xmlns", l) => {
+                                                parse_context.namespaces.insert(l, value);
+                                                //continue; // TODO: uncomment
+                                            },
+                                            ("", "xmlns") => {
+                                                parse_context.namespaces.insert("", value);
+                                                //continue; // TODO: uncomment
+                                            }
+                                            _ => (),
+                                        }
+                                        let key_namespace = match key_prefix {
+                                            "" => parse_context.namespaces.get(element_prefix.to_str()).cloned(),
+                                            _ => parse_context.namespaces.get(key_prefix).cloned(),
+                                        };
+                                        let key = FullName::new(key_namespace, key_local);
                                         let old = attrs.insert(key, value); assert_eq!(old, None);
                                         match (key_prefix, key_local) {
                                             $(
                                                 (_, $attr_local) => { // TODO: match the namespace too
-                                                    match ParseXmlStr::parse_xml_str(value, parse_context, parent_context, &Facets::default()) {
+                                                    match ParseXmlStr::parse_xml_str(value, &mut parse_context, parent_context, &Facets::default()) {
                                                         Some(("", value)) => {
                                                             $attr_name = Some(value)
                                                             // TODO: check for duplicates
@@ -202,7 +218,7 @@ macro_rules! impl_element {
                                                 $attr_name: extract_attribute!($attr_name, $attr_local, $use),
                                             )*
                                             $(
-                                                $field_name: impl_element_field!(stream, tx, parse_context, parent_context, $($field_args)*),
+                                                $field_name: impl_element_field!(stream, tx, &mut parse_context, parent_context, $($field_args)*),
                                             )*
                                         });
                                         let mut next_tok;
@@ -213,10 +229,10 @@ macro_rules! impl_element {
                                                 Some(Token::Comment(_)) => (),
                                                 Some(Token::Text(_)) => (),
                                                 Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
-                                                    assert_eq!((prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
+                                                    assert_eq!((element_prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
                                                     return ret;
                                                 }
-                                                _ => panic!(format!("Expected closing tag for {}:{}, got {:?}", prefix, name, next_tok)),
+                                                _ => panic!(format!("Expected closing tag for {}:{}, got {:?}", element_prefix, name, next_tok)),
                                             }
                                         }
                                     },
@@ -227,7 +243,7 @@ macro_rules! impl_element {
                                                 $attr_name: extract_attribute!($attr_name, $attr_local, $use),
                                             )*
                                             $(
-                                                $field_name: impl_empty_element_field!(parse_context, parent_context, $($field_args)*),
+                                                $field_name: impl_empty_element_field!(&mut parse_context, parent_context, $($field_args)*),
                                             )*
                                         });
                                     },
@@ -235,7 +251,7 @@ macro_rules! impl_element {
                                         tx.rollback(stream);
                                         return None
                                     },
-                                    _ => panic!(format!("Expected element end for {}:{}, got {:?}", prefix, name, tok)),
+                                    _ => panic!(format!("Expected element end for {}:{}, got {:?}", element_prefix, name, tok)),
                                 }
                             }
                         }
@@ -324,7 +340,7 @@ macro_rules! impl_union {
         impl<'input> ParseXmlStr<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("union ", stringify!($name));
 
-            fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
+            fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
                 $(
                     match $variant_macro!($name, input, parse_context, parent_context, facets, $($variant_args)*) {
                         Some((o, x)) => return Some((o, x)),
@@ -352,7 +368,7 @@ macro_rules! impl_list {
             const NODE_NAME: &'static str = concat!("list ", stringify!($name));
 
             #[allow(unused_variables)]
-            fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
+            fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
                 let mut input = input;
                 let mut items = Vec::new();
                 while let Some((output, item)) = ParseXmlStr::parse_xml_str(input, parse_context, parent_context, facets) {
@@ -378,7 +394,7 @@ macro_rules! impl_simpletype_restriction {
             const NODE_NAME: &'static str = stringify!($name);
 
             #[allow(unused_variables)]
-            fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
+            fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
                 let mut facets = facets.clone();
                 $(
                     facets.$facet_name =  $facet_value.or(facets.$facet_name);
