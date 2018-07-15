@@ -28,7 +28,8 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
 
 impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     pub fn new(processors: Vec<Processor<'ast, 'input>>, renames: HashMap<String, String>) -> ParserGenerator<'ast, 'input> {
-        let mut module_names: HashMap<&'input str, String> = HashMap::new();
+        let mut module_names = HashMap::new();
+        module_names.insert("unqualified", "unqualified".to_string());
         let mut name_gen = NameGenerator::new();
 
         let mut primitive_types = HashMap::new();
@@ -48,7 +49,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     pub fn get_module_name(&self, qname: FullName<'input>) -> String {
         let (prefix, _) = qname.as_tuple();
-        self.module_names.get(prefix).cloned().unwrap_or("UNQUAL".to_string())
+        self.module_names.get(prefix).unwrap().clone()
     }
 
     pub fn gen_target_scope(&mut self) -> cg::Scope {
@@ -229,7 +230,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let (type_mod_name, type_name) = match ty {
             SimpleType::Alias(name) => {
                 let (ref type_mod_name, ref type_name) = name.as_tuple();
-                if type_mod_name == &SCHEMA_URI {
+                if name.namespace() == Some(&SCHEMA_URI) {
                     for (prim_name, prim_type_name) in PRIMITIVE_TYPES {
                         if prim_name == type_name {
                             return Some(format!("support::{}", prim_type_name));
@@ -457,7 +458,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let (prefix, local) = name.as_tuple();
                 let head_local_name = format!("{}_head", local);
                 let mut substitutions = Vec::new();
-                substitutions.push(FullName::new(prefix, &head_local_name));
+                substitutions.push(FullName::new(Some(prefix), &head_local_name));
                 for proc in &self.processors {
                     if let Some(members) = proc.substitution_groups.get(&name) {
                         substitutions.extend(members);

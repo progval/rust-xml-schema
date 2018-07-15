@@ -205,7 +205,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 _ => panic!("Unknown attribute {} on <schema>.", key),
             }
         }
-        let target_namespace = target_namespace.expect("No target namespace.");
         Processor {
             namespaces: Namespaces::new(namespaces, target_namespace),
             element_form_default_qualified,
@@ -653,7 +652,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 _ => panic!("Unknown attribute {} in <restriction>", key),
             }
         }
-        let base = base.unwrap_or(FullName::new(SCHEMA_URI, "anySimpleType"));
+        let base = base.unwrap_or(FullName::new(Some(SCHEMA_URI), "anySimpleType"));
         let xs::SimpleRestrictionModel { ref local_simple_type, ref choice_facet_any } = model;
         let facets = self.process_facets(choice_facet_any);
 

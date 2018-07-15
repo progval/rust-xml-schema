@@ -56,7 +56,7 @@ pub struct Namespaces<'input> {
 }
 
 impl<'input> Namespaces<'input> {
-    pub fn new(mut namespaces: HashMap<&'input str, &'input str>, target_namespace: &'input str) -> Namespaces<'input> {
+    pub fn new(mut namespaces: HashMap<&'input str, &'input str>, target_namespace: Option<&'input str>) -> Namespaces<'input> {
         if let Some(uri) = namespaces.insert("xml", "xml") {
             panic!("Cannot have a namespace named \"xml\": {}", uri);
         }
@@ -64,15 +64,15 @@ impl<'input> Namespaces<'input> {
             panic!("Cannot have a namespace named \"xmlns\": {}", uri);
         }
         Namespaces {
-            target_namespace,
+            target_namespace: target_namespace.unwrap_or("unqualified"),
             namespaces,
         }
     }
 
-    pub fn expand_prefix(&self, prefix: Option<&'input str>) -> &'input str {
+    fn expand_prefix(&self, prefix: Option<&'input str>) -> Option<&'input str> {
         match prefix {
-            Some(prefix) => self.namespaces.get(prefix).expect(&format!("Unknown prefix: {:?}", prefix)),
-            None => self.target_namespace,
+            Some(prefix) => Some(self.namespaces.get(prefix).expect(&format!("Unknown prefix: {:?}", prefix))),
+            None => Some(self.target_namespace),
         }
     }
     pub fn expand_qname(&self, qname: QName<'input>) -> FullName<'input> {
@@ -99,14 +99,20 @@ pub fn name_from_hint<'input>(hint: &NameHint<'input>) -> Option<String> {
 }
 
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct FullName<'input>(&'input str, &'input str);
+pub struct FullName<'input>(Option<&'input str>, &'input str);
 
 impl<'input> FullName<'input> {
-    pub fn new(ns: &'input str, name: &'input str) -> FullName<'input> {
+    pub fn new(ns: Option<&'input str>, name: &'input str) -> FullName<'input> {
         FullName(ns, name)
     }
     pub fn as_tuple(&self) -> (&'input str, &'input str) {
-        (self.0, self.1)
+        (self.0.unwrap_or("unqualified"), self.1)
+    }
+    pub fn namespace(&self) -> Option<&'input str> {
+        self.0
+    }
+    pub fn local_name(&self) -> &'input str {
+        self.1
     }
 }
 
