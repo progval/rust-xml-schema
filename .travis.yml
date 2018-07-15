@@ -5,7 +5,8 @@ rust:
   - nightly
 cache: cargo
 script:
-    - wget https://www.w3.org/2009/XMLSchema/derived.nxsd https://www.w3.org/2009/XMLSchema/XMLSchema.xsd
+    - wget https://www.w3.org/2009/XMLSchema/XMLSchema.xsd -O xml-schema/XMLSchema.xsd
+    - wget https://www.w3.org/2009/XMLSchema/derived.nxsd -O xml-schema/derived.nxsd
     - cargo test
-    - cargo run --bin gen derived.nxsd XMLSchema.xsd > foo.rs
-    - diff foo.rs src/parser.rs # Fails if they are different.
+    - cargo run --package xml-schema --bin gen xml-schema/derived.nxsd xml-schema/XMLSchema.xsd > foo.rs
+    - diff foo.rs xml-schema/src/parser.rs # Fails if they are different.

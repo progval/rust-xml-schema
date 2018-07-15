@@ -12,3 +12,8 @@ Cargo.lock
 /target
 **/*.rs.bk
 Cargo.lock
+
+*.xsd
+*.nxsd
+*.xml
+foo.rs

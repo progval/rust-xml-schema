@@ -1,19 +1,5 @@
-[package]
-name = "xml-schema"
-version = "0.1.0"
-authors = ["Valentin Lorentz <progval+git@progval.net>"]
+[workspace]
 
-[dependencies]
-#quick-xml = "0.12.1"
-xmlparser = "0.5.0"
-codegen = { git = "https://github.com/carllerche/codegen" }
-heck = "0.3.0"
-bigdecimal = "0.0.12"
-num-traits = "0.2.5"
-
-[dev-dependencies]
-pretty_assertions = "^0.4"
-
-[[bin]]
-name = "gen"
-path = "src/bin/gen.rs"
+members = [
+    "xml-schema",
+]
