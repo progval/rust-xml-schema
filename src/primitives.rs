@@ -89,7 +89,6 @@ pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ("QName", "QName"),
     ("string", "XmlString"),
     ("positiveInteger", "PositiveInteger"),
-    ("ID", "Id"),
     ("anyURI", "AnyUri"),
     ("boolean", "Boolean"),
     ("NCName", "NcName"),
@@ -99,7 +98,6 @@ pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ("decimal", "Decimal"),
     ];
 
-pub type Id<'input> = NcName<'input>; // TODO ?
 pub type DateTime<'input> = Token<'input>; // TODO
 pub type Duration<'input> = Token<'input>; // TODO
 

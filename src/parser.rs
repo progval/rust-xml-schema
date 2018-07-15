@@ -703,7 +703,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Annotation<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation_content: Vec<super::enums::AnnotationContent<'input>>,
     }
 
@@ -723,7 +723,7 @@ pub mod xs {
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
         pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
         pub attr_process_contents: Option<xs::Nmtoken<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -747,7 +747,7 @@ pub mod xs {
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
         pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
         pub attr_process_contents: Option<xs::Nmtoken<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -780,7 +780,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_test: Option<support::XmlString<'input>>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -852,7 +852,7 @@ pub mod xs {
     pub struct ComplexContent<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_mixed: Option<support::Boolean<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub choice_restriction_extension: super::enums::ChoiceRestrictionExtension<'input>,
     }
@@ -895,7 +895,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_applies_to_empty: Option<support::Boolean<'input>>,
         pub attr_mode: Option<xs::Nmtoken<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub any_wildcard: super::inline_elements::AnyWildcard<'input>,
     }
@@ -1038,7 +1038,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_xpath: support::Token<'input>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -1086,7 +1086,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_namespace: Option<support::AnyUri<'input>>,
         pub attr_schema_location: Option<support::AnyUri<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -1103,7 +1103,7 @@ pub mod xs {
     pub struct Include<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_schema_location: support::AnyUri<'input>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -1119,7 +1119,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_name: Option<support::NcName<'input>>,
         pub attr_ref: Option<support::QName<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub uniqueness_spec: Option<super::sequences::UniquenessSpec<'input>>,
     }
@@ -1139,7 +1139,7 @@ pub mod xs {
         pub attr_refer: Option<support::QName<'input>>,
         pub attr_name: Option<support::NcName<'input>>,
         pub attr_ref: Option<support::QName<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub uniqueness_spec: Option<super::sequences::UniquenessSpec<'input>>,
     }
@@ -1174,7 +1174,7 @@ pub mod xs {
     pub struct List<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_item_type: Option<support::QName<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
     }
@@ -1193,7 +1193,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_value: support::AnySimpleType<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -1211,7 +1211,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_value: support::AnySimpleType<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -1244,7 +1244,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_value: support::AnySimpleType<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -1262,7 +1262,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_value: support::AnySimpleType<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -1296,7 +1296,7 @@ pub mod xs {
         pub attr_name: support::NcName<'input>,
         pub attr_public: Option<xs::Public<'input>>,
         pub attr_system: Option<support::AnyUri<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -1313,7 +1313,7 @@ pub mod xs {
     pub struct OpenContent<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_mode: Option<xs::Nmtoken<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub any_wildcard: Option<super::inline_elements::AnyWildcard<'input>>,
     }
@@ -1330,7 +1330,7 @@ pub mod xs {
     pub struct Override<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_schema_location: support::AnyUri<'input>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub schema_top: Vec<super::xs::SchemaTop<'input>>,
     }
@@ -1360,7 +1360,7 @@ pub mod xs {
     pub struct Redefine<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_schema_location: support::AnyUri<'input>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub choice_annotation_redefinable: Vec<super::enums::ChoiceAnnotationRedefinable<'input>>,
     }
 
@@ -1376,7 +1376,7 @@ pub mod xs {
     pub struct Restriction<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_base: Option<support::QName<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub simple_restriction_model: super::xs::SimpleRestrictionModel<'input>,
     }
@@ -1400,7 +1400,7 @@ pub mod xs {
         pub attr_element_form_default: Option<xs::FormChoice<'input>>,
         pub attr_default_attributes: Option<support::QName<'input>>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub composition: Vec<super::xs::Composition<'input>>,
         pub open_content: Option<super::sequences::AnnotatedOpenContent<'input>>,
         pub sequence_schema_top_annotation: Vec<super::sequences::SequenceSchemaTopAnnotation<'input>>,
@@ -1428,7 +1428,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_xpath: support::Token<'input>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -1461,7 +1461,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct SimpleContent<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub choice_restriction_extension: super::enums::ChoiceRestrictionExtension<'input>,
     }
@@ -1508,7 +1508,7 @@ pub mod xs {
     pub struct Union<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_member_types: Option<lists::QNameList<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub local_simple_type: Vec<super::inline_elements::LocalSimpleType<'input>>,
     }
@@ -1526,7 +1526,7 @@ pub mod xs {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_name: Option<support::NcName<'input>>,
         pub attr_ref: Option<support::QName<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub uniqueness_spec: Option<super::sequences::UniquenessSpec<'input>>,
     }
@@ -2130,7 +2130,7 @@ pub mod inline_elements {
         pub attr_test: Option<support::XmlString<'input>>,
         pub attr_type: Option<support::QName<'input>>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub type_: Option<super::enums::Type<'input>>,
     }
@@ -2152,7 +2152,7 @@ pub mod inline_elements {
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
         pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
         pub attr_process_contents: Option<xs::Nmtoken<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -2171,7 +2171,7 @@ pub mod inline_elements {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_test: Option<support::XmlString<'input>>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
 
@@ -2195,7 +2195,7 @@ pub mod inline_elements {
         pub attr_inheritable: Option<support::Boolean<'input>>,
         pub attr_name: Option<support::NcName<'input>>,
         pub attr_ref: Option<support::QName<'input>>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub local_simple_type: Option<super::inline_elements::LocalSimpleType<'input>>,
     }
@@ -2302,7 +2302,7 @@ pub mod inline_elements {
     pub struct ExtensionType<'input> {
         pub attrs: HashMap<QName<'input>, &'input str>,
         pub attr_base: support::QName<'input>,
-        pub attr_id: Option<support::Id<'input>>,
+        pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub open_content: Option<super::xs::OpenContent<'input>>,
         pub type_def_particle: Option<super::xs::TypeDefParticle<'input>>,
