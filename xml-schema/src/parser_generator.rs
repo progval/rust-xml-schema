@@ -581,9 +581,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     fn get_type(&self, name: &FullName<'input>) -> &RichType<'input, Type<'input>> {
         let mut type_ = None;
-        let (prefix, local) = name.as_tuple();
         for proc in &self.processors {
-            if proc.namespaces.target_namespace != prefix {
+            if proc.namespaces.target_namespace != name.namespace() {
                 continue;
             }
             type_ = proc.types.get(name);

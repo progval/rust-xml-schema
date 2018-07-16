@@ -329,7 +329,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         type_.doc.extend(&self.process_annotation(&annotation.iter().collect()));
         let doc = type_.doc.clone();
 
-        let name = FullName::new(Some(self.namespaces.target_namespace), name.0);
+        let name = FullName::new(self.namespaces.target_namespace, name.0);
         self.groups.insert(name, type_);
         RichType::new(
             NameHint::from_fullname(&name),
@@ -347,7 +347,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
         let attrs = self.process_attr_decls(&group.attr_decls);
-        let name = FullName::new(Some(self.namespaces.target_namespace), name.0);
+        let name = FullName::new(self.namespaces.target_namespace, name.0);
         self.attribute_groups.insert(name, attrs);
     }
 
@@ -380,7 +380,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let xs::SimpleType { ref attrs, ref attr_name, ref attr_final, ref annotation, ref simple_derivation } = simple_type;
         let annotation = annotation.iter().collect();
         let name = attr_name;
-        let name = FullName::new(Some(self.namespaces.target_namespace), name.0);
+        let name = FullName::new(self.namespaces.target_namespace, name.0);
         for (key, &value) in attrs.iter() {
             match key.as_tuple() {
                 (SCHEMA_URI, "name") => (),
@@ -458,7 +458,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let default_vec = Vec::new();
         let member_types = union.attr_member_types.as_ref().map(|l| &l.0).unwrap_or(&default_vec);
         let mut member_types: Vec<_> = member_types.iter().map(|name| {
-            let name = FullName::new(Some(name.0.unwrap_or(self.namespaces.target_namespace)), name.1);
+            let name = FullName::new(name.0.or(self.namespaces.target_namespace), name.1);
             let (_, field_name) = name.as_tuple();
             RichType::new(
                 NameHint::new(field_name),
@@ -533,7 +533,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         ty.doc.extend(&self.process_annotation(&annotation));
 
         let doc = ty.doc.clone();
-        let name = FullName::new(Some(self.namespaces.target_namespace), name.0);
+        let name = FullName::new(self.namespaces.target_namespace, name.0);
         self.types.insert(name, ty);
         RichType::new(
             NameHint::from_fullname(&name),
@@ -584,7 +584,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
         if let Some(name) = name {
             let doc = ty.doc.clone();
-            let name = FullName::new(Some(self.namespaces.target_namespace), name.0);
+            let name = FullName::new(self.namespaces.target_namespace, name.0);
             self.types.insert(name, ty);
             RichType::new(
                 NameHint::from_fullname(&name),
@@ -942,7 +942,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_toplevel_element(&mut self, element: &'ast xs::Element<'input>) {
-        let mut name = FullName::new(Some(self.namespaces.target_namespace), element.attr_name.0);
+        let mut name = FullName::new(self.namespaces.target_namespace, element.attr_name.0);
         let type_attr: Option<QName<'input>> = element.attr_type;
         let mut abstract_ = false;
         let mut substitution_group = &element.attr_substitution_group;
@@ -1064,7 +1064,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                             self.process_local_complex_type(attrs, None, complex_type_model, annotation2.iter().collect(), false)
                         },
                     };
-                    let name = FullName::new(Some(self.namespaces.target_namespace), name.0);
+                    let name = FullName::new(self.namespaces.target_namespace, name.0);
                     let (prefix, local) = name.as_tuple();
                     let mut name_hint = NameHint::new(local);
                     name_hint.extend(&t.name_hint);
@@ -1082,7 +1082,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         )
                 },
                 (Some(t), None) => {
-                    let name = FullName::new(Some(self.namespaces.target_namespace), name.0);
+                    let name = FullName::new(self.namespaces.target_namespace, name.0);
                     let (prefix, local) = name.as_tuple();
                     let name_hint1 = NameHint::new(t.1);
                     let mut name_hint2 = NameHint::new(local);
@@ -1123,7 +1123,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         for attr_decl in &attr_decls.attribute {
             match attr_decl {
                 enums::AttrOrAttrGroup::Attribute(e) => {
-                    let name = e.attr_name.as_ref().map(|ncn| FullName::new(Some(self.namespaces.target_namespace), ncn.0));
+                    let name = e.attr_name.as_ref().map(|ncn| FullName::new(self.namespaces.target_namespace, ncn.0));
                     let mut ref_ = e.attr_ref.as_ref().map(|qn| FullName::new(qn.0, qn.1));
                     let mut type_attr: Option<QName<'input>> = e.attr_type;
                     let mut use_ = None;

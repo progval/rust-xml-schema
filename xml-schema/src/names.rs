@@ -52,7 +52,7 @@ macro_rules! str_alias {
 
 #[derive(Debug)]
 pub struct Namespaces<'input> {
-    pub target_namespace: &'input str,
+    pub target_namespace: Option<&'input str>,
     pub namespaces: HashMap<&'input str, &'input str>, // namespace -> URI
 }
 
@@ -65,7 +65,7 @@ impl<'input> Namespaces<'input> {
             panic!("Cannot have a namespace named \"xmlns\": {}", uri);
         }
         Namespaces {
-            target_namespace: target_namespace.unwrap_or("unqualified"),
+            target_namespace,
             namespaces,
         }
     }
