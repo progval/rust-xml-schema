@@ -94,11 +94,13 @@ pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ("NCName", "NcName"),
     ("nonNegativeInteger", "NonNegativeInteger"),
     ("dateTime", "DateTime"),
+    ("date", "Date"),
     ("duration", "Duration"),
     ("decimal", "Decimal"),
     ];
 
 pub type DateTime<'input> = Token<'input>; // TODO
+pub type Date<'input> = Token<'input>; // TODO
 pub type Duration<'input> = Token<'input>; // TODO
 
 /// https://www.w3.org/TR/xmlschema11-2/#token
@@ -160,15 +162,6 @@ impl<'input> ParseXmlStr<'input> for NMToken<'input> {
     }
 }
 
-impl<'input> ParseXml<'input> for NMToken<'input> {
-    const NODE_NAME: &'static str = "NMToken";
-    fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, _parse_context: &mut ParseContext<'input>, _parent_context: &TParentContext) -> Option<NMToken<'input>> {
-        match stream.next() {
-            Some(XmlToken::Text(strspan)) => Some(NMToken(strspan.to_str())),
-            _ => None,
-        }
-    }
-}
 impl<'input> Default for NMToken<'input> {
     fn default() -> Self {
         NMToken("")

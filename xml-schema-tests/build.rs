@@ -10,14 +10,18 @@ use std::env::current_dir;
 use xml_schema::{Processor, ParserGenerator, parse_xsd};
 
 fn main() {
-    let in_dir = current_dir().unwrap();
+    let mut in_dir = current_dir().unwrap();
+    in_dir.push("src");
     let out_dir = env::var("OUT_DIR").unwrap();
+
+    println!("cargo:rerun-if-changed=build.rs");
 
     for entry in read_dir(in_dir.clone()).expect(&format!("Could not read dir {:?}", in_dir)) {
         let in_path = entry.unwrap().path();
         if in_path.extension() != Some(&OsStr::new("xsd")) {
             continue;
         }
+        println!("cargo:rerun-if-changed={}", in_path.to_str().unwrap());
 
         let mut in_file =
             File::open(in_path.clone())
@@ -40,14 +44,16 @@ fn main() {
             Path::new(&out_dir)
             .join(filename)
             .with_extension("rs");
+        println!("cargo:warning=printing to: {}", out_path.to_str().unwrap());
         let mut out_file =
             File::create(out_path.clone())
             .expect(&format!("Could not create {:?}", out_path));
         out_file
-            .write(b"#[allow(unused_imports)]\nuse support;\n")
+            .write(b"#[allow(unused_imports)]\nuse xml_schema::support;\n")
             .expect(&format!("Could not write in {:?}", out_path));
         out_file
             .write(scope.to_string().as_bytes())
             .expect(&format!("Could not write in {:?}", out_path));
     }
+    println!("cargo:rerun-if-changed={}", in_dir.to_str().unwrap());
 }

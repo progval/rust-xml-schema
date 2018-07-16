@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 use std::collections::HashMap;
 pub use std::str::FromStr;
 
-use xmlparser::{Token as XmlToken, Tokenizer};
+pub use xmlparser::{Token as XmlToken, Tokenizer, ElementEnd};
 
 pub use primitives::*; // TODO: remove the pub?
 pub use names::FullName;
@@ -146,5 +146,21 @@ pub trait ParseXmlStr<'input>: Sized {
             None => println!("// Leaving: {:?} (aborted)", Self::NODE_NAME),
         }*/
         ret
+    }
+}
+
+impl<'input, T> ParseXml<'input> for T where T: ParseXmlStr<'input> {
+    const NODE_NAME: &'static str = Self::NODE_NAME;
+    fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self> {
+        match stream.next() {
+            Some(XmlToken::Text(strspan)) => {
+                match Self::parse_self_xml_str(strspan.to_str(), parse_context, parent_context, &Facets::default()) {
+                    Some(("", out)) => Some(out),
+                    Some((unparsed, _)) => None,
+                    None => None,
+                }
+            }
+            _ => None,
+        }
     }
 }

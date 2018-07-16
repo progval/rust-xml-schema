@@ -1,3 +1,11 @@
+#[macro_export]
+macro_rules! use_xsd_types {
+    () => {
+        pub use $crate::parser::xs;
+    }
+}
+
+#[macro_export]
 macro_rules! try_rollback {
     ($stream:expr, $tx:expr, $e:expr) => {
         match $e {
@@ -13,6 +21,8 @@ macro_rules! try_rollback {
 #[macro_export]
 macro_rules! impl_enum {
     ( $name:ident, $($variant_macro:ident ! ( $($variant_args: tt )* ),  )* ) => {
+        #[allow(unused_imports)]
+        use $crate::support::*;
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("enum ", stringify!($name));
 
@@ -96,6 +106,8 @@ macro_rules! impl_struct_variant_field {
 #[macro_export]
 macro_rules! impl_group_or_sequence {
     ( $name:ident, ) => {
+        #[allow(unused_imports)]
+        use $crate::support::*;
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("empty group or sequence ", stringify!($name));
 
@@ -109,6 +121,8 @@ macro_rules! impl_group_or_sequence {
         }
     };
     ( $name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {
+        #[allow(unused_imports)]
+        use $crate::support::*;
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("group or sequence ", stringify!($name));
 
@@ -137,6 +151,8 @@ macro_rules! impl_group_or_sequence {
 #[macro_export]
 macro_rules! impl_element {
     ( $struct_name:ident, $name:expr, attributes = { $( ($attr_prefix:expr, $attr_local:expr) => $attr_name:ident : $use:ident, )* }, fields = { $( ( $field_name:ident, $( $field_args:tt )* ), )* } ) => {
+        #[allow(unused_imports)]
+        use $crate::support::*;
         impl<'input> ParseXml<'input> for $struct_name<'input> {
             const NODE_NAME: &'static str = concat!("element ", stringify!($struct_name));
 
@@ -146,21 +162,21 @@ macro_rules! impl_element {
 
             #[allow(unused_variables)]
             fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self> {
-                use xmlparser::{Token,ElementEnd};
+                use $crate::support::{XmlToken,ElementEnd};
                 let mut parse_context = parse_context.clone();
                 let tx = stream.transaction();
                 let mut tok = stream.next().unwrap();
                 loop {
                     match tok {
-                        Token::Whitespaces(_) => (),
-                        Token::Comment(_) => (),
-                        Token::Text(_) => (),
+                        XmlToken::Whitespaces(_) => (),
+                        XmlToken::Comment(_) => (),
+                        XmlToken::Text(_) => (),
                         _ => break,
                     }
                     tok = stream.next().unwrap();
                 }
                 match tok {
-                    Token::ElementStart(element_prefix, name) => {
+                    XmlToken::ElementStart(element_prefix, name) => {
                         if name.to_str() == $name {
                             let mut attrs = HashMap::new();
                             $(
@@ -169,10 +185,10 @@ macro_rules! impl_element {
                             loop {
                                 let tok = stream.next().unwrap();
                                 match tok {
-                                    Token::Whitespaces(_) => (),
-                                    Token::Comment(_) => (),
-                                    Token::Text(_) => (),
-                                    Token::Attribute((key_prefix, key_local), value) => {
+                                    XmlToken::Whitespaces(_) => (),
+                                    XmlToken::Comment(_) => (),
+                                    XmlToken::Text(_) => (),
+                                    XmlToken::Attribute((key_prefix, key_local), value) => {
                                         let key_prefix = key_prefix.to_str();
                                         let key_local = key_local.to_str();
                                         let value = value.to_str();
@@ -211,7 +227,7 @@ macro_rules! impl_element {
                                             _ => (), // TODO: unknown attribute
                                         }
                                     },
-                                    Token::ElementEnd(ElementEnd::Open) => {
+                                    XmlToken::ElementEnd(ElementEnd::Open) => {
                                         let ret = Some($struct_name {
                                             attrs,
                                             $(
@@ -225,10 +241,10 @@ macro_rules! impl_element {
                                         loop {
                                             next_tok = stream.next();
                                             match next_tok {
-                                                Some(Token::Whitespaces(_)) => (),
-                                                Some(Token::Comment(_)) => (),
-                                                Some(Token::Text(_)) => (),
-                                                Some(Token::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
+                                                Some(XmlToken::Whitespaces(_)) => (),
+                                                Some(XmlToken::Comment(_)) => (),
+                                                Some(XmlToken::Text(_)) => (),
+                                                Some(XmlToken::ElementEnd(ElementEnd::Close(prefix2, name2))) => {
                                                     assert_eq!((element_prefix.to_str(), name.to_str()), (prefix2.to_str(), name2.to_str()));
                                                     return ret;
                                                 }
@@ -236,7 +252,7 @@ macro_rules! impl_element {
                                             }
                                         }
                                     },
-                                    Token::ElementEnd(ElementEnd::Empty) => {
+                                    XmlToken::ElementEnd(ElementEnd::Empty) => {
                                         return Some($struct_name {
                                             attrs,
                                             $(
@@ -247,7 +263,7 @@ macro_rules! impl_element {
                                             )*
                                         });
                                     },
-                                    Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                                    XmlToken::ElementEnd(ElementEnd::Close(_, _)) => {
                                         tx.rollback(stream);
                                         return None
                                     },
@@ -260,7 +276,7 @@ macro_rules! impl_element {
                             None
                         }
                     },
-                    Token::ElementEnd(ElementEnd::Close(_, _)) => {
+                    XmlToken::ElementEnd(ElementEnd::Close(_, _)) => {
                         tx.rollback(stream);
                         return None
                     },
@@ -271,6 +287,7 @@ macro_rules! impl_element {
     }
 }
 
+#[macro_export]
 macro_rules! extract_attribute {
     ( $attr_name:ident, $attr_local:expr, required ) => {
         $attr_name.expect(&format!("Missing attribute {}", $attr_local))
@@ -280,6 +297,7 @@ macro_rules! extract_attribute {
     };
 }
 
+#[macro_export]
 macro_rules! impl_element_field {
     ( $stream: expr, $tx: expr, $parse_context:expr, $parent_context:expr, $type_mod_name:ident, $type_name:ident ) => {
         try_rollback!($stream, $tx, super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context))
@@ -316,6 +334,7 @@ macro_rules! impl_element_field {
 }
 
 
+#[macro_export]
 macro_rules! impl_empty_element_field {
     ( $parse_context:expr, $parent_context:expr, $type_mod_name:ident, $type_name:ident ) => {
         match super::$type_mod_name::$type_name::parse_empty($parse_context, $parent_context) {
@@ -337,6 +356,8 @@ macro_rules! impl_empty_element_field {
 #[macro_export]
 macro_rules! impl_union {
     ( $name:ident, { $($variant_macro:ident ! ( $($variant_args: tt )* ), )* } ) => {
+        #[allow(unused_imports)]
+        use $crate::support::*;
         impl<'input> ParseXmlStr<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("union ", stringify!($name));
 
@@ -364,6 +385,8 @@ macro_rules! impl_union_variant {
 #[macro_export]
 macro_rules! impl_list {
     ( $name:ident, $item_type_mod_name:ident :: $item_type:ident ) => {
+        #[allow(unused_imports)]
+        use $crate::support::*;
         impl<'input> ParseXmlStr<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("list ", stringify!($name));
 
@@ -390,6 +413,8 @@ macro_rules! impl_list {
 #[macro_export]
 macro_rules! impl_simpletype_restriction {
     ( $name:ident, Facets { $( $facet_name:ident : $facet_value:expr , )* } ) => {
+        #[allow(unused_imports)]
+        use $crate::support::*;
         impl<'input> ParseXmlStr<'input> for $name<'input> {
             const NODE_NAME: &'static str = stringify!($name);
 

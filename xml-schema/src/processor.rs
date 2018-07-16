@@ -8,6 +8,8 @@ use xmlparser::{TextUnescape, XmlSpace};
 
 use parser::*;
 use names::*;
+use support::Facets;
+use primitives::{QName,NcName};
 
 pub const SCHEMA_URI: &'static str = "http://www.w3.org/2001/XMLSchema";
 
@@ -306,7 +308,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             group: &'ast xs::Group<'input>,
             ) -> RichType<'input, Type<'input>> {
         let xs::Group { ref attrs, ref attr_name, ref annotation, choice_all_choice_sequence: ref content } = group;
-        let mut name = attr_name;
+        let name = attr_name;
         let mut max_occurs = 1;
         let mut min_occurs = 1;
         for (key, &value) in attrs.iter() {
@@ -499,7 +501,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
-        let mut name = attr_name;
+        let name = attr_name;
         let mut abstract_ = false;
         let mut mixed = false;
         for (key, &value) in attrs.iter() {
@@ -549,7 +551,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
-        let mut name = attr_name;
+        let name = attr_name;
         let mut abstract_ = false;
         let mut mixed = false;
         for (key, &value) in attrs.iter() {
@@ -652,7 +654,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             type_def_particle: &'ast xs::TypeDefParticle<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, Type<'input>> {
-        let mut base = attr_base;
+        let base = attr_base;
         for (key, &value) in attrs.iter() {
             match key.as_tuple() {
                 (SCHEMA_URI, "base") => (),
@@ -706,7 +708,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             model: &'ast xs::SimpleRestrictionModel<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, SimpleType<'input>> {
-        let mut base = attr_base;
+        let base = attr_base;
         for (key, &value) in attrs.iter() {
             match key.as_tuple() {
                 (SCHEMA_URI, "base") => (),
@@ -904,7 +906,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attr_base: &'ast QName<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, Type<'input>> {
-        let mut base = attr_base;
+        let base = attr_base;
         for (key, &value) in attrs.iter() {
             match key.as_tuple() {
                 (SCHEMA_URI, "base") => (),
@@ -926,7 +928,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
-        let mut base = attr_base;
+        let base = attr_base;
         for (key, &value) in attrs.iter() {
             match key.as_tuple() {
                 (SCHEMA_URI, "base") => (),
@@ -942,7 +944,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_toplevel_element(&mut self, element: &'ast xs::Element<'input>) {
-        let mut name = FullName::new(self.namespaces.target_namespace, element.attr_name.0);
+        let name = FullName::new(self.namespaces.target_namespace, element.attr_name.0);
         let type_attr: Option<QName<'input>> = element.attr_type;
         let mut abstract_ = false;
         let mut substitution_group = &element.attr_substitution_group;
@@ -1010,9 +1012,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, Type<'input>> {
         let inline_elements::LocalElement { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
-        let mut name = attr_name;
-        let mut ref_ = attr_ref.as_ref().map(|qn| FullName::new(qn.0, qn.1));
-        let mut type_attr = attr_type;
+        let name = attr_name;
+        let ref_ = attr_ref.as_ref().map(|qn| FullName::new(qn.0, qn.1));
+        let type_attr = attr_type;
         let mut abstract_ = false;
         //let mut substitution_group = None;
         let mut min_occurs = 1;

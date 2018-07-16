@@ -2,21 +2,15 @@
 // Input: "xml-schema/XMLSchema.xsd"
 #[allow(unused_imports)]
 use support;
-extern crate xmlparser;
-
 pub use std::collections::HashMap;
 
 pub use std::marker::PhantomData;
-
-pub use support::*;
 
 pub mod xs {
     //! http://www.w3.org/2001/XMLSchema
 
     #[allow(unused_imports)]
     use super::*;
-
-    pub(crate) use primitives::*;
 
     #[derive(Debug, PartialEq)] pub struct Entities<'input>(pub support::AnySimpleType<'input>);
 
@@ -1782,6 +1776,7 @@ pub mod xmlns {
 }
 
 pub mod enums {
+    #[allow(unused_imports)]
     use super::*;
 
     #[derive(Debug, PartialEq)]
@@ -1920,6 +1915,7 @@ pub mod enums {
 }
 
 pub mod lists {
+    #[allow(unused_imports)]
     use super::*;
 
     #[derive(Debug, PartialEq)]
@@ -1959,6 +1955,7 @@ pub mod lists {
 }
 
 pub mod unions {
+    #[allow(unused_imports)]
     use super::*;
 
     #[derive(Debug, PartialEq)]
@@ -2062,6 +2059,7 @@ pub mod unions {
 }
 
 pub mod sequences {
+    #[allow(unused_imports)]
     use super::*;
 
     #[derive(Debug, PartialEq)]
@@ -2120,6 +2118,7 @@ pub mod sequences {
 }
 
 pub mod inline_elements {
+    #[allow(unused_imports)]
     use super::*;
 
     #[derive(Debug, PartialEq)]
