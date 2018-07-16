@@ -747,8 +747,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, Type<'input>> {
         let mut ty = match particle {
             xs::NestedParticle::Element(e) => {
-                let inline_elements::LocalElement { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, annotation: ref annotation2, ref type_, ref alternative_alt_type, ref identity_constraint } = **e;
-                self.process_element(attrs, attr_name, attr_type, type_, vec_concat_opt(&annotation, annotation2.as_ref()))
+                self.process_element(e)
             },
             xs::NestedParticle::Group(e) => {
                 let inline_elements::GroupRef { ref attrs, ref attr_ref, annotation: ref annotation2 } = **e;
@@ -1009,12 +1008,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_element(&mut self,
-            attrs: &'ast HashMap<FullName<'input>, &'input str>,
-            attr_name: &'ast Option<NcName<'input>>,
-            attr_type: &'ast Option<QName<'input>>,
-            child_type: &'ast Option<enums::Type<'input>>,
-            annotation: Vec<&'ast xs::Annotation<'input>>,
+            element: &'ast inline_elements::LocalElement<'input>,
             ) -> RichType<'input, Type<'input>> {
+        let inline_elements::LocalElement { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = element;
+        let annotation = annotation.iter().collect();
         let mut name = attr_name;
         let mut ref_ = None;
         let mut type_attr = attr_type;
@@ -1059,7 +1056,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         }
         else {
             let name = name.as_ref().expect("<element> has no name.");
-            match (type_attr, &child_type) {
+            match (type_attr, &type_) {
                 (None, Some(ref c)) => {
                     let t = match c {
                         enums::Type::SimpleType(ref e) => {
