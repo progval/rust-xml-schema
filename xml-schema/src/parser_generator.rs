@@ -22,7 +22,7 @@ fn escape_keyword(name: &str) -> String {
 pub struct ParserGenerator<'ast, 'input: 'ast> {
     processors: Vec<Processor<'ast, 'input>>,
     module_names: HashMap<&'input str, String>, // URI -> module name
-    primitive_types: HashMap<&'static str, (RichType<'input, SimpleType<'input>>, Documentation<'input>)>,
+    primitive_types: HashMap<&'static str, RichType<'input, Type<'input>>>,
     renames: HashMap<String, String>,
 }
 
@@ -34,7 +34,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
         let mut primitive_types = HashMap::new();
         for (name, type_name) in PRIMITIVE_TYPES {
-            primitive_types.insert(*name, (RichType::new(NameHint::new(name), SimpleType::Primitive(name, type_name), Documentation::new()), Documentation::new()));
+            primitive_types.insert(*name, RichType::new(NameHint::new(name), Type::Simple(SimpleType::Primitive(name, type_name)), Documentation::new()));
         }
 
         for proc in &processors {
@@ -580,6 +580,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     fn get_type(&self, name: &FullName<'input>) -> &RichType<'input, Type<'input>> {
+        if name.namespace() == Some(SCHEMA_URI) {
+            if let Some(type_) = self.primitive_types.get(name.local_name()) {
+                return type_;
+            }
+        }
         let mut type_ = None;
         for proc in &self.processors {
             if proc.namespaces.target_namespace != name.namespace() {
