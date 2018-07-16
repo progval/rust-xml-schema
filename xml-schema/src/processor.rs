@@ -242,17 +242,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_redefinable(&mut self, r: &'ast xs::Redefinable<'input>, inlinable: bool) {
         match r {
             xs::Redefinable::SimpleType(ref e) => {
-                let xs::SimpleType { ref attrs, ref attr_name, ref attr_final, ref annotation, ref simple_derivation } = **e;
-                self.process_simple_type(attrs, simple_derivation, annotation.iter().collect());
+                self.process_simple_type(e);
             },
             xs::Redefinable::ComplexType(e) => {
                     let xs::ComplexType { ref attrs, ref attr_name, ref attr_mixed, ref attr_abstract, ref attr_final, ref attr_block, ref attr_default_attributes_apply, ref annotation, ref complex_type_model } = **e;
                     self.process_complex_type(attrs, attr_name, complex_type_model, annotation.iter().collect(), inlinable);
                 },
-            xs::Redefinable::Group(e) => {
-                let xs::Group { ref attrs, ref attr_name, ref annotation, ref choice_all_choice_sequence } = **e;
-                self.process_named_group(attrs, choice_all_choice_sequence, annotation.iter().collect());
-            },
+            xs::Redefinable::Group(e) => { self.process_named_group(e); },
             xs::Redefinable::AttributeGroup(e) => self.process_attribute_group(e),
         }
     }
@@ -280,16 +276,15 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_group_ref(&mut self, 
-            attrs: &'ast HashMap<FullName<'input>, &'input str>,
-            annotation: Vec<&'ast xs::Annotation<'input>>,
+            group_ref: &'ast inline_elements::GroupRef<'input>,
             ) -> RichType<'input, Type<'input>> {
-        let mut ref_ = None;
+        let inline_elements::GroupRef { ref attrs, ref attr_ref, ref annotation } = group_ref;
+        let ref_ = attr_ref;
         let mut max_occurs = 1;
         let mut min_occurs = 1;
         for (key, &value) in attrs.iter() {
             match key.as_tuple() {
-                (SCHEMA_URI, "ref") =>
-                    ref_ = Some(self.namespaces.parse_qname(value)),
+                (SCHEMA_URI, "ref") => (),
                 (SCHEMA_URI, "minOccurs") =>
                     min_occurs = value.parse().unwrap(),
                 (SCHEMA_URI, "maxOccurs") =>
@@ -298,27 +293,25 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
 
-        let ref_ = ref_.unwrap();
+        let ref_ = FullName::new(ref_.0, ref_.1);
         let (_, field_name) = ref_.as_tuple();
         RichType::new(
             NameHint::new(field_name),
             Type::Group(min_occurs, max_occurs, ref_),
-            self.process_annotation(&annotation),
+            self.process_annotation(&annotation.iter().collect()),
             )
     }
 
     fn process_named_group(&mut self, 
-            attrs: &'ast HashMap<FullName<'input>, &'input str>,
-            content: &'ast enums::ChoiceAllChoiceSequence<'input>,
-            annotation: Vec<&'ast xs::Annotation<'input>>,
+            group: &'ast xs::Group<'input>,
             ) -> RichType<'input, Type<'input>> {
-        let mut name = None;
+        let xs::Group { ref attrs, ref attr_name, ref annotation, choice_all_choice_sequence: ref content } = group;
+        let mut name = attr_name;
         let mut max_occurs = 1;
         let mut min_occurs = 1;
         for (key, &value) in attrs.iter() {
             match key.as_tuple() {
-                (SCHEMA_URI, "name") =>
-                    name = Some(self.namespaces.parse_qname(value)),
+                (SCHEMA_URI, "name") => (),
                 (SCHEMA_URI, "minOccurs") =>
                     min_occurs = value.parse().unwrap(),
                 (SCHEMA_URI, "maxOccurs") =>
@@ -326,8 +319,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 _ => panic!("Unknown attribute {} in <group>", key),
             }
         }
-
-        let name = name.expect("<group> has no name or ref.");
 
         let mut type_ = match content {
             enums::ChoiceAllChoiceSequence::All(_) => unimplemented!("all"),
@@ -335,9 +326,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             enums::ChoiceAllChoiceSequence::Sequence(e) => self.process_sequence(e, true),
         };
 
-        type_.doc.extend(&self.process_annotation(&annotation));
+        type_.doc.extend(&self.process_annotation(&annotation.iter().collect()));
         let doc = type_.doc.clone();
 
+        let name = FullName::new(Some(self.namespaces.target_namespace), name.0);
         self.groups.insert(name, type_);
         RichType::new(
             NameHint::from_fullname(&name),
@@ -347,29 +339,51 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_attribute_group(&mut self, group: &'ast xs::AttributeGroup<'input>) {
-        let mut name = None;
+        let mut name = &group.attr_name;
         for (key, &value) in group.attrs.iter() {
             match key.as_tuple() {
-                (SCHEMA_URI, "name") =>
-                    name = Some(value),
+                (SCHEMA_URI, "name") => (),
                 _ => panic!("Unknown attribute {} in <attributeGroup>", key),
             }
         }
-        let name = name.expect("<attributeGroup> has no name.");
         let attrs = self.process_attr_decls(&group.attr_decls);
-        self.attribute_groups.insert(self.namespaces.parse_qname(name), attrs);
+        let name = FullName::new(Some(self.namespaces.target_namespace), name.0);
+        self.attribute_groups.insert(name, attrs);
+    }
+
+    fn process_local_simple_type(&mut self,
+            simple_type: &'ast inline_elements::LocalSimpleType<'input>,
+            ) -> RichType<'input, SimpleType<'input>> {
+        let inline_elements::LocalSimpleType { ref attrs, ref annotation, ref simple_derivation } = simple_type;
+        for (key, &value) in attrs.iter() {
+            match key.as_tuple() {
+                //(SCHEMA_URI, "name") => (),
+                (SCHEMA_URI, "id") => (), // TODO
+                _ => panic!("Unknown attribute {} in <simpleType>", key),
+            }
+        }
+        //let struct_name = self.namespaces.new_type(QName::from(name));
+        let annotation = annotation.iter().collect();
+        match simple_derivation {
+            xs::SimpleDerivation::Restriction(e) => {
+                let xs::Restriction { ref attrs, ref attr_id, ref attr_base, annotation: ref annotation2, ref simple_restriction_model } = **e;
+                self.process_simple_restriction(attrs, attr_base, simple_restriction_model, vec_concat_opt(&annotation, annotation2.as_ref()))
+            },
+            xs::SimpleDerivation::List(ref e) => self.process_list(e, annotation.clone()),
+            xs::SimpleDerivation::Union(ref e) => self.process_union(e, annotation.clone()),
+        }
     }
 
     fn process_simple_type(&mut self,
-            attrs: &'ast HashMap<FullName<'input>, &'input str>,
-            simple_derivation: &'ast xs::SimpleDerivation<'input>,
-            annotation: Vec<&'ast xs::Annotation<'input>>,
+            simple_type: &'ast xs::SimpleType<'input>,
             ) -> RichType<'input, SimpleType<'input>> {
-        let mut name = None;
+        let xs::SimpleType { ref attrs, ref attr_name, ref attr_final, ref annotation, ref simple_derivation } = simple_type;
+        let annotation = annotation.iter().collect();
+        let name = attr_name;
+        let name = FullName::new(Some(self.namespaces.target_namespace), name.0);
         for (key, &value) in attrs.iter() {
             match key.as_tuple() {
-                (SCHEMA_URI, "name") =>
-                    name = Some(self.namespaces.parse_qname(value)),
+                (SCHEMA_URI, "name") => (),
                 (SCHEMA_URI, "id") => (), // TODO
                 _ => panic!("Unknown attribute {} in <simpleType>", key),
             }
@@ -384,36 +398,33 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             xs::SimpleDerivation::Union(ref e) => self.process_union(e, annotation.clone()),
         };
 
-        if let Some(name) = name {
-            let doc = self.process_annotation(&annotation);
-            self.simple_types.insert(name, (ty, doc.clone()));
-            RichType::new(
-                NameHint::from_fullname(&name),
-                SimpleType::Alias(name),
-                doc,
-                )
-        }
-        else {
-            ty
-        }
+        let doc = self.process_annotation(&annotation);
+        self.simple_types.insert(name, (ty, doc.clone()));
+        RichType::new(
+            NameHint::from_fullname(&name),
+            SimpleType::Alias(name),
+            doc,
+            )
     }
 
     fn process_list(&mut self,
             list: &'ast xs::List<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, SimpleType<'input>> {
-        let mut item_type = None;
+        let item_type = list.attr_item_type;
+        let item_type = item_type.map(|n| FullName::new(n.0, n.1));
         for (key, &value) in list.attrs.iter() {
             match key.as_tuple() {
-                (SCHEMA_URI, "itemType") => item_type = Some(self.namespaces.parse_qname(value)),
+                (SCHEMA_URI, "itemType") => (),
                 _ => panic!("Unknown attribute {} in <list>", key),
             }
         }
         
         let item_type = match (item_type, &list.local_simple_type) {
             (None, Some(st)) => {
-                let inline_elements::LocalSimpleType { attrs, annotation: annotation2, simple_derivation } = st;
-                self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref()))
+                let mut ty = self.process_local_simple_type(st);
+                ty.doc.extend(&self.process_annotation(&annotation));
+                ty
             },
             (Some(n), None) => {
                 RichType::new(
@@ -444,30 +455,27 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             union: &'ast xs::Union<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, SimpleType<'input>> {
-        let mut member_types = Vec::new();
+        let default_vec = Vec::new();
+        let member_types = union.attr_member_types.as_ref().map(|l| &l.0).unwrap_or(&default_vec);
+        let mut member_types: Vec<_> = member_types.iter().map(|name| {
+            let name = FullName::new(Some(name.0.unwrap_or(self.namespaces.target_namespace)), name.1);
+            let (_, field_name) = name.as_tuple();
+            RichType::new(
+                NameHint::new(field_name),
+                SimpleType::Alias(name),
+                self.process_annotation(&annotation),
+                )
+        }).collect();
         for (key, &value) in union.attrs.iter() {
             match key.as_tuple() {
-                (SCHEMA_URI, "memberTypes") => {
-                    member_types = value.split(" ").map(|s| {
-                        let name = self.namespaces.parse_qname(s);
-                        let (_, field_name) = name.as_tuple();
-                        RichType::new(
-                            NameHint::new(field_name),
-                            SimpleType::Alias(name),
-                            self.process_annotation(&annotation),
-                            )
-                    }).collect()
-                },
+                (SCHEMA_URI, "memberTypes") => (),
                 _ => panic!("Unknown attribute {} in <union>", key),
             }
         }
 
         let mut name_hint = NameHint::new("union");
         for t in union.local_simple_type.iter() {
-            let ty = {
-                let inline_elements::LocalSimpleType { attrs, annotation: annotation2, simple_derivation } = t;
-                self.process_simple_type(attrs, simple_derivation, annotation2.iter().collect())
-            };
+            let ty = self.process_local_simple_type(t);
             name_hint.extend(&ty.name_hint);
             member_types.push(ty)
         }
@@ -730,10 +738,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
     fn process_type_def_particle(&mut self, particle: &'ast xs::TypeDefParticle<'input>, inlinable: bool) -> RichType<'input, Type<'input>> {
         match particle {
-            xs::TypeDefParticle::Group(e) => {
-                let inline_elements::GroupRef { ref attrs, ref attr_ref, ref annotation } = **e;
-                self.process_group_ref(attrs, annotation.iter().collect())
-            },
+            xs::TypeDefParticle::Group(e) => self.process_group_ref(e),
             xs::TypeDefParticle::All(_) => unimplemented!("all"),
             xs::TypeDefParticle::Choice(e) => self.process_choice(e, inlinable),
             xs::TypeDefParticle::Sequence(e) => self.process_sequence(e, inlinable),
@@ -746,13 +751,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             inlinable: bool
             ) -> RichType<'input, Type<'input>> {
         let mut ty = match particle {
-            xs::NestedParticle::Element(e) => {
-                self.process_element(e)
-            },
-            xs::NestedParticle::Group(e) => {
-                let inline_elements::GroupRef { ref attrs, ref attr_ref, annotation: ref annotation2 } = **e;
-                self.process_group_ref(attrs, vec_concat_opt(&annotation, annotation2.as_ref()))
-            },
+            xs::NestedParticle::Element(e) => self.process_element(e),
+            xs::NestedParticle::Group(e) => self.process_group_ref(e),
             xs::NestedParticle::Choice(e) => self.process_choice(e, inlinable),
             xs::NestedParticle::Sequence(e) => self.process_sequence(e, inlinable),
             xs::NestedParticle::Any(e) => self.process_any(e, Vec::new()),
@@ -942,14 +942,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_toplevel_element(&mut self, element: &'ast xs::Element<'input>) {
-        let mut name = None;
+        let mut name = FullName::new(Some(self.namespaces.target_namespace), element.attr_name.0);
         let type_attr: Option<QName<'input>> = element.attr_type;
         let mut abstract_ = false;
-        let mut substitution_group = None;
+        let mut substitution_group = &element.attr_substitution_group;
         for (key, &value) in element.attrs.iter() {
             match key.as_tuple() {
-                (SCHEMA_URI, "name") =>
-                    name = Some(self.namespaces.parse_qname(value)),
+                (SCHEMA_URI, "name") => (),
                 (SCHEMA_URI, "id") =>
                     (),
                 (SCHEMA_URI, "type") => (),
@@ -960,12 +959,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         _ => panic!("Invalid value for abstract attribute: {}", value),
                     }
                 },
-                (SCHEMA_URI, "substitutionGroup") =>
-                    substitution_group = Some(self.namespaces.parse_qname(value)),
+                (SCHEMA_URI, "substitutionGroup") => (),
                 _ => panic!("Unknown attribute {:?} in toplevel <element>", key),
             }
         }
-        let name = name.expect("<element> has no name.");
         let xs::Element { ref attrs, ref attr_name, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         if let Some(heads) = attr_substitution_group {
@@ -979,8 +976,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let type_ = match (type_attr, &child_type) {
             (None, Some(ref c)) => match c {
                 enums::Type::SimpleType(ref e) => {
-                    let inline_elements::LocalSimpleType { ref attrs, annotation: ref annotation2, ref simple_derivation } = **e;
-                    self.process_simple_type(attrs, simple_derivation, vec_concat_opt(&annotation, annotation2.as_ref())).into_complex()
+                    let mut ty = self.process_local_simple_type(e);
+                    ty.doc.extend(&self.process_annotation(&annotation));
+                    ty.into_complex()
                 },
                 enums::Type::ComplexType(ref e) => {
                     let inline_elements::LocalComplexType { ref attrs, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = **e;
@@ -1013,7 +1011,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let inline_elements::LocalElement { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         let mut name = attr_name;
-        let mut ref_ = None;
+        let mut ref_ = attr_ref.as_ref().map(|qn| FullName::new(qn.0, qn.1));
         let mut type_attr = attr_type;
         let mut abstract_ = false;
         //let mut substitution_group = None;
@@ -1036,10 +1034,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         _ => panic!("Invalid value for abstract attribute: {}", value),
                     }
                 },
-                //(SCHEMA_URI, "substitutionGroup") =>
-                //    substitution_group = Some(self.namespaces.parse_qname(value)),
-                (SCHEMA_URI, "ref") =>
-                    ref_ = Some(self.namespaces.parse_qname(value)),
+                (SCHEMA_URI, "ref") => (),
                 _ => panic!("Unknown attribute {} in <element>", key),
             }
         }
@@ -1060,8 +1055,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 (None, Some(ref c)) => {
                     let t = match c {
                         enums::Type::SimpleType(ref e) => {
-                            let inline_elements::LocalSimpleType { ref attrs, annotation: ref annotation2, ref simple_derivation } = **e;
-                            self.process_simple_type(attrs, simple_derivation, annotation2.iter().collect()).into_complex()
+                            let mut ty = self.process_local_simple_type(e);
+                            ty.doc.extend(&self.process_annotation(&annotation));
+                            ty.into_complex()
                         },
                         enums::Type::ComplexType(ref e) => {
                             let inline_elements::LocalComplexType { ref attrs, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = **e;
@@ -1127,20 +1123,18 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         for attr_decl in &attr_decls.attribute {
             match attr_decl {
                 enums::AttrOrAttrGroup::Attribute(e) => {
-                    let mut name = None;
-                    let mut ref_ = None;
+                    let name = e.attr_name.as_ref().map(|ncn| FullName::new(Some(self.namespaces.target_namespace), ncn.0));
+                    let mut ref_ = e.attr_ref.as_ref().map(|qn| FullName::new(qn.0, qn.1));
                     let mut type_attr: Option<QName<'input>> = e.attr_type;
                     let mut use_ = None;
                     for (key, &value) in e.attrs.iter() {
                         match key.as_tuple() {
-                            (SCHEMA_URI, "name") =>
-                                name = Some(self.namespaces.parse_qname(value)),
+                            (SCHEMA_URI, "name") => (),
                             (SCHEMA_URI, "use") =>
                                 use_ = Some(value),
                             (SCHEMA_URI, "default") => (), // TODO
                             (SCHEMA_URI, "type") => (),
-                            (SCHEMA_URI, "ref") =>
-                                ref_ = Some(self.namespaces.parse_qname(value)), // TODO
+                            (SCHEMA_URI, "ref") => (),
                             (SCHEMA_URI, "fixed") => (), // TODO
                             _ => panic!("Unknown attribute {} in <attribute>", key),
                         }
@@ -1157,9 +1151,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                             attrs.named.push((name, use_, Some(SimpleType::Alias(FullName::new(t.0, t.1)))));
                         },
                         (Some(name), None, None, Some(t)) => {
-                            let inline_elements::LocalSimpleType {
-                                attrs: ref sub_attrs, ref simple_derivation, ref annotation } = t;
-                            let t = self.process_simple_type(sub_attrs, simple_derivation, annotation.iter().collect());
+                            let t = self.process_local_simple_type(t);
                             attrs.named.push((name, use_, Some(t.type_)));
                         },
                         (Some(name), None, None, None) =>
@@ -1176,15 +1168,14 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     }
                 },
                 enums::AttrOrAttrGroup::AttributeGroup(e) => {
-                    let mut ref_ = None;
+                    let mut ref_ = FullName::new(e.attr_ref.0, e.attr_ref.1);
                     for (key, &value) in e.attrs.iter() {
                         match key.as_tuple() {
-                            (SCHEMA_URI, "ref") =>
-                                ref_ = Some(self.namespaces.parse_qname(value)),
+                            (SCHEMA_URI, "ref") => (),
                             _ => panic!("Unknown attribute {} in <attributeGroup>", key),
                         }
                     }
-                    attrs.group_refs.push(ref_.unwrap());
+                    attrs.group_refs.push(ref_);
                 },
             }
         }

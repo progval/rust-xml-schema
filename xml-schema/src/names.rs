@@ -70,22 +70,6 @@ impl<'input> Namespaces<'input> {
         }
     }
 
-    fn expand_prefix(&self, prefix: Option<&'input str>) -> Option<&'input str> {
-        match prefix {
-            Some(prefix) => Some(self.namespaces.get(prefix).expect(&format!("Unknown prefix: {:?}", prefix))),
-            None => Some(self.target_namespace),
-        }
-    }
-    pub fn expand_qname(&self, qname: QName<'input>) -> FullName<'input> {
-        FullName::new(self.expand_prefix(qname.0), qname.1)
-    }
-    pub fn parse_qname(&self, s: &'input str) -> FullName<'input> {
-        self.expand_qname(QName::from(s))
-    }
-    pub fn qname_eq(&self, qname1: QName<'input>, qname2: QName<'input>) -> bool {
-        qname1.1 == qname2.1 && self.expand_prefix(qname1.0) == self.expand_prefix(qname2.0)
-    }
-
     pub fn modules(&self) -> impl Iterator<Item=(&&'input str, &&'input str)> {
         self.namespaces.iter()
     }
