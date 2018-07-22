@@ -435,8 +435,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         for proc in &self.processors {
             let mut elements: Vec<_> = proc.inline_elements.iter().collect();
 
-            elements.sort_by_key(|&((n,_,_),(n2,_))| (n, n2.iter().collect::<Vec<_>>()));
-            for ((tag_name, attrs, element), (struct_names, doc)) in elements {
+            elements.sort_by_key(|&((ns,n,_,_),(n2,_))| (ns, n, n2.iter().collect::<Vec<_>>()));
+            for ((namespace, tag_name, attrs, element), (struct_names, doc)) in elements {
                 // struct_names is always non-empty.
 
                 let mut struct_names: Vec<_> = struct_names.iter().map(|s| s.to_camel_case()).collect();
@@ -447,7 +447,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     module.scope().raw(&format!("pub type {}<'input> = {}<'input>;", alias, struct_names[0]));
                 }
 
-                self.gen_element(module, &struct_names[0], tag_name, attrs, element, doc);
+                let tag_name = FullName::new(*namespace, tag_name);
+                self.gen_element(module, &struct_names[0], &tag_name, attrs, element, doc);
             }
         }
     }

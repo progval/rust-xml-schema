@@ -206,7 +206,7 @@ impl<'input> fmt::Display for QName<'input> {
 }
 
 #[derive(Debug, PartialEq, Default)]
-pub struct AnyUri<'input>(&'input str);
+pub struct AnyUri<'input>(pub &'input str);
 impl<'input> ParseXmlStr<'input> for AnyUri<'input> {
     const NODE_NAME: &'static str = "AnyUri";
     fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext<'input>, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, AnyUri<'input>)> {

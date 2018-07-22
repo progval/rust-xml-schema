@@ -9,7 +9,7 @@ use xmlparser::{TextUnescape, XmlSpace};
 use parser::*;
 use names::*;
 use support::Facets;
-use primitives::{QName,NcName};
+use primitives::{QName,NcName,AnyUri};
 
 pub const SCHEMA_URI: &'static str = "http://www.w3.org/2001/XMLSchema";
 
@@ -165,7 +165,7 @@ pub struct Processor<'ast, 'input: 'ast> {
     pub sequences: HashMap<Vec<RichType<'input, Type<'input>>>, (HashSet<String>, Documentation<'input>)>,
     pub groups: HashMap<FullName<'input>, RichType<'input, Type<'input>>>,
     pub attribute_groups: HashMap<FullName<'input>, Attrs<'input>>,
-    pub inline_elements: HashMap<(FullName<'input>, Attrs<'input>, Type<'input>), (HashSet<String>, Documentation<'input>)>,
+    pub inline_elements: HashMap<(Option<&'input str>, &'input str, Attrs<'input>, Type<'input>), (HashSet<String>, Documentation<'input>)>,
 
     pub lists: HashMap<RichType<'input, SimpleType<'input>>, HashSet<String>>,
     pub unions: HashMap<Vec<RichType<'input, SimpleType<'input>>>, HashSet<String>>,
@@ -177,8 +177,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     pub fn new(ast: &'ast xs::Schema<'input>) -> Processor<'ast, 'input> {
         let mut target_namespace = None;
         let mut namespaces = HashMap::new();
-        let mut element_form_default_qualified = false;
-        let mut attribute_form_default_qualified = false;
         for (key, &value) in ast.attrs.iter() {
             match key.as_tuple() {
                 ("xml", "lang") => (),
@@ -189,24 +187,22 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     }
                 },
                 (SCHEMA_URI, "targetNamespace") => target_namespace = Some(value),
-                (SCHEMA_URI, "elementFormDefault") => {
-                    match value {
-                        "qualified" => element_form_default_qualified = true,
-                        "unqualified" => element_form_default_qualified = false,
-                        _ => panic!("Unknown value: elementFormDefault={:?}", value),
-                    }
-                },
-                (SCHEMA_URI, "attributeFormDefault") => {
-                    match value {
-                        "qualified" => attribute_form_default_qualified = true,
-                        "unqualified" => attribute_form_default_qualified = false,
-                        _ => panic!("Unknown value: attributeFormDefault={:?}", value),
-                    }
-                },
+                (SCHEMA_URI, "elementFormDefault") => (),
+                (SCHEMA_URI, "attributeFormDefault") => (),
                 (SCHEMA_URI, "version") => (),
                 _ => panic!("Unknown attribute {} on <schema>.", key),
             }
         }
+        let element_form_default_qualified = match ast.attr_element_form_default.as_ref().map(|x| ((x.0).0).0) {
+            Some("qualified") => true,
+            Some("unqualified") | None => false,
+            _ => unreachable!(),
+        };
+        let attribute_form_default_qualified = match ast.attr_attribute_form_default.as_ref().map(|x| ((x.0).0).0) {
+            Some("qualified") => true,
+            Some("unqualified") | None => false,
+            _ => unreachable!(),
+        };
         Processor {
             namespaces: Namespaces::new(namespaces, target_namespace),
             element_form_default_qualified,
@@ -1040,6 +1036,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 _ => panic!("Unknown attribute {} in <element>", key),
             }
         }
+
         if let Some(ref_) = ref_ {
             if let Some(name) = name {
                 panic!("<element> has both ref={:?} and name={:?}", ref_, name);
@@ -1052,7 +1049,21 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 )
         }
         else {
-            let name = name.as_ref().expect("<element> has no name.");
+            let name = name.as_ref().expect("<element> has no name.").0;
+
+            // https://www.w3.org/TR/xmlschema11-1/#dcl.elt.local
+            let qualified_form = match attr_form.as_ref().map(|x| ((x.0).0).0) {
+                Some("qualified") => true,
+                Some("unqualified") => false,
+                None => self.element_form_default_qualified,
+                _ => unreachable!(),
+            };
+            let namespace = match (attr_target_namespace, qualified_form) {
+                (Some(AnyUri(target_namespace)), _) => Some(*target_namespace),
+                (None, true) => self.namespaces.target_namespace,
+                (None, false) => None,
+            };
+
             match (type_attr, &type_) {
                 (None, Some(ref c)) => {
                     let t = match c {
@@ -1066,31 +1077,27 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                             self.process_local_complex_type(attrs, None, complex_type_model, annotation2.iter().collect(), false)
                         },
                     };
-                    let name = FullName::new(self.namespaces.target_namespace, name.0);
-                    let (prefix, local) = name.as_tuple();
-                    let mut name_hint = NameHint::new(local);
+                    let mut name_hint = NameHint::new(name);
                     name_hint.extend(&t.name_hint);
                     let struct_name = name_from_hint(&name_hint).unwrap();
                     let mut doc = self.process_annotation(&annotation);
                     doc.extend(&t.doc);
-                    let (elems, doc2) = self.inline_elements.entry((name, t.attrs, t.type_))
+                    let (elems, doc2) = self.inline_elements.entry((namespace, name, t.attrs, t.type_))
                             .or_insert((HashSet::new(), Documentation::new()));
                     elems.insert(struct_name.clone());
                     doc2.extend(&doc);
                     RichType::new(
-                        NameHint::new(local),
+                        NameHint::new(name),
                         Type::Element(min_occurs, max_occurs, struct_name),
                         doc,
                         )
                 },
                 (Some(t), None) => {
-                    let name = FullName::new(self.namespaces.target_namespace, name.0);
-                    let (prefix, local) = name.as_tuple();
                     let name_hint1 = NameHint::new(t.1);
-                    let mut name_hint2 = NameHint::new(local);
+                    let mut name_hint2 = NameHint::new(name);
                     name_hint2.push(t.1);
                     // TODO: move this heuristic in names.rs
-                    let name_hint = if t.1.to_lowercase().contains(&local.to_lowercase()) {
+                    let name_hint = if t.1.to_lowercase().contains(&name.to_lowercase()) {
                         name_hint1
                     }
                     else {
@@ -1098,12 +1105,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     };
                     let struct_name = name_from_hint(&name_hint).unwrap();
                     let mut doc = self.process_annotation(&annotation);
-                    let (elems, doc2) = self.inline_elements.entry((name, Attrs::new(), Type::Alias(FullName::new(t.0, t.1))))
+                    let (elems, doc2) = self.inline_elements.entry((namespace, name, Attrs::new(), Type::Alias(FullName::new(t.0, t.1))))
                             .or_insert((HashSet::new(), Documentation::new()));
                     elems.insert(struct_name.clone());
                     doc.extend(doc2);
                     RichType::new(
-                        NameHint::new(local),
+                        NameHint::new(name),
                         Type::Element(min_occurs, max_occurs, struct_name),
                         doc,
                         )
