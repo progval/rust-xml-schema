@@ -85,7 +85,6 @@ macro_rules! validate_decimal {
 pub const PRIMITIVE_TYPES: &[(&'static str, &'static str)] = &[
     ("anySimpleType", "AnySimpleType"),
     ("token", "Token"),
-    ("NMToken", "NMToken"),
     ("QName", "QName"),
     ("string", "XmlString"),
     ("positiveInteger", "PositiveInteger"),
@@ -137,34 +136,6 @@ impl<'input> ParseXmlStr<'input> for Token<'input> {
 impl<'input> Default for Token<'input> {
     fn default() -> Self {
         Token("")
-    }
-}
-
-
-pub type Nmtoken<'input> = NMToken<'input>; // TODO: remove this
-#[derive(Debug, PartialEq)]
-pub struct NMToken<'input>(&'input str);
-impl<'input> ParseXmlStr<'input> for NMToken<'input> {
-    const NODE_NAME: &'static str = "NMToken";
-    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, _parse_context: &mut ParseContext<'input>, _parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, NMToken<'input>)> {
-        if input.len() == 0 {
-            return None;
-        }
-        for (i, c) in input.char_indices() {
-            if c == ' ' { // TODO
-                if i == 0 {
-                    return None;
-                }
-                return Some((&input[i..], NMToken(&input[0..i])))
-            }
-        }
-        Some(("", NMToken(input)))
-    }
-}
-
-impl<'input> Default for NMToken<'input> {
-    fn default() -> Self {
-        NMToken("")
     }
 }
 
