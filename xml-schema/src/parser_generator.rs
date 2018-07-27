@@ -554,8 +554,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     fn gen_element(&self, module: &mut cg::Module, struct_name: &str, tag_name: &FullName<'input>, attrs: &Attrs<'input>, type_: &Type<'input>, doc: &Documentation<'input>) {
         let mut impl_code = Vec::new();
-        let (_, tag_name) = tag_name.as_tuple();
-        impl_code.push(format!("impl_element!({}, \"{}\", attributes = {{", struct_name, tag_name));
+        let (tag_namespace, tag_name) = tag_name.as_tuple();
+        impl_code.push(format!("impl_element!({}, \"{}\", \"{}\", attributes = {{", struct_name, tag_namespace, tag_name));
         {
             let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             let mut empty_struct = false;

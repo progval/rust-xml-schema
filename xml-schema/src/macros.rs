@@ -150,7 +150,7 @@ macro_rules! impl_group_or_sequence {
 
 #[macro_export]
 macro_rules! impl_element {
-    ( $struct_name:ident, $name:expr, attributes = { $( ($attr_prefix:expr, $attr_local:expr) => $attr_name:ident : $use:ident, )* }, fields = { $( ( $field_name:ident, $( $field_args:tt )* ), )* } ) => {
+    ( $struct_name:ident, $namespace:expr, $name:expr, attributes = { $( ($attr_prefix:expr, $attr_local:expr) => $attr_name:ident : $use:ident, )* }, fields = { $( ( $field_name:ident, $( $field_args:tt )* ), )* } ) => {
         #[allow(unused_imports)]
         use $crate::support::*;
         impl<'input> ParseXml<'input> for $struct_name<'input> {
@@ -228,6 +228,10 @@ macro_rules! impl_element {
                                         }
                                     },
                                     XmlToken::ElementEnd(ElementEnd::Open) => {
+                                        let element_ns: &'input str = parse_context.namespaces.get(element_prefix.to_str()).expect(&format!("unknown namespace {:?}", element_prefix.to_str())).clone();
+                                        if element_ns != $namespace { // This can't be checked on the ElementStart, because we have to check for xmlns first.
+                                            return None
+                                        }
                                         let ret = Some($struct_name {
                                             attrs,
                                             $(
@@ -253,6 +257,10 @@ macro_rules! impl_element {
                                         }
                                     },
                                     XmlToken::ElementEnd(ElementEnd::Empty) => {
+                                        let element_ns: &'input str = parse_context.namespaces.get(element_prefix.to_str()).expect(&format!("unknown namespace {:?}", element_prefix.to_str())).clone();
+                                        if element_ns != $namespace { // This can't be checked on the ElementStart, because we have to check for xmlns first.
+                                            return None
+                                        }
                                         return Some($struct_name {
                                             attrs,
                                             $(
