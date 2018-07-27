@@ -30,7 +30,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
 impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     pub fn new(processors: Vec<Processor<'ast, 'input>>, renames: HashMap<String, String>) -> ParserGenerator<'ast, 'input> {
         let mut module_names = HashMap::new();
-        module_names.insert("unqualified", "unqualified".to_string());
+        module_names.insert("", "unqualified".to_string());
         let mut name_gen = NameGenerator::new();
 
         let mut primitive_types = HashMap::new();

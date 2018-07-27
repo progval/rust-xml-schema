@@ -228,7 +228,15 @@ macro_rules! impl_element {
                                         }
                                     },
                                     XmlToken::ElementEnd(ElementEnd::Open) => {
-                                        let element_ns: &'input str = parse_context.namespaces.get(element_prefix.to_str()).expect(&format!("unknown namespace {:?}", element_prefix.to_str())).clone();
+                                        let element_ns: &'input str = match element_prefix.to_str() {
+                                            "" => {
+                                                parse_context.namespaces.get("").cloned().unwrap_or("")
+                                            },
+                                            p => {
+                                                parse_context.namespaces.get(p)
+                                                .expect(&format!("unknown namespace {:?}", element_prefix.to_str())).clone()
+                                            },
+                                        };
                                         if element_ns != $namespace { // This can't be checked on the ElementStart, because we have to check for xmlns first.
                                             return None
                                         }

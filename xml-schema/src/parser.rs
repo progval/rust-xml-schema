@@ -6,6 +6,13 @@ pub use std::collections::HashMap;
 
 pub use std::marker::PhantomData;
 
+pub mod unqualified {
+    //! 
+
+    #[allow(unused_imports)]
+    use super::*;
+}
+
 pub mod xs {
     //! http://www.w3.org/2001/XMLSchema
 
@@ -1749,13 +1756,6 @@ pub mod xs {
 
 pub mod hfp {
     //! http://www.w3.org/2001/XMLSchema-hasFacetAndProperty
-
-    #[allow(unused_imports)]
-    use super::*;
-}
-
-pub mod unqualified {
-    //! unqualified
 
     #[allow(unused_imports)]
     use super::*;

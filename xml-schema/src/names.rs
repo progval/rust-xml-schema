@@ -91,7 +91,7 @@ impl<'input> FullName<'input> {
         FullName(ns, name)
     }
     pub fn as_tuple(&self) -> (&'input str, &'input str) {
-        (self.0.unwrap_or("unqualified"), self.1)
+        (self.0.unwrap_or(""), self.1) // TODO: return an option instead
     }
     pub fn namespace(&self) -> Option<&'input str> {
         self.0
