@@ -749,7 +749,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             inlinable: bool
             ) -> RichType<'input, Type<'input>> {
         let mut ty = match particle {
-            xs::NestedParticle::Element(e) => self.process_element(e),
+            xs::NestedParticle::Element(e) => self.process_local_element(e),
             xs::NestedParticle::Group(e) => self.process_group_ref(e),
             xs::NestedParticle::Choice(e) => self.process_choice(e, inlinable),
             xs::NestedParticle::Sequence(e) => self.process_sequence(e, inlinable),
@@ -1003,7 +1003,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         self.elements.insert(name, type_);
     }
 
-    fn process_element(&mut self,
+    fn process_local_element(&mut self,
             element: &'ast inline_elements::LocalElement<'input>,
             ) -> RichType<'input, Type<'input>> {
         let inline_elements::LocalElement { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = element;
