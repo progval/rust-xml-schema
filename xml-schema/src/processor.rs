@@ -239,13 +239,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
     fn process_redefinable(&mut self, r: &'ast xs::Redefinable<'input>, inlinable: bool) {
         match r {
-            xs::Redefinable::SimpleType(ref e) => {
-                self.process_simple_type(e);
-            },
-            xs::Redefinable::ComplexType(e) => {
-                    let xs::ComplexType { ref attrs, ref attr_name, ref attr_mixed, ref attr_abstract, ref attr_final, ref attr_block, ref attr_default_attributes_apply, ref annotation, ref complex_type_model } = **e;
-                    self.process_complex_type(attrs, attr_name, complex_type_model, annotation.iter().collect(), inlinable);
-                },
+            xs::Redefinable::SimpleType(ref e) => { self.process_simple_type(e); },
+            xs::Redefinable::ComplexType(e) => { self.process_complex_type(e, inlinable); },
             xs::Redefinable::Group(e) => { self.process_named_group(e); },
             xs::Redefinable::AttributeGroup(e) => self.process_attribute_group(e),
         }
@@ -361,12 +356,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
         //let struct_name = self.namespaces.new_type(QName::from(name));
-        let annotation = annotation.iter().collect();
+        let annotation: Vec<_> = annotation.iter().collect();
         match simple_derivation {
-            xs::SimpleDerivation::Restriction(e) => {
-                let xs::Restriction { ref attrs, ref attr_id, ref attr_base, annotation: ref annotation2, ref simple_restriction_model } = **e;
-                self.process_simple_restriction(attrs, attr_base, simple_restriction_model, vec_concat_opt(&annotation, annotation2.as_ref()))
-            },
+            xs::SimpleDerivation::Restriction(e) => self.process_simple_restriction(e, annotation.clone()),
             xs::SimpleDerivation::List(ref e) => self.process_list(e, annotation.clone()),
             xs::SimpleDerivation::Union(ref e) => self.process_union(e, annotation.clone()),
         }
@@ -376,7 +368,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             simple_type: &'ast xs::SimpleType<'input>,
             ) -> RichType<'input, SimpleType<'input>> {
         let xs::SimpleType { ref attrs, ref attr_name, ref attr_final, ref annotation, ref simple_derivation } = simple_type;
-        let annotation = annotation.iter().collect();
+        let annotation: Vec<_> = annotation.iter().collect();
         let name = attr_name;
         let name = FullName::new(self.namespaces.target_namespace, name.0);
         for (key, &value) in attrs.iter() {
@@ -388,10 +380,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         }
         //let struct_name = self.namespaces.new_type(QName::from(name));
         let ty = match simple_derivation {
-            xs::SimpleDerivation::Restriction(e) => {
-                let xs::Restriction { ref attrs, ref attr_id, ref attr_base, annotation: ref annotation2, ref simple_restriction_model } = **e;
-                self.process_simple_restriction(attrs, attr_base, simple_restriction_model, vec_concat_opt(&annotation, annotation2.as_ref()))
-            },
+            xs::SimpleDerivation::Restriction(e) => 
+                self.process_simple_restriction(e, annotation.clone()),
             xs::SimpleDerivation::List(ref e) => self.process_list(e, annotation.clone()),
             xs::SimpleDerivation::Union(ref e) => self.process_union(e, annotation.clone()),
         };
@@ -491,12 +481,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_complex_type(&mut self,
-            attrs: &'ast HashMap<FullName<'input>, &'input str>,
-            attr_name: &'ast NcName<'input>,
-            model: &'ast xs::ComplexTypeModel<'input>,
-            annotation: Vec<&'ast xs::Annotation<'input>>,
+            complex_type: &'ast xs::ComplexType<'input>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
+        let xs::ComplexType { ref attrs, ref attr_name, ref attr_mixed, ref attr_abstract, ref attr_final, ref attr_block, ref attr_default_attributes_apply, ref annotation, ref complex_type_model } = complex_type;
         let name = attr_name;
         let mut abstract_ = false;
         let mut mixed = false;
@@ -521,14 +509,14 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
         //let struct_name = self.namespaces.new_type(QName::from(name));
-        let mut ty = match model {
+        let mut ty = match complex_type_model {
             xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
             xs::ComplexTypeModel::ComplexContent(ref model) =>
                 self.process_complex_content(model, false),
             xs::ComplexTypeModel::CompleteContentModel { ref open_content, ref type_def_particle, ref attr_decls, ref assertions } =>
                 self.process_complete_content_model(open_content, type_def_particle, attr_decls, assertions, inlinable),
         };
-        ty.doc.extend(&self.process_annotation(&annotation));
+        ty.doc.extend(&self.process_annotation(&annotation.iter().collect()));
 
         let doc = ty.doc.clone();
         let name = FullName::new(self.namespaces.target_namespace, name.0);
@@ -541,12 +529,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_local_complex_type(&mut self,
-            attrs: &'ast HashMap<FullName<'input>, &'input str>,
+            complex_type: &'ast inline_elements::LocalComplexType<'input>,
             attr_name: Option<&'ast NcName<'input>>,
-            model: &'ast xs::ComplexTypeModel<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
+        let inline_elements::LocalComplexType { ref attrs, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = complex_type;
         let name = attr_name;
         let mut abstract_ = false;
         let mut mixed = false;
@@ -571,14 +559,14 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
         //let struct_name = self.namespaces.new_type(QName::from(name));
-        let mut ty = match model {
+        let mut ty = match complex_type_model {
             xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
             xs::ComplexTypeModel::ComplexContent(ref model) =>
                 self.process_complex_content(model, false),
             xs::ComplexTypeModel::CompleteContentModel { ref open_content, ref type_def_particle, ref attr_decls, ref assertions } =>
                 self.process_complete_content_model(open_content, type_def_particle, attr_decls, assertions, inlinable),
         };
-        ty.doc.extend(&self.process_annotation(&annotation));
+        ty.doc.extend(&self.process_annotation(&vec_concat_opt(&annotation, annotation2.as_ref())));
 
         if let Some(name) = name {
             let doc = ty.doc.clone();
@@ -699,11 +687,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_simple_restriction(&mut self, 
-            attrs: &'ast HashMap<FullName<'input>, &'input str>,
-            attr_base: &'ast Option<QName<'input>>,
-            model: &'ast xs::SimpleRestrictionModel<'input>,
+            restriction: &'ast xs::Restriction<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, SimpleType<'input>> {
+        let xs::Restriction { ref attrs, ref attr_id, ref attr_base, annotation: ref annotation2, ref simple_restriction_model } = restriction;
         let base = attr_base;
         for (key, &value) in attrs.iter() {
             match key.as_tuple() {
@@ -713,7 +700,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         }
         let base = base.unwrap_or(QName(Some(SCHEMA_URI), "anySimpleType"));
         let base = FullName::new(base.0, base.1);
-        let xs::SimpleRestrictionModel { ref local_simple_type, ref choice_facet_any } = model;
+        let xs::SimpleRestrictionModel { ref local_simple_type, ref choice_facet_any } = simple_restriction_model;
         let facets = self.process_facets(choice_facet_any);
 
         match local_simple_type {
@@ -721,7 +708,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 RichType::new(
                     NameHint::new(base.as_tuple().1),
                     SimpleType::Restriction(base, facets),
-                    self.process_annotation(&annotation),
+                    self.process_annotation(&vec_concat_opt(&annotation, annotation2.as_ref())),
                     )
             },
             None => {
@@ -979,8 +966,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     ty.into_complex()
                 },
                 enums::Type::ComplexType(ref e) => {
-                    let inline_elements::LocalComplexType { ref attrs, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = **e;
-                    self.process_local_complex_type(attrs, Some(attr_name), complex_type_model, vec_concat_opt(&annotation, annotation2.as_ref()), false)
+                    self.process_local_complex_type(e, Some(attr_name), annotation, false)
                 },
             },
             (Some(t), None) => {
@@ -1066,30 +1052,27 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
             match (type_attr, &type_) {
                 (None, Some(ref c)) => {
-                    let t = match c {
+                    let mut t = match c {
                         enums::Type::SimpleType(ref e) => {
                             let mut ty = self.process_local_simple_type(e);
                             ty.doc.extend(&self.process_annotation(&annotation));
                             ty.into_complex()
                         },
                         enums::Type::ComplexType(ref e) => {
-                            let inline_elements::LocalComplexType { ref attrs, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = **e;
-                            self.process_local_complex_type(attrs, None, complex_type_model, annotation2.iter().collect(), false)
+                            self.process_local_complex_type(e, None, annotation, false)
                         },
                     };
                     let mut name_hint = NameHint::new(name);
                     name_hint.extend(&t.name_hint);
                     let struct_name = name_from_hint(&name_hint).unwrap();
-                    let mut doc = self.process_annotation(&annotation);
-                    doc.extend(&t.doc);
-                    let (elems, doc2) = self.inline_elements.entry((namespace, name, t.attrs, t.type_))
+                    let (elems, doc) = self.inline_elements.entry((namespace, name, t.attrs, t.type_))
                             .or_insert((HashSet::new(), Documentation::new()));
                     elems.insert(struct_name.clone());
-                    doc2.extend(&doc);
+                    t.doc.extend(doc);
                     RichType::new(
                         NameHint::new(name),
                         Type::Element(min_occurs, max_occurs, struct_name),
-                        doc,
+                        t.doc,
                         )
                 },
                 (Some(t), None) => {
