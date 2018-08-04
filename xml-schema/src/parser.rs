@@ -7,14 +7,14 @@ pub use std::collections::HashMap;
 pub use std::marker::PhantomData;
 
 pub mod unqualified {
-    //! 
+    //! None
 
     #[allow(unused_imports)]
     use super::*;
 }
 
 pub mod xs {
-    //! http://www.w3.org/2001/XMLSchema
+    //! Some("http://www.w3.org/2001/XMLSchema")
 
     #[allow(unused_imports)]
     use super::*;
@@ -1755,7 +1755,7 @@ pub mod xs {
 }
 
 pub mod hfp {
-    //! http://www.w3.org/2001/XMLSchema-hasFacetAndProperty
+    //! Some("http://www.w3.org/2001/XMLSchema-hasFacetAndProperty")
 
     #[allow(unused_imports)]
     use super::*;

@@ -34,7 +34,7 @@ fn escape_keyword(name: &str) -> String {
 #[derive(Debug)]
 pub struct ParserGenerator<'ast, 'input: 'ast> {
     processors: Vec<Processor<'ast, 'input>>,
-    module_names: HashMap<&'input str, String>, // URI -> module name
+    module_names: HashMap<Option<&'input str>, String>, // URI -> module name
     primitive_types: HashMap<&'static str, RichType<'input, Type<'input>>>,
     renames: HashMap<String, String>,
     self_gen: bool,
@@ -43,7 +43,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
 impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     pub fn new(processors: Vec<Processor<'ast, 'input>>, parse_context: &XsdParseContext<'input>, renames: HashMap<String, String>) -> ParserGenerator<'ast, 'input> {
         let mut module_names = HashMap::new();
-        module_names.insert("", "unqualified".to_string());
+        module_names.insert(None, "unqualified".to_string());
         let mut name_gen = NameGenerator::new();
 
         let mut primitive_types = HashMap::new();
@@ -51,9 +51,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             primitive_types.insert(*name, RichType::new(NameHint::new(name), Type::Simple(SimpleType::Primitive(name, type_name)), Documentation::new()));
         }
 
-        for (uri, ns) in parse_context.namespaces.iter() {
-            if Some(&ns.to_string()) != module_names.get(uri) {
-                module_names.insert(*uri, name_gen.gen_name(ns.to_string()));
+        for (&uri, ns) in parse_context.namespaces.iter() {
+            if Some(&ns.to_string()) != module_names.get(&Some(uri)) {
+                module_names.insert(Some(uri), name_gen.gen_name(ns.to_string()));
             }
         }
 
@@ -67,8 +67,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     }
 
     pub fn get_module_name(&self, qname: FullName<'input>) -> String {
-        let (prefix, _) = qname.as_tuple();
-        self.module_names.get(prefix).unwrap().clone()
+        self.module_names.get(&qname.namespace()).unwrap().clone()
     }
 
     pub fn gen_target_scope(&mut self) -> cg::Scope {
@@ -90,14 +89,14 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn create_modules(&mut self, scope: &mut cg::Scope) {
         let mut modules: Vec<_> = self.module_names.iter().collect();
         modules.sort();
-        for (uri, mod_name) in modules {
-            if !self.self_gen && uri == &SCHEMA_URI {
+        for (&uri, mod_name) in modules {
+            if !self.self_gen && uri == Some(SCHEMA_URI) {
                 scope.raw(&format!("#[allow(unused_imports)]\npub use xml_schema::parser::xs as {};", mod_name));
             }
             else {
                 let mut module = scope.new_module(mod_name);
                 module.vis("pub");
-                module.scope().raw(&format!("//! {}", uri));
+                module.scope().raw(&format!("//! {:?}", uri));
                 module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
             }
         }
@@ -248,32 +247,30 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
     fn get_simple_type_name(&self, ty: &SimpleType<'input>) -> Option<(String, String)> {
         let (type_mod_name, type_name) = match ty {
             SimpleType::Alias(name) => {
-                let (ref type_mod_name, ref type_name) = name.as_tuple();
                 if name.namespace() == Some(&SCHEMA_URI) {
                     for (prim_name, prim_type_name) in PRIMITIVE_TYPES {
-                        if prim_name == type_name {
+                        if *prim_name == name.local_name() {
                             return Some(("support".to_string(), prim_type_name.to_string()));
                         }
                     }
                 }
-                let type_mod_name = self.module_names.get(type_mod_name).expect(type_mod_name);
+                let type_mod_name = self.get_module_name(*name);
                 let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                let type_name = escape_keyword(&type_name.to_camel_case());
+                let type_name = escape_keyword(&name.local_name().to_camel_case());
                 (type_mod_name, type_name)
             },
             SimpleType::Restriction(name, _facets) => {
                 // TODO: deduplicate/factorize with Alias
-                let (ref type_mod_name, ref type_name) = name.as_tuple();
-                if type_mod_name == &SCHEMA_URI {
+                if name.namespace() == Some(&SCHEMA_URI) {
                     for (prim_name, prim_type_name) in PRIMITIVE_TYPES {
-                        if prim_name == type_name {
+                        if *prim_name == name.local_name() {
                             return Some(("support".to_string(), prim_type_name.to_string()));
                         }
                     }
                 }
-                let type_mod_name = self.module_names.get(type_mod_name).expect(type_mod_name);
+                let type_mod_name = self.get_module_name(*name);
                 let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                let type_name = escape_keyword(&type_name.to_camel_case());
+                let type_name = escape_keyword(&name.local_name().to_camel_case());
                 (type_mod_name, type_name)
             }
             SimpleType::Primitive(field_name, type_name) => {
@@ -299,14 +296,13 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         for proc in &self.processors {
             let mut types: Vec<_> = proc.simple_types.iter().collect();
             types.sort_by_key(|&(n,_)| n);
-            for (ref name, (ref ty, ref doc)) in types {
-                let (mod_name, name) = name.as_tuple();
-                let name = escape_keyword(&name.to_camel_case());
+            for (&qname, (ref ty, ref doc)) in types {
+                let name = escape_keyword(&qname.local_name().to_camel_case());
                 let name = name_gen.gen_name(name);
                 if let Some((type_mod_name, type_name)) = self.get_simple_type_name(&ty.type_) {
                     match ty.type_ {
                         SimpleType::Restriction(_name, ref facets) => {
-                            let scope = scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
+                            let scope = scope.get_module_mut(&self.get_module_name(qname))
                                 .unwrap().scope();
                             scope.raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}::{}<'input>);", name, type_mod_name, type_name));
                             let mut s = Vec::new();
@@ -336,7 +332,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                             scope.raw(&format!("impl_simpletype_restriction!({}, Facets {{\n    {}\n}});", name, s.join("\n    ")));
                         }
                         _ => {
-                            scope.get_module_mut(self.module_names.get(mod_name).expect(mod_name))
+                            scope.get_module_mut(&self.get_module_name(qname))
                                 .unwrap().scope()
                                 .raw(&format!("pub type {}<'input> = {}::{}<'input>;", name, type_mod_name, type_name));
                         }
@@ -371,7 +367,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             for (&name, group) in groups {
                 let mod_name = self.get_module_name(name);
                 let mut module = scope.get_module_mut(&mod_name).unwrap();
-                let (mod_name, struct_name) = name.as_tuple();
+                let struct_name = name.local_name();
                 if let Type::InlineChoice(ref items) = group.type_ {
                     self.gen_choice(module.scope(), &struct_name.to_string().to_camel_case(), items, &group.doc);
                 }
@@ -503,11 +499,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         let mut name_gen = NameGenerator::new();
         {
             let enum_ = scope.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-            for substitution in substitutions {
-                let (prefix, local) = substitution.as_tuple();
-                let variant_name = escape_keyword(&name_gen.gen_name(local.to_camel_case()));
-                let type_mod_name = escape_keyword(&self.module_names.get(prefix).expect(prefix).to_snake_case());
-                let type_name = escape_keyword(&local.to_camel_case());
+            for &substitution in substitutions {
+                let variant_name = escape_keyword(&name_gen.gen_name(substitution.local_name().to_camel_case()));
+                let type_mod_name = escape_keyword(&self.get_module_name(substitution).to_snake_case());
+                let type_name = escape_keyword(&substitution.local_name().to_camel_case());
                 let mut variant = enum_.new_variant(&variant_name);
                 variant.tuple(&format!("Box<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
                 impl_code.push(format!("    impl_singleton_variant!({}, {}, Box<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
@@ -651,10 +646,9 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
             Type::Group(min_occurs, max_occurs, name) |
             Type::ElementRef(min_occurs, max_occurs, name) => {
-                let (mod_name, type_name) = name.as_tuple();
-                let field_name = type_name;
-                let mod_name = self.module_names.get(mod_name).expect(mod_name);
-                field_writer(field_name.to_string(), mod_name.to_string(), *min_occurs, *max_occurs, type_name.to_string());
+                let field_name = name.local_name();
+                let mod_name = self.get_module_name(*name);
+                field_writer(field_name.to_string(), mod_name.to_string(), *min_occurs, *max_occurs, name.local_name().to_string());
             },
             Type::Choice(min_occurs, max_occurs, ref name) => {
                 field_writer(name.to_string(), "enums".to_string(), *min_occurs, *max_occurs, name.to_string());

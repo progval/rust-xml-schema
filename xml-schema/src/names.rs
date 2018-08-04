@@ -33,47 +33,6 @@ impl NameGenerator {
     }
 }
 
-/*
-macro_rules! str_alias {
-    ($name:ident) => {
-        #[derive(Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-        pub struct $name<'input>(&'input str);
-        impl<'input> $name<'input> {
-            pub fn new(s: &'input str) -> $name<'input> {
-                $name(s)
-            }
-            pub fn as_str(&self) -> &'input str {
-                self.0
-            }
-        }
-    }
-}
-*/
-
-#[derive(Debug)]
-pub struct Namespaces<'input> {
-    pub target_namespace: Option<&'input str>,
-    pub namespaces: HashMap<&'input str, &'input str>, // namespace -> URI
-}
-
-impl<'input> Namespaces<'input> {
-    pub fn new(mut namespaces: HashMap<&'input str, &'input str>, target_namespace: Option<&'input str>) -> Namespaces<'input> {
-        if let Some(uri) = namespaces.insert("xml", "xml") {
-            panic!("Cannot have a namespace named \"xml\": {}", uri);
-        }
-        if let Some(uri) = namespaces.insert("xmlns", "xmlns") {
-            panic!("Cannot have a namespace named \"xmlns\": {}", uri);
-        }
-        Namespaces {
-            target_namespace,
-            namespaces,
-        }
-    }
-
-    pub fn modules(&self) -> impl Iterator<Item=(&&'input str, &&'input str)> {
-        self.namespaces.iter()
-    }
-}
 pub fn name_from_hint<'input>(hint: &NameHint<'input>) -> Option<String> {
     if hint.tokens.len() > 0 {
         Some(hint.tokens.iter().map(|&s| escape_keyword(s)).collect::<Vec<_>>().join("_"))
