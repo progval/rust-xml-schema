@@ -98,29 +98,40 @@ impl<'input> Iterator for InnerStream<'input> {
 
 
 #[derive(Clone)]
-pub struct ParseContext<'input> {
+pub struct ParentContext<'input> {
     pub namespaces: HashMap<&'input str, &'input str>,
 }
-impl<'input> Default for ParseContext<'input> {
-    fn default() -> ParseContext<'input> {
+impl<'input> Default for ParentContext<'input> {
+    fn default() -> ParentContext<'input> {
         let mut namespaces = HashMap::new();
         namespaces.insert("xmlns", "xmlns");
         namespaces.insert("xml", "xml");
-        ParseContext { namespaces }
+        ParentContext { namespaces }
     }
+}
+pub trait ParseContext<'input> {
+    fn on_xmlns(&mut self, _name: Option<&'input str>, _uri: &'input str) {
+    }
+}
+#[derive(Default)]
+pub struct DefaultParseContext<'input> {
+    _phantom: PhantomData<&'input str>,
+}
+
+impl<'input> ParseContext<'input> for DefaultParseContext<'input> {
 }
 
 pub trait ParseXml<'input>: Sized {
     const NODE_NAME: &'static str;
 
-    fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self>;
+    fn parse_self_xml<TParseContext: ParseContext<'input>>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &ParentContext<'input>) -> Option<Self>;
 
 
-    fn parse_empty<TParentContext>(_parse_context: &mut ParseContext<'input>, _parent_context: &TParentContext) -> Option<Self> {
+    fn parse_empty<TParseContext: ParseContext<'input>>(_parse_context: &mut TParseContext, _parent_context: &ParentContext<'input>) -> Option<Self> {
         None
     }
 
-    fn parse_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self> {
+    fn parse_xml<TParseContext: ParseContext<'input>>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &ParentContext<'input>) -> Option<Self> {
         //println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml(stream, parse_context, parent_context);
         /*
@@ -135,9 +146,9 @@ pub trait ParseXml<'input>: Sized {
 pub trait ParseXmlStr<'input>: Sized {
     const NODE_NAME: &'static str;
 
-    fn parse_self_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)>;
+    fn parse_self_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, parse_context: &mut TParseContext, parent_context: &ParentContext<'input>, facets: &Facets<'a>) -> Option<(&'input str, Self)>;
 
-    fn parse_xml_str<'a, TParentContext>(input: &'input str, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
+    fn parse_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, parse_context: &mut TParseContext, parent_context: &ParentContext<'input>, facets: &Facets<'a>) -> Option<(&'input str, Self)> {
         //println!("// Entering: {:?}", Self::NODE_NAME);
         let ret = Self::parse_self_xml_str(input, parse_context, parent_context, facets);
         /*
@@ -151,7 +162,7 @@ pub trait ParseXmlStr<'input>: Sized {
 
 impl<'input, T> ParseXml<'input> for T where T: ParseXmlStr<'input> {
     const NODE_NAME: &'static str = Self::NODE_NAME;
-    fn parse_self_xml<TParentContext>(stream: &mut Stream<'input>, parse_context: &mut ParseContext<'input>, parent_context: &TParentContext) -> Option<Self> {
+    fn parse_self_xml<'b, TParseContext: ParseContext<'input>>(stream: &mut Stream<'input>, parse_context: &mut TParseContext, parent_context: &'b ParentContext<'input>) -> Option<Self> {
         match stream.next() {
             Some(XmlToken::Text(strspan)) => {
                 match Self::parse_self_xml_str(strspan.to_str(), parse_context, parent_context, &Facets::default()) {

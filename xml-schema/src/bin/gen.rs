@@ -8,7 +8,7 @@ extern crate xml_schema;
 extern crate codegen;
 use xml_schema::processor::*;
 use xml_schema::parser_generator::*;
-use xml_schema::parse_xsd;
+use xml_schema::parse_xsd_with_visitor;
 
 const RENAMES: &[(&'static str, &'static str)] = &[
     ("SequenceDefaultOpenContentAnnotation", "AnnotatedOpenContent"),
@@ -37,9 +37,11 @@ fn main() {
     
     let inputs2 = inputs.iter().map(|(arg, s)| (arg, &s[..]));
 
+    let mut parse_context = XsdParseContext::default();
+
     let mut documents = Vec::new();
     for (filename, input) in inputs2 {
-        documents.push((filename, parse_xsd(input)));
+        documents.push((filename, parse_xsd_with_visitor(input, &mut parse_context).unwrap()));
     }
 
     let mut processors = Vec::new();
@@ -55,7 +57,7 @@ fn main() {
         renames.insert(from_.to_string(), to_.to_string());
     }
 
-    let mut gen = ParserGenerator::new(processors, renames);
+    let mut gen = ParserGenerator::new(processors, &parse_context, renames);
     let scope = gen.gen_target_scope();
     println!("#[allow(unused_imports)]\nuse support;\n{}", scope.to_string());
 }

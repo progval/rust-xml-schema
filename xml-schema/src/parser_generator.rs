@@ -3,10 +3,23 @@ use std::collections::{HashMap, HashSet};
 use codegen as cg;
 use heck::{SnakeCase, CamelCase};
 
-//use support::*;
+use support::ParseContext;
 use primitives::PRIMITIVE_TYPES;
 use processor::*;
 use names::*;
+
+#[derive(Default)]
+pub struct XsdParseContext<'input> {
+    namespaces: HashMap<&'input str, &'input str>,
+}
+impl<'input> ParseContext<'input> for XsdParseContext<'input> {
+    fn on_xmlns(&mut self, name: Option<&'input str>, uri: &'input str) {
+        match name {
+            None => (),
+            Some(ns) => { self.namespaces.insert(uri, ns); },
+        }
+    }
+}
 
 const KEYWORDS: &[&'static str] = &["override"];
 fn escape_keyword(name: &str) -> String {
@@ -28,7 +41,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
 }
 
 impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
-    pub fn new(processors: Vec<Processor<'ast, 'input>>, renames: HashMap<String, String>) -> ParserGenerator<'ast, 'input> {
+    pub fn new(processors: Vec<Processor<'ast, 'input>>, parse_context: &XsdParseContext<'input>, renames: HashMap<String, String>) -> ParserGenerator<'ast, 'input> {
         let mut module_names = HashMap::new();
         module_names.insert("", "unqualified".to_string());
         let mut name_gen = NameGenerator::new();
@@ -38,15 +51,15 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             primitive_types.insert(*name, RichType::new(NameHint::new(name), Type::Simple(SimpleType::Primitive(name, type_name)), Documentation::new()));
         }
 
-        let mut self_gen = false;
-
-        for proc in &processors {
-            for (ns, uri) in proc.namespaces.namespaces.iter() {
-                if Some(&ns.to_string()) != module_names.get(uri) {
-                    module_names.insert(*uri, name_gen.gen_name(ns.to_string()));
-                }
+        for (uri, ns) in parse_context.namespaces.iter() {
+            if Some(&ns.to_string()) != module_names.get(uri) {
+                module_names.insert(*uri, name_gen.gen_name(ns.to_string()));
             }
-            if proc.namespaces.target_namespace == Some(&SCHEMA_URI) {
+        }
+
+        let mut self_gen = false;
+        for proc in &processors {
+            if proc.target_namespace == Some(&SCHEMA_URI) {
                 self_gen = true;
             }
         }
@@ -593,7 +606,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
         let mut type_ = None;
         for proc in &self.processors {
-            if proc.namespaces.target_namespace != name.namespace() {
+            if proc.target_namespace != name.namespace() {
                 continue;
             }
             type_ = proc.types.get(name);

@@ -1761,20 +1761,6 @@ pub mod hfp {
     use super::*;
 }
 
-pub mod xml {
-    //! xml
-
-    #[allow(unused_imports)]
-    use super::*;
-}
-
-pub mod xmlns {
-    //! xmlns
-
-    #[allow(unused_imports)]
-    use super::*;
-}
-
 pub mod enums {
     #[allow(unused_imports)]
     use super::*;

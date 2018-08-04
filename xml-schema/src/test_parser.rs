@@ -19,8 +19,6 @@ const PERSON_XSD: &'static str = r#"
 
 #[test]
 fn generated_parses_person_xsd() {
-    let tokenizer = xmlparser::Tokenizer::from(PERSON_XSD);
-    let mut stream = Box::new(InnerStream::new(tokenizer));
-    let doc = xs::Schema::parse_xml(&mut stream, &mut Default::default(), &());
+    let (doc, _) = parse_xsd(PERSON_XSD);
     assert_ne!(doc, None);
 }

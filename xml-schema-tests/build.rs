@@ -30,13 +30,14 @@ fn main() {
         in_file
             .read_to_string(&mut in_xml)
             .expect(&format!("Could not read {:?}", in_path));
-        let document = parse_xsd(&in_xml);
+        let (document, parse_context) = parse_xsd(&in_xml);
+        let document = document.expect(&format!("Could not parse {:?}", in_path));
 
         let mut proc = Processor::new(&document);
         proc.process_ast(&document);
 
         let renames = Default::default();
-        let mut gen = ParserGenerator::new(vec![proc], renames);
+        let mut gen = ParserGenerator::new(vec![proc], &parse_context, renames);
         let scope = gen.gen_target_scope();
 
         let filename = in_path.file_name().unwrap();

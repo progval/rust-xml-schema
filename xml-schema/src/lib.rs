@@ -22,14 +22,20 @@ mod test_parser;
 #[cfg(test)]
 mod test_parser_schema;
 
-use support::{ParseXml, InnerStream, ParseContext};
+use support::{ParseXml, InnerStream, ParseContext, ParentContext};
 
 pub use processor::Processor;
-pub use parser_generator::ParserGenerator;
+pub use parser_generator::{XsdParseContext, ParserGenerator};
 
-pub fn parse_xsd(xsd: &str) -> parser::xs::Schema {
+pub fn parse_xsd<'input>(xsd: &'input str) -> (Option<parser::xs::Schema<'input>>, XsdParseContext) {
+    let mut visitor = XsdParseContext::default();
+    let ast = parse_xsd_with_visitor(xsd, &mut visitor);
+    (ast, visitor)
+}
+
+pub fn parse_xsd_with_visitor<'input, TParseContext: ParseContext<'input>>(xsd: &'input str, visitor: &mut TParseContext) -> Option<parser::xs::Schema<'input>> {
     let tokenizer = xmlparser::Tokenizer::from(xsd);
     let mut stream = Box::new(InnerStream::new(tokenizer));
-    parser::xs::Schema::parse_xml(&mut stream, &mut ParseContext::default(), &()).unwrap()
+    parser::xs::Schema::parse_xml(&mut stream, visitor, &ParentContext::default())
 }
 

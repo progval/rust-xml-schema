@@ -1,7 +1,7 @@
 extern crate xml_schema;
 extern crate xml_schema_tests;
 
-use xml_schema::support::{ParseXml, InnerStream, Tokenizer};
+use xml_schema::support::{ParseXml, DefaultParseContext, InnerStream, Tokenizer};
 use xml_schema_tests::po;
 
 const EXAMPLE: &'static str = r#"
@@ -43,7 +43,7 @@ const EXAMPLE: &'static str = r#"
 fn test_example() {
     let tokenizer = Tokenizer::from(EXAMPLE);
     let mut stream = Box::new(InnerStream::new(tokenizer));
-    let order = po::unqualified::PurchaseOrder::parse_xml(&mut stream, &mut Default::default(), &());
+    let order = po::unqualified::PurchaseOrder::parse_xml(&mut stream, &mut DefaultParseContext::default(), &Default::default());
     let order = order.unwrap();
     assert_eq!(order.attr_order_date.unwrap().0, "1999-10-20");
 }
