@@ -331,7 +331,19 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 if self.simple_restrictions.get(&(*base_name, facets.clone())).is_some() {
                     continue;
                 }
-                let name = name_gen.gen_name(format!("Restrict_{}", base_name.local_name()).to_camel_case());
+                let name = match &facets.enumeration {
+                    Some(items) => {
+                        if items.len() == 1 {
+                            format!("{}", items[0])
+                        }
+                        else {
+                            format!("enumeration_{}", items.join("_"))
+                        }
+                    },
+                    None => format!("Restrict_{}", base_name.local_name()),
+                };
+                let name = name.to_camel_case();
+                let name = name_gen.gen_name(name.clone());
                 self.simple_restrictions.insert((base_name.clone(), facets.clone()), name.clone());
                 let (base_mod_name, base_type_name) = self.get_simple_type_name(&SimpleType::Alias(*base_name)).unwrap(); // TODO
                 module.scope().raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}::{}<'input>);", name, base_mod_name, base_type_name));

@@ -73,11 +73,11 @@ pub mod xs {
 
     pub type BlockSet<'input> = unions::UnionTokenDerivationControlList<'input>;
 
-    pub type DerivationControl<'input> = restrictions::RestrictNmtoken8<'input>;
+    pub type DerivationControl<'input> = restrictions::EnumerationSubstitutionExtensionRestrictionListUnion<'input>;
 
     pub type DerivationSet<'input> = unions::UnionTokenReducedDerivationControlList<'input>;
 
-    pub type FormChoice<'input> = restrictions::RestrictNmtoken6<'input>;
+    pub type FormChoice<'input> = restrictions::EnumerationQualifiedUnqualified<'input>;
 
     pub type FullDerivationSet<'input> = unions::UnionTokenTypeDerivationControlList<'input>;
 
@@ -89,13 +89,13 @@ pub mod xs {
 
     pub type QnameListA<'input> = lists::UnionQNameTokenList<'input>;
 
-    pub type ReducedDerivationControl<'input> = restrictions::RestrictDerivationControl<'input>;
+    pub type ReducedDerivationControl<'input> = restrictions::EnumerationExtensionRestriction<'input>;
 
     pub type SimpleDerivationSet<'input> = unions::UnionTokenDerivationControlList<'input>;
 
-    pub type SpecialNamespaceList<'input> = restrictions::RestrictToken5<'input>;
+    pub type SpecialNamespaceList<'input> = restrictions::EnumerationAnyOther<'input>;
 
-    pub type TypeDerivationControl<'input> = restrictions::RestrictDerivationControl2<'input>;
+    pub type TypeDerivationControl<'input> = restrictions::EnumerationExtensionRestrictionListUnion<'input>;
 
     pub type XpathDefaultNamespace<'input> = unions::UnionAnyUriToken<'input>;
 
@@ -103,8 +103,8 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct All<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
-        pub attr_min_occurs: Option<restrictions::RestrictNonNegativeInteger3<'input>>,
-        pub attr_max_occurs: Option<restrictions::RestrictAllNni<'input>>,
+        pub attr_min_occurs: Option<restrictions::Enumeration012<'input>>,
+        pub attr_max_occurs: Option<restrictions::Enumeration01<'input>>,
         pub all_model: super::xs::AllModel<'input>,
     }
 
@@ -137,7 +137,7 @@ pub mod xs {
         pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
         pub attr_not_namespace: Option<restrictions::RestrictBasicNamespaceList<'input>>,
-        pub attr_process_contents: Option<restrictions::RestrictNmtoken7<'input>>,
+        pub attr_process_contents: Option<restrictions::EnumerationSkipLaxStrict<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -161,7 +161,7 @@ pub mod xs {
         pub attr_not_q_name: Option<xs::QnameListA<'input>>,
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
         pub attr_not_namespace: Option<restrictions::RestrictBasicNamespaceList<'input>>,
-        pub attr_process_contents: Option<restrictions::RestrictNmtoken7<'input>>,
+        pub attr_process_contents: Option<restrictions::EnumerationSkipLaxStrict<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -309,7 +309,7 @@ pub mod xs {
     pub struct DefaultOpenContent<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_applies_to_empty: Option<support::Boolean<'input>>,
-        pub attr_mode: Option<restrictions::RestrictNmtoken<'input>>,
+        pub attr_mode: Option<restrictions::EnumerationInterleaveSuffix<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub any_wildcard: super::inline_elements::AnyWildcard<'input>,
@@ -388,7 +388,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct ExplicitTimezone<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
-        pub attr_value: restrictions::RestrictNmtoken3<'input>,
+        pub attr_value: restrictions::EnumerationOptionalRequiredProhibited<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -728,7 +728,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct OpenContent<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
-        pub attr_mode: Option<restrictions::RestrictNmtoken2<'input>>,
+        pub attr_mode: Option<restrictions::EnumerationNoneInterleaveSuffix<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub any_wildcard: Option<super::inline_elements::AnyWildcard<'input>>,
@@ -961,7 +961,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct WhiteSpace<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
-        pub attr_value: restrictions::RestrictNmtoken4<'input>,
+        pub attr_value: restrictions::EnumerationPreserveReplaceCollapse<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -1774,9 +1774,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken<'input>(pub xs::Nmtoken<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationInterleaveSuffix<'input>(pub xs::Nmtoken<'input>);
 
-    impl_simpletype_restriction!(RestrictNmtoken, Facets {
+    impl_simpletype_restriction!(EnumerationInterleaveSuffix, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -1793,9 +1793,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken2<'input>(pub xs::Nmtoken<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationNoneInterleaveSuffix<'input>(pub xs::Nmtoken<'input>);
 
-    impl_simpletype_restriction!(RestrictNmtoken2, Facets {
+    impl_simpletype_restriction!(EnumerationNoneInterleaveSuffix, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -1812,9 +1812,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken3<'input>(pub xs::Nmtoken<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationOptionalRequiredProhibited<'input>(pub xs::Nmtoken<'input>);
 
-    impl_simpletype_restriction!(RestrictNmtoken3, Facets {
+    impl_simpletype_restriction!(EnumerationOptionalRequiredProhibited, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -1831,9 +1831,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken4<'input>(pub xs::Nmtoken<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationPreserveReplaceCollapse<'input>(pub xs::Nmtoken<'input>);
 
-    impl_simpletype_restriction!(RestrictNmtoken4, Facets {
+    impl_simpletype_restriction!(EnumerationPreserveReplaceCollapse, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -1850,9 +1850,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken5<'input>(pub xs::Nmtoken<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationProhibitedOptionalRequired<'input>(pub xs::Nmtoken<'input>);
 
-    impl_simpletype_restriction!(RestrictNmtoken5, Facets {
+    impl_simpletype_restriction!(EnumerationProhibitedOptionalRequired, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -1869,9 +1869,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken6<'input>(pub xs::Nmtoken<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationQualifiedUnqualified<'input>(pub xs::Nmtoken<'input>);
 
-    impl_simpletype_restriction!(RestrictNmtoken6, Facets {
+    impl_simpletype_restriction!(EnumerationQualifiedUnqualified, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -1888,9 +1888,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken7<'input>(pub xs::Nmtoken<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationSkipLaxStrict<'input>(pub xs::Nmtoken<'input>);
 
-    impl_simpletype_restriction!(RestrictNmtoken7, Facets {
+    impl_simpletype_restriction!(EnumerationSkipLaxStrict, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -1907,9 +1907,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken8<'input>(pub xs::Nmtoken<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationSubstitutionExtensionRestrictionListUnion<'input>(pub xs::Nmtoken<'input>);
 
-    impl_simpletype_restriction!(RestrictNmtoken8, Facets {
+    impl_simpletype_restriction!(EnumerationSubstitutionExtensionRestrictionListUnion, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -1926,9 +1926,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken9<'input>(pub xs::Nmtoken<'input>);
+    #[derive(Debug, PartialEq)] pub struct Unbounded<'input>(pub xs::Nmtoken<'input>);
 
-    impl_simpletype_restriction!(RestrictNmtoken9, Facets {
+    impl_simpletype_restriction!(Unbounded, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -1945,9 +1945,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictAllNni<'input>(pub xs::AllNni<'input>);
+    #[derive(Debug, PartialEq)] pub struct Enumeration01<'input>(pub xs::AllNni<'input>);
 
-    impl_simpletype_restriction!(RestrictAllNni, Facets {
+    impl_simpletype_restriction!(Enumeration01, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -1983,9 +1983,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictDerivationControl<'input>(pub xs::DerivationControl<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationExtensionRestriction<'input>(pub xs::DerivationControl<'input>);
 
-    impl_simpletype_restriction!(RestrictDerivationControl, Facets {
+    impl_simpletype_restriction!(EnumerationExtensionRestriction, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2002,9 +2002,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictDerivationControl2<'input>(pub xs::DerivationControl<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationExtensionRestrictionListUnion<'input>(pub xs::DerivationControl<'input>);
 
-    impl_simpletype_restriction!(RestrictDerivationControl2, Facets {
+    impl_simpletype_restriction!(EnumerationExtensionRestrictionListUnion, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2021,9 +2021,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictDerivationControl3<'input>(pub xs::DerivationControl<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationExtensionRestrictionSubstitution<'input>(pub xs::DerivationControl<'input>);
 
-    impl_simpletype_restriction!(RestrictDerivationControl3, Facets {
+    impl_simpletype_restriction!(EnumerationExtensionRestrictionSubstitution, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2040,9 +2040,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictDerivationControl4<'input>(pub xs::DerivationControl<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationListUnionRestrictionExtension<'input>(pub xs::DerivationControl<'input>);
 
-    impl_simpletype_restriction!(RestrictDerivationControl4, Facets {
+    impl_simpletype_restriction!(EnumerationListUnionRestrictionExtension, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2059,9 +2059,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictNonNegativeInteger3<'input>(pub support::NonNegativeInteger<'input>);
+    #[derive(Debug, PartialEq)] pub struct Enumeration012<'input>(pub support::NonNegativeInteger<'input>);
 
-    impl_simpletype_restriction!(RestrictNonNegativeInteger3, Facets {
+    impl_simpletype_restriction!(Enumeration012, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2097,9 +2097,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictToken5<'input>(pub support::Token<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationAnyOther<'input>(pub support::Token<'input>);
 
-    impl_simpletype_restriction!(RestrictToken5, Facets {
+    impl_simpletype_restriction!(EnumerationAnyOther, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2116,9 +2116,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictToken6<'input>(pub support::Token<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationDefaultNamespaceTargetNamespaceLocal<'input>(pub support::Token<'input>);
 
-    impl_simpletype_restriction!(RestrictToken6, Facets {
+    impl_simpletype_restriction!(EnumerationDefaultNamespaceTargetNamespaceLocal, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2135,9 +2135,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictToken7<'input>(pub support::Token<'input>);
+    #[derive(Debug, PartialEq)] pub struct Defined<'input>(pub support::Token<'input>);
 
-    impl_simpletype_restriction!(RestrictToken7, Facets {
+    impl_simpletype_restriction!(Defined, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2154,9 +2154,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictToken8<'input>(pub support::Token<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationDefinedDefinedSibling<'input>(pub support::Token<'input>);
 
-    impl_simpletype_restriction!(RestrictToken8, Facets {
+    impl_simpletype_restriction!(EnumerationDefinedDefinedSibling, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2173,9 +2173,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictToken9<'input>(pub support::Token<'input>);
+    #[derive(Debug, PartialEq)] pub struct EnumerationTargetNamespaceLocal<'input>(pub support::Token<'input>);
 
-    impl_simpletype_restriction!(RestrictToken9, Facets {
+    impl_simpletype_restriction!(EnumerationTargetNamespaceLocal, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2192,9 +2192,9 @@ pub mod restrictions {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct RestrictToken10<'input>(pub support::Token<'input>);
+    #[derive(Debug, PartialEq)] pub struct All<'input>(pub support::Token<'input>);
 
-    impl_simpletype_restriction!(RestrictToken10, Facets {
+    impl_simpletype_restriction!(All, Facets {
         min_exclusive: None,
         min_inclusive: None,
         max_exclusive: None,
@@ -2222,14 +2222,14 @@ pub mod lists {
     impl_list!(QNameList, support::QName);
 
     #[derive(Debug, PartialEq)]
-    pub struct DerivationControlList<'input>(pub Vec<restrictions::RestrictDerivationControl3<'input>>);
+    pub struct DerivationControlList<'input>(pub Vec<restrictions::EnumerationExtensionRestrictionSubstitution<'input>>);
 
-    impl_list!(DerivationControlList, restrictions::RestrictDerivationControl3);
+    impl_list!(DerivationControlList, restrictions::EnumerationExtensionRestrictionSubstitution);
 
     #[derive(Debug, PartialEq)]
-    pub struct DerivationControlList2<'input>(pub Vec<restrictions::RestrictDerivationControl4<'input>>);
+    pub struct DerivationControlList2<'input>(pub Vec<restrictions::EnumerationListUnionRestrictionExtension<'input>>);
 
-    impl_list!(DerivationControlList2, restrictions::RestrictDerivationControl4);
+    impl_list!(DerivationControlList2, restrictions::EnumerationListUnionRestrictionExtension);
 
     #[derive(Debug, PartialEq)]
     pub struct ReducedDerivationControlList<'input>(pub Vec<xs::ReducedDerivationControl<'input>>);
@@ -2259,7 +2259,7 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionQNameToken<'input> {
         QName(support::QName<'input>),
-        Token(restrictions::RestrictToken7<'input>),
+        Token(restrictions::Defined<'input>),
     }
 
     impl_union!(UnionQNameToken, {
@@ -2270,7 +2270,7 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionQNameToken2<'input> {
         QName(support::QName<'input>),
-        Token(restrictions::RestrictToken8<'input>),
+        Token(restrictions::EnumerationDefinedDefinedSibling<'input>),
     }
 
     impl_union!(UnionQNameToken2, {
@@ -2281,7 +2281,7 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionAnyUriToken<'input> {
         AnyUri(support::AnyUri<'input>),
-        Token(restrictions::RestrictToken6<'input>),
+        Token(restrictions::EnumerationDefaultNamespaceTargetNamespaceLocal<'input>),
     }
 
     impl_union!(UnionAnyUriToken, {
@@ -2292,7 +2292,7 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionAnyUriToken2<'input> {
         AnyUri(support::AnyUri<'input>),
-        Token(restrictions::RestrictToken9<'input>),
+        Token(restrictions::EnumerationTargetNamespaceLocal<'input>),
     }
 
     impl_union!(UnionAnyUriToken2, {
@@ -2303,7 +2303,7 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionNonNegativeIntegerNmtoken<'input> {
         NonNegativeInteger(support::NonNegativeInteger<'input>),
-        Nmtoken(restrictions::RestrictNmtoken9<'input>),
+        Nmtoken(restrictions::Unbounded<'input>),
     }
 
     impl_union!(UnionNonNegativeIntegerNmtoken, {
@@ -2324,7 +2324,7 @@ pub mod unions {
 
     #[derive(Debug, PartialEq)]
     pub enum UnionTokenDerivationControlList<'input> {
-        Token(restrictions::RestrictToken10<'input>),
+        Token(restrictions::All<'input>),
         DerivationControlList(lists::DerivationControlList<'input>),
     }
 
@@ -2335,7 +2335,7 @@ pub mod unions {
 
     #[derive(Debug, PartialEq)]
     pub enum UnionTokenReducedDerivationControlList<'input> {
-        Token(restrictions::RestrictToken10<'input>),
+        Token(restrictions::All<'input>),
         ReducedDerivationControlList(lists::ReducedDerivationControlList<'input>),
     }
 
@@ -2346,7 +2346,7 @@ pub mod unions {
 
     #[derive(Debug, PartialEq)]
     pub enum UnionTokenTypeDerivationControlList<'input> {
-        Token(restrictions::RestrictToken10<'input>),
+        Token(restrictions::All<'input>),
         TypeDerivationControlList(lists::TypeDerivationControlList<'input>),
     }
 
@@ -2458,7 +2458,7 @@ pub mod inline_elements {
         pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
         pub attr_not_namespace: Option<restrictions::RestrictBasicNamespaceList<'input>>,
-        pub attr_process_contents: Option<restrictions::RestrictNmtoken7<'input>>,
+        pub attr_process_contents: Option<restrictions::EnumerationSkipLaxStrict<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -2494,7 +2494,7 @@ pub mod inline_elements {
     pub struct Attribute<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_type: Option<support::QName<'input>>,
-        pub attr_use: Option<restrictions::RestrictNmtoken5<'input>>,
+        pub attr_use: Option<restrictions::EnumerationProhibitedOptionalRequired<'input>>,
         pub attr_default: Option<support::XmlString<'input>>,
         pub attr_fixed: Option<support::XmlString<'input>>,
         pub attr_form: Option<xs::FormChoice<'input>>,
