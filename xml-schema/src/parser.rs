@@ -114,25 +114,6 @@ pub mod xs {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct NcName<'input>(pub xs::Name<'input>);
-
-    impl_simpletype_restriction!(NcName, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: Some("[\\i-[:]][\\c-[:]]*"),
-        assertion: None,
-        explicit_timezone: None,
-    });
-
     #[derive(Debug, PartialEq)] pub struct Nmtoken<'input>(pub support::Token<'input>);
 
     impl_simpletype_restriction!(Nmtoken, Facets {
@@ -342,25 +323,6 @@ pub mod xs {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct NonNegativeInteger<'input>(pub xs::Integer<'input>);
-
-    impl_simpletype_restriction!(NonNegativeInteger, Facets {
-        min_exclusive: None,
-        min_inclusive: Some(BigFloatNotNaN::from_str("0").unwrap()),
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
     #[derive(Debug, PartialEq)] pub struct NonPositiveInteger<'input>(pub xs::Integer<'input>);
 
     impl_simpletype_restriction!(NonPositiveInteger, Facets {
@@ -399,25 +361,6 @@ pub mod xs {
         explicit_timezone: None,
     });
 
-    #[derive(Debug, PartialEq)] pub struct PositiveInteger<'input>(pub support::NonNegativeInteger<'input>);
-
-    impl_simpletype_restriction!(PositiveInteger, Facets {
-        min_exclusive: None,
-        min_inclusive: Some(BigFloatNotNaN::from_str("1").unwrap()),
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
     #[derive(Debug, PartialEq)] pub struct Short<'input>(pub xs::Int<'input>);
 
     impl_simpletype_restriction!(Short, Facets {
@@ -432,25 +375,6 @@ pub mod xs {
         max_length: None,
         enumeration: None,
         white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct Token<'input>(pub xs::NormalizedString<'input>);
-
-    impl_simpletype_restriction!(Token, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: Some("collapse"),
         pattern: None,
         assertion: None,
         explicit_timezone: None,
