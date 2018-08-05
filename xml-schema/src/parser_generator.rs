@@ -577,12 +577,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 AttrUse::Prohibited => (),
             }
         }
-        //impl_code.push(format!("//// {:?}", attrs));
         for group_name in &attrs.group_refs {
             let mut found = false;
             for processor in self.processors.iter() {
                 if let Some(attrs) = processor.attribute_groups.get(group_name) {
-                    //impl_code.push(format!("// {:?}", attrs));
                     self.gen_attrs(struct_, impl_code, name_gen, attrs, seen_attrs, generated_attrs, false);
                     found = true;
                     break;
