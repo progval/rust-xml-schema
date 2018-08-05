@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use codegen as cg;
 use heck::{SnakeCase, CamelCase};
 
-use support::ParseContext;
+use support::{ParseContext, Facets};
 use primitives::PRIMITIVE_TYPES;
 use processor::*;
 use names::*;
@@ -36,6 +36,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     processors: Vec<Processor<'ast, 'input>>,
     module_names: HashMap<Option<&'input str>, String>, // URI -> module name
     primitive_types: HashMap<&'static str, RichType<'input, Type<'input>>>,
+    simple_restrictions: HashMap<(FullName<'input>, Facets<'input>), String>,
     renames: HashMap<String, String>,
     self_gen: bool,
 }
@@ -63,7 +64,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 self_gen = true;
             }
         }
-        ParserGenerator { processors, renames, module_names, primitive_types, self_gen, }
+        ParserGenerator {
+            processors, renames, module_names, primitive_types, self_gen,
+            simple_restrictions: HashMap::new(),
+        }
     }
 
     pub fn get_module_name(&self, qname: FullName<'input>) -> String {
@@ -267,19 +271,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 (type_mod_name, type_name)
             },
             SimpleType::Restriction(name, facets) => {
-                // TODO: deduplicate/factorize with Alias
-                if name.namespace() == Some(&SCHEMA_URI) {
-                    for (prim_name, prim_type_name) in PRIMITIVE_TYPES {
-                        if *prim_name == name.local_name() {
-                            return Some(("support".to_string(), prim_type_name.to_string()));
-                        }
-                    }
-                }
-                let type_mod_name = self.get_module_name(*name);
-                let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                let type_name = escape_keyword(&name.local_name().to_camel_case());
-                (type_mod_name, type_name)
-                //self.restrictions.get((name, facets)).expect(&format!("{:?}", ty))
+                ("restrictions".to_string(), self.simple_restrictions.get(&(name.clone(), facets.clone())).unwrap().to_string())
             }
             SimpleType::Primitive(field_name, type_name) => {
                 ("support".to_string(), type_name.to_string())
@@ -299,7 +291,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         Some((type_mod_name, type_name))
     }
 
-    fn gen_simple_types(&self, scope: &mut cg::Scope) {
+    fn gen_simple_types(&mut self, scope: &mut cg::Scope) {
+        self.gen_simple_restrictions(scope);
         let mut name_gen = NameGenerator::new();
         for proc in &self.processors {
             let mut types: Vec<_> = proc.simple_types.iter().collect();
@@ -314,45 +307,59 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     .expect(&mod_name).scope();
                 let name = escape_keyword(&qname.local_name().to_camel_case());
                 let name = name_gen.gen_name(name);
-                match ty.type_ {
-                    SimpleType::Restriction(base_name, ref facets) => {
-                        let (base_mod_name, base_type_name) = self.get_simple_type_name(&SimpleType::Alias(base_name)).unwrap(); // TODO
-                        scope.raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}::{}<'input>);", name, base_mod_name, base_type_name));
-                        let mut s = Vec::new();
-                        let f = &mut |n: &Option<_>| {
-                            match n.as_ref() {
-                                None => "None".to_string(),
-                                Some(f) => format!("Some(BigFloatNotNaN::from_str(\"{}\").unwrap())", f),
-                            }
-                        };
-                        s.push(format!("min_exclusive: {},", f(&facets.min_exclusive)));
-                        s.push(format!("min_inclusive: {},", f(&facets.min_inclusive)));
-                        s.push(format!("max_exclusive: {},", f(&facets.max_exclusive)));
-                        s.push(format!("max_inclusive: {},", f(&facets.max_inclusive)));
-                        s.push(format!("total_digits: {:?},", facets.total_digits));
-                        s.push(format!("fraction_digits: {:?},", facets.fraction_digits));
-                        s.push(format!("length: {:?},", facets.length));
-                        s.push(format!("min_length: {:?},", facets.min_length));
-                        s.push(format!("max_length: {:?},", facets.max_length));
-                        match &facets.enumeration {
-                            Some(items) => s.push(format!("enumeration: Some(vec![{}]),", items.iter().map(|i| format!("{:?}", i)).collect::<Vec<_>>().join(", "))),
-                            None => s.push("enumeration: None,".to_string()),
-                        }
-                        s.push(format!("white_space: {:?},", facets.white_space));
-                        s.push(format!("pattern: {:?},", facets.pattern));
-                        s.push(format!("assertion: {:?},", facets.assertion));
-                        s.push(format!("explicit_timezone: {:?},", facets.explicit_timezone));
-                        scope.raw(&format!("impl_simpletype_restriction!({}, Facets {{\n    {}\n}});", name, s.join("\n    ")));
-                    }
-                    _ => {
-                        if let Some((type_mod_name, type_name)) = self.get_simple_type_name(&ty.type_) {
-                            scope.raw(&format!("pub type {}<'input> = {}::{}<'input>;", name, type_mod_name, type_name));
-                        }
-                        else {
-                            panic!("{:?}", ty)
-                        }
-                    }
+                if let Some((type_mod_name, type_name)) = self.get_simple_type_name(&ty.type_) {
+                    scope.raw(&format!("pub type {}<'input> = {}::{}<'input>;", name, type_mod_name, type_name));
                 }
+                else {
+                    panic!("{:?}", ty)
+                }
+            }
+        }
+    }
+
+    fn gen_simple_restrictions(&mut self, scope: &mut cg::Scope) {
+        let mut name_gen = NameGenerator::new();
+        let module = scope.new_module("restrictions");
+        module.vis("pub");
+        module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
+
+        for proc in &self.processors {
+            let mut simple_restrictions: Vec<_> = proc.simple_restrictions.iter().collect();
+
+            simple_restrictions.sort();
+            for (base_name, facets) in simple_restrictions {
+                if self.simple_restrictions.get(&(*base_name, facets.clone())).is_some() {
+                    continue;
+                }
+                let name = name_gen.gen_name(format!("Restrict_{}", base_name.local_name()).to_camel_case());
+                self.simple_restrictions.insert((base_name.clone(), facets.clone()), name.clone());
+                let (base_mod_name, base_type_name) = self.get_simple_type_name(&SimpleType::Alias(*base_name)).unwrap(); // TODO
+                module.scope().raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}::{}<'input>);", name, base_mod_name, base_type_name));
+                let mut s = Vec::new();
+                let f = &mut |n: &Option<_>| {
+                    match n.as_ref() {
+                        None => "None".to_string(),
+                        Some(f) => format!("Some(BigFloatNotNaN::from_str(\"{}\").unwrap())", f),
+                    }
+                };
+                s.push(format!("min_exclusive: {},", f(&facets.min_exclusive)));
+                s.push(format!("min_inclusive: {},", f(&facets.min_inclusive)));
+                s.push(format!("max_exclusive: {},", f(&facets.max_exclusive)));
+                s.push(format!("max_inclusive: {},", f(&facets.max_inclusive)));
+                s.push(format!("total_digits: {:?},", facets.total_digits));
+                s.push(format!("fraction_digits: {:?},", facets.fraction_digits));
+                s.push(format!("length: {:?},", facets.length));
+                s.push(format!("min_length: {:?},", facets.min_length));
+                s.push(format!("max_length: {:?},", facets.max_length));
+                match &facets.enumeration {
+                    Some(items) => s.push(format!("enumeration: Some(vec![{}]),", items.iter().map(|i| format!("{:?}", i)).collect::<Vec<_>>().join(", "))),
+                    None => s.push("enumeration: None,".to_string()),
+                }
+                s.push(format!("white_space: {:?},", facets.white_space));
+                s.push(format!("pattern: {:?},", facets.pattern));
+                s.push(format!("assertion: {:?},", facets.assertion));
+                s.push(format!("explicit_timezone: {:?},", facets.explicit_timezone));
+                module.scope().raw(&format!("impl_simpletype_restriction!({}, Facets {{\n    {}\n}});", name, s.join("\n    ")));
             }
         }
     }

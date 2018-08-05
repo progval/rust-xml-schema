@@ -19,461 +19,53 @@ pub mod xs {
     #[allow(unused_imports)]
     use super::*;
 
-    #[derive(Debug, PartialEq)] pub struct Entities<'input>(pub support::AnySimpleType<'input>);
+    pub type Entities<'input> = restrictions::RestrictAnySimpleType<'input>;
 
-    impl_simpletype_restriction!(Entities, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: Some(1),
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type Entity<'input> = restrictions::RestrictNcName<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct Entity<'input>(pub support::NcName<'input>);
+    pub type Id<'input> = restrictions::RestrictNcName<'input>;
 
-    impl_simpletype_restriction!(Entity, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type Idref<'input> = restrictions::RestrictNcName<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct Id<'input>(pub support::NcName<'input>);
+    pub type Idrefs<'input> = restrictions::RestrictAnySimpleType<'input>;
 
-    impl_simpletype_restriction!(Id, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type Nmtoken<'input> = restrictions::RestrictToken2<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct Idref<'input>(pub support::NcName<'input>);
+    pub type Nmtokens<'input> = restrictions::RestrictAnySimpleType<'input>;
 
-    impl_simpletype_restriction!(Idref, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type Name<'input> = restrictions::RestrictToken3<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct Idrefs<'input>(pub support::AnySimpleType<'input>);
+    pub type Byte<'input> = restrictions::RestrictShort<'input>;
 
-    impl_simpletype_restriction!(Idrefs, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: Some(1),
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type DateTimeStamp<'input> = restrictions::RestrictDateTime<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct Nmtoken<'input>(pub support::Token<'input>);
+    pub type DayTimeDuration<'input> = restrictions::RestrictDuration2<'input>;
 
-    impl_simpletype_restriction!(Nmtoken, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: Some("\\c+"),
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type Int<'input> = restrictions::RestrictLong<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct Nmtokens<'input>(pub support::AnySimpleType<'input>);
+    pub type Integer<'input> = restrictions::RestrictDecimal<'input>;
 
-    impl_simpletype_restriction!(Nmtokens, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: Some(1),
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type Language<'input> = restrictions::RestrictToken<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct Name<'input>(pub support::Token<'input>);
+    pub type Long<'input> = restrictions::RestrictInteger2<'input>;
 
-    impl_simpletype_restriction!(Name, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: Some("\\i\\c*"),
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type NegativeInteger<'input> = restrictions::RestrictNonPositiveInteger<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct Byte<'input>(pub xs::Short<'input>);
+    pub type NonPositiveInteger<'input> = restrictions::RestrictInteger<'input>;
 
-    impl_simpletype_restriction!(Byte, Facets {
-        min_exclusive: None,
-        min_inclusive: Some(BigFloatNotNaN::from_str("-128").unwrap()),
-        max_exclusive: None,
-        max_inclusive: Some(BigFloatNotNaN::from_str("127").unwrap()),
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type NormalizedString<'input> = restrictions::RestrictString<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct DateTimeStamp<'input>(pub support::DateTime<'input>);
+    pub type Short<'input> = restrictions::RestrictInt<'input>;
 
-    impl_simpletype_restriction!(DateTimeStamp, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: Some("required"),
-    });
+    pub type UnsignedByte<'input> = restrictions::RestrictUnsignedShort<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct DayTimeDuration<'input>(pub support::Duration<'input>);
+    pub type UnsignedInt<'input> = restrictions::RestrictUnsignedLong<'input>;
 
-    impl_simpletype_restriction!(DayTimeDuration, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: Some("[^YM]*(T.*)?"),
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type UnsignedLong<'input> = restrictions::RestrictNonNegativeInteger<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct Int<'input>(pub xs::Long<'input>);
+    pub type UnsignedShort<'input> = restrictions::RestrictUnsignedInt<'input>;
 
-    impl_simpletype_restriction!(Int, Facets {
-        min_exclusive: None,
-        min_inclusive: Some(BigFloatNotNaN::from_str("-2147483648").unwrap()),
-        max_exclusive: None,
-        max_inclusive: Some(BigFloatNotNaN::from_str("2147483647").unwrap()),
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct Integer<'input>(pub support::Decimal<'input>);
-
-    impl_simpletype_restriction!(Integer, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: Some(0),
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: Some("[\\-+]?[0-9]+"),
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct Language<'input>(pub support::Token<'input>);
-
-    impl_simpletype_restriction!(Language, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: Some("[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*"),
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct Long<'input>(pub xs::Integer<'input>);
-
-    impl_simpletype_restriction!(Long, Facets {
-        min_exclusive: None,
-        min_inclusive: Some(BigFloatNotNaN::from_str("-9223372036854775808").unwrap()),
-        max_exclusive: None,
-        max_inclusive: Some(BigFloatNotNaN::from_str("9223372036854775807").unwrap()),
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct NegativeInteger<'input>(pub xs::NonPositiveInteger<'input>);
-
-    impl_simpletype_restriction!(NegativeInteger, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: Some(BigFloatNotNaN::from_str("-1").unwrap()),
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct NonPositiveInteger<'input>(pub xs::Integer<'input>);
-
-    impl_simpletype_restriction!(NonPositiveInteger, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: Some(BigFloatNotNaN::from_str("0").unwrap()),
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct NormalizedString<'input>(pub support::XmlString<'input>);
-
-    impl_simpletype_restriction!(NormalizedString, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: Some("replace"),
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct Short<'input>(pub xs::Int<'input>);
-
-    impl_simpletype_restriction!(Short, Facets {
-        min_exclusive: None,
-        min_inclusive: Some(BigFloatNotNaN::from_str("-32768").unwrap()),
-        max_exclusive: None,
-        max_inclusive: Some(BigFloatNotNaN::from_str("32767").unwrap()),
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct UnsignedByte<'input>(pub xs::UnsignedShort<'input>);
-
-    impl_simpletype_restriction!(UnsignedByte, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: Some(BigFloatNotNaN::from_str("255").unwrap()),
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct UnsignedInt<'input>(pub xs::UnsignedLong<'input>);
-
-    impl_simpletype_restriction!(UnsignedInt, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: Some(BigFloatNotNaN::from_str("4294967295").unwrap()),
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct UnsignedLong<'input>(pub support::NonNegativeInteger<'input>);
-
-    impl_simpletype_restriction!(UnsignedLong, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: Some(BigFloatNotNaN::from_str("18446744073709551615").unwrap()),
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct UnsignedShort<'input>(pub xs::UnsignedInt<'input>);
-
-    impl_simpletype_restriction!(UnsignedShort, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: Some(BigFloatNotNaN::from_str("65535").unwrap()),
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct YearMonthDuration<'input>(pub support::Duration<'input>);
-
-    impl_simpletype_restriction!(YearMonthDuration, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: Some("[^DT]*"),
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type YearMonthDuration<'input> = restrictions::RestrictDuration<'input>;
 
     pub type AllNni<'input> = unions::UnionNonNegativeIntegerNmtoken<'input>;
 
@@ -481,131 +73,29 @@ pub mod xs {
 
     pub type BlockSet<'input> = unions::UnionTokenDerivationControlList<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct DerivationControl<'input>(pub xs::Nmtoken<'input>);
-
-    impl_simpletype_restriction!(DerivationControl, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: Some(vec!["substitution", "extension", "restriction", "list", "union"]),
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type DerivationControl<'input> = restrictions::RestrictNmtoken8<'input>;
 
     pub type DerivationSet<'input> = unions::UnionTokenReducedDerivationControlList<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct FormChoice<'input>(pub xs::Nmtoken<'input>);
-
-    impl_simpletype_restriction!(FormChoice, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: Some(vec!["qualified", "unqualified"]),
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type FormChoice<'input> = restrictions::RestrictNmtoken6<'input>;
 
     pub type FullDerivationSet<'input> = unions::UnionTokenTypeDerivationControlList<'input>;
 
     pub type NamespaceList<'input> = unions::UnionSpecialNamespaceListBasicNamespaceList<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct Public<'input>(pub support::Token<'input>);
-
-    impl_simpletype_restriction!(Public, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: None,
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type Public<'input> = restrictions::RestrictToken4<'input>;
 
     pub type QnameList<'input> = lists::UnionQNameTokenList<'input>;
 
     pub type QnameListA<'input> = lists::UnionQNameTokenList<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct ReducedDerivationControl<'input>(pub xs::DerivationControl<'input>);
-
-    impl_simpletype_restriction!(ReducedDerivationControl, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: Some(vec!["extension", "restriction"]),
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type ReducedDerivationControl<'input> = restrictions::RestrictDerivationControl<'input>;
 
     pub type SimpleDerivationSet<'input> = unions::UnionTokenDerivationControlList<'input>;
 
-    #[derive(Debug, PartialEq)] pub struct SpecialNamespaceList<'input>(pub support::Token<'input>);
+    pub type SpecialNamespaceList<'input> = restrictions::RestrictToken5<'input>;
 
-    impl_simpletype_restriction!(SpecialNamespaceList, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: Some(vec!["##any", "##other"]),
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
-
-    #[derive(Debug, PartialEq)] pub struct TypeDerivationControl<'input>(pub xs::DerivationControl<'input>);
-
-    impl_simpletype_restriction!(TypeDerivationControl, Facets {
-        min_exclusive: None,
-        min_inclusive: None,
-        max_exclusive: None,
-        max_inclusive: None,
-        total_digits: None,
-        fraction_digits: None,
-        length: None,
-        min_length: None,
-        max_length: None,
-        enumeration: Some(vec!["extension", "restriction", "list", "union"]),
-        white_space: None,
-        pattern: None,
-        assertion: None,
-        explicit_timezone: None,
-    });
+    pub type TypeDerivationControl<'input> = restrictions::RestrictDerivationControl2<'input>;
 
     pub type XpathDefaultNamespace<'input> = unions::UnionAnyUriToken<'input>;
 
@@ -613,8 +103,8 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct All<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
-        pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
-        pub attr_max_occurs: Option<xs::AllNni<'input>>,
+        pub attr_min_occurs: Option<restrictions::RestrictNonNegativeInteger3<'input>>,
+        pub attr_max_occurs: Option<restrictions::RestrictAllNni<'input>>,
         pub all_model: super::xs::AllModel<'input>,
     }
 
@@ -646,8 +136,8 @@ pub mod xs {
         pub attr_min_occurs: Option<support::NonNegativeInteger<'input>>,
         pub attr_max_occurs: Option<xs::AllNni<'input>>,
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
-        pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
-        pub attr_process_contents: Option<xs::Nmtoken<'input>>,
+        pub attr_not_namespace: Option<restrictions::RestrictBasicNamespaceList<'input>>,
+        pub attr_process_contents: Option<restrictions::RestrictNmtoken7<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -670,8 +160,8 @@ pub mod xs {
         pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_not_q_name: Option<xs::QnameListA<'input>>,
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
-        pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
-        pub attr_process_contents: Option<xs::Nmtoken<'input>>,
+        pub attr_not_namespace: Option<restrictions::RestrictBasicNamespaceList<'input>>,
+        pub attr_process_contents: Option<restrictions::RestrictNmtoken7<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -819,7 +309,7 @@ pub mod xs {
     pub struct DefaultOpenContent<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_applies_to_empty: Option<support::Boolean<'input>>,
-        pub attr_mode: Option<xs::Nmtoken<'input>>,
+        pub attr_mode: Option<restrictions::RestrictNmtoken<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub any_wildcard: super::inline_elements::AnyWildcard<'input>,
@@ -898,7 +388,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct ExplicitTimezone<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
-        pub attr_value: xs::Nmtoken<'input>,
+        pub attr_value: restrictions::RestrictNmtoken3<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -961,7 +451,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Field<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
-        pub attr_xpath: support::Token<'input>,
+        pub attr_xpath: restrictions::RestrictToken4<'input>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1238,7 +728,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct OpenContent<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
-        pub attr_mode: Option<xs::Nmtoken<'input>>,
+        pub attr_mode: Option<restrictions::RestrictNmtoken2<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
         pub any_wildcard: Option<super::inline_elements::AnyWildcard<'input>>,
@@ -1353,7 +843,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct Selector<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
-        pub attr_xpath: support::Token<'input>,
+        pub attr_xpath: restrictions::RestrictToken4<'input>,
         pub attr_xpath_default_namespace: Option<xs::XpathDefaultNamespace<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
@@ -1471,7 +961,7 @@ pub mod xs {
     #[derive(Debug, PartialEq)]
     pub struct WhiteSpace<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
-        pub attr_value: xs::Nmtoken<'input>,
+        pub attr_value: restrictions::RestrictNmtoken4<'input>,
         pub attr_fixed: Option<support::Boolean<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -1824,6 +1314,904 @@ pub mod enums {
     );
 }
 
+pub mod restrictions {
+    #[allow(unused_imports)]
+    use super::*;
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNcName<'input>(pub support::NcName<'input>);
+
+    impl_simpletype_restriction!(RestrictNcName, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictName<'input>(pub xs::Name<'input>);
+
+    impl_simpletype_restriction!(RestrictName, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: Some("[\\i-[:]][\\c-[:]]*"),
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictAnySimpleType<'input>(pub support::AnySimpleType<'input>);
+
+    impl_simpletype_restriction!(RestrictAnySimpleType, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: Some(1),
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictDateTime<'input>(pub support::DateTime<'input>);
+
+    impl_simpletype_restriction!(RestrictDateTime, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: Some("required"),
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictDecimal<'input>(pub support::Decimal<'input>);
+
+    impl_simpletype_restriction!(RestrictDecimal, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: Some(0),
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: Some("[\\-+]?[0-9]+"),
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictDuration<'input>(pub support::Duration<'input>);
+
+    impl_simpletype_restriction!(RestrictDuration, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: Some("[^DT]*"),
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictDuration2<'input>(pub support::Duration<'input>);
+
+    impl_simpletype_restriction!(RestrictDuration2, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: Some("[^YM]*(T.*)?"),
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictInt<'input>(pub xs::Int<'input>);
+
+    impl_simpletype_restriction!(RestrictInt, Facets {
+        min_exclusive: None,
+        min_inclusive: Some(BigFloatNotNaN::from_str("-32768").unwrap()),
+        max_exclusive: None,
+        max_inclusive: Some(BigFloatNotNaN::from_str("32767").unwrap()),
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictInteger<'input>(pub xs::Integer<'input>);
+
+    impl_simpletype_restriction!(RestrictInteger, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: Some(BigFloatNotNaN::from_str("0").unwrap()),
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictInteger2<'input>(pub xs::Integer<'input>);
+
+    impl_simpletype_restriction!(RestrictInteger2, Facets {
+        min_exclusive: None,
+        min_inclusive: Some(BigFloatNotNaN::from_str("-9223372036854775808").unwrap()),
+        max_exclusive: None,
+        max_inclusive: Some(BigFloatNotNaN::from_str("9223372036854775807").unwrap()),
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictInteger3<'input>(pub xs::Integer<'input>);
+
+    impl_simpletype_restriction!(RestrictInteger3, Facets {
+        min_exclusive: None,
+        min_inclusive: Some(BigFloatNotNaN::from_str("0").unwrap()),
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictLong<'input>(pub xs::Long<'input>);
+
+    impl_simpletype_restriction!(RestrictLong, Facets {
+        min_exclusive: None,
+        min_inclusive: Some(BigFloatNotNaN::from_str("-2147483648").unwrap()),
+        max_exclusive: None,
+        max_inclusive: Some(BigFloatNotNaN::from_str("2147483647").unwrap()),
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNonNegativeInteger<'input>(pub support::NonNegativeInteger<'input>);
+
+    impl_simpletype_restriction!(RestrictNonNegativeInteger, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: Some(BigFloatNotNaN::from_str("18446744073709551615").unwrap()),
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNonNegativeInteger2<'input>(pub support::NonNegativeInteger<'input>);
+
+    impl_simpletype_restriction!(RestrictNonNegativeInteger2, Facets {
+        min_exclusive: None,
+        min_inclusive: Some(BigFloatNotNaN::from_str("1").unwrap()),
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNonPositiveInteger<'input>(pub xs::NonPositiveInteger<'input>);
+
+    impl_simpletype_restriction!(RestrictNonPositiveInteger, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: Some(BigFloatNotNaN::from_str("-1").unwrap()),
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNormalizedString<'input>(pub xs::NormalizedString<'input>);
+
+    impl_simpletype_restriction!(RestrictNormalizedString, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: Some("collapse"),
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictShort<'input>(pub xs::Short<'input>);
+
+    impl_simpletype_restriction!(RestrictShort, Facets {
+        min_exclusive: None,
+        min_inclusive: Some(BigFloatNotNaN::from_str("-128").unwrap()),
+        max_exclusive: None,
+        max_inclusive: Some(BigFloatNotNaN::from_str("127").unwrap()),
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictString<'input>(pub support::XmlString<'input>);
+
+    impl_simpletype_restriction!(RestrictString, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: Some("replace"),
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictToken<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(RestrictToken, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: Some("[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*"),
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictToken2<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(RestrictToken2, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: Some("\\c+"),
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictToken3<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(RestrictToken3, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: Some("\\i\\c*"),
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictUnsignedInt<'input>(pub xs::UnsignedInt<'input>);
+
+    impl_simpletype_restriction!(RestrictUnsignedInt, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: Some(BigFloatNotNaN::from_str("65535").unwrap()),
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictUnsignedLong<'input>(pub xs::UnsignedLong<'input>);
+
+    impl_simpletype_restriction!(RestrictUnsignedLong, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: Some(BigFloatNotNaN::from_str("4294967295").unwrap()),
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictUnsignedShort<'input>(pub xs::UnsignedShort<'input>);
+
+    impl_simpletype_restriction!(RestrictUnsignedShort, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: Some(BigFloatNotNaN::from_str("255").unwrap()),
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(RestrictNmtoken, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["interleave", "suffix"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken2<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(RestrictNmtoken2, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["none", "interleave", "suffix"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken3<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(RestrictNmtoken3, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["optional", "required", "prohibited"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken4<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(RestrictNmtoken4, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["preserve", "replace", "collapse"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken5<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(RestrictNmtoken5, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["prohibited", "optional", "required"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken6<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(RestrictNmtoken6, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["qualified", "unqualified"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken7<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(RestrictNmtoken7, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["skip", "lax", "strict"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken8<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(RestrictNmtoken8, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["substitution", "extension", "restriction", "list", "union"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNmtoken9<'input>(pub xs::Nmtoken<'input>);
+
+    impl_simpletype_restriction!(RestrictNmtoken9, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["unbounded"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictAllNni<'input>(pub xs::AllNni<'input>);
+
+    impl_simpletype_restriction!(RestrictAllNni, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["0", "1"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictBasicNamespaceList<'input>(pub xs::BasicNamespaceList<'input>);
+
+    impl_simpletype_restriction!(RestrictBasicNamespaceList, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: Some(1),
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictDerivationControl<'input>(pub xs::DerivationControl<'input>);
+
+    impl_simpletype_restriction!(RestrictDerivationControl, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["extension", "restriction"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictDerivationControl2<'input>(pub xs::DerivationControl<'input>);
+
+    impl_simpletype_restriction!(RestrictDerivationControl2, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["extension", "restriction", "list", "union"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictDerivationControl3<'input>(pub xs::DerivationControl<'input>);
+
+    impl_simpletype_restriction!(RestrictDerivationControl3, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["extension", "restriction", "substitution"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictDerivationControl4<'input>(pub xs::DerivationControl<'input>);
+
+    impl_simpletype_restriction!(RestrictDerivationControl4, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["list", "union", "restriction", "extension"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictNonNegativeInteger3<'input>(pub support::NonNegativeInteger<'input>);
+
+    impl_simpletype_restriction!(RestrictNonNegativeInteger3, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["0", "1"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictToken4<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(RestrictToken4, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: None,
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictToken5<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(RestrictToken5, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["##any", "##other"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictToken6<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(RestrictToken6, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["##defaultNamespace", "##targetNamespace", "##local"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictToken7<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(RestrictToken7, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["##defined"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictToken8<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(RestrictToken8, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["##defined", "##definedSibling"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictToken9<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(RestrictToken9, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["##targetNamespace", "##local"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+
+    #[derive(Debug, PartialEq)] pub struct RestrictToken10<'input>(pub support::Token<'input>);
+
+    impl_simpletype_restriction!(RestrictToken10, Facets {
+        min_exclusive: None,
+        min_inclusive: None,
+        max_exclusive: None,
+        max_inclusive: None,
+        total_digits: None,
+        fraction_digits: None,
+        length: None,
+        min_length: None,
+        max_length: None,
+        enumeration: Some(vec!["#all"]),
+        white_space: None,
+        pattern: None,
+        assertion: None,
+        explicit_timezone: None,
+    });
+}
+
 pub mod lists {
     #[allow(unused_imports)]
     use super::*;
@@ -1834,14 +2222,14 @@ pub mod lists {
     impl_list!(QNameList, support::QName);
 
     #[derive(Debug, PartialEq)]
-    pub struct DerivationControlList<'input>(pub Vec<xs::DerivationControl<'input>>);
+    pub struct DerivationControlList<'input>(pub Vec<restrictions::RestrictDerivationControl3<'input>>);
 
-    impl_list!(DerivationControlList, xs::DerivationControl);
+    impl_list!(DerivationControlList, restrictions::RestrictDerivationControl3);
 
     #[derive(Debug, PartialEq)]
-    pub struct DerivationControlList2<'input>(pub Vec<xs::DerivationControl<'input>>);
+    pub struct DerivationControlList2<'input>(pub Vec<restrictions::RestrictDerivationControl4<'input>>);
 
-    impl_list!(DerivationControlList2, xs::DerivationControl);
+    impl_list!(DerivationControlList2, restrictions::RestrictDerivationControl4);
 
     #[derive(Debug, PartialEq)]
     pub struct ReducedDerivationControlList<'input>(pub Vec<xs::ReducedDerivationControl<'input>>);
@@ -1871,7 +2259,7 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionQNameToken<'input> {
         QName(support::QName<'input>),
-        Token(support::Token<'input>),
+        Token(restrictions::RestrictToken7<'input>),
     }
 
     impl_union!(UnionQNameToken, {
@@ -1882,7 +2270,7 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionQNameToken2<'input> {
         QName(support::QName<'input>),
-        Token(support::Token<'input>),
+        Token(restrictions::RestrictToken8<'input>),
     }
 
     impl_union!(UnionQNameToken2, {
@@ -1893,7 +2281,7 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionAnyUriToken<'input> {
         AnyUri(support::AnyUri<'input>),
-        Token(support::Token<'input>),
+        Token(restrictions::RestrictToken6<'input>),
     }
 
     impl_union!(UnionAnyUriToken, {
@@ -1904,7 +2292,7 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionAnyUriToken2<'input> {
         AnyUri(support::AnyUri<'input>),
-        Token(support::Token<'input>),
+        Token(restrictions::RestrictToken9<'input>),
     }
 
     impl_union!(UnionAnyUriToken2, {
@@ -1915,7 +2303,7 @@ pub mod unions {
     #[derive(Debug, PartialEq)]
     pub enum UnionNonNegativeIntegerNmtoken<'input> {
         NonNegativeInteger(support::NonNegativeInteger<'input>),
-        Nmtoken(xs::Nmtoken<'input>),
+        Nmtoken(restrictions::RestrictNmtoken9<'input>),
     }
 
     impl_union!(UnionNonNegativeIntegerNmtoken, {
@@ -1936,7 +2324,7 @@ pub mod unions {
 
     #[derive(Debug, PartialEq)]
     pub enum UnionTokenDerivationControlList<'input> {
-        Token(support::Token<'input>),
+        Token(restrictions::RestrictToken10<'input>),
         DerivationControlList(lists::DerivationControlList<'input>),
     }
 
@@ -1947,7 +2335,7 @@ pub mod unions {
 
     #[derive(Debug, PartialEq)]
     pub enum UnionTokenReducedDerivationControlList<'input> {
-        Token(support::Token<'input>),
+        Token(restrictions::RestrictToken10<'input>),
         ReducedDerivationControlList(lists::ReducedDerivationControlList<'input>),
     }
 
@@ -1958,7 +2346,7 @@ pub mod unions {
 
     #[derive(Debug, PartialEq)]
     pub enum UnionTokenTypeDerivationControlList<'input> {
-        Token(support::Token<'input>),
+        Token(restrictions::RestrictToken10<'input>),
         TypeDerivationControlList(lists::TypeDerivationControlList<'input>),
     }
 
@@ -2069,8 +2457,8 @@ pub mod inline_elements {
     pub struct AnyWildcard<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_namespace: Option<xs::NamespaceList<'input>>,
-        pub attr_not_namespace: Option<xs::BasicNamespaceList<'input>>,
-        pub attr_process_contents: Option<xs::Nmtoken<'input>>,
+        pub attr_not_namespace: Option<restrictions::RestrictBasicNamespaceList<'input>>,
+        pub attr_process_contents: Option<restrictions::RestrictNmtoken7<'input>>,
         pub attr_id: Option<xs::Id<'input>>,
         pub annotation: Option<super::xs::Annotation<'input>>,
     }
@@ -2106,7 +2494,7 @@ pub mod inline_elements {
     pub struct Attribute<'input> {
         pub attrs: HashMap<FullName<'input>, &'input str>,
         pub attr_type: Option<support::QName<'input>>,
-        pub attr_use: Option<xs::Nmtoken<'input>>,
+        pub attr_use: Option<restrictions::RestrictNmtoken5<'input>>,
         pub attr_default: Option<support::XmlString<'input>>,
         pub attr_fixed: Option<support::XmlString<'input>>,
         pub attr_form: Option<xs::FormChoice<'input>>,

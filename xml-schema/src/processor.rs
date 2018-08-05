@@ -169,6 +169,7 @@ pub struct Processor<'ast, 'input: 'ast> {
 
     pub lists: HashMap<RichType<'input, SimpleType<'input>>, HashSet<String>>,
     pub unions: HashMap<Vec<RichType<'input, SimpleType<'input>>>, HashSet<String>>,
+    pub simple_restrictions: HashSet<(FullName<'input>, Facets<'input>)>,
     pub substitution_groups: HashMap<FullName<'input>, Vec<FullName<'input>>>,
     _phantom: PhantomData<&'ast ()>, // Sometimes I need 'ast when prototyping
 }
@@ -211,6 +212,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attribute_groups: HashMap::new(),
             inline_elements: HashMap::new(),
             simple_types: HashMap::new(),
+            simple_restrictions: HashSet::new(),
             substitution_groups: HashMap::new(),
             _phantom: PhantomData::default(),
         }
@@ -667,10 +669,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         MinLength(ref e) => facets.min_length = Some(e.attr_value.0 as usize),
                         MaxLength(ref e) => facets.max_length = Some(e.attr_value.0 as usize),
                         Enumeration(ref e) => facets.enumeration.get_or_insert(Vec::new()).push(e.attr_value.0),
-                        WhiteSpace(ref e) => facets.white_space = Some((e.attr_value.0).0),
+                        WhiteSpace(ref e) => facets.white_space = Some(((e.attr_value.0).0).0),
                         Pattern(ref e) => facets.pattern = Some(e.attr_value.0),
                         Assertion(ref e) => unimplemented!("assertion facet"),
-                        ExplicitTimezone(ref e) => facets.explicit_timezone = Some((e.attr_value.0).0),
+                        ExplicitTimezone(ref e) => facets.explicit_timezone = Some(((e.attr_value.0).0).0),
                         _ => unimplemented!("{:?}", e),// TODO
                     };
                 },
@@ -696,6 +698,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let base = FullName::new(base.0, base.1);
         let xs::SimpleRestrictionModel { ref local_simple_type, ref choice_facet_any } = simple_restriction_model;
         let facets = self.process_facets(choice_facet_any);
+
+        self.simple_restrictions.insert((base.clone(), facets.clone()));
 
         match local_simple_type {
             Some(inline_elements::LocalSimpleType { ref attrs, annotation: ref annotation2, ref simple_derivation }) => {
