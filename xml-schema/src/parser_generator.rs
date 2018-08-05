@@ -697,7 +697,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     f(&ext_type.doc);
                 }
                 let base_type = &self.get_type(base);
-                let mut attrs = base_type.attrs.restrict(&ext_type.attrs);
+                let mut attrs = self.restrict_attrs(&base_type.attrs, &ext_type.attrs);
                 attr_writer(&attrs);
                 // TODO: do something with the base's type
                 self.write_type_in_struct_def(field_writer, attr_writer, doc_writer, &ext_type.type_);
@@ -712,5 +712,54 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
             _ => unimplemented!("writing {:?}", type_),
         }
+    }
+
+    pub fn restrict_attrs(&self, base: &Attrs<'input>, other: &Attrs<'input>) -> Attrs<'input> {
+        let mut other_named = HashMap::new();
+        for (name, attr_use, type_) in other.named.iter() {
+            other_named.insert(name.clone(), (*attr_use, type_));
+        }
+        let mut seen = HashSet::new();
+        let mut named: Vec<_> = base.named.iter().map(|(name, attr_use, type_)| {
+            seen.insert(name);
+            match other_named.get(name) {
+                None => (name.clone(), *attr_use, (*type_).clone()),
+                Some((attr_use, type_)) => (name.clone(), *attr_use, (*type_).clone()),
+            }
+        }).collect();
+
+        let mut other_refs = HashMap::new();
+        for (name, attr_use, ref_) in other.refs.iter() {
+            other_refs.insert((name.clone(), ref_.clone()), *attr_use);
+        }
+        let mut refs: Vec<_> = base.refs.iter().map(|(name, attr_use, ref_)| {
+            if let Some(name) = name {
+                seen.insert(name);
+            }
+            match other_refs.get(&(*name, *ref_)) {
+                None => (name.clone(), *attr_use, (*ref_).clone()),
+                Some(attr_use) => (name.clone(), *attr_use, (*ref_).clone()),
+            }
+        }).collect();
+
+        if other.any_attributes {
+            for (name, attr_use, type_) in base.named.iter() {
+                if !seen.contains(name) {
+                    named.push((name.clone(), *attr_use, type_.clone()));
+                }
+            }
+            for (name, attr_use, ref_) in other.refs.iter() {
+                match name {
+                    Some(name) => {
+                        if !seen.contains(name) {
+                            refs.push((Some(name.clone()), *attr_use, ref_.clone()));
+                        }
+                    },
+                    None => (), // TODO
+                }
+            }
+        }
+
+        Attrs { named, refs, group_refs: base.group_refs.clone(), any_attributes: other.any_attributes }
     }
 }

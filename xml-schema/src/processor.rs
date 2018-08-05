@@ -73,54 +73,6 @@ impl<'input> Attrs<'input> {
         self.group_refs.extend(group_refs);
         self.any_attributes |= any_attributes;
     }
-    pub fn restrict(&self, other: &Attrs<'input>) -> Attrs<'input> {
-        let mut other_named = HashMap::new();
-        for (name, attr_use, type_) in other.named.iter() {
-            other_named.insert(name.clone(), (*attr_use, type_));
-        }
-        let mut seen = HashSet::new();
-        let mut named: Vec<_> = self.named.iter().map(|(name, attr_use, type_)| {
-            seen.insert(name);
-            match other_named.get(name) {
-                None => (name.clone(), *attr_use, (*type_).clone()),
-                Some((attr_use, type_)) => (name.clone(), *attr_use, (*type_).clone()),
-            }
-        }).collect();
-
-        let mut other_refs = HashMap::new();
-        for (name, attr_use, ref_) in other.refs.iter() {
-            other_refs.insert((name.clone(), ref_.clone()), *attr_use);
-        }
-        let mut refs: Vec<_> = self.refs.iter().map(|(name, attr_use, ref_)| {
-            if let Some(name) = name {
-                seen.insert(name);
-            }
-            match other_refs.get(&(*name, *ref_)) {
-                None => (name.clone(), *attr_use, (*ref_).clone()),
-                Some(attr_use) => (name.clone(), *attr_use, (*ref_).clone()),
-            }
-        }).collect();
-
-        if other.any_attributes {
-            for (name, attr_use, type_) in self.named.iter() {
-                if !seen.contains(name) {
-                    named.push((name.clone(), *attr_use, type_.clone()));
-                }
-            }
-            for (name, attr_use, ref_) in other.refs.iter() {
-                match name {
-                    Some(name) => {
-                        if !seen.contains(name) {
-                            refs.push((Some(name.clone()), *attr_use, ref_.clone()));
-                        }
-                    },
-                    None => (), // TODO
-                }
-            }
-        }
-
-        Attrs { named, refs, group_refs: self.group_refs.clone(), any_attributes: other.any_attributes }
-    }
 }
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
