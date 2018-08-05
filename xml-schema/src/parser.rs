@@ -551,9 +551,9 @@ pub mod xs {
         explicit_timezone: None,
     });
 
-    pub type AllNni<'input> = unions::UnionNmtoken<'input>;
+    pub type AllNni<'input> = unions::UnionNonNegativeIntegerNmtoken<'input>;
 
-    pub type BasicNamespaceList<'input> = lists::UnionTokenList<'input>;
+    pub type BasicNamespaceList<'input> = lists::UnionAnyUriTokenList<'input>;
 
     pub type BlockSet<'input> = unions::UnionTokenDerivationControlList<'input>;
 
@@ -599,7 +599,7 @@ pub mod xs {
 
     pub type FullDerivationSet<'input> = unions::UnionTokenTypeDerivationControlList<'input>;
 
-    pub type NamespaceList<'input> = unions::Union<'input>;
+    pub type NamespaceList<'input> = unions::UnionSpecialNamespaceListBasicNamespaceList<'input>;
 
     #[derive(Debug, PartialEq)] pub struct Public<'input>(pub support::Token<'input>);
 
@@ -620,9 +620,9 @@ pub mod xs {
         explicit_timezone: None,
     });
 
-    pub type QnameList<'input> = lists::UnionTokenList<'input>;
+    pub type QnameList<'input> = lists::UnionQNameTokenList<'input>;
 
-    pub type QnameListA<'input> = lists::UnionTokenList<'input>;
+    pub type QnameListA<'input> = lists::UnionQNameTokenList<'input>;
 
     #[derive(Debug, PartialEq)] pub struct ReducedDerivationControl<'input>(pub xs::DerivationControl<'input>);
 
@@ -683,7 +683,7 @@ pub mod xs {
         explicit_timezone: None,
     });
 
-    pub type XpathDefaultNamespace<'input> = unions::UnionToken<'input>;
+    pub type XpathDefaultNamespace<'input> = unions::UnionAnyUriToken<'input>;
 
     ///  Only elements allowed inside
     #[derive(Debug, PartialEq)]
@@ -1930,14 +1930,14 @@ pub mod lists {
     impl_list!(TypeDerivationControlList, xs::TypeDerivationControl);
 
     #[derive(Debug, PartialEq)]
-    pub struct UnionTokenList<'input>(pub Vec<unions::UnionToken<'input>>);
+    pub struct UnionQNameTokenList<'input>(pub Vec<unions::UnionQNameToken<'input>>);
 
-    impl_list!(UnionTokenList, unions::UnionToken);
+    impl_list!(UnionQNameTokenList, unions::UnionQNameToken);
 
     #[derive(Debug, PartialEq)]
-    pub struct UnionTokenList2<'input>(pub Vec<unions::UnionToken<'input>>);
+    pub struct UnionAnyUriTokenList<'input>(pub Vec<unions::UnionAnyUriToken<'input>>);
 
-    impl_list!(UnionTokenList2, unions::UnionToken);
+    impl_list!(UnionAnyUriTokenList, unions::UnionAnyUriToken);
 }
 
 pub mod unions {
@@ -1945,67 +1945,67 @@ pub mod unions {
     use super::*;
 
     #[derive(Debug, PartialEq)]
-    pub enum UnionToken<'input> {
+    pub enum UnionQNameToken<'input> {
         QName(support::QName<'input>),
         Token(support::Token<'input>),
     }
 
-    impl_union!(UnionToken, {
+    impl_union!(UnionQNameToken, {
         impl_union_variant!(QName),
         impl_union_variant!(Token),
     });
 
     #[derive(Debug, PartialEq)]
-    pub enum UnionToken2<'input> {
+    pub enum UnionQNameToken2<'input> {
         QName(support::QName<'input>),
         Token(support::Token<'input>),
     }
 
-    impl_union!(UnionToken2, {
+    impl_union!(UnionQNameToken2, {
         impl_union_variant!(QName),
         impl_union_variant!(Token),
     });
 
     #[derive(Debug, PartialEq)]
-    pub enum UnionToken3<'input> {
+    pub enum UnionAnyUriToken<'input> {
         AnyUri(support::AnyUri<'input>),
         Token(support::Token<'input>),
     }
 
-    impl_union!(UnionToken3, {
+    impl_union!(UnionAnyUriToken, {
         impl_union_variant!(AnyUri),
         impl_union_variant!(Token),
     });
 
     #[derive(Debug, PartialEq)]
-    pub enum UnionToken4<'input> {
+    pub enum UnionAnyUriToken2<'input> {
         AnyUri(support::AnyUri<'input>),
         Token(support::Token<'input>),
     }
 
-    impl_union!(UnionToken4, {
+    impl_union!(UnionAnyUriToken2, {
         impl_union_variant!(AnyUri),
         impl_union_variant!(Token),
     });
 
     #[derive(Debug, PartialEq)]
-    pub enum UnionNmtoken<'input> {
+    pub enum UnionNonNegativeIntegerNmtoken<'input> {
         NonNegativeInteger(support::NonNegativeInteger<'input>),
         Nmtoken(xs::Nmtoken<'input>),
     }
 
-    impl_union!(UnionNmtoken, {
+    impl_union!(UnionNonNegativeIntegerNmtoken, {
         impl_union_variant!(NonNegativeInteger),
         impl_union_variant!(Nmtoken),
     });
 
     #[derive(Debug, PartialEq)]
-    pub enum Union<'input> {
+    pub enum UnionSpecialNamespaceListBasicNamespaceList<'input> {
         SpecialNamespaceList(xs::SpecialNamespaceList<'input>),
         BasicNamespaceList(xs::BasicNamespaceList<'input>),
     }
 
-    impl_union!(Union, {
+    impl_union!(UnionSpecialNamespaceListBasicNamespaceList, {
         impl_union_variant!(SpecialNamespaceList),
         impl_union_variant!(BasicNamespaceList),
     });

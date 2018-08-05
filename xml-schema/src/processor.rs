@@ -438,12 +438,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, SimpleType<'input>> {
         let default_vec = Vec::new();
+        let mut name_hint = NameHint::new("union");
         let member_types = union.attr_member_types.as_ref().map(|l| &l.0).unwrap_or(&default_vec);
         let mut member_types: Vec<_> = member_types.iter().map(|name| {
             let name = FullName::new(name.0.or(self.target_namespace), name.1);
-            let (_, field_name) = name.as_tuple();
+            name_hint.push(name.local_name());
             RichType::new(
-                NameHint::new(field_name),
+                NameHint::new(name.local_name()),
                 SimpleType::Alias(name),
                 self.process_annotation(&annotation),
                 )
@@ -455,7 +456,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             }
         }
 
-        let mut name_hint = NameHint::new("union");
         for t in union.local_simple_type.iter() {
             let ty = self.process_local_simple_type(t);
             name_hint.extend(&ty.name_hint);
