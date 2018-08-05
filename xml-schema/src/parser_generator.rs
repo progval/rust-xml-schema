@@ -305,17 +305,17 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut types: Vec<_> = proc.simple_types.iter().collect();
             types.sort_by_key(|&(n,_)| n);
             for (&qname, (ref ty, ref doc)) in types {
+                let mod_name = self.get_module_name(qname);
+                if mod_name == "support" {
+                    // Implemented as a primitive, skip it.
+                    continue;
+                }
+                let scope = scope.get_module_mut(&mod_name)
+                    .expect(&mod_name).scope();
                 let name = escape_keyword(&qname.local_name().to_camel_case());
                 let name = name_gen.gen_name(name);
                 match ty.type_ {
                     SimpleType::Restriction(base_name, ref facets) => {
-                        let mod_name = self.get_module_name(qname);
-                        if mod_name == "support" {
-                            // Implemented as a primitive, skip it.
-                            continue;
-                        }
-                        let scope = scope.get_module_mut(&mod_name)
-                            .expect(&mod_name).scope();
                         let (base_mod_name, base_type_name) = self.get_simple_type_name(&SimpleType::Alias(base_name)).unwrap(); // TODO
                         scope.raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}::{}<'input>);", name, base_mod_name, base_type_name));
                         let mut s = Vec::new();
@@ -346,9 +346,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                     }
                     _ => {
                         if let Some((type_mod_name, type_name)) = self.get_simple_type_name(&ty.type_) {
-                            scope.get_module_mut(&self.get_module_name(qname))
-                                .unwrap().scope()
-                                .raw(&format!("pub type {}<'input> = {}::{}<'input>;", name, type_mod_name, type_name));
+                            scope.raw(&format!("pub type {}<'input> = {}::{}<'input>;", name, type_mod_name, type_name));
                         }
                         else {
                             panic!("{:?}", ty)
