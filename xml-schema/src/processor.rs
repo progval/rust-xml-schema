@@ -9,16 +9,21 @@ use xmlparser::{TextUnescape, XmlSpace};
 use parser::*;
 use names::*;
 use support::Facets;
-use primitives::{QName,NcName,AnyUri};
+use primitives::{QName,NcName,AnyUri,NonNegativeInteger};
 
 pub const SCHEMA_URI: &'static str = "http://www.w3.org/2001/XMLSchema";
 
-fn parse_max_occurs(s: &str) -> Result<usize, ParseIntError> {
-    if s == "unbounded" {
-        Ok(usize::max_value())
+fn parse_min_occurs(x: &Option<NonNegativeInteger>) -> usize {
+    match x {
+        None => 1,
+        Some(n) => n.0 as usize,
     }
-    else {
-        s.parse()
+}
+fn parse_max_occurs(x: &Option<unions::UnionNonNegativeIntegerNmtoken>) -> usize {
+    match x {
+        None => 1,
+        Some(unions::UnionNonNegativeIntegerNmtoken::NonNegativeInteger(n)) => n.0 as usize,
+        Some(unions::UnionNonNegativeIntegerNmtoken::Nmtoken(restrictions::Unbounded(_))) => usize::max_value(),
     }
 }
 
@@ -151,18 +156,7 @@ pub struct Processor<'ast, 'input: 'ast> {
 
 impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     pub fn new(ast: &'ast xs::Schema<'input>) -> Processor<'ast, 'input> {
-        let mut target_namespace = None;
-        for (key, &value) in ast.attrs.iter() {
-            match key.as_tuple() {
-                ("xml", "lang") => (),
-                ("xmlns", ns) => (),
-                (SCHEMA_URI, "targetNamespace") => target_namespace = Some(value),
-                (SCHEMA_URI, "elementFormDefault") => (),
-                (SCHEMA_URI, "attributeFormDefault") => (),
-                (SCHEMA_URI, "version") => (),
-                _ => panic!("Unknown attribute {} on <schema>.", key),
-            }
-        }
+        let mut target_namespace = ast.attr_target_namespace.as_ref().map(|t| t.0);
         let element_form_default_qualified = match ast.attr_element_form_default.as_ref().map(|x| ((x.0).0).0) {
             Some("qualified") => true,
             Some("unqualified") | None => false,
@@ -244,18 +238,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, Type<'input>> {
         let inline_elements::GroupRef { ref attrs, ref attr_id, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation } = group_ref;
         let ref_ = attr_ref;
-        let mut max_occurs = 1;
-        let mut min_occurs = 1;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "ref") => (),
-                (SCHEMA_URI, "minOccurs") =>
-                    min_occurs = value.parse().unwrap(),
-                (SCHEMA_URI, "maxOccurs") =>
-                    max_occurs = parse_max_occurs(value).unwrap(),
-                _ => panic!("Unknown attribute {} in <group>", key),
-            }
-        }
+        let min_occurs = parse_min_occurs(attr_min_occurs);
+        let max_occurs = parse_max_occurs(attr_max_occurs);
 
         let ref_ = FullName::new(ref_.0, ref_.1);
         let (_, field_name) = ref_.as_tuple();
@@ -271,18 +255,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, Type<'input>> {
         let xs::Group { ref attrs, ref attr_id, ref attr_name, ref annotation, choice_all_choice_sequence: ref content } = group;
         let name = attr_name;
-        let mut max_occurs = 1;
-        let mut min_occurs = 1;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "name") => (),
-                (SCHEMA_URI, "minOccurs") =>
-                    min_occurs = value.parse().unwrap(),
-                (SCHEMA_URI, "maxOccurs") =>
-                    max_occurs = parse_max_occurs(value).unwrap(),
-                _ => panic!("Unknown attribute {} in <group>", key),
-            }
-        }
+        let max_occurs = 1;
+        let min_occurs = 1;
 
         let mut type_ = match content {
             enums::ChoiceAllChoiceSequence::All(_) => unimplemented!("all"),
@@ -304,12 +278,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
     fn process_attribute_group(&mut self, group: &'ast xs::AttributeGroup<'input>) {
         let mut name = &group.attr_name;
-        for (key, &value) in group.attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "name") => (),
-                _ => panic!("Unknown attribute {} in <attributeGroup>", key),
-            }
-        }
         let attrs = self.process_attr_decls(&group.attr_decls);
         let name = FullName::new(self.target_namespace, name.0);
         self.attribute_groups.insert(name, attrs);
@@ -319,13 +287,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             simple_type: &'ast inline_elements::LocalSimpleType<'input>,
             ) -> RichType<'input, SimpleType<'input>> {
         let inline_elements::LocalSimpleType { ref attrs, ref attr_id, ref annotation, ref simple_derivation } = simple_type;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                //(SCHEMA_URI, "name") => (),
-                (SCHEMA_URI, "id") => (), // TODO
-                _ => panic!("Unknown attribute {} in <simpleType>", key),
-            }
-        }
         //let struct_name = self.namespaces.new_type(QName::from(name));
         let annotation: Vec<_> = annotation.iter().collect();
         match simple_derivation {
@@ -342,13 +303,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let annotation: Vec<_> = annotation.iter().collect();
         let name = attr_name;
         let name = FullName::new(self.target_namespace, name.0);
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "name") => (),
-                (SCHEMA_URI, "id") => (), // TODO
-                _ => panic!("Unknown attribute {} in <simpleType>", key),
-            }
-        }
         //let struct_name = self.namespaces.new_type(QName::from(name));
         let ty = match simple_derivation {
             xs::SimpleDerivation::Restriction(e) => 
@@ -372,12 +326,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, SimpleType<'input>> {
         let item_type = list.attr_item_type;
         let item_type = item_type.map(|n| FullName::new(n.0, n.1));
-        for (key, &value) in list.attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "itemType") => (),
-                _ => panic!("Unknown attribute {} in <list>", key),
-            }
-        }
         
         let item_type = match (item_type, &list.local_simple_type) {
             (None, Some(st)) => {
@@ -426,12 +374,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 self.process_annotation(&annotation),
                 )
         }).collect();
-        for (key, &value) in union.attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "memberTypes") => (),
-                _ => panic!("Unknown attribute {} in <union>", key),
-            }
-        }
 
         for t in union.local_simple_type.iter() {
             let ty = self.process_local_simple_type(t);
@@ -457,28 +399,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, Type<'input>> {
         let xs::ComplexType { ref attrs, ref attr_id, ref attr_name, ref attr_mixed, ref attr_abstract, ref attr_final, ref attr_block, ref attr_default_attributes_apply, ref annotation, ref complex_type_model } = complex_type;
         let name = attr_name;
-        let mut abstract_ = false;
-        let mut mixed = false;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "name") => (),
-                (SCHEMA_URI, "abstract") => {
-                    match value {
-                        "true" => abstract_ = true,
-                        "false" => abstract_ = false,
-                        _ => panic!("Invalid value for abstract attribute: {}", value),
-                    }
-                },
-                (SCHEMA_URI, "mixed") => {
-                    match value {
-                        "true" => mixed = true,
-                        "false" => mixed = false,
-                        _ => panic!("Invalid value for mixed attribute: {}", value),
-                    }
-                },
-                _ => panic!("Unknown attribute {} in <complexType>", key),
-            }
-        }
         //let struct_name = self.namespaces.new_type(QName::from(name));
         let mut ty = match complex_type_model {
             xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
@@ -507,28 +427,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, Type<'input>> {
         let inline_elements::LocalComplexType { ref attrs, ref attr_id, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = complex_type;
         let name = attr_name;
-        let mut abstract_ = false;
-        let mut mixed = false;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "name") => (),
-                (SCHEMA_URI, "abstract") => {
-                    match value {
-                        "true" => abstract_ = true,
-                        "false" => abstract_ = false,
-                        _ => panic!("Invalid value for abstract attribute: {}", value),
-                    }
-                },
-                (SCHEMA_URI, "mixed") => {
-                    match value {
-                        "true" => mixed = true,
-                        "false" => mixed = false,
-                        _ => panic!("Invalid value for mixed attribute: {}", value),
-                    }
-                },
-                _ => panic!("Unknown attribute {} in <complexType>", key),
-            }
-        }
         //let struct_name = self.namespaces.new_type(QName::from(name));
         let mut ty = match complex_type_model {
             xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
@@ -610,12 +508,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, Type<'input>> {
         let base = attr_base;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "base") => (),
-                _ => panic!("Unknown attribute {} in <restriction>", key),
-            }
-        }
         let base = FullName::new(base.0, base.1);
         // TODO: use the base
         let ty = self.process_type_def_particle(type_def_particle, false);
@@ -663,12 +555,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, SimpleType<'input>> {
         let xs::Restriction { ref attrs, ref attr_id, ref attr_base, annotation: ref annotation2, ref simple_restriction_model } = restriction;
         let base = attr_base;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "base") => (),
-                _ => panic!("Unknown attribute {} in <restriction>", key),
-            }
-        }
         let base = base.unwrap_or(QName(Some(SCHEMA_URI), "anySimpleType"));
         let base = FullName::new(base.0, base.1);
         let xs::SimpleRestrictionModel { ref local_simple_type, ref choice_facet_any } = simple_restriction_model;
@@ -737,17 +623,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, Type<'input>> {
         let xs::Sequence { ref attrs, ref attr_id, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = seq;
         let particles = nested_particle;
-        let mut min_occurs = 1;
-        let mut max_occurs = 1;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "minOccurs") =>
-                    min_occurs = value.parse().unwrap(),
-                (SCHEMA_URI, "maxOccurs") =>
-                    max_occurs = parse_max_occurs(value).unwrap(),
-                _ => panic!("Unknown attribute {} in <sequence>", key),
-            }
-        }
+        let min_occurs = parse_min_occurs(attr_min_occurs);
+        let max_occurs = parse_max_occurs(attr_max_occurs);
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("sequence");
         if min_occurs == 1 && max_occurs == 1 && inlinable && particles.len() == 1 {
@@ -788,17 +665,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, Type<'input>> {
         let xs::Choice { ref attrs, ref attr_id, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = choice;
         let particles = nested_particle;
-        let mut min_occurs = 1;
-        let mut max_occurs = 1;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "minOccurs") =>
-                    min_occurs = value.parse().unwrap(),
-                (SCHEMA_URI, "maxOccurs") =>
-                    max_occurs = parse_max_occurs(value).unwrap(),
-                _ => panic!("Unknown attribute {} in <choice>", key),
-            }
-        }
+        let min_occurs = parse_min_occurs(attr_min_occurs);
+        let max_occurs = parse_max_occurs(attr_max_occurs);
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("choice");
         if particles.len() == 1 {
@@ -863,12 +731,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, Type<'input>> {
         let base = attr_base;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "base") => (),
-                _ => panic!("Unknown attribute {} in <extension>", key),
-            }
-        }
         let base = FullName::new(base.0, base.1);
         RichType::new(
             NameHint::new_empty(),
@@ -885,12 +747,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
         let base = attr_base;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "base") => (),
-                _ => panic!("Unknown attribute {} in <extension>", key),
-            }
-        }
         let base = FullName::new(base.0, base.1);
         RichType::new(
             NameHint::new_empty(),
@@ -902,25 +758,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_toplevel_element(&mut self, element: &'ast xs::Element<'input>) {
         let name = FullName::new(self.target_namespace, element.attr_name.0);
         let type_attr: Option<QName<'input>> = element.attr_type;
-        let mut abstract_ = false;
         let mut substitution_group = &element.attr_substitution_group;
-        for (key, &value) in element.attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "name") => (),
-                (SCHEMA_URI, "id") =>
-                    (),
-                (SCHEMA_URI, "type") => (),
-                (SCHEMA_URI, "abstract") => {
-                    match value {
-                        "true" => abstract_ = true,
-                        "false" => abstract_ = false,
-                        _ => panic!("Invalid value for abstract attribute: {}", value),
-                    }
-                },
-                (SCHEMA_URI, "substitutionGroup") => (),
-                _ => panic!("Unknown attribute {:?} in toplevel <element>", key),
-            }
-        }
         let xs::Element { ref attrs, ref attr_id, ref attr_name, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         if let Some(heads) = attr_substitution_group {
@@ -970,31 +808,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let name = attr_name;
         let ref_ = attr_ref.as_ref().map(|qn| FullName::new(qn.0, qn.1));
         let type_attr = attr_type;
-        let mut abstract_ = false;
-        //let mut substitution_group = None;
-        let mut min_occurs = 1;
-        let mut max_occurs = 1;
-        for (key, &value) in attrs.iter() {
-            match key.as_tuple() {
-                (SCHEMA_URI, "name") => (),
-                (SCHEMA_URI, "id") =>
-                    (),
-                (SCHEMA_URI, "type") => (),
-                (SCHEMA_URI, "minOccurs") =>
-                    min_occurs = value.parse().unwrap(),
-                (SCHEMA_URI, "maxOccurs") =>
-                    max_occurs = parse_max_occurs(value).unwrap(),
-                (SCHEMA_URI, "abstract") => {
-                    match value {
-                        "true" => abstract_ = true,
-                        "false" => abstract_ = false,
-                        _ => panic!("Invalid value for abstract attribute: {}", value),
-                    }
-                },
-                (SCHEMA_URI, "ref") => (),
-                _ => panic!("Unknown attribute {} in <element>", key),
-            }
-        }
+        let min_occurs = parse_min_occurs(attr_min_occurs);
+        let max_occurs = parse_max_occurs(attr_max_occurs);
 
         if let Some(ref_) = ref_ {
             if let Some(name) = name {
@@ -1091,20 +906,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     let name = e.attr_name.as_ref().map(|ncn| FullName::new(self.target_namespace, ncn.0));
                     let mut ref_ = e.attr_ref.as_ref().map(|qn| FullName::new(qn.0, qn.1));
                     let mut type_attr: Option<QName<'input>> = e.attr_type;
-                    let mut use_ = None;
-                    for (key, &value) in e.attrs.iter() {
-                        match key.as_tuple() {
-                            (SCHEMA_URI, "name") => (),
-                            (SCHEMA_URI, "use") =>
-                                use_ = Some(value),
-                            (SCHEMA_URI, "default") => (), // TODO
-                            (SCHEMA_URI, "type") => (),
-                            (SCHEMA_URI, "ref") => (),
-                            (SCHEMA_URI, "fixed") => (), // TODO
-                            _ => panic!("Unknown attribute {} in <attribute>", key),
-                        }
-                    }
-                    let use_ = match use_ {
+                    let use_ = match e.attr_use.as_ref().map(|x| ((x.0).0).0) {
                         Some("prohibited") => AttrUse::Prohibited,
                         Some("required") => AttrUse::Required,
                         Some("optional") => AttrUse::Optional,
@@ -1134,12 +936,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 },
                 enums::AttrOrAttrGroup::AttributeGroup(e) => {
                     let mut ref_ = FullName::new(e.attr_ref.0, e.attr_ref.1);
-                    for (key, &value) in e.attrs.iter() {
-                        match key.as_tuple() {
-                            (SCHEMA_URI, "ref") => (),
-                            _ => panic!("Unknown attribute {} in <attributeGroup>", key),
-                        }
-                    }
                     attrs.group_refs.push(ref_);
                 },
             }
