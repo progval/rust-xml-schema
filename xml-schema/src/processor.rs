@@ -55,7 +55,7 @@ pub enum AttrUse {
     Optional,
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Attrs<'input> {
     pub named: Vec<(FullName<'input>, AttrUse, Option<SimpleType<'input>>)>,
     pub refs: Vec<(Option<FullName<'input>>, AttrUse, FullName<'input>)>,
@@ -63,7 +63,7 @@ pub struct Attrs<'input> {
     pub any_attributes: bool,
 }
 impl<'input> Attrs<'input> {
-    fn new() -> Attrs<'input> {
+    pub fn new() -> Attrs<'input> {
         Attrs { named: Vec::new(), refs: Vec::new(), group_refs: Vec::new(), any_attributes: false }
     }
     fn extend(&mut self, other: Attrs<'input>) {
@@ -242,7 +242,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_group_ref(&mut self, 
             group_ref: &'ast inline_elements::GroupRef<'input>,
             ) -> RichType<'input, Type<'input>> {
-        let inline_elements::GroupRef { ref attrs, ref attr_ref, ref annotation } = group_ref;
+        let inline_elements::GroupRef { ref attrs, ref attr_id, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation } = group_ref;
         let ref_ = attr_ref;
         let mut max_occurs = 1;
         let mut min_occurs = 1;
@@ -269,7 +269,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_named_group(&mut self, 
             group: &'ast xs::Group<'input>,
             ) -> RichType<'input, Type<'input>> {
-        let xs::Group { ref attrs, ref attr_name, ref annotation, choice_all_choice_sequence: ref content } = group;
+        let xs::Group { ref attrs, ref attr_id, ref attr_name, ref annotation, choice_all_choice_sequence: ref content } = group;
         let name = attr_name;
         let mut max_occurs = 1;
         let mut min_occurs = 1;
@@ -318,7 +318,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_local_simple_type(&mut self,
             simple_type: &'ast inline_elements::LocalSimpleType<'input>,
             ) -> RichType<'input, SimpleType<'input>> {
-        let inline_elements::LocalSimpleType { ref attrs, ref annotation, ref simple_derivation } = simple_type;
+        let inline_elements::LocalSimpleType { ref attrs, ref attr_id, ref annotation, ref simple_derivation } = simple_type;
         for (key, &value) in attrs.iter() {
             match key.as_tuple() {
                 //(SCHEMA_URI, "name") => (),
@@ -338,7 +338,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_simple_type(&mut self,
             simple_type: &'ast xs::SimpleType<'input>,
             ) -> RichType<'input, SimpleType<'input>> {
-        let xs::SimpleType { ref attrs, ref attr_name, ref attr_final, ref annotation, ref simple_derivation } = simple_type;
+        let xs::SimpleType { ref attrs, ref attr_id, ref attr_name, ref attr_final, ref annotation, ref simple_derivation } = simple_type;
         let annotation: Vec<_> = annotation.iter().collect();
         let name = attr_name;
         let name = FullName::new(self.target_namespace, name.0);
@@ -455,7 +455,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             complex_type: &'ast xs::ComplexType<'input>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
-        let xs::ComplexType { ref attrs, ref attr_name, ref attr_mixed, ref attr_abstract, ref attr_final, ref attr_block, ref attr_default_attributes_apply, ref annotation, ref complex_type_model } = complex_type;
+        let xs::ComplexType { ref attrs, ref attr_id, ref attr_name, ref attr_mixed, ref attr_abstract, ref attr_final, ref attr_block, ref attr_default_attributes_apply, ref annotation, ref complex_type_model } = complex_type;
         let name = attr_name;
         let mut abstract_ = false;
         let mut mixed = false;
@@ -505,7 +505,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
-        let inline_elements::LocalComplexType { ref attrs, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = complex_type;
+        let inline_elements::LocalComplexType { ref attrs, ref attr_id, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = complex_type;
         let name = attr_name;
         let mut abstract_ = false;
         let mut mixed = false;
@@ -571,7 +571,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         match choice_restriction_extension {
             enums::ChoiceRestrictionExtension::Restriction(ref r) => {
                 let inline_elements::ComplexRestrictionType {
-                    ref attrs, ref attr_base, annotation: ref annotation2,
+                    ref attrs, ref attr_id, ref attr_base, annotation: ref annotation2,
                     ref sequence_open_content_type_def_particle,
                     ref attr_decls, ref assertions
                 } = **r;
@@ -677,7 +677,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         self.simple_restrictions.insert((base.clone(), facets.clone()));
 
         match local_simple_type {
-            Some(inline_elements::LocalSimpleType { ref attrs, annotation: ref annotation2, ref simple_derivation }) => {
+            Some(inline_elements::LocalSimpleType { ref attrs, ref attr_id, annotation: ref annotation2, ref simple_derivation }) => {
                 RichType::new(
                     NameHint::new(base.as_tuple().1),
                     SimpleType::Restriction(base, facets),
@@ -735,7 +735,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             seq: &'ast xs::Sequence<'input>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
-        let xs::Sequence { ref attrs, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = seq;
+        let xs::Sequence { ref attrs, ref attr_id, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = seq;
         let particles = nested_particle;
         let mut min_occurs = 1;
         let mut max_occurs = 1;
@@ -786,7 +786,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             choice: &'ast xs::Choice<'input>,
             inlinable: bool
             ) -> RichType<'input, Type<'input>> {
-        let xs::Choice { ref attrs, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = choice;
+        let xs::Choice { ref attrs, ref attr_id, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = choice;
         let particles = nested_particle;
         let mut min_occurs = 1;
         let mut max_occurs = 1;
@@ -921,7 +921,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 _ => panic!("Unknown attribute {:?} in toplevel <element>", key),
             }
         }
-        let xs::Element { ref attrs, ref attr_name, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
+        let xs::Element { ref attrs, ref attr_id, ref attr_name, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         if let Some(heads) = attr_substitution_group {
             for head in &heads.0 {
@@ -965,7 +965,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_local_element(&mut self,
             element: &'ast inline_elements::LocalElement<'input>,
             ) -> RichType<'input, Type<'input>> {
-        let inline_elements::LocalElement { ref attrs, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = element;
+        let inline_elements::LocalElement { ref attrs, ref attr_id, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         let name = attr_name;
         let ref_ = attr_ref.as_ref().map(|qn| FullName::new(qn.0, qn.1));

@@ -148,8 +148,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                         fields.push((field_name, type_mod_name, min_occurs, max_occurs, type_name));
                     };
                     let doc_writer = &mut |doc2: &Documentation<'input>| doc.extend(doc2);
-                    let mut attr_writer = &mut |_: &_| ();
-                    self.write_type_in_struct_def(field_writer, &mut attr_writer, &mut Some(doc_writer), &item.type_);
+                    self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), &item.type_);
                 }
                 enum_.doc(&doc.to_string());
                 let variant_name = name_from_hint(&item.name_hint)
@@ -442,9 +441,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 },
             }
         };
-        let attr_writer = &mut |_: &_| ();
         let doc_writer = &mut |doc2| doc.extend(doc2);
-        self.write_type_in_struct_def(field_writer, attr_writer, &mut Some(doc_writer), &type_);
+        self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), &type_);
     }
 
     fn gen_group_or_sequence(&self, module: &mut cg::Module, struct_name: &'input str, items: &Vec<&RichType<'input, Type<'input>>>, doc: &Documentation<'input>) {
@@ -605,17 +603,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let mut generated_attrs = HashSet::new();
             let mut seen_attrs = HashMap::new();
             
-            // Do not swap these two calls of gen_attrs, the first one takes precedence
-            // in case of duplicate attributes (most important when dealing with
-            // prohibited attributes).
-            self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut seen_attrs, &mut generated_attrs, false);
+            let attrs = self.compute_attrs(&type_, attrs);
+            self.gen_attrs(struct_, &mut impl_code, &mut name_gen, &attrs, &mut seen_attrs, &mut generated_attrs, false);
             {
-                let attr_writer = &mut |attrs: &Attrs<'input>| {
-                    self.gen_attrs(struct_, &mut impl_code, &mut name_gen, attrs, &mut seen_attrs, &mut generated_attrs, true);
-                };
                 let field_writer = &mut |_, _, _, _, _| ();
                 let doc_writer = &mut |_| ();
-                self.write_type_in_struct_def(field_writer, attr_writer, &mut Some(doc_writer), &type_);
+                self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), &type_);
             }
             impl_code.push(format!("}}, fields = {{"));
             self.gen_fields(&mut empty_struct, struct_, &mut impl_code, &mut doc, &mut name_gen, type_);
@@ -645,14 +638,12 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         type_
     }
 
-    fn write_type_in_struct_def<'a, F, G, H>(&'a self,
+    fn write_type_in_struct_def<'a, F, H>(&'a self,
             field_writer: &mut F,
-            attr_writer: &mut G,
             doc_writer: &mut Option<&mut H>,
             type_: &'a Type<'input>,
             ) where
             F: FnMut(String, String, usize, usize, String),
-            G: FnMut(&Attrs<'input>),
             H: FnMut(&'a Documentation<'input>),
             'ast: 'a {
         let mut doc_non_writer: Option<&mut H> = None;
@@ -662,12 +653,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 if let Some(ref mut f) = doc_writer {
                     f(&target_type.doc);
                 }
-                attr_writer(&target_type.attrs);
-                self.write_type_in_struct_def(field_writer, attr_writer, doc_writer, &target_type.type_);
+                self.write_type_in_struct_def(field_writer, doc_writer, &target_type.type_);
             },
             Type::InlineSequence(items) => {
                 for item in items {
-                    self.write_type_in_struct_def(field_writer, attr_writer, &mut doc_non_writer, &item.type_);
+                    self.write_type_in_struct_def(field_writer, &mut doc_non_writer, &item.type_);
                 }
             }
             Type::Sequence(min_occurs, max_occurs, name) => {
@@ -687,20 +677,16 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             },
             Type::Extension(base, ext_type) => {
                 let base_type = &self.get_type(base);
-                attr_writer(&base_type.attrs);
-                attr_writer(&ext_type.attrs);
-                self.write_type_in_struct_def(field_writer, attr_writer, &mut doc_non_writer, &base_type.type_);
-                self.write_type_in_struct_def(field_writer, attr_writer, doc_writer, &ext_type.type_);
+                self.write_type_in_struct_def(field_writer, &mut doc_non_writer, &base_type.type_);
+                self.write_type_in_struct_def(field_writer, doc_writer, &ext_type.type_);
             },
             Type::Restriction(base, ext_type) => {
                 if let Some(ref mut f) = doc_writer {
                     f(&ext_type.doc);
                 }
                 let base_type = &self.get_type(base);
-                let mut attrs = self.restrict_attrs(&base_type.attrs, &ext_type.attrs);
-                attr_writer(&attrs);
                 // TODO: do something with the base's type
-                self.write_type_in_struct_def(field_writer, attr_writer, doc_writer, &ext_type.type_);
+                self.write_type_in_struct_def(field_writer, doc_writer, &ext_type.type_);
             },
             Type::Empty => (), // TODO ?
             Type::Any => {
@@ -714,7 +700,43 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    pub fn restrict_attrs(&self, base: &Attrs<'input>, other: &Attrs<'input>) -> Attrs<'input> {
+    fn compute_attrs(&self, type_: &Type<'input>, own_attrs: &Attrs<'input>) -> Attrs<'input> {
+        match type_ {
+            Type::Alias(name) => {
+                let target_type = self.get_type(name);
+                let target_attrs = self.compute_attrs(&target_type.type_, &target_type.attrs);
+                self.extend_attrs(&target_attrs, own_attrs)
+            },
+            Type::InlineSequence(_) |
+            Type::Sequence(_, _, _) |
+            Type::Element(_, _, _) |
+            Type::Group(_, _, _) |
+            Type::ElementRef(_, _, _) |
+            Type::Choice(_, _, _) |
+            Type::Empty |
+            Type::Any => {
+                own_attrs.clone()
+            }
+            Type::Extension(base, ext_type) => {
+                let base_type = &self.get_type(&base);
+                let base_attrs = self.compute_attrs(&base_type.type_, &base_type.attrs);
+                let own_attrs = self.extend_attrs(own_attrs, &ext_type.attrs); // XXX
+                self.extend_attrs(&base_attrs, &own_attrs)
+            },
+            Type::Restriction(base, ext_type) => {
+                let base_type = &self.get_type(&base);
+                let base_attrs = self.compute_attrs(&base_type.type_, &base_type.attrs);
+                let own_attrs = self.extend_attrs(own_attrs, &ext_type.attrs); // XXX
+                self.restrict_attrs(&base_attrs, &own_attrs)
+            },
+            Type::Simple(type2) => {
+                own_attrs.clone()
+            }
+            _ => unimplemented!("writing {:?}", type_),
+        }
+    }
+
+    pub fn extend_attrs(&self, base: &Attrs<'input>, other: &Attrs<'input>) -> Attrs<'input> {
         let mut other_named = HashMap::new();
         for (name, attr_use, type_) in other.named.iter() {
             other_named.insert(name.clone(), (*attr_use, type_));
@@ -742,24 +764,35 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
         }).collect();
 
-        if other.any_attributes {
-            for (name, attr_use, type_) in base.named.iter() {
-                if !seen.contains(name) {
-                    named.push((name.clone(), *attr_use, type_.clone()));
-                }
+        for (name, attr_use, type_) in other.named.iter() {
+            if !seen.contains(name) {
+                named.push((name.clone(), *attr_use, type_.clone()));
             }
-            for (name, attr_use, ref_) in other.refs.iter() {
-                match name {
-                    Some(name) => {
-                        if !seen.contains(name) {
-                            refs.push((Some(name.clone()), *attr_use, ref_.clone()));
-                        }
-                    },
-                    None => (), // TODO
-                }
+        }
+        for (name, attr_use, ref_) in other.refs.iter() {
+            match name {
+                Some(name) => {
+                    if !seen.contains(name) {
+                        refs.push((Some(name.clone()), *attr_use, ref_.clone()));
+                    }
+                },
+                None => (), // TODO
             }
         }
 
-        Attrs { named, refs, group_refs: base.group_refs.clone(), any_attributes: other.any_attributes }
+        let mut group_refs = base.group_refs.clone();
+        let mut seen_refs: HashSet<_> = base.group_refs.iter().collect();
+        for group_ref in other.group_refs.iter() {
+            if !seen_refs.contains(group_ref) {
+                group_refs.push(*group_ref);
+            }
+        }
+
+        let res = Attrs { named, refs, group_refs, any_attributes: other.any_attributes };
+        res
+    }
+
+    pub fn restrict_attrs(&self, base: &Attrs<'input>, other: &Attrs<'input>) -> Attrs<'input> {
+        self.extend_attrs(base, other) // XXX
     }
 }
