@@ -216,7 +216,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                         let enum_ = module.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
                         for item in items.iter() {
                             let RichType { name_hint, attrs, type_, doc } = item;
-                            let variant_name = name_from_hint(&item.name_hint).unwrap().to_camel_case();
+                            let variant_name = name_from_hint(name_hint).unwrap().to_camel_case();
                             if let Some((type_mod_name, type_name)) = self.get_simple_type_name(type_) {
                                 enum_.new_variant(&variant_name).tuple(&format!("{}::{}<'input>", type_mod_name, type_name));
                                 impl_code.push(format!("    impl_union_variant!({}),", variant_name));
@@ -781,7 +781,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
 
         let mut group_refs = base.group_refs.clone();
-        let mut seen_refs: HashSet<_> = base.group_refs.iter().collect();
+        let seen_refs: HashSet<_> = base.group_refs.iter().collect();
         for group_ref in other.group_refs.iter() {
             if !seen_refs.contains(group_ref) {
                 group_refs.push(*group_ref);

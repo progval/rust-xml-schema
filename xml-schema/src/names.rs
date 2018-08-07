@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use support::QName;
-
 const KEYWORDS: &[&'static str] = &["override"];
 fn escape_keyword(name: &str) -> String {
     if KEYWORDS.contains(&name) {

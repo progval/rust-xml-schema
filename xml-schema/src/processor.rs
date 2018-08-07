@@ -1,7 +1,6 @@
 use std::fmt::Debug;
 use std::hash::Hash;
 use std::collections::{HashMap, HashSet};
-use std::num::ParseIntError;
 
 use xmlparser::Token as XmlToken;
 use xmlparser::{TextUnescape, XmlSpace};
@@ -156,7 +155,7 @@ pub struct Processor<'ast, 'input: 'ast> {
 
 impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     pub fn new(ast: &'ast xs::Schema<'input>) -> Processor<'ast, 'input> {
-        let mut target_namespace = ast.attr_target_namespace.as_ref().map(|t| t.0);
+        let target_namespace = ast.attr_target_namespace.as_ref().map(|t| t.0);
         let element_form_default_qualified = match ast.attr_element_form_default.as_ref().map(|x| ((x.0).0).0) {
             Some("qualified") => true,
             Some("unqualified") | None => false,
@@ -277,7 +276,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_attribute_group(&mut self, group: &'ast xs::AttributeGroup<'input>) {
-        let mut name = &group.attr_name;
+        let name = &group.attr_name;
         let attrs = self.process_attr_decls(&group.attr_decls);
         let name = FullName::new(self.target_namespace, name.0);
         self.attribute_groups.insert(name, attrs);
@@ -475,7 +474,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 } = **r;
                 let ty = match sequence_open_content_type_def_particle {
                     Some(sequences::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
-                        self.process_complex_restriction(attrs, attr_base, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref())),
+                        self.process_complex_restriction(attr_base, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref())),
                     None => {
                         RichType::new(
                             NameHint::new("empty_extension"),
@@ -502,7 +501,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     }
 
     fn process_complex_restriction(&mut self, 
-            attrs: &'ast HashMap<FullName<'input>, &'input str>,
             attr_base: &'ast QName<'input>,
             type_def_particle: &'ast xs::TypeDefParticle<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
@@ -540,7 +538,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         Pattern(ref e) => facets.pattern = Some(e.attr_value.0),
                         Assertion(ref e) => unimplemented!("assertion facet"),
                         ExplicitTimezone(ref e) => facets.explicit_timezone = Some(((e.attr_value.0).0).0),
-                        _ => unimplemented!("{:?}", e),// TODO
                     };
                 },
                 enums::ChoiceFacetAny::Any(_) => (), // TODO (probably just whitespaces)
@@ -758,7 +755,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_toplevel_element(&mut self, element: &'ast xs::Element<'input>) {
         let name = FullName::new(self.target_namespace, element.attr_name.0);
         let type_attr: Option<QName<'input>> = element.attr_type;
-        let mut substitution_group = &element.attr_substitution_group;
+        let substitution_group = &element.attr_substitution_group;
         let xs::Element { ref attrs, ref attr_id, ref attr_name, ref attr_type, ref attr_substitution_group, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_abstract, ref attr_final, ref attr_block, ref annotation, type_: ref child_type, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         if let Some(heads) = attr_substitution_group {
