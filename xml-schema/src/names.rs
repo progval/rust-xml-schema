@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::fmt;
 
+use primitives::QName;
+
 const KEYWORDS: &[&'static str] = &["override"];
 fn escape_keyword(name: &str) -> String {
     if KEYWORDS.contains(&name) {
@@ -47,14 +49,17 @@ impl<'input> FullName<'input> {
     pub fn new(ns: Option<&'input str>, name: &'input str) -> FullName<'input> {
         FullName(ns, name)
     }
-    pub fn as_tuple(&self) -> (&'input str, &'input str) {
-        (self.0.unwrap_or(""), self.1) // TODO: return an option instead
-    }
     pub fn namespace(&self) -> Option<&'input str> {
         self.0
     }
     pub fn local_name(&self) -> &'input str {
         self.1
+    }
+}
+
+impl<'input> FullName<'input> {
+    pub fn from_qname(qn: &QName<'input>, default_namespace: Option<&'input str>) -> FullName<'input> {
+        FullName(qn.namespace.or(default_namespace), qn.local_name)
     }
 }
 

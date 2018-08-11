@@ -78,7 +78,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 }
             }
         }
-        self.module_names.get(&qname.namespace()).unwrap().clone()
+        self.module_names.get(&qname.namespace()).expect(&format!("{:?}", qname.namespace())).clone()
     }
 
     pub fn gen_target_scope(&mut self) -> cg::Scope {
@@ -502,23 +502,22 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             for (&name, element) in elements {
                 let mod_name = self.get_module_name(name);
                 let mut module = scope.get_module_mut(&mod_name).expect(&mod_name);
-                let (prefix, local) = name.as_tuple();
-                let head_local_name = format!("{}_head", local);
+                let head_local_name = format!("{}_head", name.local_name());
                 let mut substitutions = Vec::new();
-                substitutions.push(FullName::new(Some(prefix), &head_local_name));
+                substitutions.push(FullName::new(name.namespace(), &head_local_name));
                 for proc in &self.processors {
                     if let Some(members) = proc.substitution_groups.get(&name) {
                         substitutions.extend(members);
                     }
                 }
                 if substitutions.len() > 1 {
-                    let enum_name = escape_keyword(&local.to_camel_case());
+                    let enum_name = escape_keyword(&name.local_name().to_camel_case());
                     self.gen_substitution_enum(module.scope(), &enum_name, &substitutions);
                     let struct_name = escape_keyword(&head_local_name.to_camel_case());
                     self.gen_element(module, &struct_name, &name, &element.attrs, &element.type_, &element.doc);
                 }
                 else {
-                    let struct_name = escape_keyword(&local.to_camel_case());
+                    let struct_name = escape_keyword(&name.local_name().to_camel_case());
                     self.gen_element(module, &struct_name, &name, &element.attrs, &element.type_, &element.doc);
                 }
             }
@@ -552,7 +551,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             let default_type = SimpleType::Primitive(SCHEMA_URI, "AnySimpleType");
             let type_ = attr_type.as_ref().unwrap_or(&default_type);
             let (type_mod_name, type_name) = self.get_simple_type_name(&type_).unwrap();
-            let (prefix, local) = attr_name.as_tuple();
             let use_ = if inherited {
                 *seen_attrs.get(attr_name).unwrap_or(use_)
             }
@@ -563,14 +561,14 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             generated_attrs.insert(attr_name.clone());
             match use_ {
                 AttrUse::Optional => {
-                    let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
+                    let field_name = name_gen.gen_name(format!("attr_{}", attr_name.local_name()).to_snake_case());
                     struct_.field(&format!("pub {}", field_name), &format!("Option<{}::{}<'input>>", type_mod_name, type_name));
-                    impl_code.push(format!("    (\"{}\", \"{}\") => {}: optional,", prefix, local, field_name));
+                    impl_code.push(format!("    ({:?}, {:?}) => {}: optional,", attr_name.namespace().unwrap_or(""), attr_name.local_name(), field_name));
                 },
                 AttrUse::Required => {
-                    let field_name = name_gen.gen_name(format!("attr_{}", local).to_snake_case());
+                    let field_name = name_gen.gen_name(format!("attr_{}", attr_name.local_name()).to_snake_case());
                     struct_.field(&format!("pub {}", field_name), &format!("{}::{}<'input>", type_mod_name, type_name));
-                    impl_code.push(format!("    (\"{}\", \"{}\") => {}: required,", prefix, local, field_name));
+                    impl_code.push(format!("    ({:?}, {:?}) => {}: required,", attr_name.namespace().unwrap_or(""), attr_name.local_name(), field_name));
                 },
                 AttrUse::Prohibited => (),
             }
@@ -592,8 +590,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
 
     fn gen_element(&self, module: &mut cg::Module, struct_name: &str, tag_name: &FullName<'input>, attrs: &Attrs<'input>, type_: &Type<'input>, doc: &Documentation<'input>) {
         let mut impl_code = Vec::new();
-        let (tag_namespace, tag_name) = tag_name.as_tuple();
-        impl_code.push(format!("impl_element!({}, \"{}\", \"{}\", attributes = {{", struct_name, tag_namespace, tag_name));
+        impl_code.push(format!("impl_element!({}, {:?}, \"{}\", attributes = {{",
+            struct_name, tag_name.namespace().unwrap_or(""), tag_name.local_name()));
         {
             let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             let mut empty_struct = false;

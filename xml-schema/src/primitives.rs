@@ -140,14 +140,20 @@ impl<'input> Default for Token<'input> {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
-pub struct QName<'input>(pub Option<&'input str>, pub &'input str);
+pub struct QName<'input> {
+    pub namespace: Option<&'input str>,
+    pub local_name: &'input str,
+}
 impl<'input> ParseXmlStr<'input> for QName<'input> {
     const NODE_NAME: &'static str = "QName";
     fn parse_self_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, _parse_context: &mut TParseContext, parent_context: &ParentContext<'input>, facets: &Facets<'a>) -> Option<(&'input str, QName<'input>)> {
         if input.len() == 0 {
             return None;
         }
-        let f = &mut |prefix, local| QName(parent_context.namespaces.get(prefix).cloned(), local);
+        let f = &mut |prefix, local| QName {
+            namespace: parent_context.namespaces.get(prefix).cloned(),
+            local_name: local
+        };
         let mut i1 = 0;
         for (i, c) in input.char_indices() {
             if c == ':' {
@@ -181,8 +187,8 @@ impl<'input> From<&'input str> for QName<'input> {
         let v2 = splitted.next();
         assert_eq!(splitted.next(), None);
         match v2 {
-            None => QName(None, v1),
-            Some(v2) => QName(Some(v1), v2),
+            None => QName { namespace: None, local_name: v1 },
+            Some(v2) => QName { namespace: Some(v1), local_name: v2 },
         }
     }
 }
@@ -190,17 +196,17 @@ impl<'input> From<&'input str> for QName<'input> {
 impl <'input> QName<'input> {
     pub fn from_strspans(prefix: StrSpan<'input>, local: StrSpan<'input>) -> QName<'input> {
         match prefix.to_str() {
-            "" => QName(None, local.to_str()),
-            p => QName(Some(p), local.to_str()),
+            "" => QName { namespace: None, local_name: local.to_str() },
+            p => QName { namespace: Some(p), local_name: local.to_str() },
         }
     }
 }
 
 impl<'input> fmt::Display for QName<'input> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self.0 {
-            Some(prefix) => write!(f, "{}:{}", prefix, self.1),
-            None => write!(f, "{}", self.1),
+        match self.namespace {
+            Some(ns) => write!(f, "{}:{}", ns, self.local_name),
+            None => write!(f, "{}", self.local_name),
         }
     }
 }

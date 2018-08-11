@@ -240,10 +240,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let min_occurs = parse_min_occurs(attr_min_occurs);
         let max_occurs = parse_max_occurs(attr_max_occurs);
 
-        let ref_ = FullName::new(ref_.0, ref_.1);
-        let (_, field_name) = ref_.as_tuple();
+        let ref_ = FullName::from_qname(ref_, self.target_namespace);
         RichType::new(
-            NameHint::new(field_name),
+            NameHint::new(ref_.local_name()),
             Type::Group(min_occurs, max_occurs, ref_),
             self.process_annotation(&annotation.iter().collect()),
             )
@@ -324,7 +323,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, SimpleType<'input>> {
         let item_type = list.attr_item_type;
-        let item_type = item_type.map(|n| FullName::new(n.0, n.1));
+        let item_type = item_type.as_ref().map(|n| FullName::from_qname(n, self.target_namespace));
         
         let item_type = match (item_type, &list.local_simple_type) {
             (None, Some(st)) => {
@@ -334,7 +333,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             },
             (Some(n), None) => {
                 RichType::new(
-                    NameHint::new(n.as_tuple().1),
+                    NameHint::new(n.local_name()),
                     SimpleType::Alias(n),
                     self.process_annotation(&annotation),
                     )
@@ -365,7 +364,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let mut name_hint = NameHint::new("union");
         let member_types = union.attr_member_types.as_ref().map(|l| &l.0).unwrap_or(&default_vec);
         let mut member_types: Vec<_> = member_types.iter().map(|name| {
-            let name = FullName::new(name.0.or(self.target_namespace), name.1);
+            let name = FullName::from_qname(name, self.target_namespace);
             name_hint.push(name.local_name());
             RichType::new(
                 NameHint::new(name.local_name()),
@@ -505,10 +504,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             type_def_particle: &'ast xs::TypeDefParticle<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, Type<'input>> {
-        let base = attr_base;
-        let base = FullName::new(base.0, base.1);
         // TODO: use the base
         let ty = self.process_type_def_particle(type_def_particle, false);
+        let base = FullName::from_qname(attr_base, self.target_namespace);
         RichType::new(
             NameHint::new_empty(),
             Type::Restriction(base, Box::new(ty)),
@@ -552,24 +550,25 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> RichType<'input, SimpleType<'input>> {
         let xs::Restriction { ref attrs, ref attr_id, ref attr_base, annotation: ref annotation2, ref simple_restriction_model } = restriction;
         let base = attr_base;
-        let base = base.unwrap_or(QName(Some(SCHEMA_URI), "anySimpleType"));
-        let base = FullName::new(base.0, base.1);
+        let base = base.unwrap_or(QName { namespace: Some(SCHEMA_URI), local_name: "anySimpleType" });
         let xs::SimpleRestrictionModel { ref local_simple_type, ref choice_facet_any } = simple_restriction_model;
         let facets = self.process_facets(choice_facet_any);
 
-        self.simple_restrictions.insert((base.clone(), facets.clone()));
+        let base = FullName::from_qname(&base, self.target_namespace);
+
+        self.simple_restrictions.insert((base, facets.clone()));
 
         match local_simple_type {
             Some(inline_elements::LocalSimpleType { ref attrs, ref attr_id, annotation: ref annotation2, ref simple_derivation }) => {
                 RichType::new(
-                    NameHint::new(base.as_tuple().1),
+                    NameHint::new(base.local_name()),
                     SimpleType::Restriction(base, facets),
                     self.process_annotation(&vec_concat_opt(&annotation, annotation2.as_ref())),
                     )
             },
             None => {
                 RichType::new(
-                    NameHint::new(base.as_tuple().1),
+                    NameHint::new(base.local_name()),
                     SimpleType::Restriction(base, facets),
                     self.process_annotation(&annotation),
                     )
@@ -727,8 +726,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attr_base: &'ast QName<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
             ) -> RichType<'input, Type<'input>> {
-        let base = attr_base;
-        let base = FullName::new(base.0, base.1);
+        let base = FullName::from_qname(&attr_base, self.target_namespace);
         RichType::new(
             NameHint::new_empty(),
             Type::Alias(base),
@@ -743,8 +741,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             annotation: Vec<&'ast xs::Annotation<'input>>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
-        let base = attr_base;
-        let base = FullName::new(base.0, base.1);
+        let base = FullName::from_qname(attr_base, self.target_namespace);
         RichType::new(
             NameHint::new_empty(),
             Type::Extension(base, Box::new(self.process_type_def_particle(type_def_particle, inlinable))),
@@ -760,7 +757,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let annotation = annotation.iter().collect();
         if let Some(heads) = attr_substitution_group {
             for head in &heads.0 {
-                let head = FullName::new(head.0, head.1);
+                let head = FullName::from_qname(head, self.target_namespace);
                 self.substitution_groups.entry(head)
                     .or_insert(Vec::new())
                     .push(name.clone());
@@ -778,9 +775,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 },
             },
             (Some(t), None) => {
+                let t = FullName::from_qname(&t, self.target_namespace);
                 RichType::new(
-                    NameHint::new(t.1),
-                    Type::Alias(FullName::new(t.0, t.1)),
+                    NameHint::new(t.local_name()),
+                    Type::Alias(t.into()),
                     self.process_annotation(&annotation),
                     )
             },
@@ -803,18 +801,17 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let inline_elements::LocalElement { ref attrs, ref attr_id, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         let name = attr_name;
-        let ref_ = attr_ref.as_ref().map(|qn| FullName::new(qn.0, qn.1));
         let type_attr = attr_type;
         let min_occurs = parse_min_occurs(attr_min_occurs);
         let max_occurs = parse_max_occurs(attr_max_occurs);
 
-        if let Some(ref_) = ref_ {
+        if let Some(ref_) = attr_ref {
             if let Some(name) = name {
                 panic!("<element> has both ref={:?} and name={:?}", ref_, name);
             }
-            let (_, field_name) = ref_.as_tuple();
+            let ref_ = FullName::from_qname(ref_, self.target_namespace);
             RichType::new(
-                NameHint::new(field_name),
+                NameHint::new(ref_.local_name()),
                 Type::ElementRef(min_occurs, max_occurs, ref_),
                 self.process_annotation(&annotation),
                 )
@@ -861,11 +858,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         )
                 },
                 (Some(t), None) => {
-                    let name_hint1 = NameHint::new(t.1);
+                    let name_hint1 = NameHint::new(t.local_name);
                     let mut name_hint2 = NameHint::new(name);
-                    name_hint2.push(t.1);
+                    name_hint2.push(t.local_name);
                     // TODO: move this heuristic in names.rs
-                    let name_hint = if t.1.to_lowercase().contains(&name.to_lowercase()) {
+                    let name_hint = if t.local_name.to_lowercase().contains(&name.to_lowercase()) {
                         name_hint1
                     }
                     else {
@@ -873,7 +870,8 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     };
                     let struct_name = name_from_hint(&name_hint).unwrap();
                     let mut doc = self.process_annotation(&annotation);
-                    let (elems, doc2) = self.inline_elements.entry((namespace, name, Attrs::new(), Type::Alias(FullName::new(t.0, t.1))))
+                    let t = FullName::from_qname(t, self.target_namespace);
+                    let (elems, doc2) = self.inline_elements.entry((namespace, name, Attrs::new(), Type::Alias(t)))
                             .or_insert((HashSet::new(), Documentation::new()));
                     elems.insert(struct_name.clone());
                     doc.extend(doc2);
@@ -901,7 +899,6 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             match attr_decl {
                 enums::AttrOrAttrGroup::Attribute(e) => {
                     let name = e.attr_name.as_ref().map(|ncn| FullName::new(self.target_namespace, ncn.0));
-                    let mut ref_ = e.attr_ref.as_ref().map(|qn| FullName::new(qn.0, qn.1));
                     let mut type_attr: Option<QName<'input>> = e.attr_type;
                     let use_ = match e.attr_use.as_ref().map(|x| ((x.0).0).0) {
                         Some("prohibited") => AttrUse::Prohibited,
@@ -910,9 +907,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         None => AttrUse::Optional, // TODO
                         Some(s) => panic!("Unknown attribute value use={:?}", s),
                     };
-                    match (name, ref_, type_attr, &e.local_simple_type) {
+                    match (name, e.attr_ref, type_attr, &e.local_simple_type) {
                         (Some(name), None, Some(t), None) => {
-                            attrs.named.push((name, use_, Some(SimpleType::Alias(FullName::new(t.0, t.1)))));
+                            let t = FullName::from_qname(&t, self.target_namespace);
+                            attrs.named.push((name, use_, Some(SimpleType::Alias(t))));
                         },
                         (Some(name), None, None, Some(t)) => {
                             let t = self.process_local_simple_type(t);
@@ -932,8 +930,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     }
                 },
                 enums::AttrOrAttrGroup::AttributeGroup(e) => {
-                    let mut ref_ = FullName::new(e.attr_ref.0, e.attr_ref.1);
-                    attrs.group_refs.push(ref_);
+                    attrs.group_refs.push(FullName::from_qname(&e.attr_ref, self.target_namespace));
                 },
             }
         }
