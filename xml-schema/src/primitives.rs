@@ -50,7 +50,6 @@ macro_rules! validate_str {
 
 macro_rules! validate_int {
     ( $n:expr, $facets:expr) => {{
-        let facets = $facets;
         let n: BigDecimal = $n.into();
         validate_decimal!(n, $facets);
     }}
