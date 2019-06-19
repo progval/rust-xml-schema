@@ -1,6 +1,32 @@
 # rust-xml-schema
 XML Parser generator based on XML schemas.
 
+Project status: pre-alpha
+
+## Features
+
+* Self-generating, meaning that all features used by `XMLSchema.xsd`
+  (XML Schema's definition using XML Schema itself) are supported.
+  This includes:
+  * namespaces
+  * group/choice/sequence/element
+  * attributes
+* Most datatypes (some natively implemented, some generated via `derived.nxsd`)
+* Anonymous elements are given a name using a best-effort heuristic -- they
+  are manually overridable
+
+## To do
+
+* simpleContent
+* some facets
+* anything related to XPath
+* assertions
+* time data types
+* notation
+* many other stuff, grep for `TODO`, `unimplemented`, `unwrap`, or `expect` in the code.
+* add tests
+* check conformance to the XSD specification
+
 ## Regenerating the schema parser
 
 ```
