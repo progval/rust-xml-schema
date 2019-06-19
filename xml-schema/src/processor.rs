@@ -457,8 +457,15 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             assertions: &'ast xs::Assertions<'input>,
             inlinable: bool,
             ) -> RichType<'input, Type<'input>> {
-        self.process_type_def_particle(type_def_particle.as_ref().unwrap(), inlinable)
-            .add_attrs(self.process_attr_decls(attr_decls))
+        let ty = match type_def_particle.as_ref() {
+            Some(type_def_particle) => self.process_type_def_particle(type_def_particle, inlinable),
+            None => RichType::new(
+                NameHint::new("empty_particle"),
+                Type::Empty,
+                Documentation::new()
+            ),
+        };
+        ty.add_attrs(self.process_attr_decls(attr_decls))
     }
 
     fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>, inlinable: bool) -> RichType<'input, Type<'input>> {
