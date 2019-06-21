@@ -38,6 +38,8 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
     primitive_types: HashMap<&'static str, RichType<'input, Type<'input>>>,
     simple_restrictions: HashMap<(FullName<'input>, Facets<'input>), String>,
     renames: HashMap<String, String>,
+    type_names: HashMap<TypeId, (String, String)>, // (mod_name, type_name)
+    simple_type_names: HashMap<SimpleTypeId, (String, String)>, // (mod_name, type_name)
     self_gen: bool,
 }
 
@@ -67,6 +69,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         ParserGenerator {
             processors, renames, module_names, primitive_types, self_gen,
             simple_restrictions: HashMap::new(),
+            type_names: HashMap::new(), simple_type_names: HashMap::new(),
         }
     }
 
@@ -86,10 +89,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         scope.raw("pub use std::collections::HashMap;");
         scope.raw("pub use std::marker::PhantomData;");
         self.create_modules(&mut scope);
-        self.gen_choices(&mut scope);
-        self.gen_simple_types(&mut scope);
-        self.gen_lists(&mut scope);
-        self.gen_unions(&mut scope);
+        self.allocate_names();
+        self.gen_anonymous_types(&mut scope);
         self.gen_sequences(&mut scope);
         self.gen_elements(&mut scope);
         self.gen_inline_elements(&mut scope);
@@ -113,26 +114,150 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn gen_choices(&self, scope: &mut cg::Scope) {
-        let module = scope.new_module("enums");
-        module.vis("pub");
-        module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
+    fn allocate_names(&mut self) {
         let mut name_gen = NameGenerator::new();
         for proc in &self.processors {
-            let mut choices: Vec<_> = proc.choices.iter().collect();
-            choices.sort_by_key(|&(t,names)| (t, names.iter().collect::<Vec<_>>()));
-            for (ref choice, ref names) in choices {
-                for name in names.iter() {
-                    let enum_name = escape_keyword(&name.to_camel_case());
-                    let enum_name = name_gen.gen_name(enum_name);
-                    self.gen_choice(module.scope(), &enum_name, choice, &Documentation::new());
+            // Complex types
+            let mut types: Vec<_> = proc.anonymous_types.iter().collect();
+            types.sort_by_key(|&(id,_type)| id);
+            for (&id, ref type_) in types {
+                let name = name_from_hint(&type_.name_hint).unwrap();  // TODO: handle None
+                let (mod_name, type_name) = match type_.type_ {
+                    Type::Choice(_, _, _) => ("choices".to_string(), name.to_camel_case()),
+                    _ => unimplemented!("{:?}", type_.type_),
+                };
+                let type_name = escape_keyword(&type_name);
+                let type_name = name_gen.gen_name(type_name);
+                let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
+                self.type_names.insert(id, (mod_name, type_name.clone()));
+            }
+
+            // Simple types
+            let mut types: Vec<_> = proc.anonymous_simple_types.iter().collect();
+            types.sort_by_key(|&(id,_type)| id);
+            for (&id, ref type_) in types {
+                let (mod_name, type_name) = match type_.type_ {
+                    SimpleType::Alias(name) => {
+                        if name.namespace() == Some(&SCHEMA_URI) {
+                            let mut res = None;
+                            for (prim_name, prim_type_name) in PRIMITIVE_TYPES {
+                                if *prim_name == name.local_name() {
+                                    res = Some(("support".to_string(), prim_type_name.to_string()))
+                                }
+                            }
+                            res.expect(&format!("Unknown primitive type in schema {}: {:?}", SCHEMA_URI, name.local_name()))
+                        }
+                        else {
+                            let type_mod_name = self.get_module_name(name);
+                            let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
+                            let type_name = escape_keyword(&name.local_name().to_camel_case());
+                            (type_mod_name, type_name)
+                        }
+                    },
+                    SimpleType::Restriction(base_name, facets) => {
+                        let name = match &facets.enumeration {
+                            Some(items) => {
+                                if items.len() == 1 {
+                                    format!("{}", items[0])
+                                }
+                                else {
+                                    format!("enumeration_{}", items.join("_"))
+                                }
+                            },
+                            None => format!("Restrict_{}", base_name.local_name()),
+                        };
+                        ("simple_restrictions".to_string(), name)
+                    }
+                    SimpleType::Primitive(field_name, type_name) => {
+                        ("support".to_string(), type_name.to_string())
+                    },
+                    SimpleType::Union(type_names) => {
+                        let name = name_from_hint(&type_.name_hint).unwrap();
+                        ("unions".to_string(), name)
+                    },
+                    SimpleType::List(name) => {
+                        let name = name_from_hint(&type_.name_hint).unwrap();
+                        ("lists".to_string(), name)
+                    },
+                    SimpleType::Empty => {
+                        ("fixme_empty".to_string(), "FixmeEmpty".to_string()) // FIXME
+                    },
+                };
+                let type_name = escape_keyword(&type_name);
+                let type_name = name_gen.gen_name(type_name);
+                let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
+                self.simple_type_names.insert(id, (mod_name, type_name.clone()));
+            }
+        }
+    }
+
+    fn gen_anonymous_types(&self, scope: &mut cg::Scope) {
+        let choices_module = scope.new_module("choices");
+        choices_module.vis("pub");
+        choices_module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
+
+        let unions_module = scope.new_module("unions");
+        unions_module.vis("pub");
+        unions_module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
+
+        let simple_restrictions_module = scope.new_module("simple_restrictions");
+        simple_restrictions_module.vis("pub");
+        simple_restrictions_module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
+
+        let lists_module = scope.new_module("lists");
+        lists_module.vis("pub");
+        lists_module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
+
+        for proc in &self.processors {
+            // Complex types
+            let mut types: Vec<_> = proc.anonymous_types.iter().collect();
+            types.sort_by_key(|&(id,_type)| id);
+            for (id, ref type_) in types {
+                let (type_mod_name, type_name) = self.type_names.get(id).unwrap();
+                match type_.type_ {
+                    Type::Choice(min_occurs, max_occurs, items) => {
+                        let items = items.iter().map(|id| proc.anonymous_types.get(id).unwrap()).collect();
+                        self.gen_choice(choices_module.scope(), &type_name, &items, &Documentation::new());
+                    },
+                    _ => panic!("wat"),
+                }
+            }
+
+            // Simple types
+            let mut types: Vec<_> = proc.anonymous_simple_types.iter().collect();
+            types.sort_by_key(|&(id,_type)| id);
+            for (id, ref type_) in types {
+                let type_name = self.simple_type_names.get(id).unwrap();
+                match type_.type_ {
+                    SimpleType::Alias(name) => {}, // nothing to generate
+                    SimpleType::Restriction(ref base_name, ref facets) => {
+                        let base_mod_name = self.module_names.get(&base_name.namespace()).unwrap();
+                        let base_type_name = escape_keyword(base_name.local_name());
+                        self.gen_simple_restriction(simple_restrictions_module.scope(), type_name.1, (base_mod_name, &base_type_name), facets, type_.doc);
+                    }
+                    SimpleType::Primitive(field_name, type_name) => {}, // Nothing to generate
+                    SimpleType::Union(variants) => {
+                        let mut name_gen = NameGenerator::new();
+                        let variants: Vec<_> = variants.iter().map(|id| {
+                            let variant_name = name_from_hint(&proc.anonymous_simple_types.get(id).unwrap().name_hint).unwrap_or("variant".to_string());
+                            let variant_name = escape_keyword(&variant_name.to_camel_case());
+                            let variant_name = name_gen.gen_name(variant_name);
+                            (variant_name, self.simple_type_names.get(id).unwrap())
+                        }).collect();
+                        self.gen_union(unions_module.scope(), &type_name.1, &variants, &type_.doc);
+                    },
+                    SimpleType::List(item_type_id) => {
+                        let (item_type_mod_name, item_type_name) = self.simple_type_names.get(&item_type_id).unwrap();
+                        self.gen_list(unions_module.scope(), type_name.1, (&item_type_mod_name, &item_type_name), &type_.doc);
+                    },
+                    SimpleType::Empty => {}, // Nothing to generate
                 }
             }
         }
     }
-    fn gen_choice(&self, scope: &mut cg::Scope, enum_name: &String, items: &Vec<RichType<'input, Type<'input>>>, doc: &Documentation<'input>) {
+
+    fn gen_choice(&self, scope: &mut cg::Scope, enum_name: &String, items: &Vec<&RichType<'input, Type<'input>>>, doc: &Documentation<'input>) {
         let mut impl_code = Vec::new();
-        let enum_name = self.renames.get(enum_name).unwrap_or(enum_name);
         impl_code.push(format!("impl_enum!({},", enum_name));
         {
             let enum_ = scope.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
@@ -198,100 +323,29 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         impl_code.push(");".to_string());
         scope.raw(&impl_code.join("\n"));
     }
-    fn gen_unions(&self, scope: &mut cg::Scope) {
-        let module = scope.new_module("unions");
-        module.vis("pub");
-        module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
-        let mut name_gen = NameGenerator::new();
-        for proc in &self.processors {
-            let mut unions: Vec<_> = proc.unions.iter().collect();
-            unions.sort_by_key(|&(items, names)| (items, names.iter().collect::<Vec<_>>()));
-            for (ref items, ref names) in unions {
-                for name in names.iter() {
-                    let enum_name = escape_keyword(&name.to_camel_case());
-                    let enum_name = name_gen.gen_name(enum_name);
-                    let mut impl_code = Vec::new();
-                    impl_code.push(format!("impl_union!({}, {{", enum_name));
-                    {
-                        let enum_ = module.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-                        for item in items.iter() {
-                            let RichType { name_hint, attrs, type_, doc } = item;
-                            let variant_name = name_from_hint(name_hint).unwrap().to_camel_case();
-                            if let Some((type_mod_name, type_name)) = self.get_simple_type_name(type_) {
-                                enum_.new_variant(&variant_name).tuple(&format!("{}::{}<'input>", type_mod_name, type_name));
-                                impl_code.push(format!("    impl_union_variant!({}),", variant_name));
-                            }
-                        }
-                    }
-                    impl_code.push(format!("}});"));
-                    module.scope().raw(&impl_code.join("\n"));
-                }
+    fn gen_union(&self, module: &mut cg::Scope, enum_name: &String, items: &Vec<(String, &(String, String))>, doc: &Documentation<'input>) {
+        let mut impl_code = Vec::new();
+        impl_code.push(format!("impl_union!({}, {{", enum_name));
+        {
+            let enum_ = module.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            for (variant_name, (variant_type_mod_name, variant_type_name)) in items.iter() {
+                enum_.new_variant(&variant_name).tuple(&format!("{}::{}<'input>", variant_type_mod_name, variant_type_name));
+                impl_code.push(format!("    impl_union_variant!({}),", variant_name));
             }
         }
+        impl_code.push(format!("}});"));
+        module.raw(&impl_code.join("\n"));
     }
 
-    fn gen_lists(&self, scope: &mut cg::Scope) {
-        let module = scope.new_module("lists");
-        module.vis("pub");
-        module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
-        let mut name_gen = NameGenerator::new();
-        for proc in &self.processors {
-            let mut lists: Vec<_> = proc.lists.iter().collect();
-            lists.sort_by_key(|&(item_type, names)| (item_type, names.iter().collect::<Vec<_>>()));
-            for (ref item_type, ref names) in lists {
-                for name in names.iter() {
-                    let name = escape_keyword(&name.to_camel_case());
-                    let struct_name = name_gen.gen_name(name);
-                    if let Some((type_mod_name, type_name)) = self.get_simple_type_name(&item_type.type_) {
-                        {
-                            let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-                            struct_.tuple_field(&format!("pub Vec<{}::{}<'input>>", type_mod_name, type_name));
-                        }
-                        module.scope().raw(&format!("impl_list!({}, {}::{});", struct_name, type_mod_name, type_name));
-                    }
-                }
-            }
-        }
+    fn gen_list(&self, module: &mut cg::Scope, struct_name: String, item_type_name: (&str, &str), doc: &Documentation<'input>) {
+        let (type_mod_name, type_name) = item_type_name;
+        let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+        struct_.tuple_field(&format!("pub Vec<{}::{}<'input>>", type_mod_name, type_name));
+
+        module.raw(&format!("impl_list!({}, {}::{});", struct_name, type_mod_name, type_name));
     }
 
-    fn get_simple_type_name(&self, ty: &SimpleType<'input>) -> Option<(String, String)> {
-        let (type_mod_name, type_name) = match ty {
-            SimpleType::Alias(name) => {
-                if name.namespace() == Some(&SCHEMA_URI) {
-                    for (prim_name, prim_type_name) in PRIMITIVE_TYPES {
-                        if *prim_name == name.local_name() {
-                            return Some(("support".to_string(), prim_type_name.to_string()));
-                        }
-                    }
-                }
-                let type_mod_name = self.get_module_name(*name);
-                let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-                let type_name = escape_keyword(&name.local_name().to_camel_case());
-                (type_mod_name, type_name)
-            },
-            SimpleType::Restriction(name, facets) => {
-                ("restrictions".to_string(), self.simple_restrictions.get(&(name.clone(), facets.clone())).unwrap().to_string())
-            }
-            SimpleType::Primitive(field_name, type_name) => {
-                ("support".to_string(), type_name.to_string())
-            },
-            SimpleType::Union(type_name) => {
-                let type_name = escape_keyword(&type_name.to_camel_case());
-                ("unions".to_string(), type_name)
-            },
-            SimpleType::List(name) => {
-                let type_name = escape_keyword(&name.to_camel_case());
-                ("lists".to_string(), type_name)
-            },
-            SimpleType::Empty => {
-                return None
-            },
-        };
-        Some((type_mod_name, type_name))
-    }
-
-    fn gen_simple_types(&mut self, scope: &mut cg::Scope) {
-        self.gen_simple_restrictions(scope);
+    /*fn gen_simple_types(&mut self, scope: &mut cg::Scope) {
         let mut name_gen = NameGenerator::new();
         for proc in &self.processors {
             let mut types: Vec<_> = proc.simple_types.iter().collect();
@@ -314,65 +368,36 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 }
             }
         }
-    }
+    }*/
 
-    fn gen_simple_restrictions(&mut self, scope: &mut cg::Scope) {
-        let mut name_gen = NameGenerator::new();
-        let module = scope.new_module("restrictions");
-        module.vis("pub");
-        module.scope().raw("#[allow(unused_imports)]\nuse super::*;");
-
-        for proc in &self.processors {
-            let mut simple_restrictions: Vec<_> = proc.simple_restrictions.iter().collect();
-
-            simple_restrictions.sort();
-            for (base_name, facets) in simple_restrictions {
-                if self.simple_restrictions.get(&(*base_name, facets.clone())).is_some() {
-                    continue;
-                }
-                let name = match &facets.enumeration {
-                    Some(items) => {
-                        if items.len() == 1 {
-                            format!("{}", items[0])
-                        }
-                        else {
-                            format!("enumeration_{}", items.join("_"))
-                        }
-                    },
-                    None => format!("Restrict_{}", base_name.local_name()),
-                };
-                let name = name.to_camel_case();
-                let name = name_gen.gen_name(name.clone());
-                self.simple_restrictions.insert((base_name.clone(), facets.clone()), name.clone());
-                let (base_mod_name, base_type_name) = self.get_simple_type_name(&SimpleType::Alias(*base_name)).unwrap(); // TODO
-                module.scope().raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}::{}<'input>);", name, base_mod_name, base_type_name));
-                let mut s = Vec::new();
-                let f = &mut |n: &Option<_>| {
-                    match n.as_ref() {
-                        None => "None".to_string(),
-                        Some(f) => format!("Some(BigFloatNotNaN::from_str(\"{}\").unwrap())", f),
-                    }
-                };
-                s.push(format!("min_exclusive: {},", f(&facets.min_exclusive)));
-                s.push(format!("min_inclusive: {},", f(&facets.min_inclusive)));
-                s.push(format!("max_exclusive: {},", f(&facets.max_exclusive)));
-                s.push(format!("max_inclusive: {},", f(&facets.max_inclusive)));
-                s.push(format!("total_digits: {:?},", facets.total_digits));
-                s.push(format!("fraction_digits: {:?},", facets.fraction_digits));
-                s.push(format!("length: {:?},", facets.length));
-                s.push(format!("min_length: {:?},", facets.min_length));
-                s.push(format!("max_length: {:?},", facets.max_length));
-                match &facets.enumeration {
-                    Some(items) => s.push(format!("enumeration: Some(vec![{}]),", items.iter().map(|i| format!("{:?}", i)).collect::<Vec<_>>().join(", "))),
-                    None => s.push("enumeration: None,".to_string()),
-                }
-                s.push(format!("white_space: {:?},", facets.white_space));
-                s.push(format!("pattern: {:?},", facets.pattern));
-                s.push(format!("assertion: {:?},", facets.assertion));
-                s.push(format!("explicit_timezone: {:?},", facets.explicit_timezone));
-                module.scope().raw(&format!("impl_simpletype_restriction!({}, Facets {{\n    {}\n}});", name, s.join("\n    ")));
+    fn gen_simple_restriction(&mut self, module: &mut cg::Scope, struct_name: String, base_name: (&str, &str), facets: &Facets<'input>, doc: Documentation<'input>) {
+        let (base_mod_name, base_type_name) = base_name;
+        module.raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}::{}<'input>);", struct_name, base_mod_name, base_type_name));
+        let mut s = Vec::new();
+        let f = &mut |n: &Option<_>| {
+            match n.as_ref() {
+                None => "None".to_string(),
+                Some(f) => format!("Some(BigFloatNotNaN::from_str(\"{}\").unwrap())", f),
             }
+        };
+        s.push(format!("min_exclusive: {},", f(&facets.min_exclusive)));
+        s.push(format!("min_inclusive: {},", f(&facets.min_inclusive)));
+        s.push(format!("max_exclusive: {},", f(&facets.max_exclusive)));
+        s.push(format!("max_inclusive: {},", f(&facets.max_inclusive)));
+        s.push(format!("total_digits: {:?},", facets.total_digits));
+        s.push(format!("fraction_digits: {:?},", facets.fraction_digits));
+        s.push(format!("length: {:?},", facets.length));
+        s.push(format!("min_length: {:?},", facets.min_length));
+        s.push(format!("max_length: {:?},", facets.max_length));
+        match &facets.enumeration {
+            Some(items) => s.push(format!("enumeration: Some(vec![{}]),", items.iter().map(|i| format!("{:?}", i)).collect::<Vec<_>>().join(", "))),
+            None => s.push("enumeration: None,".to_string()),
         }
+        s.push(format!("white_space: {:?},", facets.white_space));
+        s.push(format!("pattern: {:?},", facets.pattern));
+        s.push(format!("assertion: {:?},", facets.assertion));
+        s.push(format!("explicit_timezone: {:?},", facets.explicit_timezone));
+        module.raw(&format!("impl_simpletype_restriction!({}, Facets {{\n    {}\n}});", struct_name, s.join("\n    ")));
     }
 
     fn gen_sequences(&mut self, scope: &mut cg::Scope) {
@@ -664,7 +689,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             Type::Element(min_occurs, max_occurs, name) => {
                 field_writer(name.to_string(), "inline_elements".to_string(), *min_occurs, *max_occurs, name.to_string());
             }
-            Type::Group(min_occurs, max_occurs, name) |
+            Type::GroupRef(min_occurs, max_occurs, name) |
             Type::ElementRef(min_occurs, max_occurs, name) => {
                 let field_name = name.local_name();
                 let mod_name = self.get_module_name(*name);
@@ -708,7 +733,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             Type::InlineSequence(_) |
             Type::Sequence(_, _, _) |
             Type::Element(_, _, _) |
-            Type::Group(_, _, _) |
+            Type::GroupRef(_, _, _) |
             Type::ElementRef(_, _, _) |
             Type::Choice(_, _, _) |
             Type::Empty |
