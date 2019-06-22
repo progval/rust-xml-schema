@@ -94,7 +94,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         self.gen_sequences(&mut scope);
         self.gen_elements(&mut scope);
         self.gen_inline_elements(&mut scope);
-        self.gen_groups(&mut scope);
         scope
     }
 
@@ -123,7 +122,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             for (&id, ref type_) in types {
                 let name = name_from_hint(&type_.name_hint).unwrap();  // TODO: handle None
                 let (mod_name, type_name) = match type_.type_ {
-                    Type::Choice(_, _, _) => ("choices".to_string(), name.to_camel_case()),
+                    Type::Choice(_) => ("choices".to_string(), name.to_camel_case()),
                     _ => unimplemented!("{:?}", type_.type_),
                 };
                 let type_name = escape_keyword(&type_name);
@@ -215,7 +214,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             for (id, ref type_) in types {
                 let (type_mod_name, type_name) = self.type_names.get(id).unwrap();
                 match type_.type_ {
-                    Type::Choice(min_occurs, max_occurs, items) => {
+                    Type::Choice(items) => {
+                        let items = items.iter().map(|id| proc.anonymous_types.get(id).unwrap()).collect();
+                        self.gen_choice(choices_module.scope(), &type_name, &items, &Documentation::new());
+                    },
+                    Type::Sequence(items) => {
                         let items = items.iter().map(|id| proc.anonymous_types.get(id).unwrap()).collect();
                         self.gen_choice(choices_module.scope(), &type_name, &items, &Documentation::new());
                     },
@@ -417,28 +420,6 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn gen_groups(&mut self, scope: &mut cg::Scope) {
-        for proc in &self.processors {
-            let mut groups: Vec<_> = proc.groups.iter().collect();
-
-            groups.sort_by_key(|&(n,_)| n);
-            for (&name, group) in groups {
-                let mod_name = self.get_module_name(name);
-                let mut module = scope.get_module_mut(&mod_name).unwrap();
-                let struct_name = name.local_name();
-                if let Type::InlineChoice(ref items) = group.type_ {
-                    self.gen_choice(module.scope(), &struct_name.to_string().to_camel_case(), items, &group.doc);
-                }
-                else if let Type::InlineSequence(ref items) = group.type_ {
-                    self.gen_group_or_sequence(module, struct_name, &items.iter().collect(), &group.doc);
-                }
-                else {
-                    self.gen_group_or_sequence(module, struct_name, &vec![group], &group.doc);
-                }
-            }
-        }
-    }
-
     fn gen_fields(&self, empty_struct: &mut bool, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, doc: &mut Documentation<'input>, name_gen: &mut NameGenerator, type_: &Type<'input>) {
         let field_writer = &mut |name: String, type_mod_name: String, min_occurs, max_occurs, type_name: String| {
             *empty_struct = false;
@@ -573,9 +554,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             if generated_attrs.contains(attr_name) {
                 continue;
             }
-            let default_type = SimpleType::Primitive(SCHEMA_URI, "AnySimpleType");
-            let type_ = attr_type.as_ref().unwrap_or(&default_type);
-            let (type_mod_name, type_name) = self.get_simple_type_name(&type_).unwrap();
+            let default_type = ("support".to_string(), "AnySimpleType".to_string());
+            let (type_mod_name, type_name) = attr_type
+                .map(|id| self.simple_type_names.get(&id).unwrap())
+                .unwrap_or(&default_type);
             let use_ = if inherited {
                 *seen_attrs.get(attr_name).unwrap_or(use_)
             }
@@ -652,7 +634,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             if proc.target_namespace != name.namespace() {
                 continue;
             }
-            type_ = proc.types.get(name);
+            type_ = proc.types.get(name).and_then(|id| proc.anonymous_types.get(id));
             if type_.is_some() {
                 break;
             }
@@ -716,7 +698,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 field_writer("any".to_string(), "support".to_string(), 1, 1, "Any".to_string())
             },
             Type::Simple(type_) => {
-                let (type_mod_name, type_name) = self.get_simple_type_name(&type_).unwrap();
+                let (type_mod_name, type_name) = self.simple_type_names.get(&type_).unwrap();
                 field_writer(type_name.clone(), type_mod_name, 1, 1, type_name);
             }
             _ => unimplemented!("writing {:?}", type_),
@@ -730,12 +712,11 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let target_attrs = self.compute_attrs(&target_type.type_, &target_type.attrs);
                 self.extend_attrs(&target_attrs, own_attrs)
             },
-            Type::InlineSequence(_) |
-            Type::Sequence(_, _, _) |
-            Type::Element(_, _, _) |
-            Type::GroupRef(_, _, _) |
-            Type::ElementRef(_, _, _) |
-            Type::Choice(_, _, _) |
+            Type::Sequence(_) |
+            Type::Element(_) |
+            Type::GroupRef(_) |
+            Type::ElementRef(_) |
+            Type::Choice(_) |
             Type::Empty |
             Type::Any => {
                 own_attrs.clone()

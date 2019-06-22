@@ -29,6 +29,21 @@ macro_rules! register_rich_simple_type {
     }}
 }
 
+macro_rules! many {
+    ($self:expr, $min_occurs:expr, $max_occurs:expr, $id:expr) => {{
+        if $min_occurs != 1 || $max_occurs != 1 {
+            register_rich_type!($self, RichType::new(
+                NameHint::new("many"),
+                Type::Many($min_occurs, $max_occurs, $id),
+                Documentation::new(),
+                ))
+        }
+        else {
+            $id
+        }
+    }}
+}
+
 fn parse_min_occurs(x: &Option<NonNegativeInteger>) -> usize {
     match x {
         None => 1,
@@ -78,7 +93,7 @@ pub enum AttrUse {
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Attrs<'input> {
-    pub named: Vec<(FullName<'input>, AttrUse, Option<SimpleType<'input>>)>,
+    pub named: Vec<(FullName<'input>, AttrUse, Option<SimpleTypeId>)>,
     pub refs: Vec<(Option<FullName<'input>>, AttrUse, FullName<'input>)>,
     pub group_refs: Vec<FullName<'input>>,
     pub any_attributes: bool,
@@ -156,10 +171,8 @@ pub enum Type<'input> {
     Element(String),
     GroupRef(FullName<'input>),
     Choice(Vec<TypeId>),
-    InlineChoice(Vec<TypeId>),
     Sequence(Vec<TypeId>),
     Many(usize, usize, TypeId),
-    InlineSequence(Vec<TypeId>),
     Simple(SimpleType<'input>),
 }
 
@@ -179,7 +192,7 @@ pub struct Processor<'ast, 'input: 'ast> {
     pub target_namespace: Option<&'input str>,
     pub element_form_default_qualified: bool,
     pub attribute_form_default_qualified: bool,
-    pub elements: HashMap<FullName<'input>, TypeId>,
+    pub elements: HashMap<FullName<'input>, RichType<'input, Type<'input>>>,
     pub types: HashMap<FullName<'input>, TypeId>,
     pub simple_types: HashMap<FullName<'input>, (RichType<'input, SimpleType<'input>>, Documentation<'input>)>,
     pub sequences: HashMap<Vec<RichType<'input, Type<'input>>>, (HashSet<String>, Documentation<'input>)>,
@@ -289,19 +302,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let ref_ = FullName::from_qname(ref_, self.target_namespace);
         let id = register_rich_type!(self, RichType::new(
             NameHint::new(ref_.local_name()),
-            Type::GroupRef(min_occurs, max_occurs, ref_),
+            Type::GroupRef(ref_),
             self.process_annotation(&annotation.iter().collect()),
             ));
-        if min_occurs == 1 && max_occurs == 1 {
-            register_rich_type!(self, RichType::new(
-                NameHint::new(ref_.local_name()),
-                Type::Many(min_occurs, max_occurs, id),
-                self.process_annotation(&annotation.iter().collect()),
-                ))
-        }
-        else {
-            id
-        }
+        many!(self, min_occurs, max_occurs, id)
     }
 
     fn process_named_group(&mut self, 
@@ -326,19 +330,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         self.groups.insert(name, id);
         let id = register_rich_type!(self, RichType::new(
             NameHint::from_fullname(&name),
-            Type::GroupRef(min_occurs, max_occurs, name),
-            doc,
+            Type::GroupRef(name),
+            doc.clone(),
             ));
-        if min_occurs == 1 && max_occurs == 1 {
-            register_rich_type!(self, RichType::new(
-                NameHint::new(ref_.local_name()),
-                Type::Many(min_occurs, max_occurs, id),
-                self.process_annotation(&annotation.iter().collect()),
-                ))
-        }
-        else {
-            id
-        }
+        many!(self, min_occurs, max_occurs, id)
     }
 
     fn process_attribute_group(&mut self, group: &'ast xs::AttributeGroup<'input>) {
@@ -690,7 +685,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let max_occurs = parse_max_occurs(attr_max_occurs);
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("sequence");
-        if min_occurs == 1 && max_occurs == 1 && inlinable && particles.len() == 1 {
+        let id = if inlinable && particles.len() == 1 {
             self.process_nested_particle(particles.get(0).unwrap(), annotation.iter().collect(), inlinable)
         }
         else {
@@ -700,22 +695,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 items.push(id);
             }
             let doc = self.process_annotation(&annotation.iter().collect());
-            if min_occurs == 1 && max_occurs == 1 {
-                register_rich_type!(self, RichType::new(
-                    name_hint,
-                    Type::InlineSequence(items),
-                    doc,
-                    ))
-            }
-            else {
-                let name = name_from_hint(&name_hint).unwrap();
-                register_rich_type!(self, RichType::new(
-                    name_hint,
-                    Type::Sequence(min_occurs, max_occurs, name),
-                    doc,
-                    ))
-            }
-        }
+            register_rich_type!(self, RichType::new(
+                name_hint.clone(),
+                Type::Sequence(items),
+                doc,
+                ))
+        };
+        many!(self, min_occurs, max_occurs, id)
     }
 
     fn process_choice(&mut self,
@@ -728,32 +714,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let max_occurs = parse_max_occurs(attr_max_occurs);
         let mut items = Vec::new();
         let mut name_hint = NameHint::new("choice");
-        if particles.len() == 1 {
+        let doc = self.process_annotation(&annotation.iter().collect());
+        let id = if particles.len() == 1 {
             let particle = particles.get(0).unwrap();
-            let id = self.process_nested_particle(particle, annotation.iter().collect(), inlinable);
-            let RichType { name_hint, attrs, type_, doc } = self.anonymous_types.remove(&id).unwrap();
-            match (min_occurs, max_occurs, type_) {
-                (_, _, Type::Element(1, 1, e)) => return register_rich_type!(self, RichType {
-                    name_hint, attrs, type_: Type::Element(min_occurs, max_occurs, e), doc }),
-                (_, _, Type::GroupRef(1, 1, e)) => return register_rich_type!(self, RichType {
-                    name_hint, attrs, type_: Type::GroupRef(min_occurs, max_occurs, e), doc }),
-                (_, _, Type::Choice(1, 1, items)) => return register_rich_type!(self, RichType {
-                    name_hint, attrs, type_: Type::Choice(min_occurs, max_occurs, items), doc }),
-                (_, _, Type::Sequence(1, 1, e)) => return register_rich_type!(self, RichType {
-                    name_hint, attrs, type_: Type::Sequence(min_occurs, max_occurs, e), doc }),
-                (1, 1, type_) => return register_rich_type!(self, RichType {
-                    name_hint, attrs, type_, doc }),
-                (_, _, type_) => {
-                    let name = name_from_hint(&name_hint).unwrap();
-                    let items = vec![RichType { name_hint: name_hint.clone(), attrs: Attrs::new(), type_, doc: doc.clone() }];
-                    let (names, docs) = self.sequences.entry(items)
-                        .or_insert((HashSet::new(), Documentation::new()));
-                    names.insert(name.clone());
-                    docs.extend(&doc);
-                    let type_ = Type::Sequence(min_occurs, max_occurs, name);
-                    return register_rich_type!(self, RichType { name_hint, attrs, type_, doc })
-                },
-            }
+            self.process_nested_particle(particle, annotation.iter().collect(), inlinable)
         }
         else {
             for particle in particles.iter() {
@@ -761,25 +725,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 name_hint.extend(&self.anonymous_types.get(&id).unwrap().name_hint);
                 items.push(id);
             }
-        }
-        let doc = self.process_annotation(&annotation.iter().collect());
-        match (min_occurs, max_occurs, inlinable) {
-            (1, 1, true) => {
-                register_rich_type!(self, RichType::new(
-                    name_hint,
-                    Type::InlineChoice(items),
-                    doc,
-                    ))
-            },
-            (_, _, _) => {
-                let name = name_from_hint(&name_hint).unwrap();
-                register_rich_type!(self, RichType::new(
-                    name_hint,
-                    Type::Choice(min_occurs, max_occurs, items),
-                    doc,
-                    ))
-            }
-        }
+            register_rich_type!(self, RichType::new(
+                name_hint,
+                Type::Choice(items),
+                doc.clone(),
+            ))
+        };
+        many!(self, min_occurs, max_occurs, id)
     }
 
     fn process_trivial_extension(&mut self,
@@ -824,37 +776,38 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     .push(name.clone());
             }
         }
-        let id = match (type_attr, &child_type) {
+        let ty = match (type_attr, &child_type) {
             (None, Some(ref c)) => match c {
                 enums::Type::SimpleType(ref e) => {
                     let mut id = self.process_local_simple_type(e);
                     let mut ty = self.anonymous_simple_types.remove(&id).unwrap();
                     ty.doc.extend(&self.process_annotation(&annotation));
-                    register_rich_type!(self, ty.into_complex())
+                    ty.into_complex()
                 },
                 enums::Type::ComplexType(ref e) => {
-                    self.process_local_complex_type(e, Some(attr_name), annotation, false)
+                    let id = self.process_local_complex_type(e, Some(attr_name), annotation, false);
+                    self.anonymous_types.remove(&id).unwrap()
                 },
             },
             (Some(t), None) => {
                 let t = FullName::from_qname(&t, self.target_namespace);
-                register_rich_type!(self, RichType::new(
+                RichType::new(
                     NameHint::new(t.local_name()),
                     Type::Alias(t.into()),
                     self.process_annotation(&annotation),
-                    ))
+                    )
             },
             (None, None) => {
-                register_rich_type!(self, RichType::new(
+                RichType::new(
                     NameHint::new("empty"),
                     Type::Empty,
                     self.process_annotation(&annotation),
-                    ))
+                    )
             },
             (Some(ref t1), Some(ref t2)) => panic!("Toplevel element '{:?}' has both a type attribute ({:?}) and a child type ({:?}).", name, t1, t2),
         };
 
-        self.elements.insert(name, id);
+        self.elements.insert(name, ty);
     }
 
     fn process_local_element(&mut self,
@@ -872,11 +825,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 panic!("<element> has both ref={:?} and name={:?}", ref_, name);
             }
             let ref_ = FullName::from_qname(ref_, self.target_namespace);
-            register_rich_type!(self, RichType::new(
-                NameHint::new(ref_.local_name()),
-                Type::ElementRef(min_occurs, max_occurs, ref_),
-                self.process_annotation(&annotation),
-                ))
+            many!(self, min_occurs, max_occurs,
+                register_rich_type!(self, RichType::new(
+                    NameHint::new(ref_.local_name()),
+                    Type::ElementRef(ref_),
+                    self.process_annotation(&annotation),
+                    )))
         }
         else {
             let name = name.as_ref().expect("<element> has no name.").0;
@@ -915,11 +869,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                             .or_insert((HashSet::new(), Documentation::new()));
                     elems.insert(struct_name.clone());
                     t.doc.extend(doc);
-                    register_rich_type!(self, RichType::new(
-                        NameHint::new(name),
-                        Type::Element(min_occurs, max_occurs, struct_name),
-                        t.doc,
-                        ))
+                    many!(self, min_occurs, max_occurs,
+                        register_rich_type!(self, RichType::new(
+                            NameHint::new(name),
+                            Type::Element(struct_name),
+                            t.doc,
+                            )))
                 },
                 (Some(t), None) => {
                     let name_hint1 = NameHint::new(t.local_name);
@@ -939,18 +894,20 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                             .or_insert((HashSet::new(), Documentation::new()));
                     elems.insert(struct_name.clone());
                     doc.extend(doc2);
-                    register_rich_type!(self, RichType::new(
-                        NameHint::new(name),
-                        Type::Element(min_occurs, max_occurs, struct_name),
-                        doc,
-                        ))
+                    many!(self, min_occurs, max_occurs,
+                        register_rich_type!(self, RichType::new(
+                            NameHint::new(name),
+                            Type::Element(struct_name),
+                            doc,
+                            )))
                 },
                 (None, None) => {
-                    register_rich_type!(self, RichType::new(
-                        NameHint::new("empty"),
-                        Type::Empty,
-                        self.process_annotation(&annotation),
-                        ))
+                    many!(self, min_occurs, max_occurs,
+                        register_rich_type!(self, RichType::new(
+                            NameHint::new("empty"),
+                            Type::Empty,
+                            self.process_annotation(&annotation),
+                            )))
                 },
                 (Some(ref t1), Some(ref t2)) => panic!("Element '{:?}' has both a type attribute ({:?}) and a child type ({:?}).", name, t1, t2),
             }
@@ -974,11 +931,16 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     match (name, e.attr_ref, type_attr, &e.local_simple_type) {
                         (Some(name), None, Some(t), None) => {
                             let t = FullName::from_qname(&t, self.target_namespace);
-                            attrs.named.push((name, use_, Some(SimpleType::Alias(t))));
+                            let id = register_rich_simple_type!(self, RichType::new(
+                                NameHint::new(&t.local_name()),
+                                SimpleType::Alias(t),
+                                Documentation::new(),
+                                ));
+                            attrs.named.push((name, use_, Some(id)));
                         },
                         (Some(name), None, None, Some(t)) => {
                             let id = self.process_local_simple_type(t);
-                            attrs.named.push((name, use_, Some(SimpleType::AliasId(id))));
+                            attrs.named.push((name, use_, Some(id)));
                         },
                         (Some(name), None, None, None) =>
                             attrs.named.push((name, use_, None)),
