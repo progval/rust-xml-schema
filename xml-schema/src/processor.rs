@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 use std::hash::Hash;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use xmlparser::Token as XmlToken;
 use xmlparser::{TextUnescape, XmlSpace};
@@ -59,7 +59,7 @@ pub enum AttrUse {
     Optional,
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Attrs<'input> {
     pub named: Vec<(FullName<'input>, AttrUse, Option<SimpleType<'input>>)>,
     pub refs: Vec<(Option<FullName<'input>>, AttrUse, FullName<'input>)>,
@@ -80,55 +80,81 @@ impl<'input> Attrs<'input> {
 }
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct RichType<'input, T: Debug + Hash + PartialEq + Eq + PartialOrd + Ord> {
-    pub name_hint: NameHint<'input>,
+pub struct RichAstNode<'input, T: Debug + Hash + PartialEq + Eq + PartialOrd + Ord, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> {
     pub attrs: Attrs<'input>,
     pub type_: T,
     pub doc: Documentation<'input>,
+    pub data: D,
 }
-impl<'input, T: Debug + Hash + PartialEq + Eq + PartialOrd + Ord> RichType<'input, T> {
-    pub fn new(name_hint: NameHint<'input>, type_: T, doc: Documentation<'input>) -> RichType<'input, T> {
-        RichType { name_hint, attrs: Attrs::new(), type_, doc }
+impl<'input, T: Debug + Hash + PartialEq + Eq + PartialOrd + Ord, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> RichAstNode<'input, T, D> {
+    pub fn new(type_: T, doc: Documentation<'input>) -> RichAstNode<'input, T, D> {
+        RichAstNode { attrs: Attrs::new(), type_, doc, data: D::default() }
     }
 }
-impl<'input> RichType<'input, Type<'input>> {
-    fn add_attrs(mut self, new_attrs: Attrs<'input>) -> RichType<'input, Type<'input>> {
+impl<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> RichAstNode<'input, Type<'input>, D> {
+    fn add_attrs(mut self, new_attrs: Attrs<'input>) -> RichAstNode<'input, Type<'input>, D> {
         self.attrs.extend(new_attrs);
         self
     }
 }
 
-impl<'input> RichType<'input, SimpleType<'input>> {
-    pub fn into_complex(self) -> RichType<'input, Type<'input>> {
-        let RichType { name_hint, attrs, type_, doc } = self;
-        RichType { name_hint, attrs, type_: Type::Simple(type_), doc }
+impl<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> RichAstNode<'input, SimpleType<'input>, D> {
+    pub fn into_complex(self) -> RichAstNode<'input, Type<'input>, D> {
+        let RichAstNode { attrs, type_, doc, data } = self;
+        RichAstNode { attrs, type_: Type::Simple(type_), doc, data }
     }
 }
+
+/// A reference to a type, that can be part of another type/element/...
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct InlineComplexType<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> {
+    min_occurs: usize,
+    max_occurs: usize,
+    type_: RichAstNode<'input, Type<'input>, D>,
+}
+impl<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> InlineComplexType<'input, D> {
+    fn new(min_occurs: usize, max_occurs: usize, type_: RichAstNode<'input, Type<'input>, D>) -> InlineComplexType<'input, D> {
+        InlineComplexType { min_occurs, max_occurs, type_ }
+    }
+}
+
+/// A reference to a type, that can be part of another type/element/...
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct InlineSimpleType<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> {
+    type_: RichAstNode<'input, SimpleType<'input>, D>,
+}
+impl<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> InlineSimpleType<'input, D> {
+    fn new(type_: RichAstNode<'input, SimpleType<'input>, D>) -> InlineSimpleType<'input, D> {
+        InlineSimpleType { type_ }
+    }
+
+    fn into_complex(self) -> InlineComplexType<'input, D> {
+        InlineComplexType { min_occurs: 0, max_occurs: 0, type_: self.type_.into_complex() }
+    }
+}
+
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Type<'input> {
     Any,
     Empty,
     Alias(FullName<'input>),
-    Extension(FullName<'input>, Box<RichType<'input, Type<'input>>>),
-    Restriction(FullName<'input>, Box<RichType<'input, Type<'input>>>),
-    ElementRef(usize, usize, FullName<'input>),
-    Element(usize, usize, String),
-    Group(usize, usize, FullName<'input>),
-    Choice(usize, usize, String),
-    InlineChoice(Vec<RichType<'input, Type<'input>>>),
-    Sequence(usize, usize, String),
-    InlineSequence(Vec<RichType<'input, Type<'input>>>),
+    Extension(FullName<'input>, Box<InlineComplexType<'input, ()>>),
+    Restriction(FullName<'input>, Box<InlineComplexType<'input, ()>>),
+    ElementRef(FullName<'input>),
+    Element(FullName<'input>),
+    Group(FullName<'input>),
+    Choice(Vec<InlineComplexType<'input, ()>>),
+    Sequence(Vec<InlineComplexType<'input, ()>>),
     Simple(SimpleType<'input>),
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SimpleType<'input> {
-    Primitive(&'static str, &'static str),
     Alias(FullName<'input>),
     Restriction(FullName<'input>, Facets<'input>),
-    List(String),
-    Union(String),
+    List(Box<InlineSimpleType<'input, ()>>),
+    Union(Vec<InlineSimpleType<'input, ()>>),
     Empty,
 }
 
@@ -137,18 +163,11 @@ pub struct Processor<'ast, 'input: 'ast> {
     pub target_namespace: Option<&'input str>,
     pub element_form_default_qualified: bool,
     pub attribute_form_default_qualified: bool,
-    pub elements: HashMap<FullName<'input>, RichType<'input, Type<'input>>>,
-    pub types: HashMap<FullName<'input>, RichType<'input, Type<'input>>>,
-    pub simple_types: HashMap<FullName<'input>, (RichType<'input, SimpleType<'input>>, Documentation<'input>)>,
-    pub choices: HashMap<Vec<RichType<'input, Type<'input>>>, HashSet<String>>,
-    pub sequences: HashMap<Vec<RichType<'input, Type<'input>>>, (HashSet<String>, Documentation<'input>)>,
-    pub groups: HashMap<FullName<'input>, RichType<'input, Type<'input>>>,
+    pub elements: HashMap<FullName<'input>, InlineComplexType<'input, ()>>,
+    pub simple_types: HashMap<FullName<'input>, (InlineSimpleType<'input, ()>, Documentation<'input>)>,
+    pub groups: HashMap<FullName<'input>, InlineComplexType<'input, ()>>,
     pub attribute_groups: HashMap<FullName<'input>, Attrs<'input>>,
-    pub inline_elements: HashMap<(Option<&'input str>, &'input str, Attrs<'input>, Type<'input>), (HashSet<String>, Documentation<'input>)>,
 
-    pub lists: HashMap<RichType<'input, SimpleType<'input>>, HashSet<String>>,
-    pub unions: HashMap<Vec<RichType<'input, SimpleType<'input>>>, HashSet<String>>,
-    pub simple_restrictions: HashSet<(FullName<'input>, Facets<'input>)>,
     pub substitution_groups: HashMap<FullName<'input>, Vec<FullName<'input>>>,
     _phantom: PhantomData<&'ast ()>, // Sometimes I need 'ast when prototyping
 }
@@ -171,16 +190,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             element_form_default_qualified,
             attribute_form_default_qualified,
             elements: HashMap::new(),
-            types: HashMap::new(),
             groups: HashMap::new(),
-            choices: HashMap::new(),
-            lists: HashMap::new(),
-            unions: HashMap::new(),
-            sequences: HashMap::new(),
             attribute_groups: HashMap::new(),
-            inline_elements: HashMap::new(),
             simple_types: HashMap::new(),
-            simple_restrictions: HashSet::new(),
             substitution_groups: HashMap::new(),
             _phantom: PhantomData::default(),
         }
@@ -189,7 +201,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     pub fn process_ast(&mut self, ast: &'ast xs::Schema<'input>) {
         for top_level_item in ast.sequence_schema_top_annotation.iter() {
             match top_level_item.schema_top {
-                xs::SchemaTop::Redefinable(ref r) => self.process_redefinable(r, false),
+                xs::SchemaTop::Redefinable(ref r) => self.process_redefinable(r),
                 xs::SchemaTop::Element(ref e) => { self.process_toplevel_element(e); },
                 xs::SchemaTop::Attribute(_) => unimplemented!("top-level attribute"),
                 xs::SchemaTop::Notation(ref e) => self.process_notation(e),
@@ -201,10 +213,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         // TODO
     }
 
-    fn process_redefinable(&mut self, r: &'ast xs::Redefinable<'input>, inlinable: bool) {
+    fn process_redefinable(&mut self, r: &'ast xs::Redefinable<'input>) {
         match r {
             xs::Redefinable::SimpleType(ref e) => { self.process_simple_type(e); },
-            xs::Redefinable::ComplexType(e) => { self.process_complex_type(e, inlinable); },
+            xs::Redefinable::ComplexType(e) => { self.process_complex_type(e); },
             xs::Redefinable::Group(e) => { self.process_named_group(e); },
             xs::Redefinable::AttributeGroup(e) => self.process_attribute_group(e),
         }
@@ -234,44 +246,38 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
     fn process_group_ref(&mut self, 
             group_ref: &'ast inline_elements::GroupRef<'input>,
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         let inline_elements::GroupRef { ref attrs, ref attr_id, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref annotation } = group_ref;
         let ref_ = attr_ref;
         let min_occurs = parse_min_occurs(attr_min_occurs);
         let max_occurs = parse_max_occurs(attr_max_occurs);
 
         let ref_ = FullName::from_qname(ref_, self.target_namespace);
-        RichType::new(
-            NameHint::new(ref_.local_name()),
-            Type::Group(min_occurs, max_occurs, ref_),
-            self.process_annotation(&annotation.iter().collect()),
-            )
+
+        InlineComplexType::new(
+            min_occurs, max_occurs,
+            RichAstNode::new(
+                Type::Group(ref_),
+                self.process_annotation(&annotation.iter().collect()),
+                ))
     }
 
     fn process_named_group(&mut self, 
             group: &'ast xs::Group<'input>,
-            ) -> RichType<'input, Type<'input>> {
+            ) {
         let xs::Group { ref attrs, ref attr_id, ref attr_name, ref annotation, choice_all_choice_sequence: ref content } = group;
         let name = attr_name;
-        let max_occurs = 1;
-        let min_occurs = 1;
 
         let mut type_ = match content {
             enums::ChoiceAllChoiceSequence::All(_) => unimplemented!("all"),
-            enums::ChoiceAllChoiceSequence::Choice(e) => self.process_choice(e, true),
-            enums::ChoiceAllChoiceSequence::Sequence(e) => self.process_sequence(e, true),
+            enums::ChoiceAllChoiceSequence::Choice(e) => self.process_choice(e),
+            enums::ChoiceAllChoiceSequence::Sequence(e) => self.process_sequence(e),
         };
 
-        type_.doc.extend(&self.process_annotation(&annotation.iter().collect()));
-        let doc = type_.doc.clone();
+        type_.type_.doc.extend(&self.process_annotation(&annotation.iter().collect()));
 
         let name = FullName::new(self.target_namespace, name.0);
         self.groups.insert(name, type_);
-        RichType::new(
-            NameHint::from_fullname(&name),
-            Type::Group(min_occurs, max_occurs, name),
-            doc,
-            )
     }
 
     fn process_attribute_group(&mut self, group: &'ast xs::AttributeGroup<'input>) {
@@ -283,7 +289,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
     fn process_local_simple_type(&mut self,
             simple_type: &'ast inline_elements::LocalSimpleType<'input>,
-            ) -> RichType<'input, SimpleType<'input>> {
+            ) -> InlineSimpleType<'input, ()> {
         let inline_elements::LocalSimpleType { ref attrs, ref attr_id, ref annotation, ref simple_derivation } = simple_type;
         //let struct_name = self.namespaces.new_type(QName::from(name));
         let annotation: Vec<_> = annotation.iter().collect();
@@ -296,7 +302,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
     fn process_simple_type(&mut self,
             simple_type: &'ast xs::SimpleType<'input>,
-            ) -> RichType<'input, SimpleType<'input>> {
+            ) -> InlineSimpleType<'input, ()> {
         let xs::SimpleType { ref attrs, ref attr_id, ref attr_name, ref attr_final, ref annotation, ref simple_derivation } = simple_type;
         let annotation: Vec<_> = annotation.iter().collect();
         let name = attr_name;
@@ -311,143 +317,106 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
         let doc = self.process_annotation(&annotation);
         self.simple_types.insert(name, (ty, doc.clone()));
-        RichType::new(
-            NameHint::from_fullname(&name),
-            SimpleType::Alias(name),
-            doc,
-            )
+        InlineSimpleType::new(
+            RichAstNode::new(
+                SimpleType::Alias(name),
+                doc,
+                ))
     }
 
     fn process_list(&mut self,
             list: &'ast xs::List<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input, SimpleType<'input>> {
+            ) -> InlineSimpleType<'input, ()> {
         let item_type = list.attr_item_type;
         let item_type = item_type.as_ref().map(|n| FullName::from_qname(n, self.target_namespace));
         
         let item_type = match (item_type, &list.local_simple_type) {
             (None, Some(st)) => {
                 let mut ty = self.process_local_simple_type(st);
-                ty.doc.extend(&self.process_annotation(&annotation));
+                ty.type_.doc.extend(&self.process_annotation(&annotation));
                 ty
             },
             (Some(n), None) => {
-                RichType::new(
-                    NameHint::new(n.local_name()),
-                    SimpleType::Alias(n),
-                    self.process_annotation(&annotation),
-                    )
+                InlineSimpleType::new(
+                    RichAstNode::new(
+                        SimpleType::Alias(n),
+                        self.process_annotation(&annotation),
+                        ))
             },
             (None, None) => panic!("<list> with no itemType or child type."),
             (Some(ref t1), Some(ref t2)) => panic!("<list> has both an itemType attribute ({:?}) and a child type ({:?}).", t1, t2),
         };
 
-        let mut name_hint = item_type.name_hint.clone();
-        name_hint.push("list");
         let doc = self.process_annotation(&annotation);
-        let name = name_from_hint(&name_hint).unwrap();
-        self.lists.entry(item_type)
-                .or_insert(HashSet::new())
-                .insert(name.clone());
-        RichType::new(
-            name_hint,
-            SimpleType::List(name),
-            doc,
-            )
+        InlineSimpleType::new(
+            RichAstNode::new(
+                SimpleType::List(Box::new(item_type)),
+                doc,
+                ))
     }
 
     fn process_union(&mut self,
             union: &'ast xs::Union<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input, SimpleType<'input>> {
+            ) -> InlineSimpleType<'input, ()> {
         let default_vec = Vec::new();
-        let mut name_hint = NameHint::new("union");
         let member_types = union.attr_member_types.as_ref().map(|l| &l.0).unwrap_or(&default_vec);
         let mut member_types: Vec<_> = member_types.iter().map(|name| {
             let name = FullName::from_qname(name, self.target_namespace);
-            name_hint.push(name.local_name());
-            RichType::new(
-                NameHint::new(name.local_name()),
-                SimpleType::Alias(name),
-                self.process_annotation(&annotation),
-                )
+            InlineSimpleType::new(
+                RichAstNode::new(
+                    SimpleType::Alias(name),
+                    self.process_annotation(&annotation),
+                    ))
         }).collect();
 
         for t in union.local_simple_type.iter() {
             let ty = self.process_local_simple_type(t);
-            name_hint.extend(&ty.name_hint);
             member_types.push(ty)
         }
 
         let doc = self.process_annotation(&annotation);
-        let name = name_from_hint(&name_hint).unwrap();
-        self.unions.entry(member_types)
-                .or_insert(HashSet::new())
-                .insert(name.clone());
-        RichType::new(
-            name_hint,
-            SimpleType::Union(name),
-            doc,
-            )
+        InlineSimpleType::new(
+            RichAstNode::new(
+                SimpleType::Union(member_types),
+                doc,
+                ))
     }
 
     fn process_complex_type(&mut self,
             complex_type: &'ast xs::ComplexType<'input>,
-            inlinable: bool,
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         let xs::ComplexType { ref attrs, ref attr_id, ref attr_name, ref attr_mixed, ref attr_abstract, ref attr_final, ref attr_block, ref attr_default_attributes_apply, ref annotation, ref complex_type_model } = complex_type;
         let name = attr_name;
         //let struct_name = self.namespaces.new_type(QName::from(name));
         let mut ty = match complex_type_model {
             xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
             xs::ComplexTypeModel::ComplexContent(ref model) =>
-                self.process_complex_content(model, false),
+                self.process_complex_content(model),
             xs::ComplexTypeModel::CompleteContentModel { ref open_content, ref type_def_particle, ref attr_decls, ref assertions } =>
-                self.process_complete_content_model(open_content, type_def_particle, attr_decls, assertions, inlinable),
+                self.process_complete_content_model(open_content, type_def_particle, attr_decls, assertions),
         };
-        ty.doc.extend(&self.process_annotation(&annotation.iter().collect()));
-
-        let doc = ty.doc.clone();
-        let name = FullName::new(self.target_namespace, name.0);
-        self.types.insert(name, ty);
-        RichType::new(
-            NameHint::from_fullname(&name),
-            Type::Alias(name),
-            doc,
-            )
+        ty.type_.doc.extend(&self.process_annotation(&annotation.iter().collect()));
+        ty
     }
 
     fn process_local_complex_type(&mut self,
             complex_type: &'ast inline_elements::LocalComplexType<'input>,
             attr_name: Option<&'ast NcName<'input>>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            inlinable: bool,
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         let inline_elements::LocalComplexType { ref attrs, ref attr_id, ref attr_mixed, ref attr_default_attributes_apply, annotation: ref annotation2, ref complex_type_model } = complex_type;
         let name = attr_name;
-        //let struct_name = self.namespaces.new_type(QName::from(name));
         let mut ty = match complex_type_model {
             xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
             xs::ComplexTypeModel::ComplexContent(ref model) =>
-                self.process_complex_content(model, false),
+                self.process_complex_content(model),
             xs::ComplexTypeModel::CompleteContentModel { ref open_content, ref type_def_particle, ref attr_decls, ref assertions } =>
-                self.process_complete_content_model(open_content, type_def_particle, attr_decls, assertions, inlinable),
+                self.process_complete_content_model(open_content, type_def_particle, attr_decls, assertions),
         };
-        ty.doc.extend(&self.process_annotation(&vec_concat_opt(&annotation, annotation2.as_ref())));
-
-        if let Some(name) = name {
-            let doc = ty.doc.clone();
-            let name = FullName::new(self.target_namespace, name.0);
-            self.types.insert(name, ty);
-            RichType::new(
-                NameHint::from_fullname(&name),
-                Type::Alias(name),
-                doc,
-                )
-        }
-        else {
-            ty
-        }
+        ty.type_.doc.extend(&self.process_annotation(&vec_concat_opt(&annotation, annotation2.as_ref())));
+        ty
     }
 
     fn process_complete_content_model(&mut self,
@@ -455,20 +424,19 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             type_def_particle: &'ast Option<Box<xs::TypeDefParticle<'input>>>,
             attr_decls: &'ast xs::AttrDecls<'input>,
             assertions: &'ast xs::Assertions<'input>,
-            inlinable: bool,
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         let ty = match type_def_particle.as_ref() {
-            Some(type_def_particle) => self.process_type_def_particle(type_def_particle, inlinable),
-            None => RichType::new(
-                NameHint::new("empty_particle"),
+            Some(type_def_particle) => self.process_type_def_particle(type_def_particle),
+            None => InlineComplexType::new(1, 1, RichAstNode::new(
                 Type::Empty,
                 Documentation::new()
-            ),
+            )),
         };
-        ty.add_attrs(self.process_attr_decls(attr_decls))
+        ty.type_.add_attrs(self.process_attr_decls(attr_decls));
+        ty
     }
 
-    fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>, inlinable: bool) -> RichType<'input, Type<'input>> {
+    fn process_complex_content(&mut self, model: &'ast xs::ComplexContent<'input>) -> InlineComplexType<'input, ()> {
         let xs::ComplexContent { ref attrs, ref attr_id, ref attr_mixed, ref annotation, ref choice_restriction_extension } = model;
         let annotation = annotation.iter().collect();
         match choice_restriction_extension {
@@ -482,14 +450,16 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     Some(sequences::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
                         self.process_complex_restriction(attr_base, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref())),
                     None => {
-                        RichType::new(
-                            NameHint::new("empty_extension"),
-                            Type::Empty,
-                            self.process_annotation(&vec_concat_opt(&annotation, annotation2.as_ref())),
-                            )
+                        InlineComplexType::new(
+                            1, 1,
+                            RichAstNode::new(
+                                Type::Empty,
+                                self.process_annotation(&vec_concat_opt(&annotation, annotation2.as_ref())),
+                                ))
                     },
                 };
-                ty.add_attrs(self.process_attr_decls(attr_decls))
+                ty.type_.add_attrs(self.process_attr_decls(attr_decls));
+                ty
             },
             enums::ChoiceRestrictionExtension::Extension(ref e) => {
                 let inline_elements::ExtensionType {
@@ -498,10 +468,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 } = **e;
                 let ty = match type_def_particle {
                     Some(type_def_particle) =>
-                        self.process_extension(attrs, attr_base, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref()), inlinable),
+                        self.process_extension(attrs, attr_base, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref())),
                     None => self.process_trivial_extension(attrs, attr_base, vec_concat_opt(&annotation, annotation2.as_ref())),
                 };
-                ty.add_attrs(self.process_attr_decls(attr_decls))
+                ty.type_.add_attrs(self.process_attr_decls(attr_decls));
+                ty
             },
         }
     }
@@ -510,15 +481,16 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attr_base: &'ast QName<'input>,
             type_def_particle: &'ast xs::TypeDefParticle<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         // TODO: use the base
-        let ty = self.process_type_def_particle(type_def_particle, false);
+        let ty = self.process_type_def_particle(type_def_particle);
         let base = FullName::from_qname(attr_base, self.target_namespace);
-        RichType::new(
-            NameHint::new_empty(),
-            Type::Restriction(base, Box::new(ty)),
-            self.process_annotation(&annotation),
-            )
+        InlineComplexType::new(
+            1, 1,
+            RichAstNode::new(
+                Type::Restriction(base, Box::new(ty)),
+                self.process_annotation(&annotation),
+                ))
     }
     
     fn process_facets(&mut self, facet_list: &Vec<enums::ChoiceFacetAny<'input>>) -> Facets<'input> {
@@ -554,7 +526,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_simple_restriction(&mut self, 
             restriction: &'ast xs::Restriction<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input, SimpleType<'input>> {
+            ) -> InlineSimpleType<'input, ()> {
         let xs::Restriction { ref attrs, ref attr_id, ref attr_base, annotation: ref annotation2, ref simple_restriction_model } = restriction;
         let base = attr_base;
         let base = base.unwrap_or(QName { namespace: Some(SCHEMA_URI), local_name: "anySimpleType" });
@@ -563,182 +535,116 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
         let base = FullName::from_qname(&base, self.target_namespace);
 
-        self.simple_restrictions.insert((base, facets.clone()));
-
         match local_simple_type {
             Some(inline_elements::LocalSimpleType { ref attrs, ref attr_id, annotation: ref annotation2, ref simple_derivation }) => {
-                RichType::new(
-                    NameHint::new(base.local_name()),
-                    SimpleType::Restriction(base, facets),
-                    self.process_annotation(&vec_concat_opt(&annotation, annotation2.as_ref())),
-                    )
+                InlineSimpleType::new(
+                    RichAstNode::new(
+                        SimpleType::Restriction(base, facets),
+                        self.process_annotation(&vec_concat_opt(&annotation, annotation2.as_ref())),
+                        ))
             },
             None => {
-                RichType::new(
-                    NameHint::new(base.local_name()),
-                    SimpleType::Restriction(base, facets),
-                    self.process_annotation(&annotation),
-                    )
+                InlineSimpleType::new(
+                    RichAstNode::new(
+                        SimpleType::Restriction(base, facets),
+                        self.process_annotation(&annotation),
+                        ))
             },
         }
     }
 
-    fn process_type_def_particle(&mut self, particle: &'ast xs::TypeDefParticle<'input>, inlinable: bool) -> RichType<'input, Type<'input>> {
+    fn process_type_def_particle(&mut self, particle: &'ast xs::TypeDefParticle<'input>) -> InlineComplexType<'input, ()> {
         match particle {
             xs::TypeDefParticle::Group(e) => self.process_group_ref(e),
             xs::TypeDefParticle::All(_) => unimplemented!("all"),
-            xs::TypeDefParticle::Choice(e) => self.process_choice(e, inlinable),
-            xs::TypeDefParticle::Sequence(e) => self.process_sequence(e, inlinable),
+            xs::TypeDefParticle::Choice(e) => self.process_choice(e),
+            xs::TypeDefParticle::Sequence(e) => self.process_sequence(e),
         }
     }
 
     fn process_nested_particle(&mut self,
             particle: &'ast xs::NestedParticle<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            inlinable: bool
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         let mut ty = match particle {
             xs::NestedParticle::Element(e) => self.process_local_element(e),
             xs::NestedParticle::Group(e) => self.process_group_ref(e),
-            xs::NestedParticle::Choice(e) => self.process_choice(e, inlinable),
-            xs::NestedParticle::Sequence(e) => self.process_sequence(e, inlinable),
+            xs::NestedParticle::Choice(e) => self.process_choice(e),
+            xs::NestedParticle::Sequence(e) => self.process_sequence(e),
             xs::NestedParticle::Any(e) => self.process_any(e, Vec::new()),
         };
 
-        ty.doc.extend(&self.process_annotation(&annotation));
+        ty.type_.doc.extend(&self.process_annotation(&annotation));
         ty
     }
 
     fn process_any(&mut self,
             any: &'ast xs::Any<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input, Type<'input>> {
-        RichType::new(
-            NameHint::new("any"),
-            Type::Any,
-            self.process_annotation(&annotation),
-            )
+            ) -> InlineComplexType<'input, ()> {
+        InlineComplexType::new(
+            1, 1,
+            RichAstNode::new(
+                Type::Any,
+                self.process_annotation(&annotation),
+                ))
     }
 
     fn process_sequence(&mut self,
             seq: &'ast xs::Sequence<'input>,
-            inlinable: bool,
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         let xs::Sequence { ref attrs, ref attr_id, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = seq;
         let particles = nested_particle;
         let min_occurs = parse_min_occurs(attr_min_occurs);
         let max_occurs = parse_max_occurs(attr_max_occurs);
-        let mut items = Vec::new();
-        let mut name_hint = NameHint::new("sequence");
-        if min_occurs == 1 && max_occurs == 1 && inlinable && particles.len() == 1 {
-            self.process_nested_particle(particles.get(0).unwrap(), annotation.iter().collect(), inlinable)
+        if min_occurs == 1 && max_occurs == 1 && particles.len() == 1 {
+            self.process_nested_particle(particles.get(0).unwrap(), annotation.iter().collect())
         }
         else {
-            for particle in particles.iter() {
-                let ty = self.process_nested_particle(particle, vec![], false);
-                name_hint.extend(&ty.name_hint);
-                items.push(ty);
-            }
+            let items = particles.iter().map(|particle|
+                self.process_nested_particle(particle, vec![])
+            ).collect();
             let doc = self.process_annotation(&annotation.iter().collect());
-            if min_occurs == 1 && max_occurs == 1 {
-                RichType::new(
-                    name_hint,
-                    Type::InlineSequence(items),
+            InlineComplexType::new(
+                min_occurs, max_occurs,
+                RichAstNode::new(
+                    Type::Sequence(items),
                     doc,
-                    )
-            }
-            else {
-                let name = name_from_hint(&name_hint).unwrap();
-                let (names, docs) = self.sequences.entry(items)
-                    .or_insert((HashSet::new(), Documentation::new()));
-                names.insert(name.clone());
-                docs.extend(&doc);
-                RichType::new(
-                    name_hint,
-                    Type::Sequence(min_occurs, max_occurs, name),
-                    doc,
-                    )
-            }
+                    ))
         }
     }
 
     fn process_choice(&mut self,
             choice: &'ast xs::Choice<'input>,
-            inlinable: bool
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         let xs::Choice { ref attrs, ref attr_id, ref attr_min_occurs, ref attr_max_occurs, ref annotation, ref nested_particle } = choice;
         let particles = nested_particle;
         let min_occurs = parse_min_occurs(attr_min_occurs);
         let max_occurs = parse_max_occurs(attr_max_occurs);
-        let mut items = Vec::new();
-        let mut name_hint = NameHint::new("choice");
-        if particles.len() == 1 {
-            let particle = particles.get(0).unwrap();
-            let RichType { name_hint, attrs, type_, doc } =
-                self.process_nested_particle(particle, annotation.iter().collect(), inlinable);
-            match (min_occurs, max_occurs, type_) {
-                (_, _, Type::Element(1, 1, e)) => return RichType {
-                    name_hint, attrs, type_: Type::Element(min_occurs, max_occurs, e), doc },
-                (_, _, Type::Group(1, 1, e)) => return RichType {
-                    name_hint, attrs, type_: Type::Group(min_occurs, max_occurs, e), doc },
-                (_, _, Type::Choice(1, 1, e)) => return RichType {
-                    name_hint, attrs, type_: Type::Choice(min_occurs, max_occurs, e), doc },
-                (_, _, Type::Sequence(1, 1, e)) => return RichType {
-                    name_hint, attrs, type_: Type::Sequence(min_occurs, max_occurs, e), doc },
-                (1, 1, type_) => return RichType { name_hint, attrs, type_, doc },
-                (_, _, type_) => {
-                    let name = name_from_hint(&name_hint).unwrap();
-                    let items = vec![RichType { name_hint: name_hint.clone(), attrs: Attrs::new(), type_, doc: doc.clone() }];
-                    let (names, docs) = self.sequences.entry(items)
-                        .or_insert((HashSet::new(), Documentation::new()));
-                    names.insert(name.clone());
-                    docs.extend(&doc);
-                    let type_ = Type::Sequence(min_occurs, max_occurs, name);
-                    return RichType { name_hint, attrs, type_, doc }
-                },
-            }
-        }
-        else {
-            for particle in particles.iter() {
-                let ty = self.process_nested_particle(particle, vec![], false);
-                name_hint.extend(&ty.name_hint);
-                items.push(ty);
-            }
-        }
+        let mut items = particles.iter().map(|particle|
+            self.process_nested_particle(particle, vec![])
+        ).collect();
         let doc = self.process_annotation(&annotation.iter().collect());
-        match (min_occurs, max_occurs, inlinable) {
-            (1, 1, true) => {
-                RichType::new(
-                    name_hint,
-                    Type::InlineChoice(items),
-                    doc,
-                    )
-            },
-            (_, _, _) => {
-                let name = name_from_hint(&name_hint).unwrap();
-                self.choices.entry(items)
-                        .or_insert(HashSet::new())
-                        .insert(name.clone());
-                RichType::new(
-                    name_hint,
-                    Type::Choice(min_occurs, max_occurs, name),
-                    doc,
-                    )
-            }
-        }
+        InlineComplexType::new(
+            min_occurs, max_occurs,
+            RichAstNode::new(
+                Type::Choice(items),
+                doc,
+                ))
     }
 
     fn process_trivial_extension(&mut self,
             attrs: &'ast HashMap<FullName<'input>, &'input str>,
             attr_base: &'ast QName<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         let base = FullName::from_qname(&attr_base, self.target_namespace);
-        RichType::new(
-            NameHint::new_empty(),
-            Type::Alias(base),
-            self.process_annotation(&annotation),
-            )
+        InlineComplexType::new(
+            1, 1,
+            RichAstNode::new(
+                Type::Alias(base),
+                self.process_annotation(&annotation),
+                ))
     }
 
     fn process_extension(&mut self,
@@ -746,14 +652,14 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attr_base: &'ast QName<'input>,
             type_def_particle: &'ast xs::TypeDefParticle<'input>,
             annotation: Vec<&'ast xs::Annotation<'input>>,
-            inlinable: bool,
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         let base = FullName::from_qname(attr_base, self.target_namespace);
-        RichType::new(
-            NameHint::new_empty(),
-            Type::Extension(base, Box::new(self.process_type_def_particle(type_def_particle, inlinable))),
-            self.process_annotation(&annotation),
-            )
+        InlineComplexType::new(
+            1, 1,
+            RichAstNode::new(
+                Type::Extension(base, Box::new(self.process_type_def_particle(type_def_particle))),
+                self.process_annotation(&annotation),
+                ))
     }
 
     fn process_toplevel_element(&mut self, element: &'ast xs::Element<'input>) {
@@ -774,27 +680,29 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             (None, Some(ref c)) => match c {
                 enums::Type::SimpleType(ref e) => {
                     let mut ty = self.process_local_simple_type(e);
-                    ty.doc.extend(&self.process_annotation(&annotation));
+                    ty.type_.doc.extend(&self.process_annotation(&annotation));
                     ty.into_complex()
                 },
                 enums::Type::ComplexType(ref e) => {
-                    self.process_local_complex_type(e, Some(attr_name), annotation, false)
+                    self.process_local_complex_type(e, Some(attr_name), annotation)
                 },
             },
             (Some(t), None) => {
                 let t = FullName::from_qname(&t, self.target_namespace);
-                RichType::new(
-                    NameHint::new(t.local_name()),
-                    Type::Alias(t.into()),
-                    self.process_annotation(&annotation),
-                    )
+                InlineComplexType::new(
+                    1, 1,
+                    RichAstNode::new(
+                        Type::Alias(t.into()),
+                        self.process_annotation(&annotation),
+                        ))
             },
             (None, None) => {
-                RichType::new(
-                    NameHint::new("empty"),
-                    Type::Empty,
-                    self.process_annotation(&annotation),
-                    )
+                InlineComplexType::new(
+                    1, 1,
+                    RichAstNode::new(
+                        Type::Empty,
+                        self.process_annotation(&annotation),
+                        ))
             },
             (Some(ref t1), Some(ref t2)) => panic!("Toplevel element '{:?}' has both a type attribute ({:?}) and a child type ({:?}).", name, t1, t2),
         };
@@ -804,7 +712,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
     fn process_local_element(&mut self,
             element: &'ast inline_elements::LocalElement<'input>,
-            ) -> RichType<'input, Type<'input>> {
+            ) -> InlineComplexType<'input, ()> {
         let inline_elements::LocalElement { ref attrs, ref attr_id, ref attr_name, ref attr_ref, ref attr_min_occurs, ref attr_max_occurs, ref attr_type, ref attr_default, ref attr_fixed, ref attr_nillable, ref attr_block, ref attr_form, ref attr_target_namespace, ref annotation, ref type_, ref alternative_alt_type, ref identity_constraint } = element;
         let annotation = annotation.iter().collect();
         let name = attr_name;
@@ -817,11 +725,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 panic!("<element> has both ref={:?} and name={:?}", ref_, name);
             }
             let ref_ = FullName::from_qname(ref_, self.target_namespace);
-            RichType::new(
-                NameHint::new(ref_.local_name()),
-                Type::ElementRef(min_occurs, max_occurs, ref_),
-                self.process_annotation(&annotation),
-                )
+            InlineComplexType::new(
+                min_occurs, max_occurs,
+                RichAstNode::new(
+                    Type::ElementRef(ref_),
+                    self.process_annotation(&annotation),
+                    ))
         }
         else {
             let name = name.as_ref().expect("<element> has no name.").0;
@@ -839,61 +748,44 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 (None, false) => None,
             };
 
+            let mut doc = self.process_annotation(&annotation);
+
             match (type_attr, &type_) {
                 (None, Some(ref c)) => {
                     let mut t = match c {
                         enums::Type::SimpleType(ref e) => {
                             let mut ty = self.process_local_simple_type(e);
-                            ty.doc.extend(&self.process_annotation(&annotation));
+                            ty.type_.doc.extend(&self.process_annotation(&annotation));
                             ty.into_complex()
                         },
                         enums::Type::ComplexType(ref e) => {
-                            self.process_local_complex_type(e, None, annotation, false)
+                            self.process_local_complex_type(e, None, annotation)
                         },
                     };
-                    let mut name_hint = NameHint::new(name);
-                    name_hint.extend(&t.name_hint);
-                    let struct_name = name_from_hint(&name_hint).unwrap();
-                    let (elems, doc) = self.inline_elements.entry((namespace, name, t.attrs, t.type_))
-                            .or_insert((HashSet::new(), Documentation::new()));
-                    elems.insert(struct_name.clone());
-                    t.doc.extend(doc);
-                    RichType::new(
-                        NameHint::new(name),
-                        Type::Element(min_occurs, max_occurs, struct_name),
-                        t.doc,
-                        )
+                    t.type_.doc.extend(&doc);
+                    InlineComplexType::new(
+                        min_occurs, max_occurs,
+                        RichAstNode::new(
+                            Type::Element(FullName::new(namespace, name)),
+                            t.type_.doc.clone(),
+                            ))
                 },
                 (Some(t), None) => {
-                    let name_hint1 = NameHint::new(t.local_name);
-                    let mut name_hint2 = NameHint::new(name);
-                    name_hint2.push(t.local_name);
-                    // TODO: move this heuristic in names.rs
-                    let name_hint = if t.local_name.to_lowercase().contains(&name.to_lowercase()) {
-                        name_hint1
-                    }
-                    else {
-                        name_hint2
-                    };
-                    let struct_name = name_from_hint(&name_hint).unwrap();
-                    let mut doc = self.process_annotation(&annotation);
-                    let t = FullName::from_qname(t, self.target_namespace);
-                    let (elems, doc2) = self.inline_elements.entry((namespace, name, Attrs::new(), Type::Alias(t)))
-                            .or_insert((HashSet::new(), Documentation::new()));
-                    elems.insert(struct_name.clone());
-                    doc.extend(doc2);
-                    RichType::new(
-                        NameHint::new(name),
-                        Type::Element(min_occurs, max_occurs, struct_name),
-                        doc,
-                        )
+                    let name = FullName::from_qname(t, self.target_namespace);
+                    InlineComplexType::new(
+                        min_occurs, max_occurs,
+                        RichAstNode::new(
+                            Type::Element(name),
+                            doc,
+                            ))
                 },
                 (None, None) => {
-                    RichType::new(
-                        NameHint::new("empty"),
-                        Type::Empty,
-                        self.process_annotation(&annotation),
-                        )
+                    InlineComplexType::new(
+                        min_occurs, max_occurs,
+                        RichAstNode::new(
+                            Type::Empty,
+                            self.process_annotation(&annotation),
+                            ))
                 },
                 (Some(ref t1), Some(ref t2)) => panic!("Element '{:?}' has both a type attribute ({:?}) and a child type ({:?}).", name, t1, t2),
             }
@@ -921,7 +813,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         },
                         (Some(name), None, None, Some(t)) => {
                             let t = self.process_local_simple_type(t);
-                            attrs.named.push((name, use_, Some(t.type_)));
+                            attrs.named.push((name, use_, Some(t.type_.type_)));
                         },
                         (Some(name), None, None, None) =>
                             attrs.named.push((name, use_, None)),

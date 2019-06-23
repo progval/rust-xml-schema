@@ -13,6 +13,7 @@ fn escape_keyword(name: &str) -> String {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct NameGenerator(HashMap<String, usize>);
 
 impl NameGenerator {
