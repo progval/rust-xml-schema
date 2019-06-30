@@ -144,7 +144,10 @@ pub enum Type<'input> {
     ElementRef(FullName<'input>),
     Element(FullName<'input>),
     Group(FullName<'input>),
-    Choice(Vec<InlineComplexType<'input, ()>>),
+    Choice(Vec<Vec<InlineComplexType<'input, ()>>>),
+    //             ^- a field of a variant
+    //         ^- a variant (anonymous struct)
+    //     ^- list of variants
     Sequence(Vec<InlineComplexType<'input, ()>>),
     Simple(SimpleType<'input>),
 }
@@ -622,7 +625,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let min_occurs = parse_min_occurs(attr_min_occurs);
         let max_occurs = parse_max_occurs(attr_max_occurs);
         let mut items = particles.iter().map(|particle|
-            self.process_nested_particle(particle, vec![])
+            vec![self.process_nested_particle(particle, vec![])]
         ).collect();
         let doc = self.process_annotation(&annotation.iter().collect());
         InlineComplexType::new(
