@@ -59,7 +59,7 @@ pub enum AttrUse {
     Optional,
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Attrs<'input> {
     pub named: Vec<(FullName<'input>, AttrUse, Option<SimpleType<'input>>)>,
     pub refs: Vec<(Option<FullName<'input>>, AttrUse, FullName<'input>)>,
@@ -79,26 +79,25 @@ impl<'input> Attrs<'input> {
     }
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct RichAstNode<'input, T: Debug + Hash + PartialEq + Eq + PartialOrd + Ord, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> {
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct RichAstNode<'input, T: Debug + Clone + Hash + PartialEq + Eq + PartialOrd + Ord, D: Debug + Clone + Hash + PartialEq + Eq + PartialOrd + Ord + Default> {
     pub attrs: Attrs<'input>,
     pub type_: T,
     pub doc: Documentation<'input>,
     pub data: D,
 }
-impl<'input, T: Debug + Hash + PartialEq + Eq + PartialOrd + Ord, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> RichAstNode<'input, T, D> {
+impl<'input, T: Debug + Clone + Hash + PartialEq + Eq + PartialOrd + Ord, D: Debug + Clone + Hash + PartialEq + Eq + PartialOrd + Ord + Default> RichAstNode<'input, T, D> {
     pub fn new(type_: T, doc: Documentation<'input>) -> RichAstNode<'input, T, D> {
         RichAstNode { attrs: Attrs::new(), type_, doc, data: D::default() }
     }
 }
-impl<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> RichAstNode<'input, Type<'input>, D> {
-    fn add_attrs(mut self, new_attrs: Attrs<'input>) -> RichAstNode<'input, Type<'input>, D> {
+impl<'input, D: Debug + Clone + Hash + PartialEq + Eq + PartialOrd + Ord + Default> RichAstNode<'input, Type<'input>, D> {
+    fn add_attrs(&mut self, new_attrs: Attrs<'input>) {
         self.attrs.extend(new_attrs);
-        self
     }
 }
 
-impl<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> RichAstNode<'input, SimpleType<'input>, D> {
+impl<'input, D: Debug + Clone + Hash + PartialEq + Eq + PartialOrd + Ord + Default> RichAstNode<'input, SimpleType<'input>, D> {
     pub fn into_complex(self) -> RichAstNode<'input, Type<'input>, D> {
         let RichAstNode { attrs, type_, doc, data } = self;
         RichAstNode { attrs, type_: Type::Simple(type_), doc, data }
@@ -106,24 +105,24 @@ impl<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> Rich
 }
 
 /// A reference to a type, that can be part of another type/element/...
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct InlineComplexType<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> {
-    min_occurs: usize,
-    max_occurs: usize,
-    type_: RichAstNode<'input, Type<'input>, D>,
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct InlineComplexType<'input, D: Debug + Clone + Hash + PartialEq + Eq + PartialOrd + Ord + Default> {
+    pub min_occurs: usize,
+    pub max_occurs: usize,
+    pub type_: RichAstNode<'input, Type<'input>, D>,
 }
-impl<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> InlineComplexType<'input, D> {
+impl<'input, D: Debug + Clone + Hash + PartialEq + Eq + PartialOrd + Ord + Default> InlineComplexType<'input, D> {
     fn new(min_occurs: usize, max_occurs: usize, type_: RichAstNode<'input, Type<'input>, D>) -> InlineComplexType<'input, D> {
         InlineComplexType { min_occurs, max_occurs, type_ }
     }
 }
 
 /// A reference to a type, that can be part of another type/element/...
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct InlineSimpleType<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> {
-    type_: RichAstNode<'input, SimpleType<'input>, D>,
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct InlineSimpleType<'input, D: Debug + Clone + Hash + PartialEq + Eq + PartialOrd + Ord + Default> {
+    pub type_: RichAstNode<'input, SimpleType<'input>, D>,
 }
-impl<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> InlineSimpleType<'input, D> {
+impl<'input, D: Debug + Clone + Hash + PartialEq + Eq + PartialOrd + Ord + Default> InlineSimpleType<'input, D> {
     fn new(type_: RichAstNode<'input, SimpleType<'input>, D>) -> InlineSimpleType<'input, D> {
         InlineSimpleType { type_ }
     }
@@ -134,7 +133,7 @@ impl<'input, D: Debug + Hash + PartialEq + Eq + PartialOrd + Ord + Default> Inli
 }
 
 
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Type<'input> {
     Any,
     Empty,
@@ -152,7 +151,7 @@ pub enum Type<'input> {
     Simple(SimpleType<'input>),
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SimpleType<'input> {
     Alias(FullName<'input>),
     Restriction(FullName<'input>, Facets<'input>),
@@ -167,7 +166,8 @@ pub struct Processor<'ast, 'input: 'ast> {
     pub element_form_default_qualified: bool,
     pub attribute_form_default_qualified: bool,
     pub elements: HashMap<FullName<'input>, InlineComplexType<'input, ()>>,
-    pub simple_types: HashMap<FullName<'input>, (InlineSimpleType<'input, ()>, Documentation<'input>)>,
+    pub simple_types: HashMap<FullName<'input>, (RichAstNode<'input, SimpleType<'input>, ()>, Documentation<'input>)>,
+    pub complex_types: HashMap<FullName<'input>, RichAstNode<'input, Type<'input>, ()>>,
     pub groups: HashMap<FullName<'input>, InlineComplexType<'input, ()>>,
     pub attribute_groups: HashMap<FullName<'input>, Attrs<'input>>,
 
@@ -196,6 +196,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             groups: HashMap::new(),
             attribute_groups: HashMap::new(),
             simple_types: HashMap::new(),
+            complex_types: HashMap::new(),
             substitution_groups: HashMap::new(),
             _phantom: PhantomData::default(),
         }
@@ -319,7 +320,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         };
 
         let doc = self.process_annotation(&annotation);
-        self.simple_types.insert(name, (ty, doc.clone()));
+        self.simple_types.insert(name, (ty.type_, doc.clone()));
         InlineSimpleType::new(
             RichAstNode::new(
                 SimpleType::Alias(name),
@@ -392,16 +393,23 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ) -> InlineComplexType<'input, ()> {
         let xs::ComplexType { ref attrs, ref attr_id, ref attr_name, ref attr_mixed, ref attr_abstract, ref attr_final, ref attr_block, ref attr_default_attributes_apply, ref annotation, ref complex_type_model } = complex_type;
         let name = attr_name;
+        let name = FullName::new(self.target_namespace, name.0);
         //let struct_name = self.namespaces.new_type(QName::from(name));
-        let mut ty = match complex_type_model {
+        let ty = match complex_type_model {
             xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
             xs::ComplexTypeModel::ComplexContent(ref model) =>
                 self.process_complex_content(model),
             xs::ComplexTypeModel::CompleteContentModel { ref open_content, ref type_def_particle, ref attr_decls, ref assertions } =>
                 self.process_complete_content_model(open_content, type_def_particle, attr_decls, assertions),
         };
-        ty.type_.doc.extend(&self.process_annotation(&annotation.iter().collect()));
-        ty
+        let InlineComplexType { min_occurs, max_occurs, mut type_ } = ty;
+        type_.doc.extend(&self.process_annotation(&annotation.iter().collect()));
+        self.complex_types.insert(name, type_.clone());
+        InlineComplexType::new(
+            min_occurs, max_occurs,
+            RichAstNode::new(
+                Type::Alias(name),
+                type_.doc.clone()))
     }
 
     fn process_local_complex_type(&mut self,
@@ -428,7 +436,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             attr_decls: &'ast xs::AttrDecls<'input>,
             assertions: &'ast xs::Assertions<'input>,
             ) -> InlineComplexType<'input, ()> {
-        let ty = match type_def_particle.as_ref() {
+        let mut ty = match type_def_particle.as_ref() {
             Some(type_def_particle) => self.process_type_def_particle(type_def_particle),
             None => InlineComplexType::new(1, 1, RichAstNode::new(
                 Type::Empty,
@@ -449,7 +457,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     ref sequence_open_content_type_def_particle,
                     ref attr_decls, ref assertions
                 } = **r;
-                let ty = match sequence_open_content_type_def_particle {
+                let mut ty = match sequence_open_content_type_def_particle {
                     Some(sequences::SequenceOpenContentTypeDefParticle { open_content, type_def_particle }) =>
                         self.process_complex_restriction(attr_base, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref())),
                     None => {
@@ -469,7 +477,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     ref attrs, ref attr_base, ref attr_id, annotation: ref annotation2, ref open_content,
                     ref type_def_particle, ref attr_decls, ref assertions
                 } = **e;
-                let ty = match type_def_particle {
+                let mut ty = match type_def_particle {
                     Some(type_def_particle) =>
                         self.process_extension(attrs, attr_base, type_def_particle, vec_concat_opt(&annotation, annotation2.as_ref())),
                     None => self.process_trivial_extension(attrs, attr_base, vec_concat_opt(&annotation, annotation2.as_ref())),
@@ -624,7 +632,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let particles = nested_particle;
         let min_occurs = parse_min_occurs(attr_min_occurs);
         let max_occurs = parse_max_occurs(attr_max_occurs);
-        let mut items = particles.iter().map(|particle|
+        let items = particles.iter().map(|particle|
             vec![self.process_nested_particle(particle, vec![])]
         ).collect();
         let doc = self.process_annotation(&annotation.iter().collect());

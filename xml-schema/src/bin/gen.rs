@@ -58,6 +58,6 @@ fn main() {
     }
 
     let mut gen = ParserGenerator::new(processors, &parse_context, renames);
-    let scope = gen.gen_target_scope();
-    println!("#[allow(unused_imports)]\nuse support;\n{}", scope.to_string());
+    gen.gen_target_scope();
+    println!("#[allow(unused_imports)]\nuse support;\n{}", gen.scope.to_string());
 }

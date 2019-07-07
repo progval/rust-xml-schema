@@ -39,7 +39,7 @@ pub struct ParserGenerator<'ast, 'input: 'ast> {
 
     renames: HashMap<String, String>,
     name_gen: NameGenerator,
-    scope: cg::Scope,
+    pub scope: cg::Scope,
     self_gen: bool,
 }
 
@@ -87,7 +87,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         self.scope.raw("pub use std::marker::PhantomData;");
         self.create_modules();
         self.gen_elements();
-        self.gen_inline_elements();
+        //self.gen_inline_elements();
     }
 
     fn create_modules(&mut self) {
@@ -119,6 +119,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         match type_ {
             Type::Choice(items) => self.gen_choice(items, doc),
             Type::Sequence(items) => self.gen_sequence(items, doc),
+            Type::Alias(name) => Some(self.get_type_name(*name)),
             _ => unimplemented!("{:?}", type_),
         }
     }
@@ -131,8 +132,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             ).collect()
         ).collect();
         let mut name_hint = NameHint::new("choice");
-        for variant in items {
-            for (_min_occurs, _max_occurs, field) in variant {
+        for variant in items.iter() {
+            for (_min_occurs, _max_occurs, field) in variant.iter() {
                 name_hint.push(&field.1);
             }
         }
@@ -151,7 +152,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             for (i, fields) in items.iter().enumerate() {
                 // TODO: handle min_occurs and max_occurs
                 let mut doc = doc.clone();
-                let variant_name = NameHint::new_empty();
+                let mut variant_name = NameHint::new_empty();
                 for (_min_occurs, _max_occurs, (_mod_name, field_type_name)) in fields.iter() {
                     variant_name.push(&field_type_name);
                 }
@@ -159,10 +160,10 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 let variant_name = escape_keyword(&variant_name.to_camel_case());
                 let variant_name = variant_name_gen.gen_name(variant_name);
                 let variant_name = self.renames.get(&variant_name).unwrap_or(&variant_name);
+                // TODO set the doc on the variant instead of the enum
                 let mut variant = enum_.new_variant(&variant_name);
-                enum_.doc(&doc.to_string()); // TODO set the doc on the variant instead of the enum
                 if fields.len() == 1 {
-                    let (min_occurs, max_occurs, (type_mod_name, type_name)) = fields.remove(0);
+                    let (min_occurs, max_occurs, (type_mod_name, type_name)) = fields.get(0).unwrap();
                     match (min_occurs, max_occurs) {
                         (1, 1) => {
                             variant.tuple(&format!("Box<super::{}::{}<'input>>", escape_keyword(&type_mod_name), escape_keyword(&type_name)));
@@ -181,7 +182,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 else {
                     impl_code.push(format!("    impl_struct_variant!({},", variant_name));
                     let mut field_name_gen = NameGenerator::new();
-                    for (min_occurs, max_occurs, (type_mod_name, type_name)) in fields {
+                    for (min_occurs, max_occurs, (type_mod_name, type_name)) in fields.iter() {
                         let field_name = NameHint::new(type_name);
                         let field_name = name_from_hint(&field_name).unwrap();
                         let field_name = field_name.to_snake_case();
@@ -210,13 +211,13 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         module.scope().raw(&impl_code.join("\n"));
         Some(("choices".to_owned(), enum_name.to_owned()))
     }
-    fn gen_union(&self, items: &Vec<InlineSimpleType<'input, ()>>, doc: &Documentation<'input>) -> Option<(String, String)>{
+    fn gen_union(&mut self, items: &Vec<InlineSimpleType<'input, ()>>, doc: &Documentation<'input>) -> Option<(String, String)>{
         let items: Vec<_> = items.iter().filter_map(
             |InlineSimpleType { type_ }| self.gen_simple_type(type_)
         ).collect();
 
         let mut name_hint = NameHint::new("union");
-        for item in items {
+        for item in items.iter() {
             name_hint.push(&item.1);
         }
         let name = name_from_hint(&name_hint).unwrap();
@@ -238,7 +239,7 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
             else {
                 let mut name_gen = NameGenerator::new();
-                for (type_mod_name, type_name) in items {
+                for (type_mod_name, type_name) in items.iter() {
                     let variant_name = name_gen.gen_name(type_name.to_camel_case());
                     enum_.new_variant(&variant_name).tuple(&format!("{}::{}<'input>", type_mod_name, type_name));
                     impl_code.push(format!("    impl_union_variant!({}),", variant_name));
@@ -250,16 +251,19 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         Some(("union".to_owned(), enum_name.clone()))
     }
 
-    fn gen_list(&self, item: &RichAstNode<'input, SimpleType<'input>, ()>, doc: &Documentation<'input>) -> Option<(String, String)> {
-        if let Some((type_mod_name, type_name)) = self.gen_simple_type(item) {
+    fn gen_list(&mut self, item: &InlineSimpleType<'input, ()>, doc: &Documentation<'input>) -> Option<(String, String)> {
+        let InlineSimpleType { type_ } = item;
+        if let Some((type_mod_name, type_name)) = self.gen_simple_type(type_) {
             let mut name = NameHint::new("list");
             name.push(&type_name);
             let name = name_from_hint(&name).unwrap().to_camel_case();
             let name = escape_keyword(&name);
             let struct_name = self.name_gen.gen_name(name);
             let module = self.scope.get_module_mut("structs").unwrap();
-            let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            let mut struct_ = cg::Struct::new(&struct_name);
+            struct_.vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             struct_.tuple_field(&format!("pub Vec<{}::{}<'input>>", type_mod_name, type_name));
+            module.push_struct(struct_);
             module.scope().raw(&format!("impl_list!({}, {}::{});", struct_name, type_mod_name, type_name));
             Some(("lists".to_owned(), struct_name))
         }
@@ -268,18 +272,29 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         }
     }
 
-    fn gen_simple_type(&self, ty: &RichAstNode<'input, SimpleType<'input>, ()>) -> Option<(String, String)> {
+    fn get_type(&self, name: FullName<'input>) -> Option<&RichAstNode<'input, Type<'input>, ()>> {
+        for proc in self.processors.iter() {
+            if let Some(type_) = proc.complex_types.get(&name) {
+                return Some(type_)
+            }
+        }
+        None
+    }
+
+    fn get_type_name(&self, name: FullName<'input>) -> (String, String) {
+        let (mod_name, ns_names) = self.names.get(&name.namespace()).expect("Unknown namespace");
+        let type_name = ns_names.get(&name.local_name()).expect(&format!("Unknown simple type name {:?}", name));
+        (mod_name.clone(), type_name.clone())
+    }
+
+    fn gen_simple_type(&mut self, ty: &RichAstNode<'input, SimpleType<'input>, ()>) -> Option<(String, String)> {
         let RichAstNode { attrs, type_, doc, data } = ty;
         if attrs.named.len() != 0 || attrs.refs.len() != 0 || attrs.group_refs.len() != 0 || attrs.any_attributes {
             // RichAstNode should be changed so impossibility is enforced by the type checker.
             panic!("Simple type with attributes???");
         }
         match type_ {
-            SimpleType::Alias(name) => {
-                let (mod_name, ns_names) = self.names.get(&name.namespace()).expect("Unknown namespace");
-                let type_name = ns_names.get(&name.local_name()).expect("Unknown simple type name");
-                Some((mod_name.clone(), type_name.clone()))
-            },
+            SimpleType::Alias(name) => Some(self.get_type_name(*name)),
             SimpleType::Restriction(name, facets) => self.gen_simple_restriction(*name, facets, doc),
             SimpleType::Union(items) => self.gen_union(items, doc),
             SimpleType::List(item) => self.gen_list(item, doc),
@@ -301,9 +316,8 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         };
         let name = name.to_camel_case();
         let name = self.name_gen.gen_name(name.clone());
-        self.simple_restrictions.insert((base_name.clone(), facets.clone()), name.clone());
-        let (base_mod_name, base_type_name) = self.get_simple_type_name(&SimpleType::Alias(*base_name)).unwrap(); // TODO
-        let mut module = self.scope.get_module_mut("enumerations").unwrap();
+        let (base_mod_name, base_type_name) = self.get_type_name(base_name);
+        let module = self.scope.get_module_mut("enumerations").unwrap();
         module.scope().raw(&format!("#[derive(Debug, PartialEq)] pub struct {}<'input>(pub {}::{}<'input>);", name, base_mod_name, base_type_name));
         let mut s = Vec::new();
         let f = &mut |n: &Option<_>| {
@@ -333,78 +347,81 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
         Some(("enumeration".to_owned(), name))
     }
 
-    fn gen_fields(&self, empty_struct: &mut bool, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, doc: &mut Documentation<'input>, name_gen: &mut NameGenerator, type_: &Type<'input>) {
-        let field_writer = &mut |name: String, type_mod_name: String, min_occurs, max_occurs, type_name: String| {
-            *empty_struct = false;
-            let name = escape_keyword(&name_gen.gen_name(name.to_snake_case()));
-            let name = self.renames.get(&name).unwrap_or(&name);
-            let type_mod_name = escape_keyword(&type_mod_name.to_snake_case());
-            let type_name = escape_keyword(&type_name.to_camel_case());
-            let type_name = self.renames.get(&type_name).unwrap_or(&type_name);
-            match (min_occurs, max_occurs) {
-                (1, 1) => {
-                    struct_.field(&format!("pub {}", name), &format!("super::{}::{}<'input>", type_mod_name, type_name));
-                    impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
-                },
-                (0, 1) => {
-                    struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
-                    impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
-                },
-                (_, ::std::usize::MAX) => {
-                    struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                    impl_code.push(format!("    ({}, {}, Vec<{}; min={};>),", name, type_mod_name, type_name, min_occurs))
-                },
-                (_, _) => {
-                    struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
-                    impl_code.push(format!("    ({}, {}, Vec<{}; min={}; max={};>),", name, type_mod_name, type_name, min_occurs, max_occurs))
-                },
-            }
-        };
-        let doc_writer = &mut |doc2| doc.extend(doc2);
-        self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), &type_);
+    fn gen_field(&self, empty_struct: &mut bool, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, doc: &Documentation<'input>, name_gen: &mut NameGenerator, min_occurs: usize, max_occurs: usize, type_name: (String, String)) {
+        let (type_mod_name, type_name) = type_name;
+        *empty_struct = false;
+        let name = escape_keyword(&name_gen.gen_name(type_name.to_snake_case()));
+        let name = self.renames.get(&name).unwrap_or(&name);
+        match (min_occurs, max_occurs) {
+            (1, 1) => {
+                struct_.field(&format!("pub {}", name), &format!("super::{}::{}<'input>", type_mod_name, type_name));
+                impl_code.push(format!("    ({}, {}, {}),", name, type_mod_name, type_name))
+            },
+            (0, 1) => {
+                struct_.field(&format!("pub {}", name), &format!("Option<super::{}::{}<'input>>", type_mod_name, type_name));
+                impl_code.push(format!("    ({}, {}, Option<{}>),", name, type_mod_name, type_name))
+            },
+            (_, ::std::usize::MAX) => {
+                struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                impl_code.push(format!("    ({}, {}, Vec<{}; min={};>),", name, type_mod_name, type_name, min_occurs))
+            },
+            (_, _) => {
+                struct_.field(&format!("pub {}", name), &format!("Vec<super::{}::{}<'input>>", type_mod_name, type_name));
+                impl_code.push(format!("    ({}, {}, Vec<{}; min={}; max={};>),", name, type_mod_name, type_name, min_occurs, max_occurs))
+            },
+        }
     }
 
     fn gen_sequence(&mut self, items: &Vec<InlineComplexType<'input, ()>>, doc: &Documentation<'input>)-> Option<(String, String)> {
-        self.gen_group_or_sequence("sequence", NameHint::new("sequence"), items, doc)
+        self.gen_group_or_sequence("sequence", "sequence", items, doc)
     }
-    fn gen_group(&mut self, items: &Vec<&InlineComplexType<'input, ()>>, doc: &Documentation<'input>) -> Option<(String, String)> {
-        self.gen_group_or_sequence("group", NameHint::new("group"), items, doc)
+    fn gen_group(&mut self, items: &Vec<InlineComplexType<'input, ()>>, doc: &Documentation<'input>) -> Option<(String, String)> {
+        self.gen_group_or_sequence("group", "group", items, doc)
     }
-    fn gen_group_or_sequence(&mut self, mod_name: &str, name_hint: &NameHint<'input>, items: &Vec<&InlineComplexType<'input, ()>>, doc: &Documentation<'input>) -> Option<(String, String)> {
-        let items: Vec<_> = items.iter().filter_map(|item| self.gen_simple_type(item)).collect();
-
-        for item in items {
-            name_hint.push(&item.1);
-        }
-        let struct_name = name_from_hint(&name_hint);
-        let struct_name = escape_keyword(&struct_name.to_camel_case());
+    fn gen_group_or_sequence(&mut self, mod_name: &str, name_prefix: &str, items: &Vec<InlineComplexType<'input, ()>>, doc: &Documentation<'input>) -> Option<(String, String)> {
+        let items: Vec<_> = items.iter().filter_map(
+            |InlineComplexType { min_occurs, max_occurs, ref type_ }|
+            self.gen_complex_type(type_).map(|type_name| (*min_occurs, *max_occurs, type_name))
+        ).collect();
+        let struct_name = {
+            let mut name_hint = NameHint::new(name_prefix);
+            for (_min_occurs, _max_occurs, type_name) in items.iter() {
+                name_hint.push(&type_name.1);
+            }
+            let struct_name = name_from_hint(&name_hint).unwrap();
+            let struct_name = escape_keyword(&struct_name.to_camel_case());
+            struct_name
+        };
         let struct_name = self.name_gen.gen_name(struct_name);
         let struct_name = self.renames.get(&struct_name).unwrap_or(&struct_name);
 
-        let mut module = self.scope.module_get_mut(mod_name).unwrap();
         let mut impl_code = Vec::new();
         impl_code.push(format!("impl_group_or_sequence!({},", struct_name));
+
+        let mut empty_struct = true;
+        let mut struct_ = cg::Struct::new(&struct_name);
+        struct_.vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+        let mut name_gen = NameGenerator::new();
+        let mut doc = doc.clone();
         {
-            let mut empty_struct = true;
-            let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-            let mut name_gen = NameGenerator::new();
-            let mut doc = doc.clone();
-            {
-                for item in items {
-                    self.gen_fields(&mut empty_struct, struct_, &mut impl_code, &mut doc, &mut name_gen, &item.type_);
-                }
-            }
-            struct_.doc(&doc.to_string());
-            if empty_struct {
-                // TODO: return None instead
-                struct_.tuple_field(&format!("pub ::std::marker::PhantomData<&'input ()>"));
+            for (min_occurs, max_occurs, type_name) in items.into_iter() {
+                self.gen_field(&mut empty_struct, &mut struct_, &mut impl_code, &mut doc, &mut name_gen, min_occurs, max_occurs, type_name);
             }
         }
+        struct_.doc(&doc.to_string());
+        if empty_struct {
+            // TODO: return None instead
+            struct_.tuple_field(&format!("pub ::std::marker::PhantomData<&'input ()>"));
+        }
         impl_code.push(");".to_string());
+
+        let module = self.scope.get_module_mut(mod_name).unwrap();
+        module.push_struct(struct_);
         module.scope().raw(&impl_code.join("\n"));
-        Some((mod_name.to_string(), struct_name))
+        Some((mod_name.to_owned(), struct_name.to_owned()))
     }
 
+    /*
     fn gen_inline_elements(&mut self) {
         let module = self.scope.new_module("inline_elements");
         module.vis("pub");
@@ -428,44 +445,50 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 self.gen_element(module, &struct_names[0], &tag_name, attrs, element, doc);
             }
         }
-    }
+    }*/
 
     fn gen_elements(&mut self) {
-        for proc in &self.processors {
-            let mut elements: Vec<_> = proc.elements.iter().collect();
+        let elements: Vec<(FullName<'input>, InlineComplexType<'input, ()>)> = self.processors.iter().flat_map(
+            |proc| proc.elements.iter().map(|(name, type_)| (*name, type_.clone()))
+        ).collect();
+        let mut elements = elements.clone(); // TODO: do not clone
 
-            elements.sort_by_key(|&(n,_)| n);
-            for (&name, element) in elements {
-                let mod_name = self.get_module_name(name);
-                let mut module = self.scope.get_module_mut(&mod_name).expect(&mod_name);
-                let head_local_name = format!("{}_head", name.local_name());
-                let mut substitutions = Vec::new();
-                substitutions.push(FullName::new(name.namespace(), &head_local_name));
-                for proc in &self.processors {
-                    if let Some(members) = proc.substitution_groups.get(&name) {
-                        substitutions.extend(members);
-                    }
-                }
-                if substitutions.len() > 1 {
-                    let enum_name = escape_keyword(&name.local_name().to_camel_case());
-                    self.gen_substitution_enum(module.scope(), &enum_name, &substitutions);
-                    let struct_name = escape_keyword(&head_local_name.to_camel_case());
-                    self.gen_element(module, &struct_name, &name, &element.attrs, &element.type_, &element.doc);
-                }
-                else {
-                    let struct_name = escape_keyword(&name.local_name().to_camel_case());
-                    self.gen_element(module, &struct_name, &name, &element.attrs, &element.type_, &element.doc);
-                }
-            }
+        elements.sort_by_key(|&(n,_)| n);
+
+        for (name, element) in elements {
+            self.gen_element_with_substitution(name, &element);
         }
     }
 
-    fn gen_substitution_enum(&self, enum_name: &str, substitutions: &Vec<FullName<'input>>) {
+    fn gen_element_with_substitution(&mut self, name: FullName<'input>, element: &InlineComplexType<'input, ()>) {
+        let mut substitutions = Vec::new();
+        substitutions.push(name);
+        for proc in self.processors.iter() {
+            if let Some(members) = proc.substitution_groups.get(&name) {
+                substitutions.extend(members);
+            }
+        }
+
+        if substitutions.len() > 1 {
+            let enum_name = escape_keyword(&name.local_name().to_camel_case());
+            self.gen_substitution_enum(&enum_name, &substitutions);
+            let head_local_name = format!("{}_head", name.local_name());
+            let struct_name = escape_keyword(&head_local_name.to_camel_case());
+            self.gen_element(&struct_name, name, element);
+        }
+        else {
+            let struct_name = escape_keyword(&name.local_name().to_camel_case());
+            self.gen_element(&struct_name, name, element);
+        }
+    }
+
+    fn gen_substitution_enum(&mut self, enum_name: &str, substitutions: &Vec<FullName<'input>>) {
         let mut impl_code = Vec::new();
         impl_code.push(format!("impl_enum!({},", enum_name));
         let mut name_gen = NameGenerator::new();
         {
-            let enum_ = self.scope.new_enum(&enum_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+            let mut enum_ = cg::Enum::new(&enum_name);
+            enum_.vis("pub").derive("Debug").derive("PartialEq").generic("'input");
             for &substitution in substitutions {
                 let variant_name = escape_keyword(&name_gen.gen_name(substitution.local_name().to_camel_case()));
                 let type_mod_name = escape_keyword(&self.get_module_name(substitution).to_snake_case());
@@ -475,18 +498,19 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
                 impl_code.push(format!("    impl_singleton_variant!({}, {}, Box<{}>),", variant_name, escape_keyword(&type_mod_name), escape_keyword(&type_name)));
             }
             impl_code.push(");".to_string());
+            self.scope.push_enum(enum_);
         }
         self.scope.raw(&impl_code.join("\n"));
     }
 
-    fn gen_attrs(&self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, name_gen: &mut NameGenerator, attrs: &Attrs<'input>, seen_attrs: &mut HashMap<FullName<'input>, AttrUse>, generated_attrs: &mut HashSet<FullName<'input>>, inherited: bool) {
+    fn gen_attrs(&mut self, struct_: &mut cg::Struct, impl_code: &mut Vec<String>, name_gen: &mut NameGenerator, attrs: &Attrs<'input>, seen_attrs: &mut HashMap<FullName<'input>, AttrUse>, generated_attrs: &mut HashSet<FullName<'input>>, inherited: bool) {
         for (attr_name, use_, attr_type) in &attrs.named {
             if generated_attrs.contains(attr_name) {
                 continue;
             }
-            let default_type = SimpleType::Primitive(SCHEMA_URI, "AnySimpleType");
+            let default_type = SimpleType::Alias(FullName::new(Some(SCHEMA_URI), "AnySimpleType"));
             let type_ = attr_type.as_ref().unwrap_or(&default_type);
-            let (type_mod_name, type_name) = self.get_simple_type_name(&type_).unwrap();
+            let (type_mod_name, type_name) = self.gen_simple_type(&RichAstNode::new(type_.clone(), Documentation::new())).unwrap(); // FIXME: ugly
             let use_ = if inherited {
                 *seen_attrs.get(attr_name).unwrap_or(use_)
             }
@@ -510,72 +534,63 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
         }
         for group_name in &attrs.group_refs {
-            let mut found = false;
+            let mut found = None;
             for processor in self.processors.iter() {
                 if let Some(attrs) = processor.attribute_groups.get(group_name) {
-                    self.gen_attrs(struct_, impl_code, name_gen, attrs, seen_attrs, generated_attrs, false);
-                    found = true;
+                    found = Some(attrs.clone()); // TODO: do not clone
                     break;
                 }
             }
-            if !found {
+            if let Some(attrs) = found {
+                self.gen_attrs(struct_, impl_code, name_gen, &attrs, seen_attrs, generated_attrs, false);
+            }
+            else {
                 panic!("unknown attribute group: {:?}", group_name);
             }
         }
     }
 
-    fn gen_element(&self, module: &mut cg::Module, struct_name: &str, tag_name: &FullName<'input>, attrs: &Attrs<'input>, type_: &Type<'input>, doc: &Documentation<'input>) {
+    fn gen_element(&mut self, struct_name: &str, tag_name: FullName<'input>, type_: &InlineComplexType<'input, ()>) {
+        let mod_name = self.get_module_name(tag_name);
         let mut impl_code = Vec::new();
         impl_code.push(format!("impl_element!({}, {:?}, \"{}\", attributes = {{",
             struct_name, tag_name.namespace().unwrap_or(""), tag_name.local_name()));
-        {
-            let struct_ = module.new_struct(&struct_name).vis("pub").derive("Debug").derive("PartialEq").generic("'input");
-            let mut empty_struct = false;
-            struct_.field("pub attrs", "HashMap<FullName<'input>, &'input str>");
-            let mut name_gen = NameGenerator::new();
-            let mut doc = doc.clone();
-            let mut generated_attrs = HashSet::new();
-            let mut seen_attrs = HashMap::new();
-            
-            let attrs = self.compute_attrs(&type_, attrs);
-            self.gen_attrs(struct_, &mut impl_code, &mut name_gen, &attrs, &mut seen_attrs, &mut generated_attrs, false);
-            {
-                let field_writer = &mut |_, _, _, _, _| ();
-                let doc_writer = &mut |_| ();
-                self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), &type_);
-            }
-            impl_code.push(format!("}}, fields = {{"));
-            self.gen_fields(&mut empty_struct, struct_, &mut impl_code, &mut doc, &mut name_gen, type_);
-            struct_.doc(&doc.to_string());
+        let InlineComplexType { min_occurs, max_occurs, type_ } = type_;
+
+        let mut struct_ = cg::Struct::new(&struct_name);
+        struct_.vis("pub").derive("Debug").derive("PartialEq").generic("'input");
+        let mut empty_struct = false;
+        struct_.field("pub attrs", "HashMap<FullName<'input>, &'input str>");
+        let mut name_gen = NameGenerator::new();
+        let mut generated_attrs = HashSet::new();
+        let mut seen_attrs = HashMap::new();
+        
+        println!("{:?}", type_);
+        let attrs = self.compute_attrs(&type_.type_, &type_.attrs);
+        self.gen_attrs(&mut struct_, &mut impl_code, &mut name_gen, &attrs, &mut seen_attrs, &mut generated_attrs, false);
+        /* WTF was this supposed to do?
+         * {
+            let field_writer = &mut |_, _, _, _, _| ();
+            let doc_writer = &mut |_| ();
+            self.write_type_in_struct_def(field_writer, &mut Some(doc_writer), &type_);
+        } */
+        impl_code.push(format!("}}, fields = {{"));
+        if let Some((type_mod_name, type_name)) = self.gen_complex_type(type_) {
+            self.gen_field(&mut empty_struct, &mut struct_, &mut impl_code, &type_.doc, &mut name_gen, *min_occurs, *max_occurs, (type_mod_name, type_name));
         }
+        struct_.doc(&type_.doc.to_string());
+
         impl_code.push(format!("}});"));
+        let mut module = self.scope.get_module_mut(&mod_name).expect(&mod_name);
+        module.push_struct(struct_);
         module.scope().raw(&impl_code.join("\n"));
     }
 
-    fn get_type_generated_name(&self, name: &FullName<'input>) -> (&str, str) {
-        if name.namespace() == Some(SCHEMA_URI) {
-            if let Some(name) = self.primitive_types.get(name.local_name()) {
-                return name;
-            }
-        }
-        let mut type_ = None;
-        for proc in &self.processors {
-            if proc.target_namespace != name.namespace() {
-                continue;
-            }
-            type_ = proc.types.get(name);
-            if type_.is_some() {
-                break;
-            }
-        }
-        let type_ = type_.expect(&format!("Unknown type name: {:?}", name));
-        type_
-    }
-
+    /*
     fn write_type_in_struct_def<'a, F, H>(&'a self,
             field_writer: &mut F,
             doc_writer: &mut Option<&mut H>,
-            type_: &'a Type<'input>,
+            type_: &'a InlineComplexType<'input, ()>,
             ) where
             F: FnMut(String, String, usize, usize, String),
             H: FnMut(&'a Documentation<'input>),
@@ -632,34 +647,45 @@ impl<'ast, 'input: 'ast> ParserGenerator<'ast, 'input> {
             }
             _ => unimplemented!("writing {:?}", type_),
         }
-    }
+    }*/
 
     fn compute_attrs(&self, type_: &Type<'input>, own_attrs: &Attrs<'input>) -> Attrs<'input> {
         match type_ {
             Type::Alias(name) => {
-                let target_type = self.get_type(name);
-                let target_attrs = self.compute_attrs(&target_type.type_, &target_type.attrs);
-                self.extend_attrs(&target_attrs, own_attrs)
+                println!("{:?} {:?}", type_, name);
+                if let Some(target_type) = self.get_type(*name) {
+                    let target_attrs = self.compute_attrs(&target_type.type_, &target_type.attrs);
+                    self.extend_attrs(&target_attrs, own_attrs)
+                }
+                else {
+                    // TODO: check that simple type exists
+                    own_attrs.clone()
+                }
             },
-            Type::InlineSequence(_) |
-            Type::Sequence(_, _, _) |
-            Type::Element(_, _, _) |
-            Type::Group(_, _, _) |
-            Type::ElementRef(_, _, _) |
-            Type::Choice(_, _, _) |
+            Type::Sequence(_) |
+            Type::Element(_) |
+            Type::Group(_) |
+            Type::ElementRef(_) |
+            Type::Choice(_) |
             Type::Empty |
             Type::Any => {
                 own_attrs.clone()
             }
             Type::Extension(base, ext_type) => {
-                let base_type = &self.get_type(&base);
+                let base_type = &self.get_type(*base).unwrap();
                 let base_attrs = self.compute_attrs(&base_type.type_, &base_type.attrs);
+                let InlineComplexType { min_occurs, max_occurs, type_: ref ext_type } = **ext_type;
+                assert_eq!(min_occurs, 1); // FIXME: type of 'ext_type'
+                assert_eq!(max_occurs, 1); // FIXME: type of 'ext_type'
                 let own_attrs = self.extend_attrs(own_attrs, &ext_type.attrs); // XXX
                 self.extend_attrs(&base_attrs, &own_attrs)
             },
             Type::Restriction(base, ext_type) => {
-                let base_type = &self.get_type(&base);
+                let base_type = &self.get_type(*base).unwrap();
                 let base_attrs = self.compute_attrs(&base_type.type_, &base_type.attrs);
+                let InlineComplexType { min_occurs, max_occurs, type_: ref ext_type } = **ext_type;
+                assert_eq!(min_occurs, 1); // FIXME: type of 'ext_type'
+                assert_eq!(max_occurs, 1); // FIXME: type of 'ext_type'
                 let own_attrs = self.extend_attrs(own_attrs, &ext_type.attrs); // XXX
                 self.restrict_attrs(&base_attrs, &own_attrs)
             },

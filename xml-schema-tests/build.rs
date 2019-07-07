@@ -38,7 +38,7 @@ fn main() {
 
         let renames = Default::default();
         let mut gen = ParserGenerator::new(vec![proc], &parse_context, renames);
-        let scope = gen.gen_target_scope();
+        gen.gen_target_scope();
 
         let filename = in_path.file_name().unwrap();
         let out_path = 
@@ -53,7 +53,7 @@ fn main() {
             .write(b"#[allow(unused_imports)]\nuse xml_schema::support;\n")
             .expect(&format!("Could not write in {:?}", out_path));
         out_file
-            .write(scope.to_string().as_bytes())
+            .write(gen.scope.to_string().as_bytes())
             .expect(&format!("Could not write in {:?}", out_path));
     }
     println!("cargo:rerun-if-changed={}", in_dir.to_str().unwrap());
