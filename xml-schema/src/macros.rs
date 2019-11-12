@@ -26,7 +26,13 @@ macro_rules! impl_enum {
         impl<'input> ParseXml<'input> for $name<'input> {
             const NODE_NAME: &'static str = concat!("enum ", stringify!($name));
 
-            fn parse_empty<TParseContext: ParseContext<'input>>(_parse_context: &mut TParseContext, _parent_context: &ParentContext<'input>) -> Option<Self> {
+            fn parse_empty<TParseContext: ParseContext<'input>>(parse_context: &mut TParseContext, parent_context: &ParentContext<'input>) -> Option<Self> {
+                $(
+                    match $variant_macro!($name, __empty_element, parse_context, parent_context, $($variant_args)*) {
+                        Some(x) => return Some(x),
+                        None => (),
+                    }
+                )*
                 None
             }
 
@@ -46,7 +52,22 @@ macro_rules! impl_enum {
     }
 }
 
+// TODO: deduplicate the empty and non-empty cases
 macro_rules! impl_singleton_variant {
+    // empty element; call parse_empty_xml
+    ( $enum_name:ident, __empty_element, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Box < $type_name:ident > ) => {
+        super::$type_mod_name::$type_name::parse_empty($parse_context, $parent_context).map(Box::new).map($enum_name::$variant_name)
+    };
+    ( $enum_name:ident, __empty_element, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Option < Box < $type_name:ident > > ) => {
+        Some(super::$type_mod_name::$type_name::parse_empty($parse_context, $parent_context).map(Box::new).map($enum_name::$variant_name))
+    };
+    ( $enum_name:ident, __empty_element, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Vec < $type_name:ident > ) => {{
+        // TODO: Should it be vec![], or vec![super::$type_mod_name::$type_name::parse_empty(...)]?
+        let mut items = Vec::new();
+        Some($enum_name::$variant_name(items))
+    }};
+
+    // non-empty element; call parse_xml
     ( $enum_name:ident, $stream:expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, $type_mod_name:ident, Box < $type_name:ident > ) => {
         super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new).map($enum_name::$variant_name)
     };
@@ -62,7 +83,31 @@ macro_rules! impl_singleton_variant {
     }}
 }
 
+// TODO: deduplicate the empty and non-empty cases
 macro_rules! impl_struct_variant {
+    ( $enum_name:ident, __empty_element, $parse_context:expr, $parent_context:expr, $variant_name:ident, ) => {{
+        // empty variant
+        Some(Default::default())
+    }};
+    ( $enum_name:ident, __empty_element, $parse_context:expr, $parent_context:expr, $variant_name:ident, $( ( $field_name:ident, $( $field_args:tt )* ), )* ) => {{
+        let mut res = None;
+        loop { // single run, used for breaking
+            $(
+                let $field_name = match impl_struct_variant_field!(__empty_element, $parse_context, $parent_context, $( $field_args )* ) {
+                    Some(e) => e,
+                    None => break,
+                };
+            )*
+            res = Some($enum_name::$variant_name {
+                $(
+                    $field_name,
+                )*
+            });
+            break;
+        }
+        res
+    }};
+
     ( $enum_name:ident, $stream: expr, $parse_context:expr, $parent_context:expr, $variant_name:ident, ) => {{
         // empty variant
         None
@@ -87,7 +132,21 @@ macro_rules! impl_struct_variant {
     }}
 }
 
+// TODO: deduplicate the empty and non-empty cases
 macro_rules! impl_struct_variant_field {
+    ( __empty_element, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Box < $type_name:ident > ) => {
+        super::$type_mod_name::$type_name::parse_empty($parse_context, $parent_context).map(Box::new)
+    };
+    ( __empty_element, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Option < Box < $type_name:ident > > ) => {
+        Some(super::$type_mod_name::$type_name::parse_empty($parse_context, $parent_context).map(Box::new))
+    };
+    ( __empty_element, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Vec < $type_name:ident > ) => {{
+        // TODO: Should it be vec![], or vec![super::$type_mod_name::$type_name::parse_empty(...)]?
+        let mut items = Vec::new();
+        Some(items)
+    }};
+
+
     ( $stream: expr, $parse_context:expr, $parent_context:expr,  $type_mod_name:ident, Box < $type_name:ident > ) => {
         super::$type_mod_name::$type_name::parse_xml($stream, $parse_context, $parent_context).map(Box::new)
     };
