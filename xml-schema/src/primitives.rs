@@ -254,21 +254,21 @@ impl<'input> ParseXmlStr<'input> for Integer<'input> {
         match c {
             '+' => multiplier = 1,
             '-' => multiplier = -1,
-            '0'...'9' => n = (c as i64) - ('0' as i64),
+            '0'..='9' => n = (c as i64) - ('0' as i64),
             _ => return None,
         }
 
         if c == '+' || c == '-' {
             let c = iter.next()?.1;
             match c {
-                '0'...'9' => n = (c as i64) - ('0' as i64),
+                '0'..='9' => n = (c as i64) - ('0' as i64),
                 _ => return None,
             }
         }
 
         for (i,c) in iter {
             match c {
-                '0'...'9' => n = n * 10 + ((c as i64) - ('0' as i64)),
+                '0'..='9' => n = n * 10 + ((c as i64) - ('0' as i64)),
                 _ => {
                     let res = multiplier * n;
                     validate_int!(res, facets);
