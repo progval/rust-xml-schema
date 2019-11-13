@@ -28,7 +28,7 @@ fn parse_max_occurs(x: &Option<unions::UnionNonNegativeIntegerNmtoken>) -> usize
     }
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 #[must_use]
 pub struct Documentation<'input>(Vec<&'input str>);
 impl<'input> Documentation<'input> {
@@ -57,9 +57,13 @@ pub enum AttrUse {
     Optional,
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Attrs<'input> {
-    pub named: Vec<(FullName<'input>, AttrUse, Option<SimpleType<'input>>)>,
+    pub named: Vec<(
+        FullName<'input>,
+        AttrUse,
+        Option<RecursiveSimpleType<'input>>,
+    )>,
     pub refs: Vec<(Option<FullName<'input>>, AttrUse, FullName<'input>)>,
     pub group_refs: Vec<FullName<'input>>,
     pub any_attributes: bool,
@@ -87,34 +91,36 @@ impl<'input> Attrs<'input> {
     }
 }
 
+/// Direct retranscription of XSD's complexType in a Rust-friendly way
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ComplexType<'input> {
+pub enum RecursiveComplexType<'input> {
     Any,
     Empty,
     Alias(FullName<'input>),
-    Extension(FullName<'input>, Box<ComplexType<'input>>),
-    Restriction(FullName<'input>, Box<ComplexType<'input>>),
+    Extension(FullName<'input>, Box<RecursiveComplexType<'input>>),
+    Restriction(FullName<'input>, Box<RecursiveComplexType<'input>>),
     ElementRef(usize, usize, FullName<'input>),
     Element(
         usize,
         usize,
         Option<&'input str>,
         &'input str,
-        Box<ComplexType<'input>>,
+        Box<RecursiveComplexType<'input>>,
     ),
-    Group(usize, usize, FullName<'input>),
-    Choice(usize, usize, Vec<ComplexType<'input>>),
-    Sequence(usize, usize, Vec<ComplexType<'input>>),
-    Simple(SimpleType<'input>),
+    GroupRef(usize, usize, FullName<'input>),
+    Choice(usize, usize, Vec<RecursiveComplexType<'input>>),
+    Sequence(usize, usize, Vec<RecursiveComplexType<'input>>),
+    Simple(RecursiveSimpleType<'input>),
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum SimpleType<'input> {
+/// Direct retranscription of XSD's simpleType in a Rust-friendly way
+#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum RecursiveSimpleType<'input> {
     Primitive(&'static str, &'static str),
     Alias(FullName<'input>),
     Restriction(FullName<'input>, Facets<'input>),
-    List(Box<SimpleType<'input>>),
-    Union(Vec<SimpleType<'input>>),
+    List(Box<RecursiveSimpleType<'input>>),
+    Union(Vec<RecursiveSimpleType<'input>>),
     Empty,
 }
 
@@ -123,10 +129,10 @@ pub struct SimpleToplevel<'ast, 'input: 'ast> {
     pub target_namespace: Option<&'input str>,
     pub element_form_default_qualified: bool,
     pub attribute_form_default_qualified: bool,
-    pub elements: HashMap<FullName<'input>, ComplexType<'input>>,
-    pub simple_types: HashMap<FullName<'input>, SimpleType<'input>>,
-    pub complex_types: HashMap<FullName<'input>, ComplexType<'input>>,
-    pub groups: HashMap<FullName<'input>, ComplexType<'input>>,
+    pub elements: HashMap<FullName<'input>, RecursiveComplexType<'input>>,
+    pub simple_types: HashMap<FullName<'input>, RecursiveSimpleType<'input>>,
+    pub complex_types: HashMap<FullName<'input>, RecursiveComplexType<'input>>,
+    pub groups: HashMap<FullName<'input>, RecursiveComplexType<'input>>,
     pub attribute_groups: HashMap<FullName<'input>, Attrs<'input>>,
     _phantom: PhantomData<&'ast ()>, // Sometimes I need 'ast when prototyping
 }
@@ -185,7 +191,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_toplevel_element(
         &mut self,
         element: &'ast xs::Element<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         let xs::Element {
             ref attr_type,
             ref attr_name,
@@ -197,11 +203,11 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
         match (attr_type, &child_type) {
             (None, Some(ref c)) => match c {
-                enums::Type::SimpleType(ref e) => ComplexType::Simple(self.process_local_simple_type(e)),
+                enums::Type::SimpleType(ref e) => RecursiveComplexType::Simple(self.process_local_simple_type(e)),
                 enums::Type::ComplexType(ref e) => self.process_local_complex_type(e),
             },
-            (Some(t), None) => ComplexType::Alias(FullName::from_qname(t, self.target_namespace)),
-            (None, None) => ComplexType::Empty,
+            (Some(t), None) => RecursiveComplexType::Alias(FullName::from_qname(t, self.target_namespace)),
+            (None, None) => RecursiveComplexType::Empty,
             (Some(ref t1), Some(ref t2)) => {
                 panic!(
                 "Toplevel element '{}:{}' has both a type attribute ({:?}) and a child type ({:?}).",
@@ -214,7 +220,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_toplevel_complex_type(
         &mut self,
         complex_type: &'ast xs::ComplexType<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         let xs::ComplexType {
             ref complex_type_model,
             ..
@@ -226,7 +232,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_complex_type_model(
         &mut self,
         complex_type_model: &'ast xs::ComplexTypeModel<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         match complex_type_model {
             xs::ComplexTypeModel::SimpleContent(_) => unimplemented!("simpleContent"),
             xs::ComplexTypeModel::ComplexContent(ref model) => self.process_complex_content(model),
@@ -247,7 +253,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_local_complex_type(
         &mut self,
         complex_type: &'ast inline_elements::LocalComplexType<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         let inline_elements::LocalComplexType {
             ref complex_type_model,
             ..
@@ -258,7 +264,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_toplevel_simple_type(
         &mut self,
         simple_type: &'ast xs::SimpleType<'input>,
-    ) -> SimpleType<'input> {
+    ) -> RecursiveSimpleType<'input> {
         let xs::SimpleType {
             ref simple_derivation,
             ..
@@ -273,7 +279,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_local_simple_type(
         &mut self,
         simple_type: &'ast inline_elements::LocalSimpleType<'input>,
-    ) -> SimpleType<'input> {
+    ) -> RecursiveSimpleType<'input> {
         let inline_elements::LocalSimpleType {
             ref simple_derivation,
             ..
@@ -288,7 +294,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_simple_restriction(
         &mut self,
         restriction: &'ast xs::Restriction<'input>,
-    ) -> SimpleType<'input> {
+    ) -> RecursiveSimpleType<'input> {
         let xs::Restriction {
             ref attr_base,
             ref simple_restriction_model,
@@ -309,9 +315,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
         match local_simple_type {
             Some(inline_elements::LocalSimpleType { .. }) => {
-                SimpleType::Restriction(base, facets) // TODO: use the simple_derivation
+                RecursiveSimpleType::Restriction(base, facets) // TODO: use the simple_derivation
             }
-            None => SimpleType::Restriction(base, facets),
+            None => RecursiveSimpleType::Restriction(base, facets),
         }
     }
 
@@ -365,7 +371,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         facets
     }
 
-    fn process_list(&mut self, list: &'ast xs::List<'input>) -> SimpleType<'input> {
+    fn process_list(&mut self, list: &'ast xs::List<'input>) -> RecursiveSimpleType<'input> {
         let item_type = list.attr_item_type;
         let item_type = item_type
             .as_ref()
@@ -373,7 +379,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
         let t = match (item_type, &list.local_simple_type) {
             (None, Some(st)) => self.process_local_simple_type(st),
-            (Some(n), None) => SimpleType::Alias(n),
+            (Some(n), None) => RecursiveSimpleType::Alias(n),
             (None, None) => panic!("<list> with no itemType or child type."),
             (Some(ref t1), Some(ref t2)) => panic!(
                 "<list> has both an itemType attribute ({:?}) and a child type ({:?}).",
@@ -381,20 +387,23 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             ),
         };
 
-        SimpleType::List(Box::new(t))
+        RecursiveSimpleType::List(Box::new(t))
     }
 
-    fn process_union(&mut self, union: &'ast xs::Union<'input>) -> SimpleType<'input> {
+    fn process_union(&mut self, union: &'ast xs::Union<'input>) -> RecursiveSimpleType<'input> {
         let member_types = union
             .local_simple_type
             .iter()
             .map(|t| self.process_local_simple_type(t))
             .collect();
 
-        SimpleType::Union(member_types)
+        RecursiveSimpleType::Union(member_types)
     }
 
-    fn process_toplevel_group(&mut self, group: &'ast xs::Group<'input>) -> ComplexType<'input> {
+    fn process_toplevel_group(
+        &mut self,
+        group: &'ast xs::Group<'input>,
+    ) -> RecursiveComplexType<'input> {
         let xs::Group {
             choice_all_choice_sequence: ref content,
             ..
@@ -434,7 +443,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     match (name, e.attr_ref, type_attr, &e.local_simple_type) {
                         (Some(name), None, Some(t), None) => {
                             let t = FullName::from_qname(&t, self.target_namespace);
-                            attrs.named.push((name, use_, Some(SimpleType::Alias(t))));
+                            attrs
+                                .named
+                                .push((name, use_, Some(RecursiveSimpleType::Alias(t))));
                         }
                         (Some(name), None, None, Some(t)) => {
                             let t = self.process_local_simple_type(t);
@@ -471,7 +482,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_complex_content(
         &mut self,
         model: &'ast xs::ComplexContent<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         let xs::ComplexContent {
             ref choice_restriction_extension,
             ..
@@ -488,7 +499,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                         type_def_particle,
                         ..
                     }) => self.process_complex_restriction(attr_base, type_def_particle),
-                    None => ComplexType::Empty,
+                    None => RecursiveComplexType::Empty,
                 }
             }
             enums::ChoiceRestrictionExtension::Extension(ref e) => {
@@ -513,9 +524,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         _attrs: &'ast HashMap<FullName<'input>, &'input str>,
         attr_base: &'ast QName<'input>,
         type_def_particle: &'ast xs::TypeDefParticle<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         let base = FullName::from_qname(attr_base, self.target_namespace);
-        ComplexType::Extension(
+        RecursiveComplexType::Extension(
             base,
             Box::new(self.process_type_def_particle(type_def_particle)),
         )
@@ -525,9 +536,9 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         &mut self,
         _attrs: &'ast HashMap<FullName<'input>, &'input str>,
         attr_base: &'ast QName<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         let base = FullName::from_qname(&attr_base, self.target_namespace);
-        ComplexType::Alias(base)
+        RecursiveComplexType::Alias(base)
     }
 
     fn process_complete_content_model(
@@ -536,10 +547,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         type_def_particle: &'ast Option<Box<xs::TypeDefParticle<'input>>>,
         _attr_decls: &'ast xs::AttrDecls<'input>,
         _assertions: &'ast xs::Assertions<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         match type_def_particle.as_ref() {
             Some(type_def_particle) => self.process_type_def_particle(type_def_particle),
-            None => ComplexType::Empty,
+            None => RecursiveComplexType::Empty,
         }
     }
 
@@ -547,17 +558,17 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         &mut self,
         attr_base: &'ast QName<'input>,
         type_def_particle: &'ast xs::TypeDefParticle<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         // TODO: use the base
         let base = FullName::from_qname(attr_base, self.target_namespace);
         let ty = self.process_type_def_particle(type_def_particle);
-        ComplexType::Restriction(base, Box::new(ty))
+        RecursiveComplexType::Restriction(base, Box::new(ty))
     }
 
     fn process_type_def_particle(
         &mut self,
         particle: &'ast xs::TypeDefParticle<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         match particle {
             xs::TypeDefParticle::Group(e) => self.process_group_ref(e),
             xs::TypeDefParticle::All(_) => unimplemented!("all"),
@@ -569,7 +580,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_group_ref(
         &mut self,
         group_ref: &'ast inline_elements::GroupRef<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         let inline_elements::GroupRef {
             ref attr_ref,
             ref attr_min_occurs,
@@ -580,10 +591,10 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         let max_occurs = parse_max_occurs(attr_max_occurs);
         let ref_ = FullName::from_qname(attr_ref, self.target_namespace);
 
-        ComplexType::Group(min_occurs, max_occurs, ref_)
+        RecursiveComplexType::GroupRef(min_occurs, max_occurs, ref_)
     }
 
-    fn process_choice(&mut self, choice: &'ast xs::Choice<'input>) -> ComplexType<'input> {
+    fn process_choice(&mut self, choice: &'ast xs::Choice<'input>) -> RecursiveComplexType<'input> {
         let xs::Choice {
             ref attr_min_occurs,
             ref attr_max_occurs,
@@ -599,10 +610,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             .map(|particle| self.process_nested_particle(particle))
             .collect();
 
-        ComplexType::Choice(min_occurs, max_occurs, items)
+        RecursiveComplexType::Choice(min_occurs, max_occurs, items)
     }
 
-    fn process_sequence(&mut self, seq: &'ast xs::Sequence<'input>) -> ComplexType<'input> {
+    fn process_sequence(
+        &mut self,
+        seq: &'ast xs::Sequence<'input>,
+    ) -> RecursiveComplexType<'input> {
         let xs::Sequence {
             ref attr_min_occurs,
             ref attr_max_occurs,
@@ -618,13 +632,13 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
             .map(|particle| self.process_nested_particle(particle))
             .collect();
 
-        ComplexType::Sequence(min_occurs, max_occurs, items)
+        RecursiveComplexType::Sequence(min_occurs, max_occurs, items)
     }
 
     fn process_nested_particle(
         &mut self,
         particle: &'ast xs::NestedParticle<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         match particle {
             xs::NestedParticle::Element(e) => self.process_local_element(e),
             xs::NestedParticle::Group(e) => self.process_group_ref(e),
@@ -634,14 +648,14 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
         }
     }
 
-    fn process_any(&mut self, _any: &'ast xs::Any<'input>) -> ComplexType<'input> {
-        ComplexType::Any
+    fn process_any(&mut self, _any: &'ast xs::Any<'input>) -> RecursiveComplexType<'input> {
+        RecursiveComplexType::Any
     }
 
     fn process_local_element(
         &mut self,
         element: &'ast inline_elements::LocalElement<'input>,
-    ) -> ComplexType<'input> {
+    ) -> RecursiveComplexType<'input> {
         let inline_elements::LocalElement {
             ref attr_name,
             ref attr_ref,
@@ -672,7 +686,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 panic!("<element> has both ref={:?} and form={:?}", ref_, attr_form);
             }
             let ref_ = FullName::from_qname(ref_, self.target_namespace);
-            ComplexType::ElementRef(min_occurs, max_occurs, ref_)
+            RecursiveComplexType::ElementRef(min_occurs, max_occurs, ref_)
         } else {
             let name = name.as_ref().expect("<element> has no name.").0;
 
@@ -691,20 +705,20 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
 
             let t = match (type_attr, &type_) {
                 (None, Some(enums::Type::SimpleType(ref e))) => {
-                    ComplexType::Simple(self.process_local_simple_type(e))
+                    RecursiveComplexType::Simple(self.process_local_simple_type(e))
                 }
                 (None, Some(enums::Type::ComplexType(ref e))) => self.process_local_complex_type(e),
                 (Some(t), None) => {
                     let t = FullName::from_qname(t, self.target_namespace);
-                    ComplexType::Alias(t)
+                    RecursiveComplexType::Alias(t)
                 }
-                (None, None) => ComplexType::Empty,
+                (None, None) => RecursiveComplexType::Empty,
                 (Some(ref t1), Some(ref t2)) => panic!(
                     "Element '{:?}' has both a type attribute ({:?}) and a child type ({:?}).",
                     name, t1, t2
                 ),
             };
-            ComplexType::Element(min_occurs, max_occurs, namespace, name, Box::new(t))
+            RecursiveComplexType::Element(min_occurs, max_occurs, namespace, name, Box::new(t))
         }
     }
 }
