@@ -103,8 +103,7 @@ pub enum RecursiveComplexType<'input> {
     Element(
         usize,
         usize,
-        Option<&'input str>,
-        &'input str,
+        FullName<'input>,
         Box<RecursiveComplexType<'input>>,
     ),
     GroupRef(usize, usize, FullName<'input>),
@@ -718,7 +717,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                     name, t1, t2
                 ),
             };
-            RecursiveComplexType::Element(min_occurs, max_occurs, namespace, name, Box::new(t))
+            RecursiveComplexType::Element(
+                min_occurs,
+                max_occurs,
+                FullName::new(namespace, name),
+                Box::new(t),
+            )
         }
     }
 }
