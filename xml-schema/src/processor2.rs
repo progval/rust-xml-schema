@@ -124,7 +124,7 @@ pub enum RecursiveSimpleType<'input> {
 }
 
 #[derive(Debug)]
-pub struct SimpleToplevel<'ast, 'input: 'ast> {
+pub struct SimpleToplevel<'input> {
     pub target_namespace: Option<&'input str>,
     pub element_form_default_qualified: bool,
     pub attribute_form_default_qualified: bool,
@@ -133,7 +133,6 @@ pub struct SimpleToplevel<'ast, 'input: 'ast> {
     pub complex_types: HashMap<FullName<'input>, RecursiveComplexType<'input>>,
     pub groups: HashMap<FullName<'input>, RecursiveComplexType<'input>>,
     pub attribute_groups: HashMap<FullName<'input>, Attrs<'input>>,
-    _phantom: PhantomData<&'ast ()>, // Sometimes I need 'ast when prototyping
 }
 
 fn hashmap_map<K: Hash + Eq, V1, V2, F>(map: HashMap<K, V1>, mut mapper: F) -> HashMap<K, V2>
@@ -143,8 +142,8 @@ where
     map.into_iter().map(|(k, v)| (k, mapper(v))).collect()
 }
 
-impl<'ast, 'input: 'ast> SimpleToplevel<'ast, 'input> {
-    pub fn new_from_toplevel(toplevel: Toplevel<'ast, 'input>) -> SimpleToplevel<'ast, 'input> {
+impl<'input> SimpleToplevel<'input> {
+    pub fn new_from_toplevel<'ast>(toplevel: Toplevel<'ast, 'input>) -> SimpleToplevel<'input> {
         let Toplevel {
             target_namespace,
             element_form_default_qualified,
@@ -175,7 +174,6 @@ impl<'ast, 'input: 'ast> SimpleToplevel<'ast, 'input> {
             attribute_groups: hashmap_map(attribute_groups, |g| {
                 processor.process_toplevel_attribute_group(g)
             }),
-            _phantom: PhantomData::default(),
         }
     }
 }
