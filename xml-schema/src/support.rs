@@ -167,7 +167,7 @@ impl<'input, T> ParseXml<'input> for T where T: ParseXmlStr<'input> {
             Some(XmlToken::Text(strspan)) => {
                 match Self::parse_self_xml_str(strspan.to_str(), parse_context, parent_context, &Facets::default()) {
                     Some(("", out)) => Some(out),
-                    Some((unparsed, _)) => None,
+                    Some((_unparsed, _)) => None,
                     None => None,
                 }
             }

@@ -1,3 +1,5 @@
+#![allow(warnings)]
+
 use std::collections::{HashMap, HashSet};
 
 use codegen as cg;

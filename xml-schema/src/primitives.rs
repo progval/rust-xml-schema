@@ -145,7 +145,8 @@ pub struct QName<'input> {
 }
 impl<'input> ParseXmlStr<'input> for QName<'input> {
     const NODE_NAME: &'static str = "QName";
-    fn parse_self_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, _parse_context: &mut TParseContext, parent_context: &ParentContext<'input>, facets: &Facets<'a>) -> Option<(&'input str, QName<'input>)> {
+    fn parse_self_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, _parse_context: &mut TParseContext, parent_context: &ParentContext<'input>, _facets: &Facets<'a>) -> Option<(&'input str, QName<'input>)> {
+        // TODO: use facets
         if input.len() == 0 {
             return None;
         }
@@ -214,7 +215,8 @@ impl<'input> fmt::Display for QName<'input> {
 pub struct AnyUri<'input>(pub &'input str);
 impl<'input> ParseXmlStr<'input> for AnyUri<'input> {
     const NODE_NAME: &'static str = "AnyUri";
-    fn parse_self_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &ParentContext<'input>, facets: &Facets<'a>) -> Option<(&'input str, AnyUri<'input>)> {
+    fn parse_self_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &ParentContext<'input>, _facets: &Facets<'a>) -> Option<(&'input str, AnyUri<'input>)> {
+        // TODO: use facets
         if input.len() == 0 {
             return None;
         }
@@ -411,7 +413,8 @@ pub struct AnySimpleType<'input>(pub &'input str);
 
 impl<'input> ParseXmlStr<'input> for AnySimpleType<'input> {
     const NODE_NAME: &'static str = "AnySimpleType";
-    fn parse_self_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &ParentContext<'input>, facets: &Facets<'a>) -> Option<(&'input str, AnySimpleType<'input>)> {
+    fn parse_self_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &ParentContext<'input>, _facets: &Facets<'a>) -> Option<(&'input str, AnySimpleType<'input>)> {
+        // TODO: use facets
         Some(("", AnySimpleType(input)))
     }
 }
@@ -448,7 +451,8 @@ impl<'input> ParseXmlStr<'input> for NcName<'input> {
 pub struct Boolean<'input>(bool, PhantomData<&'input ()>);
 impl<'input> ParseXmlStr<'input> for Boolean<'input> {
     const NODE_NAME: &'static str = "Boolean";
-    fn parse_self_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &ParentContext<'input>, facets: &Facets<'a>) -> Option<(&'input str, Boolean<'input>)> {
+    fn parse_self_xml_str<'a, TParseContext: ParseContext<'input>>(input: &'input str, _parse_context: &mut TParseContext, _parent_context: &ParentContext<'input>, _facets: &Facets<'a>) -> Option<(&'input str, Boolean<'input>)> {
+        // TODO: use facets
         if input.len() >= 1 {
             match &input[0..1] {
                 "0" => return Some((&input[1..], Boolean(false, PhantomData::default()))),
