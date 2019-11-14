@@ -3,36 +3,27 @@
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
+use asts;
+use attrs_bubble_up::Attrs;
 use names::{name_from_hint, FullName, NameGenerator, NameHint};
-use processor2::{RecursiveComplexType, RecursiveSimpleType};
-use support::Facets;
+use utils::Bottom;
 
-// TODO: Make this use &str so it can implement Copy, and spare clones later in the code
-#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ConcreteName(String, String);
+use asts::non_recursive::ComplexType as NRComplexType;
+use asts::non_recursive::ConcreteName;
+use asts::non_recursive::SimpleType as NRSimpleType;
+use asts::recursive::ComplexType as RComplexType;
+use asts::recursive::SimpleType as RSimpleType;
 
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ComplexType<'input> {
-    Any,
-    Empty,
-    Alias(ConcreteName),
-    Extension(ConcreteName, ConcreteName),
-    Restriction(ConcreteName, ConcreteName),
-    ElementRef(usize, usize, ConcreteName),
-    Element(usize, usize, FullName<'input>, ConcreteName),
-    GroupRef(usize, usize, ConcreteName),
-    Choice(usize, usize, Vec<ConcreteName>),
-    Sequence(usize, usize, Vec<ConcreteName>),
-    Simple(ConcreteName),
-}
+pub type InSimpleType<'input> = asts::recursive::SimpleType<'input>;
+pub type InComplexType<'input> =
+    asts::recursive::ComplexType<'input, Attrs<'input, InSimpleType<'input>>, Bottom>;
+pub type OutSimpleType<'input> = asts::non_recursive::SimpleType<'input>;
+pub type OutComplexType<'input> =
+    asts::non_recursive::ComplexType<'input, Attrs<'input, ConcreteName>, ComplexTypeExtra<'input>>;
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum SimpleType<'input> {
-    Alias(ConcreteName),
-    Restriction(ConcreteName, Facets<'input>),
-    List(ConcreteName),
-    Union(Vec<ConcreteName>),
-    Empty,
+pub enum ComplexTypeExtra<'input> {
+    GroupRef(usize, usize, FullName<'input>),
 }
 
 fn allocate_namespace<'a, 'input>(
@@ -52,8 +43,8 @@ pub struct NameAllocator<'input> {
     module_name_gen: NameGenerator,
     module_names: HashMap<Option<&'input str>, (String, NameGenerator)>, // namespace -> (mod_name, name_gen)
     fullname_to_concrete_name: HashMap<FullName<'input>, ConcreteName>,
-    complex_types: HashMap<ConcreteName, ComplexType<'input>>,
-    simple_types: HashMap<ConcreteName, SimpleType<'input>>,
+    complex_types: HashMap<ConcreteName, OutComplexType<'input>>,
+    simple_types: HashMap<ConcreteName, OutSimpleType<'input>>,
 }
 
 impl<'input> NameAllocator<'input> {
@@ -115,58 +106,60 @@ impl<'input> NameAllocator<'input> {
     pub fn allocate_complex_type(
         &mut self,
         namespace: Option<&'input str>,
-        recursive_complex_type: &RecursiveComplexType<'input>,
+        recursive_complex_type: &InComplexType<'input>,
     ) -> ConcreteName {
         let (concrete_name, ty) = match recursive_complex_type {
-            RecursiveComplexType::Any => {
-                (self.allocate_anonymous(namespace, "any"), ComplexType::Any)
-            }
-            RecursiveComplexType::Empty => (
-                self.allocate_anonymous(namespace, "empty"),
-                ComplexType::Empty,
+            RComplexType::Any => (
+                self.allocate_anonymous(namespace, "any"),
+                NRComplexType::Any,
             ),
-            RecursiveComplexType::Alias(fullname) => {
+            RComplexType::Empty => (
+                self.allocate_anonymous(namespace, "empty"),
+                NRComplexType::Empty,
+            ),
+            RComplexType::Alias(fullname) => {
                 let referee = self.allocate_fullname(*fullname);
-                (referee.clone(), ComplexType::Alias(referee))
+                (referee.clone(), NRComplexType::Alias(referee))
             }
-            RecursiveComplexType::Extension(base, inner) => {
+            RComplexType::Extension(base, inner) => {
                 let base = self.allocate_fullname(*base);
                 let inner = self.allocate_complex_type(namespace, inner);
                 (
                     self.allocate_anonymous_compound(namespace, "extension", &[&base, &inner]),
-                    ComplexType::Extension(base, inner),
+                    NRComplexType::Extension(base, inner),
                 )
             }
-            RecursiveComplexType::Restriction(base, inner) => {
+            RComplexType::Restriction(base, inner) => {
                 let base = self.allocate_fullname(*base);
                 let inner = self.allocate_complex_type(namespace, inner);
                 (
                     self.allocate_anonymous_compound(namespace, "restriction", &[&base, &inner]),
-                    ComplexType::Restriction(base, inner),
+                    NRComplexType::Restriction(base, inner),
                 )
             }
-            RecursiveComplexType::ElementRef(min_occurs, max_occurs, fullname) => {
+            RComplexType::ElementRef(min_occurs, max_occurs, fullname) => {
                 let referee = self.allocate_fullname(*fullname);
                 (
                     self.allocate_anonymous_compound(namespace, "elementref", &[&referee]),
-                    ComplexType::ElementRef(*min_occurs, *max_occurs, referee),
+                    NRComplexType::ElementRef(*min_occurs, *max_occurs, referee),
                 )
             }
-            RecursiveComplexType::Element(min_occurs, max_occurs, fullname, inner) => {
+            RComplexType::Element(min_occurs, max_occurs, fullname, attrs, inner) => {
                 let inner = self.allocate_complex_type(namespace, inner);
+                let attrs = self.allocate_attrs(namespace, attrs);
                 (
                     self.allocate_fullname(*fullname),
-                    ComplexType::Element(*min_occurs, *max_occurs, *fullname, inner),
+                    NRComplexType::Element(*min_occurs, *max_occurs, *fullname, attrs, inner),
                 )
             }
-            RecursiveComplexType::GroupRef(min_occurs, max_occurs, fullname) => {
+            RComplexType::GroupRef(min_occurs, max_occurs, fullname) => {
                 let referee = self.allocate_fullname(*fullname);
                 (
                     self.allocate_anonymous_compound(namespace, "groupref", &[&referee]),
-                    ComplexType::ElementRef(*min_occurs, *max_occurs, referee),
+                    NRComplexType::ElementRef(*min_occurs, *max_occurs, referee),
                 )
             }
-            RecursiveComplexType::Choice(min_occurs, max_occurs, inners) => {
+            RComplexType::Choice(min_occurs, max_occurs, inners) => {
                 let inners: Vec<_> = inners
                     .iter()
                     .map(|inner| self.allocate_complex_type(namespace, inner))
@@ -177,10 +170,10 @@ impl<'input> NameAllocator<'input> {
                         "choice",
                         &inners.iter().collect::<Vec<_>>(),
                     ),
-                    ComplexType::Choice(*min_occurs, *max_occurs, inners),
+                    NRComplexType::Choice(*min_occurs, *max_occurs, inners),
                 )
             }
-            RecursiveComplexType::Sequence(min_occurs, max_occurs, inners) => {
+            RComplexType::Sequence(min_occurs, max_occurs, inners) => {
                 let inners: Vec<_> = inners
                     .iter()
                     .map(|inner| self.allocate_complex_type(namespace, inner))
@@ -191,13 +184,14 @@ impl<'input> NameAllocator<'input> {
                         "sequence",
                         &inners.iter().collect::<Vec<_>>(),
                     ),
-                    ComplexType::Sequence(*min_occurs, *max_occurs, inners),
+                    NRComplexType::Sequence(*min_occurs, *max_occurs, inners),
                 )
             }
-            RecursiveComplexType::Simple(inner) => {
+            RComplexType::Simple(inner) => {
                 let inner = self.allocate_simple_type(namespace, inner);
-                (inner.clone(), ComplexType::Simple(inner))
+                (inner.clone(), NRComplexType::Simple(inner))
             }
+            RComplexType::Extra(_) => unreachable!("It's the bottom type!"),
         };
         let entry = self.complex_types.entry(concrete_name.clone());
         if let Entry::Occupied(_) = entry {
@@ -210,25 +204,25 @@ impl<'input> NameAllocator<'input> {
     pub fn allocate_simple_type(
         &mut self,
         namespace: Option<&'input str>,
-        recursive_simple_type: &RecursiveSimpleType<'input>,
+        recursive_simple_type: &InSimpleType<'input>,
     ) -> ConcreteName {
         let (concrete_name, ty) = match recursive_simple_type {
-            RecursiveSimpleType::Primitive(mod_name, type_name) => {
+            RSimpleType::Primitive(mod_name, type_name) => {
                 let concrete_name = ConcreteName(mod_name.to_string(), type_name.to_string());
-                (concrete_name.clone(), SimpleType::Alias(concrete_name))
+                (concrete_name.clone(), NRSimpleType::Alias(concrete_name))
             }
-            RecursiveSimpleType::Alias(fullname) => {
+            RSimpleType::Alias(fullname) => {
                 let referee = self.allocate_fullname(*fullname);
-                (referee.clone(), SimpleType::Alias(referee))
+                (referee.clone(), NRSimpleType::Alias(referee))
             }
-            RecursiveSimpleType::Restriction(base, facets) => {
+            RSimpleType::Restriction(base, facets) => {
                 let base = self.allocate_fullname(*base);
                 (
                     self.allocate_anonymous_compound(namespace, "simplerestriction", &[&base]),
-                    SimpleType::Restriction(base, facets.clone()),
+                    NRSimpleType::Restriction(base, facets.clone()),
                 )
             }
-            RecursiveSimpleType::Union(inners) => {
+            RSimpleType::Union(inners) => {
                 let inners: Vec<_> = inners
                     .iter()
                     .map(|inner| self.allocate_simple_type(namespace, inner))
@@ -239,23 +233,19 @@ impl<'input> NameAllocator<'input> {
                         "union",
                         &inners.iter().collect::<Vec<_>>(),
                     ),
-                    SimpleType::Union(inners),
+                    NRSimpleType::Union(inners),
                 )
             }
-            RecursiveSimpleType::List(inner) => {
+            RSimpleType::List(inner) => {
                 let inner = self.allocate_simple_type(namespace, inner);
                 (
-                    self.allocate_anonymous_compound(
-                        namespace,
-                        "list",
-                        &[&inner],
-                    ),
-                    SimpleType::List(inner),
+                    self.allocate_anonymous_compound(namespace, "list", &[&inner]),
+                    NRSimpleType::List(inner),
                 )
             }
-            RecursiveSimpleType::Empty => (
+            RSimpleType::Empty => (
                 self.allocate_anonymous(namespace, "empty"),
-                SimpleType::Empty,
+                NRSimpleType::Empty,
             ),
         };
 
@@ -265,5 +255,13 @@ impl<'input> NameAllocator<'input> {
         }
         entry.or_insert(ty);
         concrete_name
+    }
+
+    fn allocate_attrs(
+        &mut self,
+        _namespace: Option<&'input str>,
+        _attrs: &Attrs<'input, InSimpleType>,
+    ) -> Attrs<'input, ConcreteName> {
+        unimplemented!()
     }
 }
