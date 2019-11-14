@@ -14,9 +14,9 @@ use asts::non_recursive::SimpleType as NRSimpleType;
 use asts::recursive::ComplexType as RComplexType;
 use asts::recursive::SimpleType as RSimpleType;
 
-pub type InSimpleType<'input> = asts::recursive::SimpleType<'input>;
-pub type InComplexType<'input> =
-    asts::recursive::ComplexType<'input, Attrs<'input, InSimpleType<'input>>, Bottom>;
+use attrs_bubble_up::OutSimpleType as InSimpleType;
+use attrs_bubble_up::OutComplexType as InComplexType;
+
 pub type OutSimpleType<'input> = asts::non_recursive::SimpleType<'input>;
 pub type OutComplexType<'input> =
     asts::non_recursive::ComplexType<'input, Attrs<'input, ConcreteName>, ComplexTypeExtra<'input>>;
