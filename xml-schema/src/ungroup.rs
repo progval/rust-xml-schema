@@ -5,7 +5,8 @@ use asts;
 use asts::non_recursive::ComplexType as NRComplexType;
 use asts::non_recursive::ConcreteName;
 use asts::non_recursive::SimpleType as NRSimpleType;
-use attrs_bubble_up::Attrs;
+use attrs::with_refs::Attrs as InAttrs;
+use attrs::AttrUse;
 use names::FullName;
 use utils::Bottom;
 
@@ -16,6 +17,34 @@ use name_allocator::OutSimpleType as InSimpleType;
 pub type OutSimpleType<'input> = InSimpleType<'input>;
 pub type OutComplexType<'input> =
     asts::non_recursive::ComplexType<'input, Attrs<'input, ConcreteName>, Bottom>;
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Attrs<'input, TSimpleType: Clone> {
+    pub named: Vec<(FullName<'input>, AttrUse, Option<TSimpleType>)>,
+    pub refs: Vec<(Option<FullName<'input>>, AttrUse, FullName<'input>)>,
+    pub group_refs: Vec<FullName<'input>>,
+    pub any_attributes: bool,
+}
+
+impl<'input, TSimpleType> Attrs<'input, TSimpleType>
+where
+    TSimpleType: Clone,
+{
+    fn extend(&mut self, other: Attrs<'input, TSimpleType>) {
+        let Attrs {
+            named,
+            refs,
+            group_refs,
+            any_attributes,
+        } = other;
+        self.named.extend(named);
+        self.refs.extend(refs);
+        self.group_refs.extend(group_refs);
+        self.any_attributes |= any_attributes;
+    }
+}
+
+pub type OutAttrs<'input> = Attrs<'input, OutSimpleType<'input>>;
 
 pub fn ungroup_complex_type<'input>(
     _fullname_to_concrete_name: &HashMap<FullName<'input>, ConcreteName>,

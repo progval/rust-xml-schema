@@ -4,9 +4,8 @@ use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 
 use asts;
-use attrs_bubble_up::Attrs;
+use attrs::with_refs::Attrs;
 use names::{name_from_hint, FullName, NameGenerator, NameHint};
-use utils::Bottom;
 
 use asts::non_recursive::ComplexType as NRComplexType;
 use asts::non_recursive::ConcreteName;
@@ -14,12 +13,14 @@ use asts::non_recursive::SimpleType as NRSimpleType;
 use asts::recursive::ComplexType as RComplexType;
 use asts::recursive::SimpleType as RSimpleType;
 
-use attrs_bubble_up::OutSimpleType as InSimpleType;
-use attrs_bubble_up::OutComplexType as InComplexType;
+use lift_attrs::OutAttrs as InAttrs;
+use lift_attrs::OutComplexType as InComplexType;
+use lift_attrs::OutSimpleType as InSimpleType;
 
 pub type OutSimpleType<'input> = asts::non_recursive::SimpleType<'input>;
 pub type OutComplexType<'input> =
-    asts::non_recursive::ComplexType<'input, Attrs<'input, ConcreteName>, ComplexTypeExtra<'input>>;
+    asts::non_recursive::ComplexType<'input, OutAttrs<'input>, ComplexTypeExtra<'input>>;
+pub type OutAttrs<'input> = Attrs<'input, ConcreteName>;
 
 #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ComplexTypeExtra<'input> {
@@ -260,8 +261,8 @@ impl<'input> NameAllocator<'input> {
     fn allocate_attrs(
         &mut self,
         _namespace: Option<&'input str>,
-        _attrs: &Attrs<'input, InSimpleType>,
-    ) -> Attrs<'input, ConcreteName> {
+        _attrs: &InAttrs<'input>,
+    ) -> OutAttrs<'input> {
         unimplemented!()
     }
 }

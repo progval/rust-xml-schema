@@ -16,11 +16,12 @@ pub mod bigfloat;
 pub mod utils;
 
 pub mod asts;
+pub mod attrs;
 pub mod toplevel;
 pub mod processor2;
-pub mod attrs_bubble_up;
+pub mod lift_attrs;
 pub mod name_allocator;
-pub mod ungroup;
+//pub mod ungroup;
 //pub mod parser_generator2;
 
 pub mod parser;

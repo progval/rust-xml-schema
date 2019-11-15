@@ -6,6 +6,8 @@ use xmlparser::{TextUnescape, XmlSpace};
 
 use asts;
 use asts::recursive::{ComplexType, SimpleType};
+use attrs::with_refs::Attrs;
+use attrs::AttrUse;
 use names::FullName;
 use parser::*;
 use primitives::{AnyUri, NonNegativeInteger, QName};
@@ -52,46 +54,13 @@ impl<'input> ToString for Documentation<'input> {
     }
 }
 
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub enum AttrUse {
-    Prohibited,
-    Required,
-    Optional,
-}
-
-#[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Attrs<'input> {
-    pub named: Vec<(FullName<'input>, AttrUse, Option<OutSimpleType<'input>>)>,
-    pub refs: Vec<(Option<FullName<'input>>, AttrUse, FullName<'input>)>,
-    pub group_refs: Vec<FullName<'input>>,
-    pub any_attributes: bool,
-}
-impl<'input> Attrs<'input> {
-    pub fn new() -> Attrs<'input> {
-        Attrs {
-            named: Vec::new(),
-            refs: Vec::new(),
-            group_refs: Vec::new(),
-            any_attributes: false,
-        }
-    }
-    fn extend(&mut self, other: Attrs<'input>) {
-        let Attrs {
-            named,
-            refs,
-            group_refs,
-            any_attributes,
-        } = other;
-        self.named.extend(named);
-        self.refs.extend(refs);
-        self.group_refs.extend(group_refs);
-        self.any_attributes |= any_attributes;
-    }
-}
-
 pub type OutSimpleType<'input> = asts::recursive::SimpleType<'input>;
-pub type OutComplexType<'input> =
-    asts::recursive::ComplexType<'input, Attrs<'input>, ComplexTypeExtra<'input, Attrs<'input>>>;
+pub type OutComplexType<'input> = asts::recursive::ComplexType<
+    'input,
+    OutAttrs<'input>,
+    ComplexTypeExtra<'input, OutAttrs<'input>>,
+>;
+pub type OutAttrs<'input> = Attrs<'input, OutSimpleType<'input>>;
 
 /// Other possibilities for SimpleType that will be shaven off by
 /// other passes
@@ -112,7 +81,7 @@ pub struct SimpleToplevel<'input> {
     pub simple_types: HashMap<FullName<'input>, OutSimpleType<'input>>,
     pub complex_types: HashMap<FullName<'input>, OutComplexType<'input>>,
     pub groups: HashMap<FullName<'input>, OutComplexType<'input>>,
-    pub attribute_groups: HashMap<FullName<'input>, Attrs<'input>>,
+    pub attribute_groups: HashMap<FullName<'input>, OutAttrs<'input>>,
 }
 
 fn hashmap_map<K: Hash + Eq, V1, V2, F>(map: HashMap<K, V1>, mut mapper: F) -> HashMap<K, V2>
@@ -393,12 +362,12 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
     fn process_toplevel_attribute_group(
         &mut self,
         group: &'ast xs::AttributeGroup<'input>,
-    ) -> Attrs<'input> {
+    ) -> OutAttrs<'input> {
         self.process_attr_decls(&group.attr_decls)
     }
 
-    fn process_attr_decls(&mut self, attr_decls: &'ast xs::AttrDecls<'input>) -> Attrs<'input> {
-        let mut attrs = Attrs::new();
+    fn process_attr_decls(&mut self, attr_decls: &'ast xs::AttrDecls<'input>) -> OutAttrs<'input> {
+        let mut attrs = OutAttrs::new();
         for attr_decl in &attr_decls.attribute {
             match attr_decl {
                 enums::AttrOrAttrGroup::Attribute(e) => {
@@ -695,7 +664,7 @@ impl<'ast, 'input: 'ast> Processor<'ast, 'input> {
                 min_occurs,
                 max_occurs,
                 FullName::new(namespace, name),
-                Attrs::new(),
+                OutAttrs::new(),
                 Box::new(t),
             )
         }

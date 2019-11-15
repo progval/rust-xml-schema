@@ -28,7 +28,7 @@ pub mod non_recursive {
         Extra(TExtra),
     }
 
-    #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+    #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
     pub enum SimpleType<'input> {
         Alias(ConcreteName),
         Restriction(ConcreteName, Facets<'input>),
@@ -64,7 +64,7 @@ pub mod recursive {
         Simple(SimpleType<'input>),
     }
 
-    #[derive(Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+    #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
     pub enum SimpleType<'input> {
         Primitive(&'static str, &'static str),
         Alias(FullName<'input>),
