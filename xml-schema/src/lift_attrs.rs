@@ -60,10 +60,19 @@ impl<'input> AttrsLifter<'input> {
         self.outdated_complex_types.insert(name);
     }
 
+    pub fn transform_complex_type(
+        &mut self,
+        complex_type: &InComplexType<'input>,
+    ) -> (OutAttrs<'input>, OutComplexType<'input>) {
+        assert!(self.outdated_complex_types.is_empty(), "There are outdated complex types, make_transitive_closure() should be called before transform_complex_type().");
+        let (attrs, type_) = self.get_attrs_step(complex_type);
+        (attrs.unwrap_or(OutAttrs::new()), type_)
+    }
+
     pub fn make_transitive_closure(&mut self) {
         while let Some(&name) = self.outdated_complex_types.iter().next() {
             let complex_type = self.complex_types.get(&name).expect("Name {} was supposed to be updated, but it missing from AttrsLifter.complex_types.");
-            let attrs = self.get_attrs_step(complex_type);
+            let (attrs, _inner_type) = self.get_attrs_step(complex_type); // inner_type is discarded, what a waste
             if self.attrs_of_complex_type.get(&name) != attrs.as_ref() {
                 self.outdated_complex_types.insert(name);
                 let attrs = attrs.expect(
@@ -115,7 +124,15 @@ impl<'input> AttrsLifter<'input> {
         }
     }
 
-    fn get_attrs_step(&self, complex_type: &InComplexType<'input>) -> Option<OutAttrs<'input>> {
+    fn get_attrs_step(
+        &self,
+        complex_type: &InComplexType<'input>,
+    ) -> (Option<OutAttrs<'input>>, OutComplexType<'input>) {
+        // TODO: this function is called by make_transitive_closure, which discards the
+        // OutComplexType; this means this function is doing useless computation when it's not
+        // called by transform_complex_type.
+        // On the other hand, keeping that computation here avoids duplicating this function's code
+        // for computing OutAttrs.
         let merge_attrs = |attrs1: Option<&OutAttrs<'input>>, attrs2| match (attrs1, attrs2) {
             (None, attrs2) => attrs2,
             (Some(attrs1), None) => Some(attrs1.clone()),
@@ -126,55 +143,120 @@ impl<'input> AttrsLifter<'input> {
             }
         };
         match complex_type {
-            RComplexType::Any => None,
-            RComplexType::Empty => None,
-            RComplexType::Alias(fullname) => self.attrs_of_complex_type.get(fullname).cloned(),
-
-            RComplexType::Extension(base, inner) => merge_attrs(
-                self.attrs_of_complex_type.get(base),
-                self.get_attrs_step(inner),
+            RComplexType::Any => (None, RComplexType::Any),
+            RComplexType::Empty => (None, RComplexType::Any),
+            RComplexType::Alias(fullname) => (
+                self.attrs_of_complex_type.get(fullname).cloned(),
+                RComplexType::Alias(*fullname),
             ),
+
+            RComplexType::Extension(base, inner) => {
+                let (inner_attrs, inner_type) = self.get_attrs_step(inner);
+                (
+                    merge_attrs(self.attrs_of_complex_type.get(base), inner_attrs),
+                    RComplexType::Extension(*base, Box::new(inner_type)),
+                )
+            }
             RComplexType::Restriction(base, inner) => {
+                let (inner_attrs, inner_type) = self.get_attrs_step(inner);
                 // Attributes are inherited from the base:
                 // "However, attribute declarations do not need to be repeated in the derived type definition"
                 // https://www.w3.org/TR/xmlschema-0/#DerivByRestrict
-                merge_attrs(
-                    self.attrs_of_complex_type.get(base),
-                    self.get_attrs_step(inner),
+                (
+                    merge_attrs(self.attrs_of_complex_type.get(base), inner_attrs),
+                    RComplexType::Restriction(*base, Box::new(inner_type)),
                 )
             }
-            RComplexType::ElementRef(_min_occurs, _max_occurs, _fullname) => None,
+            RComplexType::ElementRef(min_occurs, max_occurs, fullname) => (
+                None,
+                RComplexType::ElementRef(*min_occurs, *max_occurs, *fullname),
+            ),
 
-            RComplexType::Choice(_min_occurs, _max_occurs, inners)
-            | RComplexType::Sequence(_min_occurs, _max_occurs, inners) => {
-                for inner in inners {
-                    if self.get_attrs_step(inner).is_some() {
+            RComplexType::Choice(min_occurs, max_occurs, inners) => {
+                let inners: Vec<_> = inners
+                    .iter()
+                    .map(|inner| self.get_attrs_step(inner))
+                    .collect();
+                for (inner_attrs, _inner_type) in inners.iter() {
+                    if inner_attrs.is_some() {
                         unimplemented!(
-                            "Sequence/choice got attribute declaration. \
+                            "Choice got attribute declaration. \
                              I don't know what to do with that."
                         );
                     }
                 }
-                None
+                (
+                    None,
+                    RComplexType::Choice(
+                        *min_occurs,
+                        *max_occurs,
+                        inners
+                            .into_iter()
+                            .map(|(_inner_attr, inner_type)| inner_type)
+                            .collect(),
+                    ),
+                )
             }
-            RComplexType::Simple(_simple_type) => None,
+            RComplexType::Sequence(min_occurs, max_occurs, inners) => {
+                let inners: Vec<_> = inners
+                    .iter()
+                    .map(|inner| self.get_attrs_step(inner))
+                    .collect();
+                for (inner_attrs, _inner_type) in inners.iter() {
+                    if inner_attrs.is_some() {
+                        unimplemented!(
+                            "Sequence got attribute declaration. \
+                             I don't know what to do with that."
+                        );
+                    }
+                }
+                (
+                    None,
+                    RComplexType::Sequence(
+                        *min_occurs,
+                        *max_occurs,
+                        inners
+                            .into_iter()
+                            .map(|(_inner_attr, inner_type)| inner_type)
+                            .collect(),
+                    ),
+                )
+            }
+            RComplexType::Simple(simple_type) => (None, RComplexType::Simple(simple_type.clone())),
 
-            RComplexType::Element(_min_occurs, _max_occurs, _fullname, _attrs, _inner) => {
+            RComplexType::Element(min_occurs, max_occurs, fullname, attrs, inner) => {
+                let mut attrs = attrs.clone();
+                let (inner_attrs, inner_type) = self.get_attrs_step(inner);
+                if let Some(inner_attrs) = inner_attrs {
+                    attrs.extend(inner_attrs)
+                };
                 // Elements capture the attrs for themselves and don't pass any up
-                None
+                (
+                    None,
+                    RComplexType::Element(
+                        *min_occurs,
+                        *max_occurs,
+                        *fullname,
+                        attrs,
+                        Box::new(inner_type),
+                    ),
+                )
             }
-            RComplexType::GroupRef(_min_occurs, _max_occurs, fullname) => {
-                self.attrs_of_complex_type.get(fullname).cloned()
-            }
+            RComplexType::GroupRef(min_occurs, max_occurs, fullname) => (
+                self.attrs_of_complex_type.get(fullname).cloned(),
+                RComplexType::GroupRef(*min_occurs, *max_occurs, *fullname),
+            ),
             RComplexType::Extra(InComplexTypeExtra::AttrDecl(attrs, inner)) => {
-                match self.get_attrs_step(inner) {
+                let (inner_attrs, inner_type) = self.get_attrs_step(inner);
+                let attrs = match inner_attrs {
                     Some(inner_attrs) => {
                         let mut attrs = attrs.clone();
                         attrs.extend(inner_attrs);
-                        Some(attrs)
+                        attrs
                     }
-                    None => Some(attrs.clone()),
-                }
+                    None => attrs.clone(),
+                };
+                (Some(attrs), inner_type)
             }
         }
     }
